@@ -1,27 +1,24 @@
 import 'dart:convert';
 
-import 'global_cache.dart';
+import 'package:cached_query/src/models/query_state.dart';
 
-enum QueryStatus { fetching, success, error, inital }
+import 'global_cache.dart';
 
 class Query<T> {
   final dynamic key;
   final Future<T> Function() queryFn;
   final GlobalCache _globalCache = GlobalCache.instance;
   List<Object> subscribers = [];
-  T? _data;
-  QueryStatus status = QueryStatus.inital;
-  bool isFetching = false;
-  DateTime timeCreated;
+  QueryState<T> _queryState = QueryState<T>(timeCreated: DateTime.now());
+
+  final Duration _staleTime;
   Future<void>? currentFuture;
 
   Query({
     required this.queryFn,
-    required this.timeCreated,
     required this.key,
-  });
-
-  T? get data => _data;
+    Duration? staleTime,
+  }) : _staleTime = staleTime ?? const Duration(seconds: 30);
 
   void Function() subscribe(subscriber) {
     if (!subscribers.contains(subscriber)) {
@@ -41,6 +38,31 @@ class Query<T> {
     _globalCache.invalidateCache(queryHash: queryHash);
   }
 
+  Future<T> getResult() async {
+    // if data is not stale
+    if (_queryState.data != null &&
+        (_staleTime == Duration.zero ||
+            _queryState.timeCreated.add(_staleTime).isAfter(DateTime.now()))) {
+      return _queryState.data!;
+    }
+    await fetch();
+    // todo handle error
+    return _queryState.data!;
+  }
+
+  Stream<QueryState<T>> streamResult() async* {
+    // if data is not stale just return it
+    if (_queryState.timeCreated.add(_staleTime).isAfter(DateTime.now()) &&
+        _queryState.data != null) {
+      yield _queryState;
+    } else {
+      yield _queryState.copyWith(
+          status: QueryStatus.fetching, isFetching: true);
+      await fetch();
+      yield _queryState;
+    }
+  }
+
   Future<void> fetch() {
     if (currentFuture != null) return currentFuture!;
     currentFuture = _fetchQuery();
@@ -49,19 +71,21 @@ class Query<T> {
 
   Future<void> _fetchQuery() async {
     try {
-      status = QueryStatus.fetching;
-      isFetching = true;
+      if (!_queryState.isFetching) {
+        _queryState = _queryState.copyWith(
+            status: QueryStatus.fetching, isFetching: true);
+      }
 
       final res = await queryFn();
 
-      _data = res;
-      status = QueryStatus.success;
+      _queryState = _queryState.copyWith(
+          data: res, timeCreated: DateTime.now(), status: QueryStatus.success);
     } catch (e) {
-      status = QueryStatus.error;
+      _queryState = _queryState.copyWith(status: QueryStatus.error);
       rethrow;
     } finally {
       currentFuture = null;
-      isFetching = false;
+      _queryState = _queryState.copyWith(isFetching: false);
     }
   }
 }

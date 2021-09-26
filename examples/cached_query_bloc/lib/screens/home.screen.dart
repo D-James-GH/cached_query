@@ -9,11 +9,12 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('posts'),
+        title: const Text('posts'),
         actions: [
           IconButton(
-            icon: Icon(Icons.arrow_right_alt),
-            onPressed: () => Navigator.pushNamed(context, JokeScreen.routeName),
+            icon: const Icon(Icons.arrow_right_alt),
+            onPressed: () =>
+                Navigator.pushReplacementNamed(context, JokeScreen.routeName),
           )
         ],
       ),

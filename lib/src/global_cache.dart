@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_query/src/query.dart';
 
-import 'models/cached_object.dart';
+import 'models/query_state.dart';
 
 class GlobalCache {
   GlobalCache._();
@@ -11,20 +11,23 @@ class GlobalCache {
   ///map to store requests
   Map<String, Query<dynamic>> _cache = {};
 
-  Query<dynamic> getQuery<T>(
-      {required dynamic key, required Future<T> Function() queryFn}) {
+  Query<T> getQuery<T>(
+      {required dynamic key,
+      required Future<T> Function() queryFn,
+      Duration? staleTime,
+      Duration? cacheTime}) {
     final queryHash = jsonEncode(key);
     var query = _cache[queryHash];
 
     if (query == null) {
       query = Query<T>(
         key: key,
+        staleTime: staleTime,
         queryFn: queryFn,
-        timeCreated: DateTime.now(),
       );
       _cache[queryHash] = query;
     }
-    return query;
+    return query as Query<T>;
   }
 
   /// Invalidate cache, if no key is passed it will invalidate the whole cache

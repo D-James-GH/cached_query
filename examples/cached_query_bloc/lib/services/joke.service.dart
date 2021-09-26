@@ -8,7 +8,8 @@ class JokeService {
     final res = await client.get(Uri.parse("https://icanhazdadjoke.com/"),
         headers: {"Accept": "application/json"});
     if (res.statusCode == 200) {
-      return jsonDecode(res.body);
+      return Future.delayed(
+          const Duration(milliseconds: 400), () => jsonDecode(res.body));
     } else {
       throw Exception();
     }

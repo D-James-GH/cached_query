@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
               child: const HomeScreen(),
             ),
         JokeScreen.routeName: (_) => BlocProvider(
-              create: (_) => JokeBloc(),
+              create: (_) => JokeBloc()..add(JokeFetched()),
               child: const JokeScreen(),
             ),
       },
