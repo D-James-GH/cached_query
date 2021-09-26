@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'home.screen.dart';
 
-class ScreenTwo extends StatelessWidget {
+class JokeScreen extends StatelessWidget {
   static const routeName = '/screenTwo';
-  const ScreenTwo({Key? key}) : super(key: key);
+  const JokeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

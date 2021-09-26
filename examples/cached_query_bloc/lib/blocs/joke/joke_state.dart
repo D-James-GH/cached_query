@@ -1,6 +1,11 @@
 part of 'joke_bloc.dart';
 
-@immutable
-abstract class JokeState {}
+enum JokeStatus { loading, success, initial, error }
 
-class JokeInitial extends JokeState {}
+@freezed
+class JokeState with _$JokeState {
+  const factory JokeState({
+    @Default(JokeStatus.initial) JokeStatus status,
+    JokeModel? joke,
+  }) = _JokeState;
+}

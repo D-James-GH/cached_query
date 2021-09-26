@@ -1,57 +1,48 @@
+import 'package:cached_query/src/global_cache.dart';
+import './query.dart';
+
+import 'models/cached_object.dart';
+
 /// Memory cache for api requests. Includes a default time out of 1 hour.
 class CachedRepository {
-  final Duration defaultCacheDuration;
+  final Duration defaultStaleDuration;
+  final Subscriber _subscriberKey = Subscriber();
+  final GlobalCache _globalCache = GlobalCache.instance;
+  final List<void Function()> subscriberFunctions = [];
 
-  CachedRepository({this.defaultCacheDuration = const Duration(hours: 1)});
-
-  ///map to store requests
-  Map<String, CachedObject<dynamic>> cache = {};
+  CachedRepository({this.defaultStaleDuration = const Duration(hours: 1)});
 
   /// cached request
+  /// Will simply return the response to the [queryFn] and throw/rethrow if an
+  /// error occurs. For more complicated queries with state and background
+  /// fetching use [queryStream]
   Future<T> query<T>({
     required String key,
     required Future<T> Function() queryFn,
-    Duration? cacheDuration,
+    Duration? staleDuration,
   }) async {
-    cacheDuration ??= defaultCacheDuration;
+    staleDuration ??= defaultStaleDuration;
+    final query = _globalCache.getQuery<T>(key: key, queryFn: queryFn);
 
-    CachedObject<dynamic>? cachedEntry = cache[key];
-    // check if the data is in the cache
-    if (cachedEntry != null) {
-      // if the cache has data, make sure it is not stale
-      if (cachedEntry.timeCreated.add(cacheDuration).isAfter(DateTime.now())) {
-        return cachedEntry.data as T;
-      } else {
-        // if the data is stale invalidate the key and continue to fetch new data
-        invalidateCache(key: key);
-      }
-    }
-    cache[key] =
-        CachedObject<T>(data: await queryFn(), timeCreated: DateTime.now());
-    return cache[key]!.data as T;
+    // Subscribing returns a function to unsubscribe from the query.
+    // store them in an array so that we can easily unsubscribe from querys
+    // in the dispose method
+    subscriberFunctions.add(query.subscribe(_subscriberKey));
+
+    await query.fetch();
+
+    return query.data;
   }
+
+  /// query stream
+
+  /// infinite query
 
   /// cached mutation
 
-  /// Invalidate cache, if no key is passed it will invalidate the whole cache
-  void invalidateCache({String? key}) {
-    if (key != null) {
-      if (cache.containsKey(key)) {
-        cache.remove(key);
-      }
-    } else {
-      // other wise invalidate the whole cache
-      cache = {};
+  void dispose() {
+    for (var unsubscribe in subscriberFunctions) {
+      unsubscribe();
     }
   }
-}
-
-class CachedObject<T> {
-  T data;
-  DateTime timeCreated;
-
-  CachedObject({
-    required this.data,
-    required this.timeCreated,
-  });
 }
