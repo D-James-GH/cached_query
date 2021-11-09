@@ -2,14 +2,20 @@ import 'package:cached_query/cached_query.dart';
 import 'package:examples/models/joke.model.dart';
 import 'package:examples/services/joke.service.dart';
 
-class JokeRepository extends CachedRepository {
+class JokeRepository extends CachedQuery {
   final _service = JokeService();
 
-  Stream<QueryState<JokeModel>> getJoke() {
+  Stream<Query<JokeModel>> getJoke() {
     return queryStream(
       key: 'joke',
       queryFn: () async => JokeModel.fromJson(await _service.getJoke()),
-      staleTime: Duration.zero,
+    );
+  }
+
+  Future<Query<JokeModel?>> getJokeFuture() {
+    return query(
+      key: 'joke',
+      queryFn: () async => JokeModel.fromJson(await _service.getJoke()),
     );
   }
 }

@@ -1,13 +1,13 @@
-part of 'post_bloc.dart';
+part of 'post_stream_bloc.dart';
 
 enum PostStatus { loading, initial, success }
 
-class PostState extends Equatable {
+class PostStreamState extends Equatable {
   final PostStatus status;
   final List<PostModel>? posts;
   final bool hasReachedMax;
 
-  const PostState(
+  const PostStreamState(
       {this.status = PostStatus.initial,
       this.posts,
       this.hasReachedMax = false});
@@ -15,12 +15,12 @@ class PostState extends Equatable {
   @override
   List<Object?> get props => [posts, status, hasReachedMax];
 
-  PostState copyWith({
+  PostStreamState copyWith({
     PostStatus? status,
     List<PostModel>? posts,
     bool? hasReachedMax,
   }) {
-    return PostState(
+    return PostStreamState(
       status: status ?? this.status,
       posts: posts ?? this.posts,
       hasReachedMax: hasReachedMax ?? this.hasReachedMax,

@@ -2,7 +2,7 @@ import 'package:examples/blocs/joke/joke_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'home.screen.dart';
+import 'post_list.screen.dart';
 
 class JokeScreen extends StatelessWidget {
   static const routeName = '/screenTwo';
@@ -16,8 +16,8 @@ class JokeScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_right_alt),
-            onPressed: () =>
-                Navigator.pushReplacementNamed(context, HomeScreen.routeName),
+            onPressed: () => Navigator.pushReplacementNamed(
+                context, PostListScreen.routeName),
           )
         ],
       ),
