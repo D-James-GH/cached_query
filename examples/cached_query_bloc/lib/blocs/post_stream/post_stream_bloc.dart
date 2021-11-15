@@ -6,7 +6,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:cached_query/cached_query.dart';
 import 'package:equatable/equatable.dart';
-import 'package:examples/models/post.model.dart';
+import 'package:examples/models/post_model.dart';
 import 'package:meta/meta.dart';
 
 part 'post_stream_event.dart';
@@ -18,28 +18,28 @@ class PostStreamBloc extends Bloc<PostStreamEvent, PostStreamState> {
   StreamSubscription<InfiniteQuery<PostModel>>? _subscription;
 
   PostStreamBloc() : super(const PostStreamState()) {
-    on<PostsStreamFetched>(_onPostsFetched);
     on<PostsStreamNextPage>(_onPostsNextPage,
         transformer: throttleDroppable(const Duration(milliseconds: 300)));
     on<PostStreamCreated>(_onPostCreated);
     on<PostStreamUpdated>(_onPostStreamUpdated);
+    init();
   }
-
-  FutureOr<void> _onPostStreamUpdated(
-      PostStreamUpdated event, Emitter<PostStreamState> emit) {
-    emit(
-        state.copyWith(posts: event.posts, hasReachedMax: event.hasReachedMax));
-  }
-
-  FutureOr<void> _onPostsFetched(
-      PostsStreamFetched event, Emitter<PostStreamState> emit) async {
-    final result = await _repo.getPosts();
-    _subscription = result.getStream().listen((query) {
+  void init() async {
+    _infiniteQuery = await _repo.getPosts(listener: (query) {
       add(PostStreamUpdated(
           posts: query.data ?? [],
           hasReachedMax: query.hasReachedMax,
           isFetching: query.isFetching));
     });
+  }
+
+  FutureOr<void> _onPostStreamUpdated(
+      PostStreamUpdated event, Emitter<PostStreamState> emit) {
+    emit(state.copyWith(
+      posts: event.posts,
+      hasReachedMax: event.hasReachedMax,
+      status: event.isFetching ? PostStatus.loading : PostStatus.success,
+    ));
   }
 
   void _onPostsNextPage(_, __) {

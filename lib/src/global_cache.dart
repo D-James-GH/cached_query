@@ -1,12 +1,16 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:cached_query/src/query_manager.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../cached_query.dart';
 import 'infinite_query_manager.dart';
+import 'models/default_query_options.dart';
 
 class GlobalCache {
   GlobalCache._();
+  final defaultQueryOptions = const DefaultQueryOptions();
   static final GlobalCache instance = GlobalCache._();
 
   @visibleForTesting
@@ -20,6 +24,9 @@ class GlobalCache {
   // map to store infinite query's
   Map<String, InfiniteQueryManager<dynamic>> _infiniteQueryCache = {};
 
+  // map to store any global listeners
+  final Map<String, StreamSubscription<dynamic>> _subscriptions = {};
+
   /// [getQuery] either gets an existing query with the right [key]. Or it creates
   /// a new query.
   QueryManager<T> getQuery<T>({
@@ -29,6 +36,7 @@ class GlobalCache {
     Duration? cacheTime,
     bool ignoreCacheTime = false,
     bool ignoreStaleTime = false,
+    void Function(Query<T>)? listener,
   }) {
     final queryHash = jsonEncode(key);
     var query = _queryCache[queryHash];
@@ -37,11 +45,15 @@ class GlobalCache {
       query = QueryManager<T>(
         queryHash: queryHash,
         key: key,
-        staleTime: staleTime,
-        cacheTime: cacheTime,
+        staleTime: staleTime ?? defaultQueryOptions.staleTime,
+        cacheTime: cacheTime ?? defaultQueryOptions.cacheTime,
         queryFn: queryFn,
       );
       _queryCache[queryHash] = query;
+    }
+    if (listener != null) {
+      _subscriptions[queryHash] =
+          (query as QueryManager<T>).state.stream.listen(listener);
     }
     return query as QueryManager<T>;
   }
@@ -50,11 +62,10 @@ class GlobalCache {
     required dynamic key,
     required int initialPage,
     required Future<List<T>> Function(int) queryFn,
-    required Duration staleTime,
-    required Duration cacheTime,
-
-    /// Supply a list of pages to fetch when the first query is called
+    Duration? staleTime,
+    Duration? cacheTime,
     List<int>? prefetchPages,
+    void Function(InfiniteQuery<T>)? listener,
   }) {
     final queryHash = jsonEncode(key);
 
@@ -64,14 +75,21 @@ class GlobalCache {
     if (infiniteQuery == null) {
       infiniteQuery = InfiniteQueryManager<T>(
         queryFn: queryFn,
-        cacheTime: cacheTime,
-        staleTime: staleTime,
+        staleTime: staleTime ?? defaultQueryOptions.staleTime,
+        cacheTime: cacheTime ?? defaultQueryOptions.cacheTime,
         key: queryHash,
         initialPage: initialPage,
       );
-
       _infiniteQueryCache[queryHash] = infiniteQuery;
     }
+
+    if (listener != null) {
+      _subscriptions[queryHash] = (infiniteQuery as InfiniteQueryManager<T>)
+          .state
+          .stream
+          .listen(listener);
+    }
+
     if (prefetchPages != null) {
       infiniteQuery.preFetchPages(prefetchPages);
     }

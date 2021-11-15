@@ -43,8 +43,6 @@ abstract class $JokeStateCopyWith<$Res> {
   factory $JokeStateCopyWith(JokeState value, $Res Function(JokeState) then) =
       _$JokeStateCopyWithImpl<$Res>;
   $Res call({JokeStatus status, JokeModel? joke});
-
-  $JokeModelCopyWith<$Res>? get joke;
 }
 
 /// @nodoc
@@ -71,17 +69,6 @@ class _$JokeStateCopyWithImpl<$Res> implements $JokeStateCopyWith<$Res> {
               as JokeModel?,
     ));
   }
-
-  @override
-  $JokeModelCopyWith<$Res>? get joke {
-    if (_value.joke == null) {
-      return null;
-    }
-
-    return $JokeModelCopyWith<$Res>(_value.joke!, (value) {
-      return _then(_value.copyWith(joke: value));
-    });
-  }
 }
 
 /// @nodoc
@@ -91,9 +78,6 @@ abstract class _$JokeStateCopyWith<$Res> implements $JokeStateCopyWith<$Res> {
       __$JokeStateCopyWithImpl<$Res>;
   @override
   $Res call({JokeStatus status, JokeModel? joke});
-
-  @override
-  $JokeModelCopyWith<$Res>? get joke;
 }
 
 /// @nodoc

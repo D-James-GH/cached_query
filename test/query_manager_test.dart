@@ -10,6 +10,7 @@ main() {
       queryFn: () async => "test query",
       key: 'testKey',
       cacheTime: const Duration(seconds: 30),
+      staleTime: const Duration(seconds: 5),
       queryHash: jsonEncode('testKey'),
     );
   });

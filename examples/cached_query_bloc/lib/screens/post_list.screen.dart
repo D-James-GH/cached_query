@@ -1,5 +1,5 @@
 import 'package:examples/blocs/post_stream/post_stream_bloc.dart';
-import 'package:examples/models/post.model.dart';
+import 'package:examples/models/post_model.dart';
 import 'package:examples/screens/joke.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -6,7 +6,7 @@ import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:cached_query/cached_query.dart';
 import 'package:equatable/equatable.dart';
-import 'package:examples/models/post.model.dart';
+import 'package:examples/models/post_model.dart';
 import 'package:meta/meta.dart';
 
 part 'post_event.dart';

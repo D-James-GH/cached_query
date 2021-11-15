@@ -1,16 +1,21 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:examples/models/post.model.dart';
+import 'package:examples/models/post_model.dart';
 import 'package:examples/services/post.service.dart';
 
 class PostRepository extends CachedQuery {
   final _service = PostService();
 
-  Future<InfiniteQuery<PostModel>> getPosts(
-      {int initialPage = 1, int limit = 20}) async {
-    return await infiniteQuery<PostModel>(
+  Future<InfiniteQuery<PostModel>> getPosts({
+    int initialPage = 1,
+    int limit = 20,
+    void Function(InfiniteQuery<PostModel>)? listener,
+  }) {
+    return infiniteQuery<PostModel>(
       key: 'posts',
       queryFn: (page) async => PostModel.listFromJson(
           await _service.getPosts(page: page, limit: limit)),
+      // staleTime: const Duration(seconds: 5),
+      listener: listener,
     );
   }
 
@@ -26,12 +31,12 @@ class PostRepository extends CachedQuery {
   Future<List<PostModel>> createPost(PostModel post) async {
     await mutation<PostModel, PostModel>(
       key: ['posts', post.id],
-      queryFn: (p) async {
+      arg: post,
+      queryFn: (post) async {
         final res = await _service.createPost(
-            title: p!.title, userId: p.userId, body: p.body);
+            title: post!.title, userId: post.userId, body: post.body);
         return PostModel.fromJson(res);
       },
-      arg: post,
       onSuccess: (args, newPost) {
         updateInfiniteQuery<PostModel>(
             key: "posts", updateFn: (old) => [newPost, ...?old]);

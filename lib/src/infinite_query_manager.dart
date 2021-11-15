@@ -32,7 +32,7 @@ class InfiniteQueryManager<T> {
   })  : currentPage = initialPage,
         queryKeys = [key + initialPage.toString()] {
     _state = InfiniteQuery(
-      getStream: createStream,
+      createStream: createStream,
       currentPage: initialPage,
       getNextPage: _getNextPage,
       timeCreated: DateTime.now(),
@@ -46,6 +46,7 @@ class InfiniteQueryManager<T> {
         _state.data != null &&
         _state.data!.isNotEmpty == true &&
         _state.timeCreated.add(staleTime).isAfter(DateTime.now())) {
+      _streamController?.add(_state);
       return _state;
     }
 
@@ -57,6 +58,7 @@ class InfiniteQueryManager<T> {
       return _state;
     }
     await _getAllQueryResult();
+    _streamController?.add(_state);
     return _state;
   }
 
@@ -130,7 +132,6 @@ class InfiniteQueryManager<T> {
       isFetching: false,
       status: QueryStatus.success,
     );
-    _streamController?.add(_state);
   }
 
   /// [_getQuery] gets a single query from the global cache

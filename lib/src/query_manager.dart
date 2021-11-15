@@ -33,11 +33,10 @@ class QueryManager<T> {
     required this.key,
     this.ignoreStaleTime = false,
     this.ignoreCacheTime = false,
-    Duration? staleTime,
-    Duration? cacheTime,
-  })  : staleTime = staleTime ?? const Duration(seconds: 30),
-        cacheTime = cacheTime ?? const Duration(minutes: 5) {
-    _state = Query<T>(timeCreated: DateTime.now(), getStream: listen);
+    required this.staleTime,
+    required this.cacheTime,
+  }) {
+    _state = Query<T>(timeCreated: DateTime.now(), createStream: createStream);
   }
 
   /// returns the result of the [queryFn], either from cache or calling directly
@@ -58,7 +57,7 @@ class QueryManager<T> {
   /// creates an async generator which will yield the result of [queryFn] and
   /// call it again in the background if the current data is stale.
   /// Completes after any background fetches are complete
-  Stream<Query<T>> streamResult() async* {
+  Stream<Query<T>> streamResult({bool forceRefetch = false}) async* {
     // if data is not stale just return it
     if (!stale &&
         _state.data != null &&
@@ -77,7 +76,7 @@ class QueryManager<T> {
 
   /// creates a [StreamController] that will update whenever the [Query] state
   /// changes.
-  Stream<Query<T>> listen() {
+  Stream<Query<T>> createStream() {
     if (_streamController != null) {
       return _streamController!.stream;
     }

@@ -3,11 +3,6 @@ part of 'post_stream_bloc.dart';
 @immutable
 abstract class PostStreamEvent extends Equatable {}
 
-class PostsStreamFetched extends PostStreamEvent {
-  @override
-  List<Object?> get props => [];
-}
-
 class PostStreamUpdated extends PostStreamEvent {
   final List<PostModel> posts;
   final bool hasReachedMax;

@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         PostListScreen.routeName: (_) => BlocProvider(
-              create: (_) => PostStreamBloc()..add(PostsStreamFetched()),
+              create: (_) => PostStreamBloc(),
               child: const PostListScreen(),
             ),
         JokeScreen.routeName: (_) => BlocProvider(

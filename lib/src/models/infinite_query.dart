@@ -8,18 +8,19 @@ class InfiniteQuery<T> {
   final QueryStatus? status;
   final bool isFetching;
   final DateTime timeCreated;
-  final Stream<InfiniteQuery<T>> Function() getStream;
+  final Stream<InfiniteQuery<T>> Function() _stream;
+  Stream<InfiniteQuery<T>> get stream => _stream();
 
   const InfiniteQuery({
     this.hasReachedMax = false,
     this.data,
     this.status = QueryStatus.initial,
     this.isFetching = false,
-    required this.getStream,
     required this.timeCreated,
     required this.currentPage,
     required this.getNextPage,
-  });
+    required Stream<InfiniteQuery<T>> Function() createStream,
+  }) : _stream = createStream;
 
   InfiniteQuery<T> copyWith({
     List<T>? data,
@@ -36,7 +37,7 @@ class InfiniteQuery<T> {
       status: status ?? this.status,
       currentPage: currentPage,
       timeCreated: timeCreated ?? this.timeCreated,
-      getStream: getStream,
+      createStream: _stream,
     );
   }
 }

@@ -5,15 +5,16 @@ class Query<T> {
   final DateTime timeCreated;
   final QueryStatus status;
   final bool isFetching;
-  final Stream<Query<T>> Function() getStream;
+  final Stream<Query<T>> Function() _stream;
+  Stream<Query<T>> get stream => _stream();
 
   const Query({
-    required this.getStream,
+    required Stream<Query<T>> Function() createStream,
     this.data,
     required this.timeCreated,
     this.status = QueryStatus.initial,
     this.isFetching = false,
-  });
+  }) : _stream = createStream;
 
   Query<T> copyWith({
     T? data,
@@ -26,7 +27,7 @@ class Query<T> {
       timeCreated: timeCreated ?? this.timeCreated,
       status: status ?? this.status,
       isFetching: isFetching ?? this.isFetching,
-      getStream: getStream,
+      createStream: _stream,
     );
   }
 }

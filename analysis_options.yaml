@@ -19,6 +19,8 @@ linter:
   rules:
     cancel_subscriptions: true
     avoid_print: true
+    package_api_docs: true
+    sort_child_properties_last: true
 #    overridden_fields: true
     unawaited_futures: true
 #    below are rules turned off from the flutter lints package
