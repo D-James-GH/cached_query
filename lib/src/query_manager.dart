@@ -36,7 +36,7 @@ class QueryManager<T> {
     required this.staleTime,
     required this.cacheTime,
   }) {
-    _state = Query<T>(timeCreated: DateTime.now(), createStream: createStream);
+    _state = Query<T>(timeCreated: DateTime.now());
   }
 
   /// returns the result of the [queryFn], either from cache or calling directly

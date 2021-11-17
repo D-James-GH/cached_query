@@ -231,6 +231,7 @@ class CachedQuery {
       rethrow;
     }
   }
+
   // Utility methods ===========================================================
 
   /// get the result of an existing query
@@ -273,7 +274,7 @@ class CachedQuery {
     _globalCache.invalidateCache(key: key);
   }
 
-  void dispose() {
+  void close() {
     for (var unsubscribe in _subscriberFunctions) {
       unsubscribe();
     }

@@ -53,7 +53,7 @@ class GlobalCache {
     }
     if (listener != null) {
       _subscriptions[queryHash] =
-          (query as QueryManager<T>).state.stream.listen(listener);
+          (query as QueryManager<T>).createStream().listen(listener);
     }
     return query as QueryManager<T>;
   }

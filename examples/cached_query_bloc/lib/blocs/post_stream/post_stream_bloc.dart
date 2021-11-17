@@ -59,7 +59,7 @@ class PostStreamBloc extends Bloc<PostStreamEvent, PostStreamState> {
   @override
   Future<void> close() {
     _subscription?.cancel();
-    _repo.dispose();
+    _repo.close();
     return super.close();
   }
 }

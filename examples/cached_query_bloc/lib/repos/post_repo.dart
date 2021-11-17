@@ -14,7 +14,6 @@ class PostRepository extends CachedQuery {
       key: 'posts',
       queryFn: (page) async => PostModel.listFromJson(
           await _service.getPosts(page: page, limit: limit)),
-      // staleTime: const Duration(seconds: 5),
       listener: listener,
     );
   }
@@ -28,7 +27,7 @@ class PostRepository extends CachedQuery {
     );
   }
 
-  Future<List<PostModel>> createPost(PostModel post) async {
+  Future<void> createPost(PostModel post) async {
     await mutation<PostModel, PostModel>(
       key: ['posts', post.id],
       arg: post,
@@ -44,7 +43,7 @@ class PostRepository extends CachedQuery {
       },
     );
     // get query and return after invalidation;
-    return getInfiniteQuery('posts');
+    // return getInfiniteQuery('posts');
   }
 
   Stream<List<PostModel>?> streamCreatePost(PostModel post) {
