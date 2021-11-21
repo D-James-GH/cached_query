@@ -1,0 +1,49 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  plugins:
+    - dart_code_metrics
+  errors:
+    missing_required_param: error
+    avoid_print: info
+  exclude:
+    - "build/**"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  language:
+    strict-raw-types: true
+  strong-mode:
+    implicit-casts: true
+
+linter:
+  rules:
+    cancel_subscriptions: true
+    avoid_print: true
+#    overridden_fields: true
+#    unawaited_futures: false
+#    below are rules turned off from the flutter lints package
+#    prefer_const_constructors: false
+#    prefer_const_constructors_in_immutables: false
+#    use_key_in_widget_constructors: false
+#    avoid_function_literals_in_foreach_calls: false
+
+dart_code_metrics:
+  metrics:
+    cyclomatic-complexity: 20
+    maximum-nesting-level: 10
+    source-lines-of-code: 60
+  metrics-exclude:
+    - test/**
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+  rules:
+    - avoid-unnecessary-setstate
+    - member-ordering-extended:
+        - order:
+            - fields
+            - constructors
+            - getters-setters
+            - methods
+    - avoid-wrapping-in-padding
+    - prefer-single-widget-per-file:
+        ignore-private-widgets: true

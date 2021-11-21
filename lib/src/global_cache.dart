@@ -75,13 +75,6 @@ class GlobalCache {
       _infiniteQueryCache[queryHash] = infiniteQuery;
     }
 
-    // if (listener != null) {
-    //   _subscriptions[queryHash] = (infiniteQuery as InfiniteQueryManager<T>)
-    //       .state
-    //       .stream
-    //       .listen(listener);
-    // }
-
     if (prefetchPages != null) {
       infiniteQuery._preFetchPages(prefetchPages);
     }

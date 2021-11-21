@@ -29,14 +29,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^7.3.0
+  flutter_bloc: ^8.0.0
   equatable: ^2.0.3
   get_it: 7.2.0
   freezed_annotation:
   cached_query:
     path: ../../../cached_query
-  http: ^0.13.3
-  bloc_concurrency: ^0.1.0
+  http: ^0.13.4
+  bloc_concurrency: ^0.2.0
 
 dev_dependencies:
   flutter_test:

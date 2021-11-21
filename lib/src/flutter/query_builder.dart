@@ -1,16 +1,16 @@
+import 'dart:async';
+
 import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 
 ///
 class QueryBuilder<T> extends StatefulWidget {
-  final Future<T> Function() queryFn;
-  final dynamic queryKey;
-  final Widget Function(QueryState<T>? state) builder;
+  final Query<T> query;
+  final Widget Function(BuildContext context, QueryState<T> state) builder;
 
-  const QueryBuilder(
-    this.queryKey, {
+  const QueryBuilder({
     Key? key,
-    required this.queryFn,
+    required this.query,
     required this.builder,
   }) : super(key: key);
 
@@ -18,29 +18,28 @@ class QueryBuilder<T> extends StatefulWidget {
   _QueryBuilderState<T> createState() => _QueryBuilderState<T>();
 }
 
-class _QueryBuilderState<T> extends State<QueryBuilder<T>> with CachedQuery {
-  QueryState<T>? _state;
+class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
+  late QueryState<T> _state;
+  late StreamSubscription<QueryState<T>> _subscription;
   @override
   void initState() {
     super.initState();
-    query<T>(
-        key: widget.queryKey,
-        queryFn: widget.queryFn,
-        listener: (QueryState<T> data) {
-          setState(() {
-            _state = data;
-          });
-        });
+    _state = widget.query.state;
+    _subscription = widget.query.stream.listen((state) {
+      setState(() {
+        _state = state;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(_state);
+    return widget.builder(context, _state);
   }
 
   @override
   void dispose() {
-    close();
+    _subscription.cancel();
     super.dispose();
   }
 }
