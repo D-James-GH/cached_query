@@ -16,11 +16,7 @@ class JokeScreen extends StatelessWidget with CachedQuery {
           children: [
             const Text('jokes'),
             QueryBuilder<JokeModel?>(
-              query: query<JokeModel>(
-                  key: 'joke',
-                  staleTime: const Duration(seconds: 4),
-                  queryFn: () async =>
-                      JokeModel.fromJson(await JokeService().getJoke())),
+              query: _getJoke,
               builder: (_, state) {
                 print(state.isFetching);
                 if (state.isFetching) {
@@ -43,11 +39,7 @@ class JokeScreen extends StatelessWidget with CachedQuery {
       ),
       body: Center(
         child: QueryBuilder<JokeModel?>(
-          query: query<JokeModel>(
-              key: 'joke',
-              staleTime: const Duration(seconds: 4),
-              queryFn: () async =>
-                  JokeModel.fromJson(await JokeService().getJoke())),
+          query: _getJoke ,
           builder: (_, state) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -60,5 +52,13 @@ class JokeScreen extends StatelessWidget with CachedQuery {
         ),
       ),
     );
+
+  }
+  Query<JokeModel> _getJoke(){
+return query<JokeModel>(
+              key: 'joke',
+              staleTime: const Duration(seconds: 4),
+              queryFn: () async =>
+                  JokeModel.fromJson(await JokeService().getJoke()))
   }
 }
