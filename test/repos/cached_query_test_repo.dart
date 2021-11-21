@@ -1,7 +1,7 @@
 import 'package:cached_query/cached_query.dart';
 
 class CachedQueryTestRepo extends CachedQuery {
-  Future<Query<String?>> getTimeQuery() {
+  Query<String?> getTimeQuery() {
     return query(
       key: 'timeQuery',
       cacheTime: const Duration(seconds: 1),
@@ -13,8 +13,8 @@ class CachedQueryTestRepo extends CachedQuery {
     );
   }
 
-  Stream<Query<String>> streamTimeQuery() {
-    return queryStream(
+  Stream<QueryState<String?>> streamTimeQuery() {
+    return query(
       key: 'timeQuery',
       cacheTime: const Duration(seconds: 1),
       staleTime: const Duration(seconds: 2),
@@ -22,6 +22,6 @@ class CachedQueryTestRepo extends CachedQuery {
         const Duration(seconds: 1),
         () => DateTime.now().toString(),
       ),
-    );
+    ).stream;
   }
 }

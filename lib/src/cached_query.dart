@@ -1,8 +1,14 @@
-import 'package:cached_query/src/global_cache.dart';
-import './query_manager.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:cached_query/src/models/infinite_query_state.dart';
+import 'package:flutter/foundation.dart';
 
-import 'models/infinite_query.dart';
-import 'models/query.dart';
+import 'models/default_query_options.dart';
+import 'models/query_state.dart';
+part 'query.dart';
+part 'infinite_query.dart';
+part "./global_cache.dart";
+part "./query_base.dart";
 
 /// Cache any asynchronous function results with [CachedQuery]
 class CachedQuery {
@@ -25,7 +31,7 @@ class CachedQuery {
   ///
   /// Add a [listener] to the query which will be notified whenever the query's
   /// data changes.
-  Future<Query<T?>> query<T>({
+  Query<T?> query<T>({
     required dynamic key,
     required Future<T> Function() queryFn,
     Duration? staleTime,
@@ -33,41 +39,7 @@ class CachedQuery {
     bool forceRefetch = false,
     bool ignoreStaleTime = false,
     bool ignoreCacheTime = false,
-    void Function(Query<T>)? listener,
-  }) async {
-    // get an existing query, or create a new one if it doesn't exist
-    final query = _globalCache.getQuery<T>(
-      key: key,
-      queryFn: queryFn,
-      staleTime: staleTime,
-      cacheTime: cacheTime,
-      ignoreStaleTime: ignoreStaleTime,
-      ignoreCacheTime: ignoreCacheTime,
-      listener: listener,
-    );
-
-    // Subscribing returns a function to unsubscribe from the query.
-    // store them in an array so that we can easily unsubscribe from querys
-    // in the dispose method
-    _subscriberFunctions.add(query.subscribe(_subscriberKey));
-
-    return await query.getResult(forceRefetch: forceRefetch);
-  }
-
-  /// [queryStream] will return the response to the [queryFn] and throw/rethrow
-  /// if an error occurs. [queryStream] is an async generator which allows it to
-  /// output any stored cache first while update/fetching new data, if the cached
-  /// data is stale. The generator will complete when the background fetch succeeds
-  /// or fails.
-
-  Stream<Query<T>> queryStream<T>({
-    required dynamic key,
-    required Future<T> Function() queryFn,
-    Duration? cacheTime,
-    Duration? staleTime,
-    bool forceRefetch = false,
-    bool ignoreStaleTime = false,
-    bool ignoreCacheTime = false,
+    void Function(QueryState<T>)? listener,
   }) {
     // get an existing query, or create a new one if it doesn't exist
     final query = _globalCache.getQuery<T>(
@@ -75,18 +47,21 @@ class CachedQuery {
       queryFn: queryFn,
       staleTime: staleTime,
       cacheTime: cacheTime,
-      ignoreCacheTime: ignoreCacheTime,
       ignoreStaleTime: ignoreStaleTime,
+      ignoreCacheTime: ignoreCacheTime,
     );
+
     // Subscribing returns a function to unsubscribe from the query.
     // store them in an array so that we can easily unsubscribe from querys
     // in the dispose method
-    _subscriberFunctions.add(query.subscribe(_subscriberKey));
-    return query.streamResult(forceRefetch: forceRefetch);
+    _subscriberFunctions.add(query._subscribe(_subscriberKey));
+    query.getResult(forceRefetch: forceRefetch);
+
+    return query;
   }
 
-  /// [infiniteQuery] is a collection of [Query]'s stored together. The data field
-  /// in [InfiniteQuery] is a result of all the individual [Query] data concatenated
+  /// [infiniteQuery] is a collection of [QueryState]'s stored together. The data field
+  /// in [InfiniteQuery] is a result of all the individual [QueryState] data concatenated
   /// together. For more information see [InfiniteQuery]
   ///
   /// [key] defines where the result will be cached,
@@ -102,7 +77,7 @@ class CachedQuery {
   ///
   /// Add a [listener] to the query which will be notified whenever the query's
   /// data changes.
-  Future<InfiniteQuery<T>> infiniteQuery<T>({
+  InfiniteQuery<T> infiniteQuery<T>({
     required dynamic key,
     required Future<List<T>> Function(int page) queryFn,
     bool forceRefetch = false,
@@ -111,7 +86,7 @@ class CachedQuery {
     int initialPage = 1,
     List<int>? prefetchPages,
     void Function(InfiniteQuery<T>)? listener,
-  }) async {
+  }) {
     final infiniteQuery = _globalCache.getInfiniteQuery<T>(
       key: key,
       initialPage: initialPage,
@@ -119,50 +94,52 @@ class CachedQuery {
       staleTime: staleTime,
       cacheTime: cacheTime,
       prefetchPages: prefetchPages,
-      listener: listener,
     );
-    _subscriberFunctions.add(infiniteQuery.subscribe(_subscriberKey));
-    return infiniteQuery.getResult(forceRefetch: forceRefetch);
+    _subscriberFunctions.add(infiniteQuery._subscribe(_subscriberKey));
+    infiniteQuery._getResult(forceRefetch: forceRefetch);
+    return infiniteQuery;
   }
 
-  /// Stream an infinite query to include background fetching when data is stale
-  Stream<InfiniteQuery<T>> infiniteQueryStream<T>({
-    required dynamic key,
-    required Future<List<T>> Function(int page) queryFn,
-
-    /// set [forceRefetch] to true if you want to force the query to get new data
-    bool forceRefetch = false,
-
-    /// when data is stale refetch only first
-    bool refetchFirstQueryOnly = true,
-
-    /// Time between the last subscriber being removed and the cache being deleted
-    Duration? cacheTime,
-
-    /// [staleDuration] is the amount of time before another fetch happens.
-    /// Defaults to `Duration(seconds: 30)` for queries, meaning they will never be re-fetched
-    Duration? staleTime,
-
-    /// initial page of the query. Defaults to 1.
-    int initialPage = 1,
-  }) {
-    final infiniteQuery = _globalCache.getInfiniteQuery(
-      key: key,
-      initialPage: initialPage,
-      queryFn: queryFn,
-      staleTime: staleTime,
-      cacheTime: cacheTime,
-    );
-    _subscriberFunctions.add(infiniteQuery.subscribe(_subscriberKey));
-    return infiniteQuery.streamResult();
-  }
+  // /// Stream an infinite query to include background fetching when data is stale
+  // Stream<InfiniteQuery<T>> infiniteQueryStream<T>({
+  //   required dynamic key,
+  //   required Future<List<T>> Function(int page) queryFn,
+  //
+  //   /// set [forceRefetch] to true if you want to force the query to get new data
+  //   bool forceRefetch = false,
+  //
+  //   /// when data is stale refetch only first
+  //   bool refetchFirstQueryOnly = true,
+  //
+  //   /// Time between the last subscriber being removed and the cache being deleted
+  //   Duration? cacheTime,
+  //
+  //   /// [staleDuration] is the amount of time before another fetch happens.
+  //   /// Defaults to `Duration(seconds: 30)` for queries, meaning they will never be re-fetched
+  //   Duration? staleTime,
+  //
+  //   /// initial page of the query. Defaults to 1.
+  //   int initialPage = 1,
+  // }) {
+  //   final infiniteQuery = _globalCache.getInfiniteQuery(
+  //     key: key,
+  //     initialPage: initialPage,
+  //     queryFn: queryFn,
+  //     staleTime: staleTime,
+  //     cacheTime: cacheTime,
+  //   );
+  //   _subscriberFunctions.add(infiniteQuery.subscribe(_subscriberKey));
+  //   // return infiniteQuery.streamResult();
+  //   infiniteQuery._getResult();
+  //   return infiniteQuery.createStream();
+  // }
 
   /// Type arguments
   Future<T> mutation<T, A>({
     /// the argument to be passed to queryFn
     A? arg,
 
-    /// called before the mutation [queryFn] is run.
+    /// called before the mutation [_queryFn] is run.
     void Function(A? arg)? onStartMutation,
     void Function(A? arg, T res)? onSuccess,
     void Function(A? arg)? onError,
@@ -201,7 +178,7 @@ class CachedQuery {
     R? Function(dynamic arg, dynamic res)? onSuccess,
     void Function(dynamic error)? onError,
 
-    /// called before the mutation [queryFn] is run.
+    /// called before the mutation [_queryFn] is run.
     R? Function(dynamic arg)? onStartMutation,
     required dynamic key,
     required Future<dynamic> Function(dynamic arg) queryFn,
@@ -252,10 +229,9 @@ class CachedQuery {
     required dynamic key,
     required T Function(T? oldData) updateFn,
   }) {
-    final oldQuery = _globalCache.getExistingQuery(key) as QueryManager<T>?;
-    if (oldQuery != null) {
-      final newData = updateFn(oldQuery.state.data);
-      oldQuery.updateData(newData);
+    final query = _globalCache.getExistingQuery(key) as Query<T>?;
+    if (query != null) {
+      query.update(updateFn);
     }
   }
 

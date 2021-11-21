@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:cached_query/src/global_cache.dart';
+import 'package:cached_query/cached_query.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

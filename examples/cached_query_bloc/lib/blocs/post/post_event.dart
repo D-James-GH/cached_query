@@ -3,20 +3,20 @@ part of 'post_bloc.dart';
 @immutable
 abstract class PostEvent extends Equatable {}
 
-class PostsFetched extends PostEvent {
+class PostsStreamFetched extends PostEvent {
   @override
   List<Object?> get props => [];
 }
 
-class PostsNextPage extends PostEvent {
+class PostsStreamNextPage extends PostEvent {
   @override
   List<Object?> get props => [];
 }
 
-class PostCreated extends PostEvent {
+class PostStreamCreated extends PostEvent {
   final PostModel post;
 
-  PostCreated(this.post);
+  PostStreamCreated(this.post);
   @override
   List<Object?> get props => [];
 }

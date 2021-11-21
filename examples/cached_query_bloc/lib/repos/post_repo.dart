@@ -5,22 +5,11 @@ import 'package:examples/services/post.service.dart';
 class PostRepository extends CachedQuery {
   final _service = PostService();
 
-  Future<InfiniteQuery<PostModel>> getPosts({
+  InfiniteQuery<PostModel> getPosts({
     int initialPage = 1,
     int limit = 20,
-    void Function(InfiniteQuery<PostModel>)? listener,
   }) {
     return infiniteQuery<PostModel>(
-      key: 'posts',
-      queryFn: (page) async => PostModel.listFromJson(
-          await _service.getPosts(page: page, limit: limit)),
-      listener: listener,
-    );
-  }
-
-  Stream<InfiniteQuery<PostModel>> streamPosts(
-      {int initialPage = 1, int limit = 20}) {
-    return infiniteQueryStream<PostModel>(
       key: 'posts',
       queryFn: (page) async => PostModel.listFromJson(
           await _service.getPosts(page: page, limit: limit)),

@@ -1,25 +1,25 @@
 enum QueryStatus { loading, success, error, initial }
 
-class Query<T> {
+class QueryState<T> {
   final T? data;
   final DateTime timeCreated;
   final QueryStatus status;
   final bool isFetching;
 
-  const Query({
+  const QueryState({
     this.data,
     required this.timeCreated,
     this.status = QueryStatus.initial,
     this.isFetching = false,
   });
 
-  Query<T> copyWith({
+  QueryState<T> copyWith({
     T? data,
     DateTime? timeCreated,
     QueryStatus? status,
     bool? isFetching,
   }) {
-    return Query(
+    return QueryState(
       data: data ?? this.data,
       timeCreated: timeCreated ?? this.timeCreated,
       status: status ?? this.status,

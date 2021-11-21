@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'blocs/joke/joke_bloc.dart';
 import 'blocs/post/post_bloc.dart';
-import 'blocs/post_stream/post_stream_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         PostListScreen.routeName: (_) => BlocProvider(
-              create: (_) => PostStreamBloc(),
+              create: (_) => PostBloc()..add(PostsStreamFetched()),
               child: const PostListScreen(),
             ),
         JokeScreen.routeName: (_) => BlocProvider(

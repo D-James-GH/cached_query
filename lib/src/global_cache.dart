@@ -1,12 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:cached_query/src/query_manager.dart';
-import 'package:flutter/cupertino.dart';
-
-import '../cached_query.dart';
-import 'infinite_query_manager.dart';
-import 'models/default_query_options.dart';
+part of "cached_query.dart";
 
 class GlobalCache {
   GlobalCache._();
@@ -19,61 +11,61 @@ class GlobalCache {
   }
 
   //map to store requests
-  Map<String, QueryManager<dynamic>> _queryCache = {};
+  Map<String, Query<dynamic>> _queryCache = {};
 
   // map to store infinite query's
-  Map<String, InfiniteQueryManager<dynamic>> _infiniteQueryCache = {};
+  Map<String, InfiniteQuery<dynamic>> _infiniteQueryCache = {};
 
   // map to store any global listeners
-  final Map<String, StreamSubscription<dynamic>> _subscriptions = {};
+  // final Map<String, StreamSubscription<dynamic>> _subscriptions = {};
 
   /// [getQuery] either gets an existing query with the right [key]. Or it creates
   /// a new query.
-  QueryManager<T> getQuery<T>({
+  Query<T> getQuery<T>({
     required dynamic key,
     required Future<T> Function() queryFn,
     Duration? staleTime,
     Duration? cacheTime,
     bool ignoreCacheTime = false,
     bool ignoreStaleTime = false,
-    void Function(Query<T>)? listener,
+    // void Function(QueryState<T>)? listener,
   }) {
     final queryHash = jsonEncode(key);
     var query = _queryCache[queryHash];
 
     if (query == null) {
-      query = QueryManager<T>(
-        queryHash: queryHash,
+      query = Query<T>._internal(
         key: key,
         staleTime: staleTime ?? defaultQueryOptions.staleTime,
         cacheTime: cacheTime ?? defaultQueryOptions.cacheTime,
         queryFn: queryFn,
+        ignoreStaleTime: ignoreStaleTime,
+        ignoreCacheTime: ignoreCacheTime,
       );
       _queryCache[queryHash] = query;
     }
-    if (listener != null) {
-      _subscriptions[queryHash] =
-          (query as QueryManager<T>).createStream().listen(listener);
-    }
-    return query as QueryManager<T>;
+    // if (listener != null) {
+    //   _subscriptions[queryHash] =
+    //       (query as Query<T>).createStream().listen(listener);
+    // }
+    return query as Query<T>;
   }
 
-  InfiniteQueryManager<T> getInfiniteQuery<T>({
+  InfiniteQuery<T> getInfiniteQuery<T>({
     required dynamic key,
     required int initialPage,
     required Future<List<T>> Function(int) queryFn,
     Duration? staleTime,
     Duration? cacheTime,
     List<int>? prefetchPages,
-    void Function(InfiniteQuery<T>)? listener,
+    // void Function(InfiniteQuery<T>)? listener,
   }) {
     final queryHash = jsonEncode(key);
 
-    InfiniteQueryManager<dynamic>? infiniteQuery =
-        _infiniteQueryCache[queryHash];
+    InfiniteQuery<dynamic>? infiniteQuery = _infiniteQueryCache[queryHash];
 
     if (infiniteQuery == null) {
-      infiniteQuery = InfiniteQueryManager<T>(
+      infiniteQuery = InfiniteQuery<T>(
         queryFn: queryFn,
         staleTime: staleTime ?? defaultQueryOptions.staleTime,
         cacheTime: cacheTime ?? defaultQueryOptions.cacheTime,
@@ -83,32 +75,32 @@ class GlobalCache {
       _infiniteQueryCache[queryHash] = infiniteQuery;
     }
 
-    if (listener != null) {
-      _subscriptions[queryHash] = (infiniteQuery as InfiniteQueryManager<T>)
-          .state
-          .stream
-          .listen(listener);
-    }
+    // if (listener != null) {
+    //   _subscriptions[queryHash] = (infiniteQuery as InfiniteQueryManager<T>)
+    //       .state
+    //       .stream
+    //       .listen(listener);
+    // }
 
     if (prefetchPages != null) {
       infiniteQuery.preFetchPages(prefetchPages);
     }
-    return infiniteQuery as InfiniteQueryManager<T>;
+    return infiniteQuery as InfiniteQuery<T>;
   }
 
   /// Gets an existing query if it exists
-  QueryManager<T>? getExistingQuery<T>(dynamic key) {
+  Query<T>? getExistingQuery<T>(dynamic key) {
     final queryHash = jsonEncode(key);
     if (_queryCache.containsKey(queryHash)) {
-      return _queryCache[queryHash] as QueryManager<T>?;
+      return _queryCache[queryHash] as Query<T>?;
     }
   }
 
   /// Gets an existing infinite query if it exists
-  InfiniteQueryManager<T>? getExistingInfiniteQuery<T>(dynamic key) {
+  InfiniteQuery<T>? getExistingInfiniteQuery<T>(dynamic key) {
     final queryHash = jsonEncode(key);
     if (_infiniteQueryCache.containsKey(queryHash)) {
-      return _infiniteQueryCache[queryHash] as InfiniteQueryManager<T>?;
+      return _infiniteQueryCache[queryHash] as InfiniteQuery<T>?;
     }
   }
 

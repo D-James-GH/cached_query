@@ -1,51 +1,46 @@
-import 'dart:async';
-
-import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/global_cache.dart';
-import 'package:cached_query/src/models/infinite_query.dart';
-import 'package:cached_query/src/query_manager.dart';
+part of 'cached_query.dart';
 
 /// [InfiniteQueryManage] is a controller for infinite query's. It holds information
 /// on which individual query's make up part of the infinite query.
-class InfiniteQueryManager<T> {
-  final String key;
-  final GlobalCache _globalCache = GlobalCache.instance;
+class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
   final Future<List<T>> Function(int) queryFn;
-  StreamController<InfiniteQuery<T>>? _streamController;
-  final Duration staleTime;
-  final Duration cacheTime;
 
-  late InfiniteQuery<T> _state;
   List<String> queryKeys = [];
   List<Object> subscribers = [];
   int currentPage;
-  Timer? _gcTimer;
-  bool stale = false;
-  InfiniteQuery<T> get state => _state;
 
-  InfiniteQueryManager({
+  InfiniteQuery({
     required this.queryFn,
-    required this.key,
+    required dynamic key,
     required int initialPage,
-    required this.staleTime,
-    required this.cacheTime,
+    bool ignoreStaleTime = false,
+    bool ignoreCacheTime = false,
+    required Duration staleTime,
+    required Duration cacheTime,
   })  : currentPage = initialPage,
-        queryKeys = [key + initialPage.toString()] {
-    _state = InfiniteQuery(
-      createStream: createStream,
-      currentPage: initialPage,
-      getNextPage: _getNextPage,
-      timeCreated: DateTime.now(),
-    );
-  }
+        queryKeys = [key + initialPage.toString()],
+        super._internal(
+          key: key,
+          ignoreStaleTime: ignoreStaleTime,
+          ignoreCacheTime: ignoreCacheTime,
+          state: InfiniteQueryState<T>(
+            currentPage: initialPage,
+            timeCreated: DateTime.now(),
+          ),
+          staleTime: staleTime,
+          cacheTime: cacheTime,
+        );
 
-  /// returns the combined data of all the [QueryManager]'s in [queryKeys]
-  FutureOr<InfiniteQuery<T>> getResult({bool forceRefetch = false}) async {
-    if (!stale &&
+  @override
+  Future<InfiniteQueryState<T>> get result => _getResult();
+
+  /// returns the combined data of all the [Query]'s in [queryKeys]
+  Future<InfiniteQueryState<T>> _getResult({bool forceRefetch = false}) async {
+    if (!_stale &&
         !forceRefetch &&
         _state.data != null &&
         _state.data!.isNotEmpty == true &&
-        _state.timeCreated.add(staleTime).isAfter(DateTime.now())) {
+        _state.timeCreated.add(_staleTime).isAfter(DateTime.now())) {
       _streamController?.add(_state);
       return _state;
     }
@@ -62,11 +57,11 @@ class InfiniteQueryManager<T> {
     return _state;
   }
 
-  Stream<InfiniteQuery<T>> streamResult() async* {
-    if (!stale &&
+  Stream<InfiniteQueryState<T>> streamResult() async* {
+    if (!_stale &&
         _state.data != null &&
         _state.data!.isNotEmpty == true &&
-        _state.timeCreated.add(staleTime).isAfter(DateTime.now())) {
+        _state.timeCreated.add(_staleTime).isAfter(DateTime.now())) {
       _streamController?.add(_state);
       yield _state;
     } else {
@@ -81,13 +76,13 @@ class InfiniteQueryManager<T> {
   }
 
   /// Call this function to automatically increase the page number and fetch it
-  Future<InfiniteQuery<T>> _getNextPage() async {
+  Future<InfiniteQueryState<T>> getNextPage() async {
     // add one to current page number and get the query without passing in a key
     currentPage++;
     final newQuery = _getQuery();
 
     // use the new query to fetch the new data/page
-    final Query<List<T>?> res = await newQuery.getResult();
+    final QueryState<List<T>?> res = await newQuery.getResult();
 
     if (res.data == null || res.data?.isEmpty == true) {
       _state = _state.copyWith(hasReachedMax: true);
@@ -109,7 +104,7 @@ class InfiniteQueryManager<T> {
         ignoreCacheTime: true,
         ignoreStaleTime: true,
       );
-      query.fetch();
+      query._fetch();
     }
   }
 
@@ -118,8 +113,9 @@ class InfiniteQueryManager<T> {
     final queries = queryKeys.map((k) => _getQuery(queryKey: k)).toList();
 
     final List<T> data = [];
-    await Future.forEach(queries, (QueryManager<List<T>> query) async {
-      final Query<List<T>?> result = await query.getResult(forceRefetch: true);
+    await Future.forEach(queries, (Query<List<T>> query) async {
+      final QueryState<List<T>?> result =
+          await query.getResult(forceRefetch: true);
       if (result.data != null && result.data!.isNotEmpty) {
         data.addAll(result.data!);
       }
@@ -135,7 +131,7 @@ class InfiniteQueryManager<T> {
   }
 
   /// [_getQuery] gets a single query from the global cache
-  QueryManager<List<T>> _getQuery({String? queryKey}) {
+  Query<List<T>> _getQuery({String? queryKey}) {
     queryKey ??= key + currentPage.toString();
     var page = currentPage;
     final query = _globalCache.getQuery<List<T>>(
@@ -145,23 +141,10 @@ class InfiniteQueryManager<T> {
       ignoreStaleTime: true,
     );
     if (!queryKeys.contains(queryKey)) {
-      queryKeys.add(queryKey);
+      queryKeys.add(queryKey!);
     }
 
     return query;
-  }
-
-  Stream<InfiniteQuery<T>> createStream() {
-    if (_streamController != null) {
-      return _streamController!.stream;
-    }
-    _streamController = StreamController.broadcast(
-        onListen: () => _streamController!.add(_state),
-        onCancel: () {
-          _streamController!.close();
-          _streamController = null;
-        });
-    return _streamController!.stream;
   }
 
   void updateData(List<T> newData) {
@@ -169,42 +152,16 @@ class InfiniteQueryManager<T> {
     _streamController?.add(_state);
   }
 
-  void Function() subscribe(subscriber) {
-    if (!subscribers.contains(subscriber)) {
-      subscribers.add(subscriber);
-    }
-    unScheduleGC();
-
-    return () => unsubscribe(subscriber);
-  }
-
-  void unsubscribe(Subscriber subscriber) {
-    subscribers = subscribers.where((e) => e != subscriber).toList();
-    if (subscribers.isEmpty) {
-      scheduleGC();
-    }
-  }
-
-  /// After the [cacheTime] is up remove the query from the [GlobalCache]
-  void scheduleGC() {
-    _gcTimer = Timer(cacheTime, () => deleteQuery());
-  }
-
-  /// Cancel the garbage collection if another subscriber is added
-  void unScheduleGC() {
-    if (_gcTimer?.isActive == true) {
-      _gcTimer!.cancel();
-    }
-  }
-
   /// invalidate all queries in the infinite query
+  @override
   void invalidateQuery() {
-    stale = true;
+    _stale = true;
     for (final k in queryKeys) {
       _globalCache.invalidateCache(queryHash: k);
     }
   }
 
+  @override
   void deleteQuery() {
     for (final k in queryKeys) {
       _globalCache.deleteCache(queryHash: k);

@@ -17,17 +17,17 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   InfiniteQuery<PostModel>? _infiniteQuery;
 
   PostBloc() : super(const PostState()) {
-    on<PostsFetched>(_onPostsFetched);
-    on<PostsNextPage>(_onPostsNextPage,
+    on<PostsStreamFetched>(_onPostsFetched);
+    on<PostsStreamNextPage>(_onPostsNextPage,
         transformer: throttleDroppable(const Duration(milliseconds: 300)));
-    on<PostCreated>(_onPostCreated);
+    on<PostStreamCreated>(_onPostCreated);
   }
 
   FutureOr<void> _onPostsFetched(
-      PostsFetched event, Emitter<PostState> emit) async {
-    await emit.forEach<InfiniteQuery<PostModel>>(_repo.streamPosts(),
+      PostsStreamFetched event, Emitter<PostState> emit) async {
+    _infiniteQuery = _repo.getPosts();
+    await emit.forEach<InfiniteQueryState<PostModel>>(_infiniteQuery!.stream,
         onData: (query) {
-      _infiniteQuery = query;
       return state.copyWith(
         posts: query.data,
         status: query.isFetching ? PostStatus.loading : PostStatus.success,
@@ -36,29 +36,12 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     });
   }
 
-  FutureOr<void> _onPostsNextPage(
-      PostsNextPage event, Emitter<PostState> emit) async {
-    if (state.hasReachedMax) return;
-    emit(state.copyWith(status: PostStatus.loading));
-
-    final newQuery = await _infiniteQuery!.getNextPage();
-    emit(state.copyWith(
-        status: PostStatus.success,
-        posts: newQuery.data,
-        hasReachedMax: newQuery.hasReachedMax));
+  void _onPostsNextPage(_, __) {
+    _infiniteQuery?.getNextPage();
   }
 
-  FutureOr<void> _onPostCreated(
-      PostCreated event, Emitter<PostState> emit) async {
-    // without optimistic updates
-    // emit(state.copyWith(posts: await _repo.createPost(event.post)));
-
-    // with optimistic updates
-    await emit.forEach<List<PostModel>?>(_repo.streamCreatePost(event.post),
-        onData: (data) => state.copyWith(
-              status: PostStatus.success,
-              posts: data as List<PostModel>,
-            ));
+  void _onPostCreated(PostStreamCreated event, _) {
+    _repo.createPost(event.post);
   }
 
   EventTransformer<E> throttleDroppable<E>(Duration duration) {
@@ -69,7 +52,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
   @override
   Future<void> close() {
-    _repo.dispose();
+    _repo.close();
     return super.close();
   }
 }

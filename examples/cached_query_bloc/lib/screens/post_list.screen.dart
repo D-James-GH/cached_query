@@ -1,4 +1,4 @@
-import 'package:examples/blocs/post_stream/post_stream_bloc.dart';
+import 'package:examples/blocs/post/post_bloc.dart';
 import 'package:examples/models/post_model.dart';
 import 'package:examples/screens/joke.screen.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +25,7 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BlocBuilder<PostStreamBloc, PostStreamState>(
-            builder: (context, state) {
+        title: BlocBuilder<PostBloc, PostState>(builder: (context, state) {
           return SizedBox(
             width: 150,
             child: Stack(
@@ -49,14 +48,13 @@ class _PostListScreenState extends State<PostListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.create),
-            onPressed: () => context
-                .read<PostStreamBloc>()
-                .add(PostStreamCreated(const PostModel(
-                  id: 1234,
-                  title: "new post",
-                  userId: 1,
-                  body: 'this is the body of the post',
-                ))),
+            onPressed: () =>
+                context.read<PostBloc>().add(PostStreamCreated(const PostModel(
+                      id: 1234,
+                      title: "new post",
+                      userId: 1,
+                      body: 'this is the body of the post',
+                    ))),
           ),
           IconButton(
             icon: const Icon(Icons.arrow_right_alt),
@@ -65,7 +63,7 @@ class _PostListScreenState extends State<PostListScreen> {
           )
         ],
       ),
-      body: BlocBuilder<PostStreamBloc, PostStreamState>(
+      body: BlocBuilder<PostBloc, PostState>(
         builder: (context, state) {
           if (state.posts != null) {
             return CustomScrollView(
@@ -112,7 +110,7 @@ class _PostListScreenState extends State<PostListScreen> {
   }
 
   void _onScroll() {
-    if (_isBottom) context.read<PostStreamBloc>().add(PostsStreamNextPage());
+    if (_isBottom) context.read<PostBloc>().add(PostsStreamNextPage());
   }
 
   bool get _isBottom {

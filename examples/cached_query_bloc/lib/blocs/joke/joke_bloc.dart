@@ -12,16 +12,16 @@ part 'joke_bloc.freezed.dart';
 
 class JokeBloc extends Bloc<JokeEvent, JokeState> {
   final _repo = JokeRepository();
-  StreamSubscription<Query<JokeModel?>>? _subscription;
+  StreamSubscription<QueryState<JokeModel?>>? _subscription;
   JokeBloc() : super(const JokeState()) {
     on<JokeFetched>(_onJokeFetched);
     on<JokeUpdated>(_onJokeUpdated);
     init();
   }
   void init() async {
-    _repo.getJokeFuture((event) {
-      add(JokeUpdated(joke: event.data, isFetching: event.isFetching));
-    });
+    // _repo.getJokeFuture((event) {
+    //   add(JokeUpdated(joke: event.data, isFetching: event.isFetching));
+    // });
   }
 
   FutureOr<void> _onJokeUpdated(JokeUpdated event, Emitter<JokeState> emit) {
@@ -36,26 +36,13 @@ class JokeBloc extends Bloc<JokeEvent, JokeState> {
     // final res = await _repo.getJokeFuture();
     // _subscription = res.
     // wait for the whole stream to finish
-    // await emit.forEach<Query<JokeModel>>(
-    //   _repo.getJoke(),
-    //   onData: (query) => state.copyWith(
-    //       joke: query.data,
-    //       status: query.isFetching ? JokeStatus.loading : JokeStatus.success),
-    // );
+    await emit.forEach<QueryState<JokeModel?>>(
+      _repo.getJoke(),
+      onData: (query) => state.copyWith(
+          joke: query.data,
+          status: query.isFetching ? JokeStatus.loading : JokeStatus.success),
+    );
   }
-
-  // example using cached query with a mixin in the bloc
-  // FutureOr<void> _onJokeFetched(
-  //   JokeFetched event,
-  //   Emitter<JokeState> emit,
-  // ) async {
-  //   await emit.forEach<QueryState<JokeModel>>(
-  //     queryStream(key: 'joke', queryFn: _repo.getJokeNoCache),
-  //     onData: (query) => state.copyWith(
-  //         joke: query.data,
-  //         status: query.isFetching ? JokeStatus.loading : JokeStatus.success),
-  //   );
-  // }
 
   @override
   Future<void> close() {
