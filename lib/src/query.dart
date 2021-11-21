@@ -40,33 +40,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     return _state;
   }
 
-  // /// creates an async generator which will yield the result of [queryFn] and
-  // /// call it again in the background if the current data is stale.
-  // /// Completes after any background fetches are complete
-  // Stream<Query<T>> streamResult({bool forceRefetch = false}) {
-  //   final controller = StreamController<Query<T>>.broadcast();
-  //   controller.onListen = () async {
-  //     // if data is not stale just return it
-  //     if (!stale &&
-  //         _state.data != null &&
-  //         (ignoreStaleTime ||
-  //             _state.timeCreated.add(staleTime).isAfter(DateTime.now()))) {
-  //       controller.add(_state);
-  //     } else {
-  //       _state = _state.copyWith(status: QueryStatus.loading, isFetching: true);
-  //       _streamController?.add(_state);
-  //       controller.add(_state);
-  //       await fetch();
-  //       controller.add(_state);
-  //       stale = false;
-  //       controller.add(_state);
-  //       await controller.close();
-  //     }
-  //   };
-  //   return controller.stream;
-  // }
-
-  /// [_fetch] de-duplicates request, in-case multiple requests come in at once.
+  /// [_fetch] de-duplicates request
   Future<void> _fetch() {
     if (_currentFuture != null) return _currentFuture!;
     _currentFuture = _fetchQuery();

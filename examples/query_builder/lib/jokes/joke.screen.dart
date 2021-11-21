@@ -12,7 +12,27 @@ class JokeScreen extends StatelessWidget with CachedQuery {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('jokes'),
+        title: Row(
+          children: [
+            const Text('jokes'),
+            QueryBuilder<JokeModel?>(
+              query: query<JokeModel>(
+                  key: 'joke',
+                  staleTime: const Duration(seconds: 4),
+                  queryFn: () async =>
+                      JokeModel.fromJson(await JokeService().getJoke())),
+              builder: (_, state) {
+                print(state.isFetching);
+                if (state.isFetching) {
+                  return const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  );
+                }
+                return const SizedBox();
+              },
+            ),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.arrow_right_alt),

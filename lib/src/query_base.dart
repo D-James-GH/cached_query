@@ -64,12 +64,12 @@ abstract class QueryBase<T, State> {
     if (_streamController != null) {
       return _streamController!.stream;
     }
-    _streamController = StreamController.broadcast(
-        onListen: () => _streamController!.add(_state),
-        onCancel: () {
-          _streamController!.close();
-          _streamController = null;
-        });
+    _streamController = StreamController.broadcast(onListen: () {
+      _streamController!.add(_state);
+    }, onCancel: () {
+      _streamController!.close();
+      _streamController = null;
+    });
     return _streamController!.stream;
   }
 
