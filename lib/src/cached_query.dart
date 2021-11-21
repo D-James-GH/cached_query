@@ -239,10 +239,10 @@ class CachedQuery {
     required dynamic key,
     required List<T> Function(List<T>? oldData) updateFn,
   }) {
-    final oldQuery = _globalCache.getExistingInfiniteQuery(key);
-    if (oldQuery != null) {
-      final newData = updateFn(oldQuery.state.data as List<T>);
-      oldQuery.updateData(newData);
+    final query =
+        _globalCache.getExistingInfiniteQuery(key) as InfiniteQuery<T>?;
+    if (query != null) {
+      query.update(updateFn);
     }
   }
 

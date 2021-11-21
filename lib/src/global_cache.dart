@@ -83,7 +83,7 @@ class GlobalCache {
     // }
 
     if (prefetchPages != null) {
-      infiniteQuery.preFetchPages(prefetchPages);
+      infiniteQuery._preFetchPages(prefetchPages);
     }
     return infiniteQuery as InfiniteQuery<T>;
   }

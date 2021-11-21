@@ -21,7 +21,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
             staleTime: staleTime,
             cacheTime: cacheTime);
 
-  /// get the current result of [queryFn] either from cache or fetching
+  /// get the current result of [_queryFn] either from cache or fetching
   @override
   Future<QueryState<T>> get result => getResult(forceRefetch: false);
 

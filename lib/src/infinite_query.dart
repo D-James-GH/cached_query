@@ -3,21 +3,22 @@ part of 'cached_query.dart';
 /// [InfiniteQueryManage] is a controller for infinite query's. It holds information
 /// on which individual query's make up part of the infinite query.
 class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
-  final Future<List<T>> Function(int) queryFn;
+  final Future<List<T>> Function(int) _queryFn;
 
   List<String> queryKeys = [];
   List<Object> subscribers = [];
   int currentPage;
 
   InfiniteQuery({
-    required this.queryFn,
+    required Future<List<T>> Function(int) queryFn,
     required dynamic key,
     required int initialPage,
     bool ignoreStaleTime = false,
     bool ignoreCacheTime = false,
     required Duration staleTime,
     required Duration cacheTime,
-  })  : currentPage = initialPage,
+  })  : _queryFn = queryFn,
+        currentPage = initialPage,
         queryKeys = [key + initialPage.toString()],
         super._internal(
           key: key,
@@ -95,12 +96,12 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
     return _state;
   }
 
-  void preFetchPages(List<int> pages) {
+  void _preFetchPages(List<int> pages) {
     for (var page in pages) {
       final queryKey = key + currentPage.toString();
       final query = _globalCache.getQuery<List<T>>(
         key: queryKey,
-        queryFn: () => queryFn(page),
+        queryFn: () => _queryFn(page),
         ignoreCacheTime: true,
         ignoreStaleTime: true,
       );
@@ -136,7 +137,7 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
     var page = currentPage;
     final query = _globalCache.getQuery<List<T>>(
       key: queryKey,
-      queryFn: () => queryFn(page),
+      queryFn: () => _queryFn(page),
       ignoreCacheTime: true,
       ignoreStaleTime: true,
     );
@@ -147,7 +148,9 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
     return query;
   }
 
-  void updateData(List<T> newData) {
+  /// updates the current cached data.
+  void update(List<T> Function(List<T>? oldData) updateFn) {
+    final newData = updateFn(_state.data);
     _state = _state.copyWith(data: newData);
     _streamController?.add(_state);
   }
