@@ -23,7 +23,16 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   /// get the current result of [_queryFn] either from cache or fetching
   @override
-  Future<QueryState<T>> get result => getResult(forceRefetch: false);
+  Future<QueryState<T>> get result {
+    // if the _gcTimer is running reset it
+    _resetGC();
+    // if there are no other listeners and result has been called schedule
+    // garbage collection.
+    if (_streamController?.hasListener != true && _gcTimer?.isActive != true) {
+      _scheduleGC();
+    }
+    return getResult(forceRefetch: false);
+  }
 
   /// returns the result of the [_queryFn], either from cache or calling directly
   Future<QueryState<T>> getResult({bool forceRefetch = false}) async {

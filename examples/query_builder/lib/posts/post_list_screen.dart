@@ -1,5 +1,7 @@
+import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 import 'package:query_builder/jokes/joke.screen.dart';
+import 'package:query_builder/posts/post_service.dart';
 
 import 'post_model/post_model.dart';
 
@@ -13,6 +15,7 @@ class PostListScreen extends StatefulWidget {
 
 class _PostListScreenState extends State<PostListScreen> {
   final _scrollController = ScrollController();
+  final _postService = PostService();
 
   @override
   void initState() {
@@ -30,12 +33,12 @@ class _PostListScreenState extends State<PostListScreen> {
           IconButton(
             icon: const Icon(Icons.create),
             onPressed: () {
-              const post = PostModel(
+              _postService.createPost(const PostModel(
                 id: 1234,
                 title: "new post",
                 userId: 1,
                 body: 'this is the body of the post',
-              );
+              ));
             },
           ),
           IconButton(
@@ -45,55 +48,55 @@ class _PostListScreenState extends State<PostListScreen> {
           )
         ],
       ),
-      body: SizedBox(),
-      // body: BlocBuilder<PostBloc, PostState>(
-      //   builder: (context, state) {
-      //     if (state.posts != null) {
-      //       return CustomScrollView(
-      //         controller: _scrollController,
-      //         slivers: [
-      //           SliverList(
-      //             delegate: SliverChildBuilderDelegate(
-      //                 (context, i) => _Post(
-      //                       post: state.posts![i],
-      //                       index: i,
-      //                     ),
-      //                 childCount: state.posts!.length),
-      //           ),
-      //           if (state.status == PostStatus.loading)
-      //             const SliverToBoxAdapter(
-      //               child: Center(
-      //                 child: SizedBox(
-      //                   height: 40,
-      //                   width: 40,
-      //                   child: CircularProgressIndicator(),
-      //                 ),
-      //               ),
-      //             ),
-      //           SliverPadding(
-      //             padding: EdgeInsets.only(
-      //                 bottom: MediaQuery.of(context).padding.bottom),
-      //           )
-      //         ],
-      //       );
-      //     }
-      //     if (state.status == PostStatus.loading) {
-      //       return const Center(
-      //         child: SizedBox(
-      //           height: 40,
-      //           width: 40,
-      //           child: CircularProgressIndicator(),
-      //         ),
-      //       );
-      //     }
-      //     return const Text("no posts found");
-      //   },
-      // ),
+      body: InfiniteQueryBuilder<PostModel>(
+        query: _postService.getPosts(),
+        builder: (context, state, query) {
+          if (state.data != null) {
+            return CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                      (context, i) => _Post(
+                            post: state.data![i],
+                            index: i,
+                          ),
+                      childCount: state.data!.length),
+                ),
+                if (state.isFetching)
+                  const SliverToBoxAdapter(
+                    child: Center(
+                      child: SizedBox(
+                        height: 40,
+                        width: 40,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ),
+                  ),
+                SliverPadding(
+                  padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom),
+                )
+              ],
+            );
+          }
+          if (state.isFetching) {
+            return const Center(
+              child: SizedBox(
+                height: 40,
+                width: 40,
+                child: CircularProgressIndicator(),
+              ),
+            );
+          }
+          return const Text("no posts found");
+        },
+      ),
     );
   }
 
   void _onScroll() {
-    // if (_isBottom) context.read<PostBloc>().add(PostsStreamNextPage());
+    if (_isBottom) _postService.getPosts().getNextPage();
   }
 
   bool get _isBottom {

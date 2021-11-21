@@ -66,15 +66,19 @@ abstract class QueryBase<T, State> {
     }
     _streamController = StreamController.broadcast(onListen: () {
       _streamController!.add(_state);
+      _unScheduleGC();
     }, onCancel: () {
       _streamController!.close();
       _streamController = null;
+      if (_subscribers.isEmpty) {
+        _scheduleGC();
+      }
     });
     return _streamController!.stream;
   }
 
   /// add a [Subscriber] to this query.
-  void Function() _subscribe(subscriber) {
+  void Function() _subscribe(Subscriber subscriber) {
     if (!_subscribers.contains(subscriber)) {
       _subscribers.add(subscriber);
     }
@@ -94,6 +98,7 @@ abstract class QueryBase<T, State> {
 
   /// After the [_cacheTime] is up remove the query from the [GlobalCache]
   void _scheduleGC() {
+    print('scheduling gc');
     if (!_ignoreCacheTime) {
       _gcTimer = Timer(_cacheTime, () => deleteQuery());
     }
@@ -101,8 +106,16 @@ abstract class QueryBase<T, State> {
 
   /// Cancel the garbage collection if another subscriber is added
   void _unScheduleGC() {
-    if (_gcTimer?.isActive == true) {
+    if (_gcTimer?.isActive ?? false) {
       _gcTimer!.cancel();
+      print('unscheduling gc');
+    }
+  }
+
+  void _resetGC() {
+    if (_gcTimer?.isActive ?? false) {
+      _gcTimer!.cancel();
+      _gcTimer = Timer(_cacheTime, () => deleteQuery());
     }
   }
 

@@ -54,7 +54,7 @@ class CachedQuery {
     // Subscribing returns a function to unsubscribe from the query.
     // store them in an array so that we can easily unsubscribe from querys
     // in the dispose method
-    _subscriberFunctions.add(query._subscribe(_subscriberKey));
+    // _subscriberFunctions.add(query._subscribe(_subscriberKey));
     query.getResult(forceRefetch: forceRefetch);
 
     return query;
@@ -95,7 +95,7 @@ class CachedQuery {
       cacheTime: cacheTime,
       prefetchPages: prefetchPages,
     );
-    _subscriberFunctions.add(infiniteQuery._subscribe(_subscriberKey));
+    // _subscriberFunctions.add(infiniteQuery._subscribe(_subscriberKey));
     infiniteQuery._getResult(forceRefetch: forceRefetch);
     return infiniteQuery;
   }
@@ -137,14 +137,14 @@ class CachedQuery {
   /// Type arguments
   Future<T> mutation<T, A>({
     /// the argument to be passed to queryFn
-    A? arg,
+    required A arg,
 
     /// called before the mutation [_queryFn] is run.
-    void Function(A? arg)? onStartMutation,
-    void Function(A? arg, T res)? onSuccess,
-    void Function(A? arg)? onError,
+    void Function(A arg)? onStartMutation,
+    void Function(A arg, T res)? onSuccess,
+    void Function(A arg)? onError,
     required dynamic key,
-    required Future<T> Function(A? arg) queryFn,
+    required Future<T> Function(A arg) queryFn,
     List<dynamic>? invalidateQueries,
   }) async {
     if (onStartMutation != null) {

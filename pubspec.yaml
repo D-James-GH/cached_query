@@ -10,10 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  meta: ^1.7.0
+
+
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
+  test: ^1.19.3
   flutter_lints: ^1.0.4
 
 # For information on the generic Dart part of this file, see the

@@ -26,4 +26,21 @@ class QueryState<T> {
       isFetching: isFetching ?? this.isFetching,
     );
   }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is QueryState &&
+          runtimeType == other.runtimeType &&
+          data == other.data &&
+          isFetching == other.isFetching &&
+          timeCreated == other.timeCreated &&
+          status == other.status;
+
+  @override
+  int get hashCode =>
+      runtimeType.hashCode ^
+      data.hashCode ^
+      status.hashCode ^
+      isFetching.hashCode;
 }

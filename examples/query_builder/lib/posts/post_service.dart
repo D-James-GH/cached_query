@@ -1,30 +1,43 @@
 import 'dart:convert';
+import 'package:cached_query/cached_query.dart';
 import 'package:http/http.dart' as http;
+import 'package:query_builder/posts/post_model/post_model.dart';
 
-class PostService {
-  Future<List<dynamic>> getPosts({
-    required int limit,
-    required int page,
-  }) async {
-    final uri = Uri.parse(
-        'https://jsonplaceholder.typicode.com/posts?_limit=$limit&_page=$page');
-    var res = await http.get(uri);
-    // extra delay for testing purposes
-    return jsonDecode(res.body);
+class PostService with CachedQuery {
+  InfiniteQuery<PostModel> getPosts() {
+    return infiniteQuery(
+      key: 'posts',
+      queryFn: (page) async {
+        final uri = Uri.parse(
+            'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$page');
+        var res = await http.get(uri);
+        return PostModel.listFromJson(
+            // extra delay for testing purposes
+            jsonDecode(res.body));
+      },
+    );
   }
 
-  Future<Map<String, dynamic>> createPost(
-      {required String title,
-      required int userId,
-      required String body}) async {
-    // extra delay for testing purposes
-    return Future.delayed(
-        const Duration(seconds: 1),
-        () => {
-              "id": 123,
-              "title": title,
-              "userId": userId,
-              "body": body,
-            });
+  Future<void> createPost(PostModel post) async {
+    mutation<PostModel, PostModel>(
+      key: ['posts', post.id],
+      arg: post,
+      queryFn: (post) async {
+        final res = await Future.delayed(
+            const Duration(seconds: 1),
+            () => {
+                  "id": 123,
+                  "title": post.title,
+                  "userId": post.userId,
+                  "body": post.body,
+                });
+        return PostModel.fromJson(res);
+      },
+      onSuccess: (args, newPost) {
+        updateInfiniteQuery<PostModel>(
+            key: "posts", updateFn: (old) => [newPost, ...?old]);
+        invalidateQuery('posts');
+      },
+    );
   }
 }

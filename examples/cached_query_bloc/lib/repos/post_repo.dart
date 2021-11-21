@@ -22,7 +22,7 @@ class PostRepository extends CachedQuery {
       arg: post,
       queryFn: (post) async {
         final res = await _service.createPost(
-            title: post!.title, userId: post.userId, body: post.body);
+            title: post.title, userId: post.userId, body: post.body);
         return PostModel.fromJson(res);
       },
       onSuccess: (args, newPost) {
