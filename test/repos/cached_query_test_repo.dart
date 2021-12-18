@@ -4,8 +4,8 @@ class CachedQueryTestRepo extends CachedQuery {
   Query<String?> getTimeQuery() {
     return query(
       key: 'timeQuery',
-      cacheTime: const Duration(seconds: 1),
-      staleTime: const Duration(seconds: 2),
+      cacheDuration: const Duration(seconds: 1),
+      refetchDuration: const Duration(seconds: 2),
       queryFn: () => Future.delayed(
         const Duration(seconds: 1),
         () => DateTime.now().toString(),
@@ -16,8 +16,8 @@ class CachedQueryTestRepo extends CachedQuery {
   Stream<QueryState<String?>> streamTimeQuery() {
     return query(
       key: 'timeQuery',
-      cacheTime: const Duration(seconds: 1),
-      staleTime: const Duration(seconds: 2),
+      cacheDuration: const Duration(seconds: 1),
+      refetchDuration: const Duration(seconds: 2),
       queryFn: () => Future.delayed(
         const Duration(seconds: 1),
         () => DateTime.now().toString(),

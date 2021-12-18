@@ -7,13 +7,13 @@ class PostService with CachedQuery {
   InfiniteQuery<PostModel> getPosts() {
     return infiniteQuery(
       key: 'posts',
+      cacheDuration: const Duration(seconds: 4),
+      serializer: (post) => PostModel.listFromJson(jsonDecode(post)),
       queryFn: (page) async {
         final uri = Uri.parse(
             'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$page');
         var res = await http.get(uri);
-        return PostModel.listFromJson(
-            // extra delay for testing purposes
-            jsonDecode(res.body));
+        return PostModel.listFromJson(jsonDecode(res.body));
       },
     );
   }
@@ -36,7 +36,7 @@ class PostService with CachedQuery {
       onSuccess: (args, newPost) {
         updateInfiniteQuery<PostModel>(
             key: "posts", updateFn: (old) => [newPost, ...?old]);
-        invalidateQuery('posts');
+        // invalidateQuery('posts');
       },
     );
   }

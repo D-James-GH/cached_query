@@ -1,12 +1,17 @@
+import 'package:cached_query/cached_query.dart';
+
 enum QueryStatus { loading, success, error, initial }
 
-class QueryState<T> {
+class QueryState<T> extends StateBase {
+  @override
   final T? data;
   final DateTime timeCreated;
   final QueryStatus status;
   final bool isFetching;
+  final dynamic error;
 
   const QueryState({
+    this.error,
     this.data,
     required this.timeCreated,
     this.status = QueryStatus.initial,
@@ -18,11 +23,13 @@ class QueryState<T> {
     DateTime? timeCreated,
     QueryStatus? status,
     bool? isFetching,
+    dynamic error,
   }) {
     return QueryState(
       data: data ?? this.data,
       timeCreated: timeCreated ?? this.timeCreated,
       status: status ?? this.status,
+      error: error ?? this.error,
       isFetching: isFetching ?? this.isFetching,
     );
   }
@@ -35,6 +42,7 @@ class QueryState<T> {
           data == other.data &&
           isFetching == other.isFetching &&
           timeCreated == other.timeCreated &&
+          error == other.error &&
           status == other.status;
 
   @override
@@ -42,5 +50,6 @@ class QueryState<T> {
       runtimeType.hashCode ^
       data.hashCode ^
       status.hashCode ^
-      isFetching.hashCode;
+      isFetching.hashCode ^
+      error.hashCode;
 }

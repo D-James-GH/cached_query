@@ -1,7 +1,13 @@
 part of "./cached_query.dart";
 
-abstract class QueryBase<T, State> {
+abstract class StateBase {
+  dynamic get data;
+  const StateBase();
+}
+
+abstract class QueryBase<T, State extends StateBase> {
   final dynamic key;
+  final Serializer<dynamic>? _serializer;
 
   /// string encoded key
   final String _queryHash;
@@ -9,17 +15,14 @@ abstract class QueryBase<T, State> {
   /// global cache singleton
   final GlobalCache _globalCache = GlobalCache.instance;
 
-  /// holds the current fetching future for de-duping requests
-  Future<void>? _currentFuture;
-
   /// garbage collection timer
-  Timer? _gcTimer;
+  Timer? _deleteTimer;
 
   /// List of subscribers to the query
   List<Object> _subscribers = [];
 
   @visibleForTesting
-  Timer? get gcTimer => _gcTimer;
+  Timer? get gcTimer => _deleteTimer;
 
   /// time before the query should be re-fetched
   final Duration _staleTime;
@@ -46,76 +49,92 @@ abstract class QueryBase<T, State> {
     required this.key,
     required bool ignoreStaleTime,
     required bool ignoreCacheTime,
-    required Duration staleTime,
-    required Duration cacheTime,
+    Duration? refetchDuration,
+    Duration? cacheDuration,
     required State state,
+    Serializer<dynamic>? serializer,
   })  : _ignoreStaleTime = ignoreStaleTime,
         _ignoreCacheTime = ignoreCacheTime,
         _queryHash = jsonEncode(key),
-        _staleTime = staleTime,
-        _cacheTime = cacheTime,
-        _state = state;
+        _staleTime = refetchDuration ?? GlobalCache.instance.refetchDuration,
+        _cacheTime = cacheDuration ?? GlobalCache.instance.cacheDuration,
+        _state = state,
+        _serializer = serializer;
 
   Future<State> get result;
 
   State get state => _state;
 
+  /// sets the new state and adds the new state to the query stream
+  void _setState(State newState) {
+    _streamController?.add(newState);
+    _state = newState;
+  }
+
+  void _save() {
+    if (_globalCache.storage != null) {
+      try {
+        _globalCache.storage!.put(_queryHash, item: jsonEncode(_state.data));
+      } catch (e) {
+        print(e);
+        throw Exception(
+            "The state of this query is not directly serializable and it does not have a `.toJson()` method");
+      }
+    }
+  }
+
+  Future<T?> _fetchFromStorage() async {
+    if (_globalCache.storage != null) {
+      try {
+        final storedData = await _globalCache.storage?.get(_queryHash);
+
+        if (storedData != null) {
+          final converted = jsonDecode(storedData);
+          return _serializer == null ? converted : _serializer!(converted);
+        }
+      } catch (e) {
+        //TODO: add exception
+      }
+    }
+  }
+
   Stream<State> get stream {
     if (_streamController != null) {
       return _streamController!.stream;
     }
-    _streamController = StreamController.broadcast(onListen: () {
-      _streamController!.add(_state);
-      _unScheduleGC();
-    }, onCancel: () {
-      _streamController!.close();
-      _streamController = null;
-      if (_subscribers.isEmpty) {
-        _scheduleGC();
-      }
-    });
+    _streamController = StreamController.broadcast(
+      onListen: () {
+        _streamController!.add(_state);
+        _cancelDelete();
+      },
+      onCancel: () {
+        _streamController!.close();
+        _streamController = null;
+        if (_subscribers.isEmpty) {
+          _scheduleDelete();
+        }
+      },
+    );
     return _streamController!.stream;
   }
 
-  /// add a [Subscriber] to this query.
-  void Function() _subscribe(Subscriber subscriber) {
-    if (!_subscribers.contains(subscriber)) {
-      _subscribers.add(subscriber);
-    }
-    _unScheduleGC();
-
-    return () => _unsubscribe(subscriber);
-  }
-
-  /// remove a [Subscriber] from this query. If removing the last subscriber schedule
-  /// a garbage collection.
-  void _unsubscribe(Subscriber subscriber) {
-    _subscribers = _subscribers.where((e) => e != subscriber).toList();
-    if (_subscribers.isEmpty) {
-      _scheduleGC();
-    }
-  }
-
   /// After the [_cacheTime] is up remove the query from the [GlobalCache]
-  void _scheduleGC() {
-    print('scheduling gc');
+  void _scheduleDelete() {
     if (!_ignoreCacheTime) {
-      _gcTimer = Timer(_cacheTime, () => deleteQuery());
+      _deleteTimer = Timer(_cacheTime, () => deleteQuery());
     }
   }
 
-  /// Cancel the garbage collection if another subscriber is added
-  void _unScheduleGC() {
-    if (_gcTimer?.isActive ?? false) {
-      _gcTimer!.cancel();
-      print('unscheduling gc');
+  void _cancelDelete() {
+    if (_deleteTimer?.isActive ?? false) {
+      _deleteTimer!.cancel();
     }
   }
 
-  void _resetGC() {
-    if (_gcTimer?.isActive ?? false) {
-      _gcTimer!.cancel();
-      _gcTimer = Timer(_cacheTime, () => deleteQuery());
+  void _resetDeleteTimer() {
+    if (_deleteTimer?.isActive ?? false) {
+      _deleteTimer!.cancel();
+      _deleteTimer = Timer(_cacheTime, () => deleteQuery());
     }
   }
 

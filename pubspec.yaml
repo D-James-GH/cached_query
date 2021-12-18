@@ -11,11 +11,16 @@ dependencies:
   flutter:
     sdk: flutter
   meta: ^1.7.0
+  hive: ^2.0.5
+  hive_flutter:
+  sqflite: ^2.0.1
+  path: ^1.8.0
+
 
 
 
 dev_dependencies:
-  test: ^1.19.3
+  test: ^1.20.0
   flutter_lints: ^1.0.4
 
 # For information on the generic Dart part of this file, see the

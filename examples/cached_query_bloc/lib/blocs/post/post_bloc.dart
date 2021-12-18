@@ -14,7 +14,6 @@ part 'post_state.dart';
 
 class PostBloc extends Bloc<PostEvent, PostState> {
   final _repo = PostRepository();
-  InfiniteQuery<PostModel>? _infiniteQuery;
 
   PostBloc() : super(const PostState()) {
     on<PostsStreamFetched>(_onPostsFetched);
@@ -25,8 +24,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
   FutureOr<void> _onPostsFetched(
       PostsStreamFetched event, Emitter<PostState> emit) async {
-    _infiniteQuery = _repo.getPosts();
-    await emit.forEach<InfiniteQueryState<PostModel>>(_infiniteQuery!.stream,
+    await emit.forEach<InfiniteQueryState<PostModel>>(_repo.getPosts().stream,
         onData: (query) {
       return state.copyWith(
         posts: query.data,
@@ -37,7 +35,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   void _onPostsNextPage(_, __) {
-    _infiniteQuery?.getNextPage();
+    _repo.getPosts().getNextPage();
   }
 
   void _onPostCreated(PostStreamCreated event, _) {
@@ -48,11 +46,5 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     return (events, mapper) {
       return droppable<E>().call(events.throttle(duration), mapper);
     };
-  }
-
-  @override
-  Future<void> close() {
-    _repo.close();
-    return super.close();
   }
 }

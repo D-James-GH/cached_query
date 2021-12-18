@@ -12,42 +12,17 @@ part 'joke_bloc.freezed.dart';
 
 class JokeBloc extends Bloc<JokeEvent, JokeState> {
   final _repo = JokeRepository();
-  StreamSubscription<QueryState<JokeModel?>>? _subscription;
   JokeBloc() : super(const JokeState()) {
     on<JokeFetched>(_onJokeFetched);
-    on<JokeUpdated>(_onJokeUpdated);
-    init();
-  }
-  void init() async {
-    // _repo.getJokeFuture((event) {
-    //   add(JokeUpdated(joke: event.data, isFetching: event.isFetching));
-    // });
-  }
-
-  FutureOr<void> _onJokeUpdated(JokeUpdated event, Emitter<JokeState> emit) {
-    emit(state.copyWith(
-      joke: event.joke,
-      status: event.isFetching ? JokeStatus.loading : JokeStatus.success,
-    ));
   }
 
   FutureOr<void> _onJokeFetched(
       JokeFetched event, Emitter<JokeState> emit) async {
-    // final res = await _repo.getJokeFuture();
-    // _subscription = res.
-    // wait for the whole stream to finish
     await emit.forEach<QueryState<JokeModel?>>(
-      _repo.getJoke(),
+      _repo.getJoke().stream,
       onData: (query) => state.copyWith(
           joke: query.data,
           status: query.isFetching ? JokeStatus.loading : JokeStatus.success),
     );
-  }
-
-  @override
-  Future<void> close() {
-    _subscription?.cancel();
-    _repo.close();
-    return super.close();
   }
 }

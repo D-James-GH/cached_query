@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:cached_query/cached_query.dart';
+import 'package:test/test.dart';
 
 import 'repos/cached_query_test_repo.dart';
 

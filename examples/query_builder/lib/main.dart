@@ -1,9 +1,11 @@
+import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 
 import 'jokes/joke.screen.dart';
 import 'posts/post_list_screen.dart';
 
 void main() async {
+  CachedQuery.initialize(storage: await SqlStorage.ensureInitialized());
   runApp(const MyApp());
 }
 

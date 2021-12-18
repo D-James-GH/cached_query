@@ -6,7 +6,8 @@ import 'package:query_builder/posts/post_list_screen.dart';
 
 class JokeScreen extends StatelessWidget {
   static const routeName = '/screenTwo';
-  const JokeScreen({Key? key}) : super(key: key);
+  final JokeService service = JokeService();
+  JokeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +17,7 @@ class JokeScreen extends StatelessWidget {
           children: [
             const Text('jokes'),
             QueryBuilder<JokeModel?>(
-              query: _getJoke(),
+              query: service.getJoke(),
               builder: (_, state) {
                 if (state.isFetching) {
                   return const CircularProgressIndicator(
@@ -38,7 +39,7 @@ class JokeScreen extends StatelessWidget {
       ),
       body: Center(
         child: QueryBuilder<JokeModel?>(
-          query: _getJoke(),
+          query: service.getJoke(),
           builder: (_, state) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -51,12 +52,5 @@ class JokeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Query<JokeModel?> _getJoke() {
-    return CachedQuery().query<JokeModel>(
-        key: 'joke',
-        staleTime: const Duration(seconds: 4),
-        queryFn: () async => JokeModel.fromJson(await JokeService().getJoke()));
   }
 }

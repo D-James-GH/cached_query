@@ -34,22 +34,4 @@ class PostRepository extends CachedQuery {
     // get query and return after invalidation;
     // return getInfiniteQuery('posts');
   }
-
-  Stream<List<PostModel>?> streamCreatePost(PostModel post) {
-    return mutationStream<PostModel, List<PostModel>>(
-        key: ['post'],
-        queryFn: (p) async => PostModel.fromJson(
-              await _service.createPost(
-                  title: p!.title, userId: p.userId, body: p.body),
-            ),
-        arg: post,
-        onStartMutation: (p) {
-          updateInfiniteQuery<PostModel>(
-              key: 'posts', updateFn: (List<PostModel>? old) => [p, ...?old]);
-          return getInfiniteQuery('posts');
-        },
-        onSuccess: (post, res) {
-          invalidateQuery('posts');
-        });
-  }
 }
