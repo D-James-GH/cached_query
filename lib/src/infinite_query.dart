@@ -21,7 +21,7 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
   })  : _queryFn = queryFn,
         _initialPage = initialPage,
         _currentPage = initialPage,
-        _queryKeys = [key + initialPage.toString()],
+        _queryKeys = [],
         super._internal(
           key: key,
           ignoreStaleTime: ignoreStaleTime,
@@ -49,32 +49,15 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
       return _state;
     }
 
-    if (_queryKeys.length == 1) {
+    if (_queryKeys.isEmpty) {
       // get initial page
       final initialQuery = await _getQuery().getResult();
       _setState(_state.copyWith(data: initialQuery.data));
       return _state;
     }
-    await _getAllQueryResult();
+    await _refetchAllQueries();
     return _state;
   }
-
-  // Stream<InfiniteQueryState<T>> streamResult() async* {
-  //   if (!_stale &&
-  //       _state.data != null &&
-  //       _state.data!.isNotEmpty == true &&
-  //       _state.timeCreated.add(_staleTime).isAfter(DateTime.now())) {
-  //     _streamController?.add(_state);
-  //     yield _state;
-  //   } else {
-  //     var loadingState =
-  //         _state.copyWith(status: QueryStatus.loading, isFetching: true);
-  //     _streamController?.add(loadingState);
-  //     yield loadingState;
-  //     await _getAllQueryResult();
-  //     yield _state;
-  //   }
-  // }
 
   /// Get the next page in an [InfiniteQuery] and cache the result.
   Future<InfiniteQueryState<T>> getNextPage() {
@@ -87,9 +70,7 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
   Future<InfiniteQueryState<T>> _fetchNextPage() async {
     // add one to the current page to check whether it has data
     final QueryState<List<T>?> res =
-        await _getQuery(queryKey: key + (_currentPage + 1).toString())
-            .getResult();
-
+        await _getQuery(key: [key, _currentPage + 1]).getResult();
     if (res.data == null || res.data?.isEmpty == true) {
       _setState(_state.copyWith(hasReachedMax: true));
       return _state;
@@ -97,6 +78,7 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
 
     _currentPage++;
     _setState(_state.copyWith(data: [...?_state.data, ...res.data!]));
+    _currentFuture = null;
     return _state;
   }
 
@@ -112,8 +94,8 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
   }
 
   /// get all queries in the query key list
-  Future<void> _getAllQueryResult() async {
-    final queries = _queryKeys.map((k) => _getQuery(queryKey: k)).toList();
+  Future<void> _refetchAllQueries() async {
+    final queries = _queryKeys.map((k) => _getQuery(key: k)).toList();
 
     final List<T> data = [];
     await Future.forEach(queries, (Query<List<T>> query) async {
@@ -132,18 +114,16 @@ class InfiniteQuery<T> extends QueryBase<T, InfiniteQueryState<T>> {
   }
 
   /// [_getQuery] gets a single query from the global cache
-  Query<List<T>> _getQuery({String? queryKey}) {
-    queryKey ??= key + _currentPage.toString();
+  Query<List<T>> _getQuery({dynamic key}) {
+    key ??= [this.key, _currentPage];
     var page = _currentPage;
     final q = query<List<T>>(
-      key: queryKey,
+      key: key,
       serializer: _serializer as Serializer<List<T>>,
       queryFn: () => _queryFn(page),
-      ignoreCacheTime: true,
-      ignoreStaleTime: true,
     );
-    if (!_queryKeys.contains(queryKey)) {
-      _queryKeys.add(queryKey!);
+    if (!_queryKeys.contains(q._queryHash)) {
+      _queryKeys.add(q._queryHash);
     }
 
     return q;

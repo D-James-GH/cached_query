@@ -7,8 +7,9 @@ class PostService with CachedQuery {
   InfiniteQuery<PostModel> getPosts() {
     return infiniteQuery(
       key: 'posts',
-      cacheDuration: const Duration(seconds: 4),
-      serializer: (post) => PostModel.listFromJson(jsonDecode(post)),
+      cacheDuration: const Duration(seconds: 2),
+      refetchDuration: const Duration(seconds: 2),
+      serializer: (post) => PostModel.listFromJson(post),
       queryFn: (page) async {
         final uri = Uri.parse(
             'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$page');

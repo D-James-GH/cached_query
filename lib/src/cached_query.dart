@@ -2,10 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query/src/hydration/query_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:hive/hive.dart';
 part 'query.dart';
 part 'infinite_query.dart';
 part "./global_cache.dart";
@@ -47,8 +44,8 @@ Query<T> query<T>({
   Duration? refetchDuration,
   Duration? cacheDuration,
   bool forceRefetch = false,
-  bool ignoreStaleTime = false,
-  bool ignoreCacheTime = false,
+  bool ignoreRefetchDuration = false,
+  bool ignoreCacheDuration = false,
 }) {
   final globalCache = GlobalCache.instance;
   var query = globalCache.getQuery<T>(key);
@@ -61,8 +58,8 @@ Query<T> query<T>({
       cacheDuration: cacheDuration,
       queryFn: queryFn,
       serializer: serializer,
-      ignoreStaleTime: ignoreStaleTime,
-      ignoreCacheTime: ignoreCacheTime,
+      ignoreStaleTime: ignoreRefetchDuration,
+      ignoreCacheTime: ignoreCacheDuration,
     );
     globalCache.addQuery(query);
   }
@@ -125,7 +122,7 @@ InfiniteQuery<T> infiniteQuery<T>({
   }
   // _subscriberFunctions.add(infiniteQuery._subscribe(_subscriberKey));
   infiniteQuery._getResult(forceRefetch: forceRefetch);
-  return infiniteQuery as InfiniteQuery<T>;
+  return infiniteQuery;
 }
 
 /// Type arguments

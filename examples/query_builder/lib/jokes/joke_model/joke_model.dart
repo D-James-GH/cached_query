@@ -10,6 +10,8 @@ class JokeModel with _$JokeModel {
     required String id,
   }) = _JokeModel;
 
-  factory JokeModel.fromJson(Map<String, dynamic> json) =>
-      _$JokeModelFromJson(json);
+  factory JokeModel.fromJson(Map<String, dynamic> json) {
+    print("inside jokemodel $json");
+    return _$JokeModelFromJson(json);
+  }
 }

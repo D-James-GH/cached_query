@@ -6,13 +6,12 @@ class GlobalCache {
 
   static final GlobalCache instance = GlobalCache._();
 
-  /// Allow the creation of new instances for testing purposes
   @visibleForTesting
   factory GlobalCache.asNewInstance() {
     return GlobalCache._();
   }
 
-  /// A flag to only allow the default options to be set once
+  /// only allow the default options to be set once
   bool _defaultsSet = false;
 
   QueryStorage? storage;
@@ -22,7 +21,7 @@ class GlobalCache {
   ///map to store requests
   Map<String, Query<dynamic>> queryCache = {};
 
-  /// map to store infinite query's
+  // map to store infinite query's
   Map<String, InfiniteQuery<dynamic>> infiniteQueryCache = {};
 
   void setDefaults({

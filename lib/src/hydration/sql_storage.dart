@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:cached_query/src/hydration/query_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -68,7 +65,7 @@ class SqlStorage extends QueryStorage {
     try {
       await _db.insert(
         _queryTable,
-        {"queryKey": key, "queryData": jsonEncode(item)},
+        {"queryKey": key, "queryData": item},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {

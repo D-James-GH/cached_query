@@ -86,10 +86,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
             status: QueryStatus.success),
       );
       // save to local storage if exists
-      _save();
+      _saveToStorage();
     } catch (e) {
       _setState(_state.copyWith(status: QueryStatus.error, error: e));
-      rethrow;
     } finally {
       _currentFuture = null;
       _setState(_state.copyWith(isFetching: false));

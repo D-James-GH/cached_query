@@ -18,9 +18,6 @@ abstract class QueryBase<T, State extends StateBase> {
   /// garbage collection timer
   Timer? _deleteTimer;
 
-  /// List of subscribers to the query
-  List<Object> _subscribers = [];
-
   @visibleForTesting
   Timer? get gcTimer => _deleteTimer;
 
@@ -71,14 +68,13 @@ abstract class QueryBase<T, State extends StateBase> {
     _state = newState;
   }
 
-  void _save() {
+  void _saveToStorage() {
     if (_globalCache.storage != null) {
       try {
         _globalCache.storage!.put(_queryHash, item: jsonEncode(_state.data));
       } catch (e) {
-        print(e);
         throw Exception(
-            "The state of this query is not directly serializable and it does not have a `.toJson()` method");
+            "The data in this query is not directly serializable and it does not have a `.toJson()` method");
       }
     }
   }
@@ -94,6 +90,7 @@ abstract class QueryBase<T, State extends StateBase> {
         }
       } catch (e) {
         //TODO: add exception
+        print(e);
       }
     }
   }
@@ -110,9 +107,7 @@ abstract class QueryBase<T, State extends StateBase> {
       onCancel: () {
         _streamController!.close();
         _streamController = null;
-        if (_subscribers.isEmpty) {
-          _scheduleDelete();
-        }
+        _scheduleDelete();
       },
     );
     return _streamController!.stream;
