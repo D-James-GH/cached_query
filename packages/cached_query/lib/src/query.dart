@@ -9,7 +9,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   Future<void>? _currentFuture;
 
   Query._internal({
-    required dynamic key,
+    required String key,
     required Future<T> Function() queryFn,
     bool ignoreStaleTime = false,
     bool ignoreCacheTime = false,
@@ -20,8 +20,8 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         super._internal(
             key: key,
             state: QueryState<T>(timeCreated: DateTime.now()),
-            ignoreCacheTime: ignoreCacheTime,
-            ignoreStaleTime: ignoreStaleTime,
+            ignoreCacheDuration: ignoreCacheTime,
+            ignoreRefetchDuration: ignoreStaleTime,
             serializer: serializer,
             refetchDuration: refetchDuration,
             cacheDuration: cacheDuration);
@@ -66,11 +66,15 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     try {
       if (_state.data == null) {
         // try to get any data from storage if the query has no data
-        final dataFromStorage = await _fetchFromStorage();
-        _setState(_state.copyWith(
-            data: dataFromStorage,
-            status: QueryStatus.loading,
-            isFetching: true));
+        final dynamic dataFromStorage = await _fetchFromStorage();
+        assert(dataFromStorage is T,
+            "The data serialized from storage should have the same type as T");
+        if (dataFromStorage is T) {
+          _setState(_state.copyWith(
+              data: dataFromStorage,
+              status: QueryStatus.loading,
+              isFetching: true));
+        }
       }
       if (!_state.isFetching) {
         _setState(

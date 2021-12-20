@@ -13,7 +13,8 @@ analyzer:
   language:
     strict-raw-types: true
   strong-mode:
-    implicit-casts: true
+    implicit-casts: false
+    implicit-dynamic: false
 
 linter:
   rules:

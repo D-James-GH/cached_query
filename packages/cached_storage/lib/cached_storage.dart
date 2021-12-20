@@ -1,7 +1,9 @@
-import 'package:cached_query/src/hydration/query_storage.dart';
+library cached_storage;
+
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:cached_query/cached_query.dart';
 
 class SqlStorage extends QueryStorage {
   static const String _queryTable = "Query";

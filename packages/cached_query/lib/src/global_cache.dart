@@ -6,12 +6,13 @@ class GlobalCache {
 
   static final GlobalCache instance = GlobalCache._();
 
+  /// Allow the creation of new instances for testing purposes
   @visibleForTesting
   factory GlobalCache.asNewInstance() {
     return GlobalCache._();
   }
 
-  /// only allow the default options to be set once
+  /// A flag to only allow the default options to be set once
   bool _defaultsSet = false;
 
   QueryStorage? storage;
@@ -21,8 +22,8 @@ class GlobalCache {
   ///map to store requests
   Map<String, Query<dynamic>> queryCache = {};
 
-  // map to store infinite query's
-  Map<String, InfiniteQuery<dynamic>> infiniteQueryCache = {};
+  /// map to store infinite query's
+  Map<String, InfiniteQuery<dynamic, dynamic>> infiniteQueryCache = {};
 
   void setDefaults({
     Duration? cacheDuration,
@@ -43,40 +44,37 @@ class GlobalCache {
   }
 
   /// Gets an existing query if it exists
-  Query<T>? getQuery<T>(dynamic key) {
-    final queryHash = jsonEncode(key);
-    if (queryCache.containsKey(queryHash)) {
-      return queryCache[queryHash] as Query<T>?;
+  Query<T>? getQuery<T>(String key) {
+    if (queryCache.containsKey(key)) {
+      return queryCache[key] as Query<T>?;
     }
   }
 
   void addQuery<T>(Query<T> query) {
-    queryCache[query._queryHash] = query;
+    queryCache[query.key] = query;
   }
 
   /// Gets an existing infinite query if it exists
-  InfiniteQuery<T>? getInfiniteQuery<T>(dynamic key) {
-    final queryHash = jsonEncode(key);
-    if (infiniteQueryCache.containsKey(queryHash)) {
-      return infiniteQueryCache[queryHash] as InfiniteQuery<T>?;
+  InfiniteQuery<T, A>? getInfiniteQuery<T, A>(String key) {
+    if (infiniteQueryCache.containsKey(key)) {
+      return infiniteQueryCache[key] as InfiniteQuery<T, A>?;
     }
   }
 
-  void addInfiniteQuery<T>(InfiniteQuery<T> query) {
-    infiniteQueryCache[query._queryHash] = query;
+  void addInfiniteQuery<T, A>(InfiniteQuery<T, A> query) {
+    infiniteQueryCache[query.key] = query;
   }
 
   /// Invalidate cache, if no key is passed it will invalidate the whole cache
-  void invalidateCache({dynamic key, String? queryHash}) {
+  void invalidateCache({
+    String? key,
+  }) {
     if (key != null) {
-      queryHash = jsonEncode(key);
-    }
-    if (queryHash != null) {
-      if (queryCache.containsKey(queryHash)) {
-        queryCache[queryHash]?.invalidateQuery();
+      if (queryCache.containsKey(key)) {
+        queryCache[key]?.invalidateQuery();
       }
-      if (infiniteQueryCache.containsKey(queryHash)) {
-        infiniteQueryCache[queryHash]?.invalidateQuery();
+      if (infiniteQueryCache.containsKey(key)) {
+        infiniteQueryCache[key]?.invalidateQuery();
       }
     } else {
       // other wise invalidate the whole cache
@@ -84,13 +82,10 @@ class GlobalCache {
     }
   }
 
-  void deleteCache({dynamic key, String? queryHash}) {
+  void deleteCache({String? key}) {
     if (key != null) {
-      queryHash = jsonEncode(key);
-    }
-    if (queryHash != null) {
-      if (queryCache.containsKey(queryHash)) {
-        queryCache.remove(queryHash);
+      if (queryCache.containsKey(key)) {
+        queryCache.remove(key);
       }
     } else {
       // other wise invalidate the whole cache

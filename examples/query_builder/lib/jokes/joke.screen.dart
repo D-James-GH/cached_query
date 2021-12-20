@@ -11,6 +11,7 @@ class JokeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Row(

@@ -3,20 +3,21 @@ import 'dart:async';
 import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 
-class InfiniteQueryBuilder<T> extends StatefulWidget {
-  final InfiniteQuery<T> query;
+class InfiniteQueryBuilder<T, A> extends StatefulWidget {
+  final InfiniteQuery<T, A> query;
   final Widget Function(BuildContext context, InfiniteQueryState<T> state,
-      InfiniteQuery<T> query) builder;
+      InfiniteQuery<T, A> query) builder;
   const InfiniteQueryBuilder(
       {Key? key, required this.query, required this.builder})
       : super(key: key);
 
   @override
-  _InfiniteQueryBuilderState<T> createState() =>
-      _InfiniteQueryBuilderState<T>();
+  _InfiniteQueryBuilderState<T, A> createState() =>
+      _InfiniteQueryBuilderState<T, A>();
 }
 
-class _InfiniteQueryBuilderState<T> extends State<InfiniteQueryBuilder<T>> {
+class _InfiniteQueryBuilderState<T, A>
+    extends State<InfiniteQueryBuilder<T, A>> {
   late InfiniteQueryState<T> _state;
   late StreamSubscription<InfiniteQueryState<T>> _subscription;
 

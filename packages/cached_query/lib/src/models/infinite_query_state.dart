@@ -1,10 +1,8 @@
 import 'package:cached_query/cached_query.dart';
 
-import './query_state.dart';
-
 class InfiniteQueryState<T> extends StateBase {
   @override
-  final List<T>? data;
+  final List<T> data;
   final int currentPage;
   final bool hasReachedMax;
   final QueryStatus? status;
@@ -14,7 +12,7 @@ class InfiniteQueryState<T> extends StateBase {
 
   const InfiniteQueryState({
     this.hasReachedMax = false,
-    this.data,
+    required this.data,
     this.status = QueryStatus.initial,
     this.isFetching = false,
     this.error,

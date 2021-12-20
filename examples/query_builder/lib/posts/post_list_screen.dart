@@ -48,20 +48,21 @@ class _PostListScreenState extends State<PostListScreen> {
           )
         ],
       ),
-      body: InfiniteQueryBuilder<PostModel>(
+      body: InfiniteQueryBuilder<List<PostModel>, int>(
         query: _postService.getPosts(),
         builder: (context, state, query) {
-          if (state.data != null) {
+          if (state.data.isNotEmpty) {
+            final allPosts = state.data.expand((e) => e).toList();
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                       (context, i) => _Post(
-                            post: state.data![i],
+                            post: allPosts[i],
                             index: i,
                           ),
-                      childCount: state.data!.length),
+                      childCount: state.data.length),
                 ),
                 if (state.isFetching)
                   const SliverToBoxAdapter(

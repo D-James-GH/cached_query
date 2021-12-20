@@ -1,16 +1,16 @@
 part of "./cached_query.dart";
 
 abstract class StateBase {
-  dynamic get data;
+  Object? get data;
   const StateBase();
 }
 
 abstract class QueryBase<T, State extends StateBase> {
-  final dynamic key;
+  final String key;
   final Serializer<dynamic>? _serializer;
 
   /// string encoded key
-  final String _queryHash;
+  // final String _queryHash;
 
   /// global cache singleton
   final GlobalCache _globalCache = GlobalCache.instance;
@@ -44,15 +44,15 @@ abstract class QueryBase<T, State extends StateBase> {
 
   QueryBase._internal({
     required this.key,
-    required bool ignoreStaleTime,
-    required bool ignoreCacheTime,
+    required bool ignoreRefetchDuration,
+    required bool ignoreCacheDuration,
     Duration? refetchDuration,
     Duration? cacheDuration,
     required State state,
     Serializer<dynamic>? serializer,
-  })  : _ignoreStaleTime = ignoreStaleTime,
-        _ignoreCacheTime = ignoreCacheTime,
-        _queryHash = jsonEncode(key),
+  })  : _ignoreStaleTime = ignoreRefetchDuration,
+        _ignoreCacheTime = ignoreCacheDuration,
+        // _queryHash = jsonEncode(key),
         _staleTime = refetchDuration ?? GlobalCache.instance.refetchDuration,
         _cacheTime = cacheDuration ?? GlobalCache.instance.cacheDuration,
         _state = state,
@@ -71,7 +71,7 @@ abstract class QueryBase<T, State extends StateBase> {
   void _saveToStorage() {
     if (_globalCache.storage != null) {
       try {
-        _globalCache.storage!.put(_queryHash, item: jsonEncode(_state.data));
+        _globalCache.storage!.put(key, item: jsonEncode(_state.data));
       } catch (e) {
         throw Exception(
             "The data in this query is not directly serializable and it does not have a `.toJson()` method");
@@ -79,18 +79,21 @@ abstract class QueryBase<T, State extends StateBase> {
     }
   }
 
-  Future<T?> _fetchFromStorage() async {
+  Future<dynamic> _fetchFromStorage() async {
     if (_globalCache.storage != null) {
       try {
-        final storedData = await _globalCache.storage?.get(_queryHash);
+        final storedData = await _globalCache.storage?.get(key);
 
         if (storedData != null) {
-          final converted = jsonDecode(storedData);
+          final dynamic converted = jsonDecode(storedData);
           return _serializer == null ? converted : _serializer!(converted);
         }
       } catch (e) {
         //TODO: add exception
-        print(e);
+        assert(() {
+          print(e);
+          return true;
+        }());
       }
     }
   }
@@ -140,6 +143,6 @@ abstract class QueryBase<T, State extends StateBase> {
 
   /// delete the query and query key from cache
   void deleteQuery() {
-    _globalCache.deleteCache(queryHash: _queryHash);
+    _globalCache.deleteCache(key: key);
   }
 }

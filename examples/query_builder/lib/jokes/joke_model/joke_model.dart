@@ -11,7 +11,6 @@ class JokeModel with _$JokeModel {
   }) = _JokeModel;
 
   factory JokeModel.fromJson(Map<String, dynamic> json) {
-    print("inside jokemodel $json");
     return _$JokeModelFromJson(json);
   }
 }

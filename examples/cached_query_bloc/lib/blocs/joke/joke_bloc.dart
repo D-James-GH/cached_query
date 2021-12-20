@@ -4,7 +4,6 @@ import 'package:examples/models/joke_model.dart';
 import 'package:examples/repos/joke_repo.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
 
 part 'joke_event.dart';
 part 'joke_state.dart';
