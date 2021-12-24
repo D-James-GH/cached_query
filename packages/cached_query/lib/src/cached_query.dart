@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/query_storage.dart';
+import 'package:cached_query/src/storage_interface.dart';
 import 'package:meta/meta.dart';
 part 'query.dart';
 part 'infinite_query.dart';
@@ -13,14 +13,14 @@ typedef Serializer<T> = T Function(dynamic json);
 /// A function to determine the parameters of the next page in an infinite query.
 /// Return null if the last page has already been fetch and therefore trigger
 /// [InfiniteQueryState.hasReachedMax] to equal `true`
-typedef GetNextArg<T, A> = A? Function(int currentPage, T? lastPage);
+typedef GetNextArg<A, T> = A? Function(int currentPage, T? lastPage);
 
 /// Cache any asynchronous function results with [CachedQuery]
 class CachedQuery {
   static void initialize({
     Duration? cacheDuration,
     Duration? refetchDuration,
-    QueryStorage? storage,
+    StorageInterface? storage,
   }) async {
     GlobalCache.instance.setDefaults(
       refetchDuration: refetchDuration,
@@ -71,7 +71,7 @@ Query<T> query<T>({
   }
 
   // start the fetching process
-  query.getResult(forceRefetch: forceRefetch);
+  query._getResult(forceRefetch: forceRefetch);
 
   return query;
 }
@@ -95,8 +95,8 @@ Query<T> query<T>({
 /// data changes.
 InfiniteQuery<T, A> infiniteQuery<T, A>({
   required Object key,
-  required Future<T> Function(A? arg) queryFn,
-  required GetNextArg<T, A> getNextArg,
+  required Future<T> Function(A arg) queryFn,
+  required GetNextArg<A, T> getNextArg,
   Serializer<T>? serializer,
   bool forceRefetch = false,
   Duration? cacheDuration,

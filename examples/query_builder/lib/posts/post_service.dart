@@ -7,8 +7,6 @@ class PostService with CachedQuery {
   InfiniteQuery<List<PostModel>, int> getPosts() {
     return infiniteQuery<List<PostModel>, int>(
       key: 'posts',
-      cacheDuration: const Duration(seconds: 2),
-      refetchDuration: const Duration(seconds: 2),
       serializer: (post) => PostModel.listFromJson(post),
       initialIndex: 1,
       getNextArg: (pageIndex, lastPage) {

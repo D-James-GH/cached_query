@@ -7,7 +7,7 @@ void main() {
   setUp(() {
     globalCache = GlobalCache.asNewInstance();
   });
-  group("Creating and invalidating cache.", () {});
+  group("Invalidate cache.", () {});
 
   // first time create a new query
 

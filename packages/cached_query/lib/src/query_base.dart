@@ -16,10 +16,7 @@ abstract class QueryBase<T, State extends StateBase> {
   final GlobalCache _globalCache = GlobalCache.instance;
 
   /// garbage collection timer
-  Timer? _deleteTimer;
-
-  @visibleForTesting
-  Timer? get gcTimer => _deleteTimer;
+  Timer? _deleteQueryTimer;
 
   /// time before the query should be re-fetched
   final Duration _staleTime;
@@ -58,9 +55,11 @@ abstract class QueryBase<T, State extends StateBase> {
         _state = state,
         _serializer = serializer;
 
-  Future<State> get result;
-
   State get state => _state;
+  bool get stale => _stale;
+
+  Future<State> get result;
+  Future<State> refetch();
 
   /// sets the new state and adds the new state to the query stream
   void _setState(State newState) {
@@ -104,7 +103,7 @@ abstract class QueryBase<T, State extends StateBase> {
     }
     _streamController = StreamController.broadcast(
       onListen: () {
-        _streamController!.add(_state);
+        // _streamController!.add(_state);
         _cancelDelete();
       },
       onCancel: () {
@@ -119,20 +118,20 @@ abstract class QueryBase<T, State extends StateBase> {
   /// After the [_cacheTime] is up remove the query from the [GlobalCache]
   void _scheduleDelete() {
     if (!_ignoreCacheTime) {
-      _deleteTimer = Timer(_cacheTime, () => deleteQuery());
+      _deleteQueryTimer = Timer(_cacheTime, () => deleteQuery());
     }
   }
 
   void _cancelDelete() {
-    if (_deleteTimer?.isActive ?? false) {
-      _deleteTimer!.cancel();
+    if (_deleteQueryTimer?.isActive ?? false) {
+      _deleteQueryTimer!.cancel();
     }
   }
 
   void _resetDeleteTimer() {
-    if (_deleteTimer?.isActive ?? false) {
-      _deleteTimer!.cancel();
-      _deleteTimer = Timer(_cacheTime, () => deleteQuery());
+    if (_deleteQueryTimer?.isActive ?? false) {
+      _deleteQueryTimer!.cancel();
+      _deleteQueryTimer = Timer(_cacheTime, () => deleteQuery());
     }
   }
 

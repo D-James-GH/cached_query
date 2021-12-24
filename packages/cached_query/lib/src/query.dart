@@ -31,16 +31,19 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   Future<QueryState<T>> get result {
     _resetDeleteTimer();
     // if there are no other listeners and result has been called schedule
-    // garbage collection.
+    // a delete.
     if (_streamController?.hasListener != true &&
-        _deleteTimer?.isActive != true) {
+        _deleteQueryTimer?.isActive != true) {
       _scheduleDelete();
     }
-    return getResult(forceRefetch: false);
+    return _getResult(forceRefetch: false);
   }
 
+  @override
+  Future<QueryState<T>> refetch() => _getResult(forceRefetch: true);
+
   /// returns the result of the [_queryFn], either from cache or calling directly
-  Future<QueryState<T>> getResult({bool forceRefetch = false}) async {
+  Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
     if (!_stale &&
         !forceRefetch &&
         _state.data != null &&
@@ -67,9 +70,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       if (_state.data == null) {
         // try to get any data from storage if the query has no data
         final dynamic dataFromStorage = await _fetchFromStorage();
-        assert(dataFromStorage is T,
-            "The data serialized from storage should have the same type as T");
-        if (dataFromStorage is T) {
+        if (dataFromStorage is T && dataFromStorage != null) {
           _setState(_state.copyWith(
               data: dataFromStorage,
               status: QueryStatus.loading,
@@ -82,20 +83,22 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       }
 
       final res = await _queryFn();
-
-      _setState(
-        _state.copyWith(
-            data: res,
-            timeCreated: DateTime.now(),
-            status: QueryStatus.success),
-      );
-      // save to local storage if exists
-      _saveToStorage();
+      if (res != null) {
+        _setState(
+          _state.copyWith(
+              data: res,
+              timeCreated: DateTime.now(),
+              isFetching: false,
+              status: QueryStatus.success),
+        );
+        // save to local storage if exists
+        _saveToStorage();
+      }
     } catch (e) {
-      _setState(_state.copyWith(status: QueryStatus.error, error: e));
+      _setState(_state.copyWith(
+          status: QueryStatus.error, error: e, isFetching: false));
     } finally {
       _currentFuture = null;
-      _setState(_state.copyWith(isFetching: false));
     }
   }
 

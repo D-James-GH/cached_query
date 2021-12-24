@@ -15,7 +15,7 @@ class GlobalCache {
   /// A flag to only allow the default options to be set once
   bool _defaultsSet = false;
 
-  QueryStorage? storage;
+  StorageInterface? storage;
   Duration refetchDuration = const Duration(seconds: 30);
   Duration cacheDuration = const Duration(minutes: 5);
 
@@ -28,7 +28,7 @@ class GlobalCache {
   void setDefaults({
     Duration? cacheDuration,
     Duration? refetchDuration,
-    QueryStorage? storage,
+    StorageInterface? storage,
   }) {
     assert(_defaultsSet == false);
     if (!_defaultsSet) {
@@ -72,13 +72,13 @@ class GlobalCache {
     if (key != null) {
       if (queryCache.containsKey(key)) {
         queryCache[key]?.invalidateQuery();
-      }
-      if (infiniteQueryCache.containsKey(key)) {
+      } else if (infiniteQueryCache.containsKey(key)) {
         infiniteQueryCache[key]?.invalidateQuery();
       }
     } else {
       // other wise invalidate the whole cache
       queryCache = {};
+      infiniteQueryCache = {};
     }
   }
 
@@ -86,10 +86,13 @@ class GlobalCache {
     if (key != null) {
       if (queryCache.containsKey(key)) {
         queryCache.remove(key);
+      } else if (infiniteQueryCache.containsKey(key)) {
+        infiniteQueryCache.remove(key);
       }
     } else {
       // other wise invalidate the whole cache
       queryCache = {};
+      infiniteQueryCache = {};
     }
   }
 }

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 
-///
 class QueryBuilder<T> extends StatefulWidget {
   final Query<T> query;
   final Widget Function(BuildContext context, QueryState<T> state) builder;

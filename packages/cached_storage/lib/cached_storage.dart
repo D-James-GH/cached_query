@@ -5,15 +5,15 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cached_query/cached_query.dart';
 
-class SqlStorage extends QueryStorage {
+class CachedStorage extends StorageInterface {
   static const String _queryTable = "Query";
   late final Database _db;
   bool isOpen = false;
 
-  SqlStorage._();
-  static final SqlStorage _instance = SqlStorage._();
+  CachedStorage._();
+  static final CachedStorage _instance = CachedStorage._();
 
-  static Future<SqlStorage> ensureInitialized() async {
+  static Future<CachedStorage> ensureInitialized() async {
     WidgetsFlutterBinding.ensureInitialized();
     if (!_instance.isOpen) {
       var databasesPath = await getDatabasesPath();

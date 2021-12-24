@@ -1,4 +1,5 @@
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:query_builder/jokes/joke.screen.dart';
 import 'package:query_builder/posts/post_service.dart';
@@ -62,7 +63,7 @@ class _PostListScreenState extends State<PostListScreen> {
                             post: allPosts[i],
                             index: i,
                           ),
-                      childCount: state.data.length),
+                      childCount: allPosts.length),
                 ),
                 if (state.isFetching)
                   const SliverToBoxAdapter(

@@ -1,4 +1,4 @@
-import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:query_builder/jokes/joke.service.dart';
 import 'package:query_builder/jokes/joke_model/joke_model.dart';
