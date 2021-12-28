@@ -68,31 +68,16 @@ abstract class QueryBase<T, State extends StateBase> {
   }
 
   void _saveToStorage() {
-    if (_globalCache.storage != null) {
-      try {
-        _globalCache.storage!.put(key, item: jsonEncode(_state.data));
-      } catch (e) {
-        throw Exception(
-            "The data in this query is not directly serializable and it does not have a `.toJson()` method");
-      }
+    if (_globalCache.storage != null && _state.data != null) {
+      _globalCache.storage!.put<T>(key, item: _state.data! as T);
     }
   }
 
   Future<dynamic> _fetchFromStorage() async {
     if (_globalCache.storage != null) {
-      try {
-        final storedData = await _globalCache.storage?.get(key);
-
-        if (storedData != null) {
-          final dynamic converted = jsonDecode(storedData);
-          return _serializer == null ? converted : _serializer!(converted);
-        }
-      } catch (e) {
-        //TODO: add exception
-        assert(() {
-          print(e);
-          return true;
-        }());
+      final storedData = await _globalCache.storage?.get<T>(key);
+      if (storedData != null) {
+        return _serializer == null ? storedData : _serializer!(storedData);
       }
     }
   }

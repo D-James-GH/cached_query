@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/query_state.dart';
 import 'package:cached_query/src/storage_interface.dart';
 import 'package:meta/meta.dart';
 part 'query.dart';

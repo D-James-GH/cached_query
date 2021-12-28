@@ -1,13 +1,16 @@
 part of 'cached_query.dart';
 
-/// [InfiniteQuery] is a controller for infinite query's. It holds information
-/// on which individual query's make up part of the infinite query.
+/// An infinite query is essentially just a paginated list of [Query]'s.
+/// The [InfiniteQuery] class stores information on which individual Query's
+/// make up the list. It also stores information on the [cacheDuration] and
+/// [staleDuration].
 class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
   final Future<T> Function(A arg) _queryFn;
   final GetNextArg<A, T> _getNextArg;
   final int _initialIndex;
   List<String> _queryKeys = [];
   int _currentIndex;
+  Future<InfiniteQueryState<T>>? _currentNextPageFuture;
   Future<InfiniteQueryState<T>>? _currentFuture;
 
   InfiniteQuery({
@@ -58,54 +61,77 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
       _streamController?.add(_state);
       return _state;
     }
+    if (_currentFuture != null) return _currentFuture!;
+    _currentFuture = _fetch();
+    return _currentFuture!;
+  }
 
+  Future<InfiniteQueryState<T>> _fetch() async {
+    _setState(_state.copyWith(status: QueryStatus.loading, isFetching: true));
+    // if the query is the first page
     if (_queryKeys.isEmpty) {
       final pageParam = _getNextArg(_currentIndex, null);
       if (pageParam != null) {
         // get initial page
         final initialQuery = await _getQuery(arg: pageParam)._getResult();
-        if (initialQuery.data != null) {
-          _setState(_state.copyWith(data: [initialQuery.data!]));
-        }
+        _setState(_state.copyWith(
+          data: initialQuery.data != null ? [initialQuery.data!] : [],
+          status: QueryStatus.success,
+          isFetching: false,
+        ));
+        _stale = false;
+
         return _state;
       }
 
       // initial param was null, indicating there are no more pages, which is an error
       _setState(_state.copyWith(
-          error: "Initial argument was null", status: QueryStatus.error));
+        error: "Initial argument was null",
+        status: QueryStatus.error,
+        isFetching: false,
+      ));
       return _state;
     }
 
+    // not the first time this infinite query has been called
     await _refetchAllQueries();
     return _state;
   }
 
   /// Get the next page in an [InfiniteQuery] and cache the result.
   Future<InfiniteQueryState<T>> getNextPage() {
-    if (_currentFuture != null) return _currentFuture!;
-    _currentFuture = _fetchNextPage();
-    return _currentFuture!;
+    if (_currentNextPageFuture != null) return _currentNextPageFuture!;
+    _currentNextPageFuture = _fetchNextPage();
+    return _currentNextPageFuture!;
   }
 
   //TODO: might be unnecessary to de-dupe
   /// Private fetch function to help with de-duping next page requests.
   Future<InfiniteQueryState<T>> _fetchNextPage() async {
     if (_state.hasReachedMax) return _state;
+    _setState(_state.copyWith(status: QueryStatus.loading));
     final nextArg = _getNextArg(_currentIndex, lastPage);
     if (nextArg == null) {
-      _setState(_state.copyWith(hasReachedMax: true));
+      _setState(_state.copyWith(
+        hasReachedMax: true,
+        status: QueryStatus.success,
+      ));
       return _state;
     }
+    _setState(_state.copyWith(isFetching: true));
     _currentIndex++;
     // add one to the current page to check whether it has data
     final QueryState<T> query = await _getQuery(
       key: key + (_currentIndex + 1).toString(),
       arg: nextArg,
     )._getResult();
-    if (query.data != null) {
-      _setState(_state.copyWith(data: [..._state.data, query.data!]));
-      _currentFuture = null;
-    }
+    _setState(_state.copyWith(
+      data: [..._state.data, if (query.data != null) query.data!],
+      status: QueryStatus.success,
+      isFetching: false,
+    ));
+
+    _currentNextPageFuture = null;
 
     return _state;
   }

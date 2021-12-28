@@ -1,10 +1,17 @@
 library cached_storage;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:cached_query/cached_query.dart';
 
+/// A storage delegate utilizing [sqflite](https://pub.dev/packages/sqflite) as the database plugin.
+/// [CachedStorage] stores the fetched data as a jsonEncoded string.
+/// If better performance or to have more control over how the data is stored
+/// create a custom storage class by extending [StorageInterface] from the
+/// [CachedQuery] package.
 class CachedStorage extends StorageInterface {
   static const String _queryTable = "Query";
   late final Database _db;
@@ -23,6 +30,7 @@ class CachedStorage extends StorageInterface {
         path,
         version: 1,
         onCreate: (db, version) async {
+          //TODO add expiry to stored data --> 24hrs?
           await db.execute('''
           CREATE TABLE IF NOT EXISTS $_queryTable(
            queryKey TEXT PRIMARY KEY,
@@ -51,7 +59,7 @@ class CachedStorage extends StorageInterface {
   }
 
   @override
-  Future<String> get(String key) async {
+  Future<T> get<T>(String key) async {
     final query = await _db.query(
       _queryTable,
       where: 'queryKey = ?',
@@ -59,19 +67,20 @@ class CachedStorage extends StorageInterface {
       columns: ["queryData"],
       limit: 1,
     );
-    return query.first["queryData"] as String;
+    return jsonDecode(query.first["queryData"] as String) as T;
   }
 
   @override
-  void put(String key, {required String item}) async {
+  void put<T>(String key, {required T item}) async {
     try {
       await _db.insert(
         _queryTable,
-        {"queryKey": key, "queryData": item},
+        {"queryKey": key, "queryData": jsonEncode(item)},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
-      // log(e.toString());
+      throw Exception(
+          "Error inserting into the Database. It is likely that the data in this query is not directly serializable and it does not have a `.toJson()` method");
     }
   }
 }
