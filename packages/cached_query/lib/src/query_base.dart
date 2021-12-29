@@ -7,7 +7,7 @@ abstract class StateBase {
 
 abstract class QueryBase<T, State extends StateBase> {
   final String key;
-  final Serializer<dynamic>? _serializer;
+  final Serializer<T>? _serializer;
 
   /// string encoded key
   // final String _queryHash;
@@ -46,7 +46,7 @@ abstract class QueryBase<T, State extends StateBase> {
     Duration? refetchDuration,
     Duration? cacheDuration,
     required State state,
-    Serializer<dynamic>? serializer,
+    Serializer<T>? serializer,
   })  : _ignoreStaleTime = ignoreRefetchDuration,
         _ignoreCacheTime = ignoreCacheDuration,
         // _queryHash = jsonEncode(key),
@@ -61,10 +61,15 @@ abstract class QueryBase<T, State extends StateBase> {
   Future<State> get result;
   Future<State> refetch();
 
-  /// sets the new state and adds the new state to the query stream
+  /// sets the new state. In case any additional logic needs to be added when
+  /// setting the state.
   void _setState(State newState) {
-    _streamController?.add(newState);
     _state = newState;
+  }
+
+  /// Emits the current state down the stream.
+  void _emit() {
+    _streamController?.add(_state);
   }
 
   void _saveToStorage() {
@@ -75,7 +80,7 @@ abstract class QueryBase<T, State extends StateBase> {
 
   Future<dynamic> _fetchFromStorage() async {
     if (_globalCache.storage != null) {
-      final storedData = await _globalCache.storage?.get<T>(key);
+      final dynamic storedData = await _globalCache.storage?.get(key);
       if (storedData != null) {
         return _serializer == null ? storedData : _serializer!(storedData);
       }
@@ -88,7 +93,7 @@ abstract class QueryBase<T, State extends StateBase> {
     }
     _streamController = StreamController.broadcast(
       onListen: () {
-        // _streamController!.add(_state);
+        _emit();
         _cancelDelete();
       },
       onCancel: () {
@@ -97,6 +102,7 @@ abstract class QueryBase<T, State extends StateBase> {
         _scheduleDelete();
       },
     );
+
     return _streamController!.stream;
   }
 

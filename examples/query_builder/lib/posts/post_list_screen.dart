@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
@@ -54,9 +56,23 @@ class _PostListScreenState extends State<PostListScreen> {
         builder: (context, state, query) {
           if (state.data.isNotEmpty) {
             final allPosts = state.data.expand((e) => e).toList();
+
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
+                if (state.status == QueryStatus.error &&
+                    state.error is SocketException)
+                  SliverToBoxAdapter(
+                    child: Container(
+                      decoration:
+                          BoxDecoration(color: Theme.of(context).errorColor),
+                      child: const Text(
+                        "No internet connection",
+                        style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                       (context, i) => _Post(

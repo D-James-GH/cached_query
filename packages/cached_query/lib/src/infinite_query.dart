@@ -56,9 +56,10 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
   Future<InfiniteQueryState<T>> _getResult({bool forceRefetch = false}) async {
     if (!_stale &&
         !forceRefetch &&
+        _state.status != QueryStatus.error &&
         _state.data.isNotEmpty &&
         _state.timeCreated.add(_staleTime).isAfter(DateTime.now())) {
-      _streamController?.add(_state);
+      _emit();
       return _state;
     }
     if (_currentFuture != null) return _currentFuture!;
@@ -68,19 +69,26 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
 
   Future<InfiniteQueryState<T>> _fetch() async {
     _setState(_state.copyWith(status: QueryStatus.loading, isFetching: true));
+    _emit();
     // if the query is the first page
     if (_queryKeys.isEmpty) {
       final pageParam = _getNextArg(_currentIndex, null);
       if (pageParam != null) {
         // get initial page
-        final initialQuery = await _getQuery(arg: pageParam)._getResult();
+        final initialQuery =
+            await _getQuery(arg: pageParam)._getResult(forceRefetch: true);
         _setState(_state.copyWith(
           data: initialQuery.data != null ? [initialQuery.data!] : [],
-          status: QueryStatus.success,
+          status: initialQuery.status == QueryStatus.error
+              ? QueryStatus.error
+              : QueryStatus.success,
           isFetching: false,
+          timeCreated: DateTime.now(),
+          error: initialQuery.error,
         ));
         _stale = false;
-
+        _emit();
+        _currentFuture = null;
         return _state;
       }
 
@@ -90,11 +98,15 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
         status: QueryStatus.error,
         isFetching: false,
       ));
+      _emit();
+      _currentFuture = null;
       return _state;
     }
 
     // not the first time this infinite query has been called
     await _refetchAllQueries();
+    _emit();
+    _currentFuture = null;
     return _state;
   }
 
@@ -108,7 +120,10 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
   //TODO: might be unnecessary to de-dupe
   /// Private fetch function to help with de-duping next page requests.
   Future<InfiniteQueryState<T>> _fetchNextPage() async {
-    if (_state.hasReachedMax) return _state;
+    if (_state.hasReachedMax) {
+      _emit();
+      return _state;
+    }
     _setState(_state.copyWith(status: QueryStatus.loading));
     final nextArg = _getNextArg(_currentIndex, lastPage);
     if (nextArg == null) {
@@ -116,9 +131,11 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
         hasReachedMax: true,
         status: QueryStatus.success,
       ));
+      _emit();
       return _state;
     }
     _setState(_state.copyWith(isFetching: true));
+    _emit();
     _currentIndex++;
     // add one to the current page to check whether it has data
     final QueryState<T> query = await _getQuery(
@@ -132,7 +149,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     ));
 
     _currentNextPageFuture = null;
-
+    _emit();
     return _state;
   }
 
@@ -158,8 +175,12 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     }
 
     final List<T> data = [];
+    var hasError = false;
     await Future.forEach(queries, (Query<T> query) async {
       final QueryState<T?> result = await query._getResult(forceRefetch: true);
+      if (result.status == QueryStatus.error) {
+        hasError = true;
+      }
       if (result.data != null) {
         data.add(result.data!);
       }
@@ -168,7 +189,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
       data: data,
       timeCreated: DateTime.now(),
       isFetching: false,
-      status: QueryStatus.success,
+      status: hasError ? QueryStatus.error : QueryStatus.success,
     ));
   }
 
@@ -177,7 +198,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     key ??= this.key + _currentIndex.toString();
     final q = query<T>(
       key: key,
-      serializer: _serializer as Serializer<T>?,
+      serializer: _serializer,
       queryFn: () => _queryFn(arg),
     );
     if (!_queryKeys.contains(q.key)) {

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:query_builder/jokes/joke.service.dart';
@@ -11,7 +13,6 @@ class JokeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -38,19 +39,36 @@ class JokeScreen extends StatelessWidget {
           )
         ],
       ),
-      body: Center(
-        child: QueryBuilder<JokeModel?>(
-          query: service.getJoke(),
-          builder: (_, state) {
-            return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (state.isFetching) const CircularProgressIndicator(),
-                Text(state.data?.joke ?? ""),
-              ],
-            );
-          },
-        ),
+      body: QueryBuilder<JokeModel?>(
+        query: service.getJoke(),
+        builder: (_, state) {
+          return Column(
+            children: [
+              if (state.status == QueryStatus.error &&
+                  state.error is SocketException)
+                SliverToBoxAdapter(
+                  child: Container(
+                    decoration:
+                        BoxDecoration(color: Theme.of(context).errorColor),
+                    child: const Text(
+                      "No internet connection",
+                      style: TextStyle(color: Colors.white),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              Expanded(
+                  child: Center(
+                      child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(state.data?.joke ?? ""),
+                  if (state.isFetching) const CircularProgressIndicator(),
+                ],
+              ))),
+            ],
+          );
+        },
       ),
     );
   }

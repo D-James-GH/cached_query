@@ -1,6 +1,6 @@
-import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
+import 'package:cached_storage/cached_storage.dart';
 import 'package:flutter/material.dart';
-import "package:cached_storage/cached_storage.dart";
 
 import 'jokes/joke.screen.dart';
 import 'posts/post_list_screen.dart';

@@ -46,10 +46,11 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
     if (!_stale &&
         !forceRefetch &&
+        _state.status != QueryStatus.error &&
         _state.data != null &&
         (_ignoreStaleTime ||
             _state.timeCreated.add(_staleTime).isAfter(DateTime.now()))) {
-      _streamController?.add(_state);
+      _emit();
       return _state;
     }
     await _fetch();
@@ -66,39 +67,45 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   /// call the [_queryFn] and return the error or result
   Future<void> _fetchQuery() async {
+    _setState(_state.copyWith(
+      status: QueryStatus.loading,
+      isFetching: true,
+    ));
+    _emit();
     try {
       if (_state.data == null) {
         // try to get any data from storage if the query has no data
         final dynamic dataFromStorage = await _fetchFromStorage();
         if (dataFromStorage is T && dataFromStorage != null) {
-          _setState(_state.copyWith(
-              data: dataFromStorage,
-              status: QueryStatus.loading,
-              isFetching: true));
+          _setState(_state.copyWith(data: dataFromStorage));
+          // Emit the data from storage
+          _emit();
         }
-      }
-      if (!_state.isFetching) {
-        _setState(
-            _state.copyWith(status: QueryStatus.loading, isFetching: true));
       }
 
       final res = await _queryFn();
       if (res != null) {
         _setState(
           _state.copyWith(
-              data: res,
-              timeCreated: DateTime.now(),
-              isFetching: false,
-              status: QueryStatus.success),
+            data: res,
+            timeCreated: DateTime.now(),
+            isFetching: false,
+            status: QueryStatus.success,
+          ),
         );
         // save to local storage if exists
         _saveToStorage();
+        _setState(_state.copyWith(status: QueryStatus.success));
       }
     } catch (e) {
       _setState(_state.copyWith(
-          status: QueryStatus.error, error: e, isFetching: false));
+        status: QueryStatus.error,
+        error: e,
+      ));
     } finally {
       _currentFuture = null;
+      _setState(_state.copyWith(isFetching: false));
+      _emit();
     }
   }
 
@@ -106,6 +113,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   void update(T Function(T? oldData) updateFn) {
     final newData = updateFn(_state.data);
     _setState(_state.copyWith(data: newData));
+    _emit();
   }
 }
 

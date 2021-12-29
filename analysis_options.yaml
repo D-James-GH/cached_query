@@ -21,14 +21,33 @@ linter:
     cancel_subscriptions: true
     avoid_print: true
     package_api_docs: true
+    unnecessary_statements: true
     sort_child_properties_last: true
+    always_declare_return_types: true
+    unnecessary_lambdas: true
+    always_put_required_named_parameters_first: true
+    avoid_positional_boolean_parameters: true
+    avoid_redundant_argument_values: true
+    avoid_types_on_closure_parameters: true
+    cascade_invocations: true
+    join_return_with_assignment: true
+    no_leading_underscores_for_local_identifiers: true
+    prefer_final_in_for_each: true
+    prefer_final_locals: true
+    prefer_interpolation_to_compose_strings: true
+    sized_box_shrink_expand: true
+    unnecessary_await_in_return: true
+    unnecessary_late: true
+    unnecessary_null_aware_assignments: true
+    unnecessary_parenthesis: true
+    use_decorated_box: true
+    use_if_null_to_convert_nulls_to_bools: true
+    use_named_constants: true
+
+    # possibly good ones
+    flutter_style_todos: true
+
 #    overridden_fields: true
-    unawaited_futures: true
-#    below are rules turned off from the flutter lints package
-#    prefer_const_constructors: false
-#    prefer_const_constructors_in_immutables: false
-#    use_key_in_widget_constructors: false
-#    avoid_function_literals_in_foreach_calls: false
 
 dart_code_metrics:
   metrics:

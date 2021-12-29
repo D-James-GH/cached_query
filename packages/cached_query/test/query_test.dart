@@ -1,6 +1,3 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
@@ -55,7 +52,10 @@ void main() {
         () async {
       int i = 0;
 
-      await QueryMock().getQuery().stream.listen(expectAsync1(
+      await QueryMock()
+          .getQuery(Duration(seconds: 1))
+          .stream
+          .listen(expectAsync1(
             (event) {
               if (i == 0) {
                 expect(event.data, isNull);

@@ -2,10 +2,10 @@ library cached_storage;
 
 import 'dart:convert';
 
+import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:cached_query/cached_query.dart';
 
 /// A storage delegate utilizing [sqflite](https://pub.dev/packages/sqflite) as the database plugin.
 /// [CachedStorage] stores the fetched data as a jsonEncoded string.
@@ -59,15 +59,19 @@ class CachedStorage extends StorageInterface {
   }
 
   @override
-  Future<T> get<T>(String key) async {
-    final query = await _db.query(
+  Future<dynamic> get(String key) async {
+    final dbQuery = await _db.query(
       _queryTable,
       where: 'queryKey = ?',
       whereArgs: [key],
       columns: ["queryData"],
       limit: 1,
     );
-    return jsonDecode(query.first["queryData"] as String) as T;
+    final item = dbQuery.first["queryData"];
+    if (dbQuery.isNotEmpty && item is String) {
+      return jsonDecode(item);
+    }
+    return null;
   }
 
   @override
