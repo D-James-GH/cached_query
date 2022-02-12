@@ -1,9 +1,8 @@
 import 'dart:io';
 
-import 'package:cached_query/cached_query.dart';
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:query_builder/jokes/joke.screen.dart';
+import 'package:query_builder/jokes/joke_screen.dart';
 import 'package:query_builder/posts/post_service.dart';
 
 import 'post_model/post_model.dart';
@@ -30,18 +29,43 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('posts'),
+        title: InfiniteQueryBuilder(
+            query: _postService.getPosts(),
+            builder: (context, state, _) {
+              print(state);
+              return Row(
+                children: [
+                  if (state.isFetching)
+                    const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  const Text('posts'),
+                ],
+              );
+            }),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.create),
-            onPressed: () {
-              _postService.createPost(const PostModel(
-                id: 1234,
-                title: "new post",
-                userId: 1,
-                body: 'this is the body of the post',
-              ));
+          MutationBuilder<PostModel, PostModel>(
+            mutation: _postService.createPost(),
+            builder: (context, state, mutate) {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (state.isFetching)
+                    const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  IconButton(
+                    icon: const Icon(Icons.create),
+                    onPressed: () => mutate(const PostModel(
+                      id: 1234,
+                      title: "new post",
+                      userId: 1,
+                      body: 'this is the body of the post',
+                    )),
+                  ),
+                ],
+              );
             },
           ),
           IconButton(
@@ -73,6 +97,23 @@ class _PostListScreenState extends State<PostListScreen> {
                       ),
                     ),
                   ),
+                SliverToBoxAdapter(
+                  child: MutationBuilder<PostModel, PostModel>(
+                    mutation: _postService.createPost(),
+                    builder: (context, state, _) {
+                      if (state.isFetching) {
+                        return Container(
+                          color: Colors.teal,
+                          child: const Text(
+                            "This will show when the mutation is loading.",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        );
+                      }
+                      return const SizedBox();
+                    },
+                  ),
+                ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
                       (context, i) => _Post(

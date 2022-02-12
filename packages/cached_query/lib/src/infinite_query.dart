@@ -117,7 +117,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     return _currentNextPageFuture!;
   }
 
-  //TODO: might be unnecessary to de-dupe
+  // TODO(Dan): might be unnecessary to de-dupe
   /// Private fetch function to help with de-duping next page requests.
   Future<InfiniteQueryState<T>> _fetchNextPage() async {
     if (_state.hasReachedMax) {
@@ -176,7 +176,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
 
     final List<T> data = [];
     var hasError = false;
-    await Future.forEach(queries, (Query<T> query) async {
+    await Future.forEach<Query<T>>(queries, (query) async {
       final QueryState<T?> result = await query._getResult(forceRefetch: true);
       if (result.status == QueryStatus.error) {
         hasError = true;
@@ -212,6 +212,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
   void update(List<T> Function(List<T>? oldData) updateFn) {
     final newData = updateFn(_state.data);
     _setState(_state.copyWith(data: newData));
+    _emit();
   }
 
   /// invalidate all queries in the infinite query

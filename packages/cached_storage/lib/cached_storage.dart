@@ -23,14 +23,14 @@ class CachedStorage extends StorageInterface {
   static Future<CachedStorage> ensureInitialized() async {
     WidgetsFlutterBinding.ensureInitialized();
     if (!_instance.isOpen) {
-      var databasesPath = await getDatabasesPath();
-      String path = join(databasesPath, 'query_storage.db');
+      final databasesPath = await getDatabasesPath();
+      final String path = join(databasesPath, 'query_storage.db');
 
       _instance._db = await openDatabase(
         path,
         version: 1,
         onCreate: (db, version) async {
-          //TODO add expiry to stored data --> 24hrs?
+          // TODO(dan): add expiry to stored data --> 24hrs?
           await db.execute('''
           CREATE TABLE IF NOT EXISTS $_queryTable(
            queryKey TEXT PRIMARY KEY,
@@ -45,17 +45,17 @@ class CachedStorage extends StorageInterface {
 
   @override
   void close() {
-    // TODO: implement close
+    // TODO(Dan): implement close
   }
 
   @override
   void delete(String key) {
-    // TODO: implement delete
+    // TODO(Dan): implement delete
   }
 
   @override
   void deleteAll() {
-    // TODO: implement deleteAll
+    // TODO(Dan): implement deleteAll
   }
 
   @override
@@ -67,9 +67,11 @@ class CachedStorage extends StorageInterface {
       columns: ["queryData"],
       limit: 1,
     );
-    final item = dbQuery.first["queryData"];
-    if (dbQuery.isNotEmpty && item is String) {
-      return jsonDecode(item);
+    if (dbQuery.isNotEmpty) {
+      final item = dbQuery.first["queryData"];
+      if (item is String) {
+        return jsonDecode(item);
+      }
     }
     return null;
   }

@@ -8,8 +8,11 @@ class PostService with CachedQuery {
   InfiniteQuery<List<PostModel>, int> getPosts() {
     return infiniteQuery<List<PostModel>, int>(
       key: 'posts',
-      serializer: (post) => PostModel.listFromJson(post),
+      serializer: (dynamic postJson) => PostModel.listFromJson(
+          List<Map<String, dynamic>>.from(postJson as List<dynamic>)),
       initialIndex: 1,
+      cacheDuration: const Duration(seconds: 2),
+      refetchDuration: const Duration(seconds: 2),
       getNextArg: (pageIndex, lastPage) {
         if (lastPage == null) return 1;
         if (lastPage.isEmpty) return null;
@@ -18,16 +21,17 @@ class PostService with CachedQuery {
       queryFn: (arg) async {
         final uri = Uri.parse(
             'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg');
-        var res = await http.get(uri);
-        return PostModel.listFromJson(jsonDecode(res.body));
+        final res = await http.get(uri);
+        return PostModel.listFromJson(List<Map<String, dynamic>>.from(
+            jsonDecode(res.body) as List<dynamic>));
       },
     );
   }
 
-  Future<void> createPost(PostModel post) async {
-    mutation<PostModel, PostModel>(
-      key: ['posts', post.id],
-      arg: post,
+  Mutation<PostModel, PostModel> createPost() {
+    return Mutation<PostModel, PostModel>(
+      key: "createPost",
+      invalidateQueries: ['posts'],
       queryFn: (post) async {
         final res = await Future.delayed(
             const Duration(seconds: 1),
@@ -40,9 +44,13 @@ class PostService with CachedQuery {
         return PostModel.fromJson(res);
       },
       onSuccess: (args, newPost) {
-        updateInfiniteQuery<PostModel, int>(
-            key: "posts", updateFn: (old) => [newPost, ...?old]);
-        // invalidateQuery('posts');
+        updateInfiniteQuery<List<PostModel>, int>(
+          key: "posts",
+          updateFn: (old) => [
+            [newPost, ...old![0]],
+            ...old.sublist(1).toList()
+          ],
+        );
       },
     );
   }

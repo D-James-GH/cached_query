@@ -36,7 +36,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         _deleteQueryTimer?.isActive != true) {
       _scheduleDelete();
     }
-    return _getResult(forceRefetch: false);
+    return _getResult();
   }
 
   @override
@@ -84,20 +84,21 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       }
 
       final res = await _queryFn();
-      if (res != null) {
-        _setState(
-          _state.copyWith(
-            data: res,
-            timeCreated: DateTime.now(),
-            isFetching: false,
-            status: QueryStatus.success,
-          ),
-        );
-        // save to local storage if exists
-        _saveToStorage();
-        _setState(_state.copyWith(status: QueryStatus.success));
-      }
+      _setState(
+        _state.copyWith(
+          data: res,
+          timeCreated: DateTime.now(),
+          isFetching: false,
+          status: QueryStatus.success,
+        ),
+      );
+      // save to local storage if exists
+      _saveToStorage();
     } catch (e) {
+      assert(() {
+        print(e);
+        return true;
+      }());
       _setState(_state.copyWith(
         status: QueryStatus.error,
         error: e,

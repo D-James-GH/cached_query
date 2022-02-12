@@ -57,6 +57,7 @@ abstract class QueryBase<T, State extends StateBase> {
 
   State get state => _state;
   bool get stale => _stale;
+  bool get hasListener => _streamController?.hasListener ?? false;
 
   Future<State> get result;
   Future<State> refetch();
@@ -109,7 +110,7 @@ abstract class QueryBase<T, State extends StateBase> {
   /// After the [_cacheTime] is up remove the query from the [GlobalCache]
   void _scheduleDelete() {
     if (!_ignoreCacheTime) {
-      _deleteQueryTimer = Timer(_cacheTime, () => deleteQuery());
+      _deleteQueryTimer = Timer(_cacheTime, deleteQuery);
     }
   }
 
@@ -122,7 +123,7 @@ abstract class QueryBase<T, State extends StateBase> {
   void _resetDeleteTimer() {
     if (_deleteQueryTimer?.isActive ?? false) {
       _deleteQueryTimer!.cancel();
-      _deleteQueryTimer = Timer(_cacheTime, () => deleteQuery());
+      _deleteQueryTimer = Timer(_cacheTime, deleteQuery);
     }
   }
 

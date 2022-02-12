@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/query_state.dart';
-import 'package:cached_query/src/storage_interface.dart';
-import 'package:meta/meta.dart';
+import 'package:cached_query/src/util/encode_key.dart';
+import './global_cache.dart';
+
 part 'query.dart';
 part 'infinite_query.dart';
-part "./global_cache.dart";
 part "./query_base.dart";
 
 typedef Serializer<T> = T Function(dynamic json);
@@ -14,7 +12,7 @@ typedef Serializer<T> = T Function(dynamic json);
 /// A function to determine the parameters of the next page in an infinite query.
 /// Return null if the last page has already been fetch and therefore trigger
 /// [InfiniteQueryState.hasReachedMax] to equal `true`
-typedef GetNextArg<A, T> = A? Function(int currentPage, T? lastPage);
+typedef GetNextArg<A, T> = A? Function(int currentPageIndex, T? lastPage);
 
 /// Cache any asynchronous function results with [CachedQuery]
 class CachedQuery {
@@ -22,7 +20,7 @@ class CachedQuery {
     Duration? cacheDuration,
     Duration? refetchDuration,
     StorageInterface? storage,
-  }) async {
+  }) {
     GlobalCache.instance.setDefaults(
       refetchDuration: refetchDuration,
       cacheDuration: cacheDuration,
@@ -54,7 +52,7 @@ Query<T> query<T>({
   bool ignoreCacheDuration = false,
 }) {
   final globalCache = GlobalCache.instance;
-  final queryKey = _encodeKey(key);
+  final queryKey = encodeKey(key);
   var query = globalCache.getQuery<T>(queryKey);
 
   // if query is null check the storage
@@ -104,19 +102,19 @@ InfiniteQuery<T, A> infiniteQuery<T, A>({
   Duration? refetchDuration,
   int initialIndex = 0,
   List<A>? prefetchPages,
-  bool ignoreStaleTime = false,
-  bool ignoreCacheTime = false,
+  bool ignoreRefetchDuration = false,
+  bool ignoreCacheDuration = false,
 }) {
   final globalCache = GlobalCache.instance;
-  final queryKey = _encodeKey(key);
+  final queryKey = encodeKey(key);
   InfiniteQuery<T, A>? infiniteQuery = globalCache.getInfiniteQuery(queryKey);
 
   // create query if it is null
   if (infiniteQuery == null) {
     infiniteQuery = InfiniteQuery<T, A>(
       queryFn: queryFn,
-      ignoreRefetchDuration: ignoreStaleTime,
-      ignoreCacheDuration: ignoreCacheTime,
+      ignoreRefetchDuration: ignoreRefetchDuration,
+      ignoreCacheDuration: ignoreCacheDuration,
       serializer: serializer,
       getNextArg: getNextArg,
       refetchDuration: refetchDuration ?? globalCache.refetchDuration,
@@ -134,63 +132,21 @@ InfiniteQuery<T, A> infiniteQuery<T, A>({
   return infiniteQuery;
 }
 
-/// Type arguments
-Future<T> mutation<T, A>({
-  /// the argument to be passed to queryFn
-  required A arg,
-
-  /// called before the mutation [_queryFn] is run.
-  void Function(A arg)? onStartMutation,
-  void Function(A arg, T res)? onSuccess,
-  void Function(A arg, Object error)? onError,
-  required Object key,
-  required Future<T> Function(A arg) queryFn,
-  List<Object>? invalidateQueries,
-}) async {
-  if (onStartMutation != null) {
-    onStartMutation(arg);
-  }
-  // call query fn
-  try {
-    final res = await queryFn(arg);
-    if (onSuccess != null) {
-      onSuccess(arg, res);
-    }
-    if (invalidateQueries != null) {
-      for (var k in invalidateQueries) {
-        GlobalCache.instance.invalidateCache(key: _encodeKey(k));
-      }
-    }
-    return res;
-  } catch (e) {
-    if (onError != null) {
-      onError(arg, e);
-    }
-    rethrow;
-  }
-}
-
 // Utility methods ===========================================================
 
-/// get the result of an existing query
-T? getQuery<T>(Object key) {
-  final query = GlobalCache.instance.getQuery<T>(_encodeKey(key));
-  return query?.state.data;
+Query<T>? getQuery<T>(Object key) {
+  return GlobalCache.instance.getQuery<T>(encodeKey(key));
 }
 
-/// get the result of an existing query
-T? getInfiniteQuery<T, A>(Object key, {int? page}) {
-  final query = GlobalCache.instance.getInfiniteQuery<T, A>(_encodeKey(key));
-  if (query == null) return null;
-  final res = query.state;
-  return res.data as T?;
+InfiniteQuery<T, A>? getInfiniteQuery<T, A>(Object key, {int? page}) {
+  return GlobalCache.instance.getInfiniteQuery<T, A>(encodeKey(key));
 }
 
 void updateQuery<T>({
   required Object key,
   required T Function(T? oldData) updateFn,
 }) {
-  final query = GlobalCache.instance.getQuery<T>(_encodeKey(key));
+  final query = GlobalCache.instance.getQuery<T>(encodeKey(key));
   if (query != null) {
     query.update(updateFn);
   }
@@ -200,17 +156,45 @@ void updateInfiniteQuery<T, A>({
   required Object key,
   required List<T> Function(List<T>? oldData) updateFn,
 }) {
-  final query = GlobalCache.instance.getInfiniteQuery<T, A>(_encodeKey(key));
-  if (query != null) {
-    query.update(updateFn);
+  final infiniteQuery =
+      GlobalCache.instance.getInfiniteQuery<T, A>(encodeKey(key));
+  if (infiniteQuery != null) {
+    infiniteQuery.update(updateFn);
   }
 }
 
 void invalidateQuery(Object key) {
-  GlobalCache.instance.invalidateCache(key: _encodeKey(key));
+  GlobalCache.instance.invalidateCache(key: encodeKey(key));
 }
 
-String _encodeKey(Object key) {
-  if (key is String) return key;
-  return jsonEncode(key);
+void deleteCache({String? key}) {
+  GlobalCache.instance.deleteCache(key: key);
+}
+
+void refetchQueries(List<Object> keys) {
+  for (final k in keys) {
+    GlobalCache.instance.refetchQuery(encodeKey(k));
+  }
+}
+
+typedef FindCallback<T> = bool Function(T);
+List<Query<dynamic>>? whereQuery(FindCallback<Query<dynamic>> findCallback) {
+  final List<Query<dynamic>> result = [];
+  for (final query in GlobalCache.instance.queryCache.values) {
+    if (findCallback(query)) {
+      result.add(query);
+    }
+  }
+  return result.isNotEmpty ? result : null;
+}
+
+List<InfiniteQuery<dynamic, dynamic>>? whereInfiniteQuery(
+    FindCallback<InfiniteQuery<dynamic, dynamic>> findCallback) {
+  final List<InfiniteQuery<dynamic, dynamic>> result = [];
+  for (final infiniteQuery in GlobalCache.instance.infiniteQueryCache.values) {
+    if (findCallback(infiniteQuery)) {
+      result.add(infiniteQuery);
+    }
+  }
+  return result.isNotEmpty ? result : null;
 }

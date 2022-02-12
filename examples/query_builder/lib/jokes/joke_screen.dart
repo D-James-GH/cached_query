@@ -1,14 +1,14 @@
 import 'dart:io';
-
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:query_builder/jokes/joke.service.dart';
+import 'package:query_builder/jokes/joke_service.dart';
 import 'package:query_builder/jokes/joke_model/joke_model.dart';
 import 'package:query_builder/posts/post_list_screen.dart';
 
 class JokeScreen extends StatelessWidget {
   static const routeName = '/screenTwo';
   final JokeService service = JokeService();
+
   JokeScreen({Key? key}) : super(key: key);
 
   @override
@@ -46,26 +46,26 @@ class JokeScreen extends StatelessWidget {
             children: [
               if (state.status == QueryStatus.error &&
                   state.error is SocketException)
-                SliverToBoxAdapter(
-                  child: Container(
-                    decoration:
-                        BoxDecoration(color: Theme.of(context).errorColor),
-                    child: const Text(
-                      "No internet connection",
-                      style: TextStyle(color: Colors.white),
-                      textAlign: TextAlign.center,
-                    ),
+                Container(
+                  width: double.infinity,
+                  decoration:
+                      BoxDecoration(color: Theme.of(context).errorColor),
+                  child: const Text(
+                    "No internet connection",
+                    style: TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               Expanded(
-                  child: Center(
-                      child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(state.data?.joke ?? ""),
-                  if (state.isFetching) const CircularProgressIndicator(),
-                ],
-              ))),
+                child: Center(
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(child: Text(state.data?.joke ?? "")),
+                    if (state.isFetching) const CircularProgressIndicator(),
+                  ],
+                )),
+              ),
             ],
           );
         },

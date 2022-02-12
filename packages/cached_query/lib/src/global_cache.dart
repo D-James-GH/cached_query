@@ -1,4 +1,5 @@
-part of "cached_query.dart";
+import 'package:meta/meta.dart';
+import '../cached_query.dart';
 
 ///[GlobalCache] is a singleton that keeps track of all the cached queries
 class GlobalCache {
@@ -16,7 +17,7 @@ class GlobalCache {
   bool _defaultsSet = false;
 
   StorageInterface? storage;
-  Duration refetchDuration = const Duration(seconds: 30);
+  Duration refetchDuration = Duration.zero;
   Duration cacheDuration = const Duration(minutes: 5);
 
   ///map to store requests
@@ -24,6 +25,8 @@ class GlobalCache {
 
   /// map to store infinite query's
   Map<String, InfiniteQuery<dynamic, dynamic>> infiniteQueryCache = {};
+
+  Map<String, Mutation<dynamic, dynamic>> mutationCache = {};
 
   void setDefaults({
     Duration? cacheDuration,
@@ -65,6 +68,18 @@ class GlobalCache {
     infiniteQueryCache[query.key] = query;
   }
 
+  Mutation<T, A>? getMutation<T, A>(String key) {
+    if (mutationCache.containsKey(key)) {
+      return mutationCache[key] as Mutation<T, A>;
+    }
+  }
+
+  void addMutation<T, A>(Mutation<T, A> mutation) {
+    if (mutation.key != null) {
+      mutationCache[mutation.key!] = mutation;
+    }
+  }
+
   /// Invalidate cache, if no key is passed it will invalidate the whole cache
   void invalidateCache({
     String? key,
@@ -82,6 +97,14 @@ class GlobalCache {
     }
   }
 
+  void refetchQuery(String key) {
+    if (queryCache.containsKey(key)) {
+      queryCache[key]!.refetch();
+    } else if (infiniteQueryCache.containsKey(key)) {
+      infiniteQueryCache[key]!.refetch();
+    }
+  }
+
   void deleteCache({String? key}) {
     if (key != null) {
       if (queryCache.containsKey(key)) {
@@ -93,6 +116,12 @@ class GlobalCache {
       // other wise invalidate the whole cache
       queryCache = {};
       infiniteQueryCache = {};
+    }
+  }
+
+  void deleteMutation(String key) {
+    if (mutationCache.containsKey(key)) {
+      mutationCache.remove(key);
     }
   }
 }

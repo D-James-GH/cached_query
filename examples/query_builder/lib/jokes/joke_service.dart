@@ -11,14 +11,16 @@ class JokeService with CachedQuery {
     return query<JokeModel>(
         key: 'joke',
         refetchDuration: const Duration(seconds: 4),
-        serializer: (json) => JokeModel.fromJson(json),
+        serializer: (dynamic json) =>
+            JokeModel.fromJson(json as Map<String, dynamic>),
         queryFn: () async {
           final res = await client.get(Uri.parse("https://icanhazdadjoke.com/"),
               headers: {"Accept": "application/json"});
           if (res.statusCode == 200) {
             return Future.delayed(
               const Duration(milliseconds: 400),
-              () => JokeModel.fromJson(jsonDecode(res.body)),
+              () => JokeModel.fromJson(
+                  jsonDecode(res.body) as Map<String, dynamic>),
             );
           } else {
             throw Exception();

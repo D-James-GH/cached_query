@@ -24,10 +24,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
   FutureOr<void> _onPostsFetched(
       PostsStreamFetched event, Emitter<PostState> emit) async {
-    await emit.forEach<InfiniteQueryState<PostModel>>(_repo.getPosts().stream,
-        onData: (query) {
+    await emit.forEach<InfiniteQueryState<List<PostModel>>>(
+        _repo.getPosts().stream, onData: (query) {
       return state.copyWith(
-        posts: query.data,
+        posts: [...?state.posts, ...?query.lastPage],
         status: query.isFetching ? PostStatus.loading : PostStatus.success,
         hasReachedMax: query.hasReachedMax,
       );

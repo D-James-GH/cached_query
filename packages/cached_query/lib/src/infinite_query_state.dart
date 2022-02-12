@@ -20,6 +20,8 @@ class InfiniteQueryState<T> extends StateBase {
     required this.currentPage,
   });
 
+  T? get lastPage => data.isNotEmpty ? data[data.length - 1] : null;
+
   InfiniteQueryState<T> copyWith({
     List<T>? data,
     QueryStatus? status,

@@ -6,9 +6,7 @@ import 'repos/infinite_query_test_repo.dart';
 void main() async {
   final repo = InfiniteQueryTestRepository();
   group("creating a query", () {
-    tearDownAll(() {
-      GlobalCache.instance.deleteCache();
-    });
+    tearDownAll(deleteCache);
     test("query is created and added to cache", () {
       final query = infiniteQuery<String, int>(
           key: InfiniteQueryTestRepository.key,
@@ -19,15 +17,13 @@ void main() async {
             return pageIndex + 1;
           });
 
-      final queryFromCache = GlobalCache.instance
-          .getInfiniteQuery<String, int>(InfiniteQueryTestRepository.key);
+      final queryFromCache =
+          getInfiniteQuery<String, int>(InfiniteQueryTestRepository.key);
       expect(query, queryFromCache);
     });
   });
   group("Infinite query as a future", () {
-    tearDown(() {
-      GlobalCache.instance.deleteCache();
-    });
+    tearDown(deleteCache);
     test("Should return an infinite query", () async {
       final query = infiniteQuery<String, int>(
           key: InfiniteQueryTestRepository.key,
@@ -50,12 +46,22 @@ void main() async {
             if (lastPage.isEmpty) return null;
             return pageIndex + 1;
           });
-      expect(await query.result, same(await query.result));
+      String res1 = "";
+      String res2 = "";
+      query.result.whenComplete(() {
+        res1 = DateTime.now().toString();
+      });
+      query.result.whenComplete(() {
+        res2 = DateTime.now().toString();
+      });
+      expect(res1, res2);
     });
-    test("calling query result twice is gets the result from cache", () async {
+    test("Adding refetchDuration means next result will come from cache.",
+        () async {
       final query = infiniteQuery<String, int>(
           key: InfiniteQueryTestRepository.key,
           queryFn: repo.getPosts,
+          refetchDuration: Duration(seconds: 5),
           getNextArg: (pageIndex, lastPage) {
             if (lastPage == null) return 1;
             if (lastPage.isEmpty) return null;

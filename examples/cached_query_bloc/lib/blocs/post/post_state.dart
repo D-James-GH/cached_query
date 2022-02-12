@@ -7,10 +7,11 @@ class PostState extends Equatable {
   final List<PostModel>? posts;
   final bool hasReachedMax;
 
-  const PostState(
-      {this.status = PostStatus.initial,
-      this.posts,
-      this.hasReachedMax = false});
+  const PostState({
+    this.status = PostStatus.initial,
+    this.posts,
+    this.hasReachedMax = false,
+  });
 
   @override
   List<Object?> get props => [posts, status, hasReachedMax];

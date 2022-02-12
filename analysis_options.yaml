@@ -25,7 +25,6 @@ linter:
     sort_child_properties_last: true
     always_declare_return_types: true
     unnecessary_lambdas: true
-    always_put_required_named_parameters_first: true
     avoid_positional_boolean_parameters: true
     avoid_redundant_argument_values: true
     avoid_types_on_closure_parameters: true
