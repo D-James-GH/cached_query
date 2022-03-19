@@ -1,15 +1,16 @@
 import 'dart:convert';
 
-import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:query_builder/posts/post_model/post_model.dart';
 
-class PostService with CachedQuery {
+class PostService {
   InfiniteQuery<List<PostModel>, int> getPosts() {
-    return infiniteQuery<List<PostModel>, int>(
+    return InfiniteQuery<List<PostModel>, int>(
       key: 'posts',
       serializer: (dynamic postJson) => PostModel.listFromJson(
-          List<Map<String, dynamic>>.from(postJson as List<dynamic>)),
+        List<Map<String, dynamic>>.from(postJson as List<dynamic>),
+      ),
       initialIndex: 1,
       cacheDuration: const Duration(seconds: 2),
       refetchDuration: const Duration(seconds: 2),
@@ -20,10 +21,14 @@ class PostService with CachedQuery {
       },
       queryFn: (arg) async {
         final uri = Uri.parse(
-            'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg');
+          'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
+        );
         final res = await http.get(uri);
-        return PostModel.listFromJson(List<Map<String, dynamic>>.from(
-            jsonDecode(res.body) as List<dynamic>));
+        return PostModel.listFromJson(
+          List<Map<String, dynamic>>.from(
+            jsonDecode(res.body) as List<dynamic>,
+          ),
+        );
       },
     );
   }
@@ -34,17 +39,18 @@ class PostService with CachedQuery {
       invalidateQueries: ['posts'],
       queryFn: (post) async {
         final res = await Future.delayed(
-            const Duration(seconds: 1),
-            () => {
-                  "id": 123,
-                  "title": post.title,
-                  "userId": post.userId,
-                  "body": post.body,
-                });
+          const Duration(milliseconds: 400),
+          () => {
+            "id": 123,
+            "title": post.title,
+            "userId": post.userId,
+            "body": post.body,
+          },
+        );
         return PostModel.fromJson(res);
       },
       onSuccess: (args, newPost) {
-        updateInfiniteQuery<List<PostModel>, int>(
+        CachedQuery.instance.updateInfiniteQuery<List<PostModel>, int>(
           key: "posts",
           updateFn: (old) => [
             [newPost, ...old![0]],

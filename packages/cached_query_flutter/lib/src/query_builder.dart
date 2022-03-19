@@ -1,11 +1,19 @@
-import 'dart:async';
-import 'package:cached_query/cached_query.dart';
-import 'package:flutter/material.dart';
+part of cached_query_flutter;
 
+// todo(Dan): add examples to docs.
+/// {@template queryBuilder}
+/// Listen to changes in an [Mutation] and build the ui with the result.
+/// {@endTemplate}
 class QueryBuilder<T> extends StatefulWidget {
+  /// The [Query] to used to update the ui.
   final Query<T> query;
+
+  /// Called on each widget build.
+  ///
+  /// Passes [BuildContext], [QueryState].
   final Widget Function(BuildContext context, QueryState<T> state) builder;
 
+  /// {@macro queryBuilder}
   const QueryBuilder({
     Key? key,
     required this.query,

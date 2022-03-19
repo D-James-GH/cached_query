@@ -25,36 +25,43 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: BlocBuilder<PostBloc, PostState>(builder: (context, state) {
-          return SizedBox(
-            width: 150,
-            child: Stack(
-              children: [
-                if (state.status == PostStatus.loading)
-                  const Align(
+        title: BlocBuilder<PostBloc, PostState>(
+          builder: (context, state) {
+            return SizedBox(
+              width: 150,
+              child: Stack(
+                children: [
+                  if (state.status == PostStatus.loading)
+                    const Align(
                       alignment: Alignment.centerLeft,
                       child: SizedBox(
                         height: 20,
                         width: 20,
                         child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white)),
-                      )),
-                const Center(child: Text('posts')),
-              ],
-            ),
-          );
-        }),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    ),
+                  const Center(child: Text('posts')),
+                ],
+              ),
+            );
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.create),
-            onPressed: () =>
-                context.read<PostBloc>().add(PostStreamCreated(const PostModel(
+            onPressed: () => context.read<PostBloc>().add(
+                  PostStreamCreated(
+                    const PostModel(
                       id: 1234,
                       title: "new post",
                       userId: 1,
                       body: 'this is the body of the post',
-                    ))),
+                    ),
+                  ),
+                ),
           ),
           IconButton(
             icon: const Icon(Icons.arrow_right_alt),
@@ -71,11 +78,12 @@ class _PostListScreenState extends State<PostListScreen> {
               slivers: [
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                      (context, i) => _Post(
-                            post: state.posts![i],
-                            index: i,
-                          ),
-                      childCount: state.posts!.length),
+                    (context, i) => _Post(
+                      post: state.posts![i],
+                      index: i,
+                    ),
+                    childCount: state.posts!.length,
+                  ),
                 ),
                 if (state.status == PostStatus.loading)
                   const SliverToBoxAdapter(
@@ -89,7 +97,8 @@ class _PostListScreenState extends State<PostListScreen> {
                   ),
                 SliverPadding(
                   padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom),
+                    bottom: MediaQuery.of(context).padding.bottom,
+                  ),
                 )
               ],
             );
@@ -141,7 +150,8 @@ class _Post extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.black12))),
+        border: Border(bottom: BorderSide(color: Colors.black12)),
+      ),
       child: Row(
         children: [
           Padding(

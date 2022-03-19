@@ -1,28 +1,26 @@
-import 'dart:io';
-import 'dart:async';
+part of cached_query_flutter;
 
-import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
-import 'package:cached_query/cached_query.dart' as dartQuery;
-
-/// Override the dart specific initialize function with a flutter specific one.
-class CachedQuery {
-  static void initialize({
+/// Flutter specific extension on [CachedQuery]
+extension CachedQueryExt on CachedQuery {
+  /// Override the dart specific initialize function with a flutter specific one.
+  ///
+  /// Set the global default config which all queries will use.
+  void configFlutter({
     Duration? cacheDuration,
     Duration? refetchDuration,
-    dartQuery.StorageInterface? storage,
+    StorageInterface? storage,
     bool refetchOnResume = true,
   }) {
-    dartQuery.CachedQuery.initialize(
+    CachedQuery.instance.config(
       refetchDuration: refetchDuration,
       cacheDuration: cacheDuration,
       storage: storage,
     );
+
     if (refetchOnResume) {
       _refetchOnResume();
     }
+
     _RetryOnConnect.instance.initialize();
   }
 }
@@ -53,6 +51,7 @@ class _RetryOnConnect {
     checkConnection();
   }
 
+  // stream current connection state
   Stream<bool> get stream => connectionChangeController.stream;
 
   //The test to actually see if there is a connection
@@ -61,7 +60,7 @@ class _RetryOnConnect {
 
     try {
       final future = InternetAddress.lookup('example.com')
-        ..timeout(Duration(seconds: 5));
+        ..timeout(const Duration(seconds: 5));
       final result = await future;
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         hasConnection = true;
@@ -94,7 +93,7 @@ class _RetryOnConnect {
 /// A query is considered on screen or active if it has listeners.
 void _refetchCurrentQueries() {
   // Check if any queries have listeners and refetch.
-  final queries = dartQuery.whereQuery((query) => query.hasListener);
+  final queries = CachedQuery.instance.whereQuery((query) => query.hasListener);
   if (queries != null) {
     for (final query in queries) {
       query.refetch();
@@ -102,7 +101,7 @@ void _refetchCurrentQueries() {
   }
   // Check if any infinite queries have listeners and refetch.
   final infiniteQueries =
-      dartQuery.whereInfiniteQuery((query) => query.hasListener);
+      CachedQuery.instance.whereInfiniteQuery((query) => query.hasListener);
   if (infiniteQueries != null) {
     for (final i in infiniteQueries) {
       i.refetch();

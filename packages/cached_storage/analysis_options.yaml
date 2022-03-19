@@ -9,6 +9,7 @@ analyzer:
   exclude:
     - "build/**"
     - "**/*.g.dart"
+    - "**/*.gr.dart"
     - "**/*.freezed.dart"
   language:
     strict-raw-types: true
@@ -26,6 +27,7 @@ linter:
     always_declare_return_types: true
     unnecessary_lambdas: true
     avoid_positional_boolean_parameters: true
+    public_member_api_docs: true
     avoid_redundant_argument_values: true
     avoid_types_on_closure_parameters: true
     cascade_invocations: true
@@ -42,6 +44,7 @@ linter:
     use_decorated_box: true
     use_if_null_to_convert_nulls_to_bools: true
     use_named_constants: true
+    require_trailing_commas: true
 
     # possibly good ones
     flutter_style_todos: true
@@ -49,24 +52,33 @@ linter:
 #    overridden_fields: true
 
 dart_code_metrics:
-  metrics:
-    cyclomatic-complexity: 20
-    maximum-nesting-level: 10
-    source-lines-of-code: 60
   metrics-exclude:
     - test/**
     - "**/*.g.dart"
+    - "**/*.gr.dart"
+    - "**/*.freezed.dart"
+  rules-exclude:
+    - test/**
+    - "**/*.g.dart"
+    - "**/*.gr.dart"
     - "**/*.freezed.dart"
   rules:
+    - newline-before-return
     - avoid-unnecessary-setstate
-    - member-ordering:
-        alphabetize: true
+    - avoid-wrapping-in-padding
+    - avoid-unnecessary-type-casts
+    - avoid-unused-parameters
+    - no-equal-then-else
+    - avoid-wrapping-in-padding
+    #    below can have ignored named arguments passed to it
+    - member-ordering-extended:
         order:
+          - constructors
           - public-fields
           - private-fields
-          - constructors
-          - getters-setters
-          - methods
-    - avoid-wrapping-in-padding
-    - prefer-single-widget-per-file:
-        ignore-private-widgets: true
+          - public-getters
+          - public-setters
+          - private-getters
+          - private-setters
+          - public-methods
+          - private-methods

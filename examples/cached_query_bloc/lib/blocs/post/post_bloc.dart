@@ -17,28 +17,34 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
   PostBloc() : super(const PostState()) {
     on<PostsStreamFetched>(_onPostsFetched);
-    on<PostsStreamNextPage>(_onPostsNextPage,
-        transformer: throttleDroppable(const Duration(milliseconds: 300)));
+    on<PostsStreamNextPage>(
+      _onPostsNextPage,
+      transformer: throttleDroppable(const Duration(milliseconds: 300)),
+    );
     on<PostStreamCreated>(_onPostCreated);
   }
 
   FutureOr<void> _onPostsFetched(
-      PostsStreamFetched event, Emitter<PostState> emit) async {
+    PostsStreamFetched event,
+    Emitter<PostState> emit,
+  ) async {
     await emit.forEach<InfiniteQueryState<List<PostModel>>>(
-        _repo.getPosts().stream, onData: (query) {
-      return state.copyWith(
-        posts: [...?state.posts, ...?query.lastPage],
-        status: query.isFetching ? PostStatus.loading : PostStatus.success,
-        hasReachedMax: query.hasReachedMax,
-      );
-    });
+      _repo.getPosts().stream,
+      onData: (query) {
+        return state.copyWith(
+          posts: [...?state.posts, ...?query.lastPage],
+          status: query.isFetching ? PostStatus.loading : PostStatus.success,
+          hasReachedMax: query.hasReachedMax,
+        );
+      },
+    );
   }
 
-  void _onPostsNextPage(_, __) {
+  void _onPostsNextPage(PostEvent _, Emitter<PostState> __) {
     _repo.getPosts().getNextPage();
   }
 
-  void _onPostCreated(PostStreamCreated event, _) {
+  void _onPostCreated(PostStreamCreated event, Emitter<PostState> _) {
     _repo.createPost(event.post);
   }
 

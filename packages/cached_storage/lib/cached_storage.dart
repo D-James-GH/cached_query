@@ -15,11 +15,15 @@ import 'package:sqflite/sqflite.dart';
 class CachedStorage extends StorageInterface {
   static const String _queryTable = "Query";
   late final Database _db;
+
+  /// True if the SqfLite  instance is open
   bool isOpen = false;
 
   CachedStorage._();
   static final CachedStorage _instance = CachedStorage._();
 
+  /// Initialise [CachedStorage]. Must be initialised before any [Query]'s are
+  /// called.
   static Future<CachedStorage> ensureInitialized() async {
     WidgetsFlutterBinding.ensureInitialized();
     if (!_instance.isOpen) {
@@ -31,12 +35,14 @@ class CachedStorage extends StorageInterface {
         version: 1,
         onCreate: (db, version) async {
           // TODO(dan): add expiry to stored data --> 24hrs?
-          await db.execute('''
+          await db.execute(
+            '''
           CREATE TABLE IF NOT EXISTS $_queryTable(
            queryKey TEXT PRIMARY KEY,
            queryData TEXT
           )
-          ''');
+          ''',
+          );
         },
       );
     }
@@ -86,7 +92,8 @@ class CachedStorage extends StorageInterface {
       );
     } catch (e) {
       throw Exception(
-          "Error inserting into the Database. It is likely that the data in this query is not directly serializable and it does not have a `.toJson()` method");
+        "Error inserting into the Database. It is likely that the data in this query is not directly serializable and it does not have a `.toJson()` method",
+      );
     }
   }
 }

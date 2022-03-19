@@ -6,7 +6,8 @@ import 'jokes/joke_screen.dart';
 import 'posts/post_list_screen.dart';
 
 void main() async {
-  CachedQuery.initialize(storage: await CachedStorage.ensureInitialized());
+  CachedQuery.instance
+      .configFlutter(storage: await CachedStorage.ensureInitialized());
   runApp(const MyApp());
 }
 

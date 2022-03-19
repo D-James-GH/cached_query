@@ -30,19 +30,19 @@ class _PostListScreenState extends State<PostListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: InfiniteQueryBuilder(
-            query: _postService.getPosts(),
-            builder: (context, state, _) {
-              print(state);
-              return Row(
-                children: [
-                  if (state.isFetching)
-                    const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  const Text('posts'),
-                ],
-              );
-            }),
+          query: _postService.getPosts(),
+          builder: (context, state, _) {
+            return Row(
+              children: [
+                if (state.isFetching)
+                  const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                const Text('posts'),
+              ],
+            );
+          },
+        ),
         centerTitle: true,
         actions: [
           MutationBuilder<PostModel, PostModel>(
@@ -57,12 +57,14 @@ class _PostListScreenState extends State<PostListScreen> {
                     ),
                   IconButton(
                     icon: const Icon(Icons.create),
-                    onPressed: () => mutate(const PostModel(
-                      id: 1234,
-                      title: "new post",
-                      userId: 1,
-                      body: 'this is the body of the post',
-                    )),
+                    onPressed: () => mutate(
+                      const PostModel(
+                        id: 1234,
+                        title: "new post",
+                        userId: 1,
+                        body: 'this is the body of the post',
+                      ),
+                    ),
                   ),
                 ],
               );
@@ -87,7 +89,7 @@ class _PostListScreenState extends State<PostListScreen> {
                 if (state.status == QueryStatus.error &&
                     state.error is SocketException)
                   SliverToBoxAdapter(
-                    child: Container(
+                    child: DecoratedBox(
                       decoration:
                           BoxDecoration(color: Theme.of(context).errorColor),
                       child: const Text(
@@ -116,11 +118,12 @@ class _PostListScreenState extends State<PostListScreen> {
                 ),
                 SliverList(
                   delegate: SliverChildBuilderDelegate(
-                      (context, i) => _Post(
-                            post: allPosts[i],
-                            index: i,
-                          ),
-                      childCount: allPosts.length),
+                    (context, i) => _Post(
+                      post: allPosts[i],
+                      index: i,
+                    ),
+                    childCount: allPosts.length,
+                  ),
                 ),
                 if (state.isFetching)
                   const SliverToBoxAdapter(
@@ -134,7 +137,8 @@ class _PostListScreenState extends State<PostListScreen> {
                   ),
                 SliverPadding(
                   padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom),
+                    bottom: MediaQuery.of(context).padding.bottom,
+                  ),
                 )
               ],
             );
@@ -186,7 +190,8 @@ class _Post extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Colors.black12))),
+        border: Border(bottom: BorderSide(color: Colors.black12)),
+      ),
       child: Row(
         children: [
           Padding(

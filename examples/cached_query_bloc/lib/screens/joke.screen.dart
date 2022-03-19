@@ -17,23 +17,29 @@ class JokeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.arrow_right_alt),
             onPressed: () => Navigator.pushReplacementNamed(
-                context, PostListScreen.routeName),
+              context,
+              PostListScreen.routeName,
+            ),
           )
         ],
       ),
-      body: BlocBuilder<JokeBloc, JokeState>(builder: (context, state) {
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (state.status == JokeStatus.loading)
-              const SizedBox(
-                  width: 40, height: 40, child: CircularProgressIndicator()),
-            if (state.status == JokeStatus.initial) const Text('no joke yet'),
-            if (state.joke != null) Text(state.joke!.joke),
-          ],
-        );
-      }),
+      body: BlocBuilder<JokeBloc, JokeState>(
+        builder: (context, state) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (state.status == JokeStatus.loading)
+                const SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: CircularProgressIndicator(),
+                ),
+              if (state.status == JokeStatus.initial) const Text('no joke yet'),
+              if (state.joke != null) Text(state.joke!.joke),
+            ],
+          );
+        },
+      ),
     );
   }
 }

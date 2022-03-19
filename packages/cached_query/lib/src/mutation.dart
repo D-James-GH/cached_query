@@ -1,14 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:cached_query/cached_query.dart';
-import './global_cache.dart';
 import 'package:cached_query/src/util/encode_key.dart';
 
+import '../cached_query.dart';
+
+/// Called when the [queryFn] as completed with no error.
 typedef OnSuccessCallback<T, A> = void Function(T res, A arg);
+
+/// Called when the [queryFn] as completed with an error.
 typedef OnErrorCallback<A> = void Function(A arg, Object error);
+
+/// Called when [Mutation] has started.
 typedef OnStartMutateCallback<A> = void Function(A arg);
-typedef MutationCallback<T, A> = Future<T> Function(A arg);
+
+/// The asynchronous query function.
+typedef MutationQueryCallback<T, A> = Future<T> Function(A arg);
 
 /// {@template mutation}
 /// Mutation is normally used to create, update and delete data from an asynchronous
@@ -33,34 +39,26 @@ typedef MutationCallback<T, A> = Future<T> Function(A arg);
 /// To invalidate and refetch a query use [refetchQueries]
 /// {@endtemplate mutation}
 class Mutation<T, A> {
-  /// A stringified key to reference the mutation
+  /// A stringified key to reference the mutation.
   final String? key;
 
-  /// This is called is before the mutation [_queryFn] is run.
   final OnStartMutateCallback<A>? _onStartMutation;
-
-  /// This is called after the [_queryFn] has completed with no error.
   final OnSuccessCallback<T, A>? _onSuccess;
-
-  /// [_onError] is called if the [queryFn] throws and error.
   final OnErrorCallback<A>? _onError;
-  final MutationCallback<T, A> _queryFn;
+  final MutationQueryCallback<T, A> _queryFn;
   final List<Object>? _invalidateQueries;
   final List<Object>? _refetchQueries;
-
-  /// current state of the mutation
-  MutationState<T> _state = MutationState();
-
-  /// broadcast stream that reacts to changes to the mutation state
+  MutationState<T> _state = const MutationState();
   StreamController<MutationState<T>>? _streamController;
   Future<T?>? _currentFuture;
+  final _cache = _MutationCache.instance;
 
   Mutation._internal({
     this.key,
     OnStartMutateCallback<A>? onStartMutation,
     OnSuccessCallback<T, A>? onSuccess,
     OnErrorCallback<A>? onError,
-    required MutationCallback<T, A> queryFn,
+    required MutationQueryCallback<T, A> queryFn,
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
   })  : _queryFn = queryFn,
@@ -70,7 +68,7 @@ class Mutation<T, A> {
         _onSuccess = onSuccess,
         _refetchQueries = refetchQueries {
     if (key != null) {
-      GlobalCache.instance.addMutation(this);
+      _cache.addMutation(this);
     }
   }
 
@@ -80,7 +78,7 @@ class Mutation<T, A> {
     OnStartMutateCallback<A>? onStartMutation,
     OnSuccessCallback<T, A>? onSuccess,
     OnErrorCallback<A>? onError,
-    required MutationCallback<T, A> queryFn,
+    required MutationQueryCallback<T, A> queryFn,
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
   }) {
@@ -88,7 +86,7 @@ class Mutation<T, A> {
     if (key != null) {
       stringKey = encodeKey(key);
       final mutationFromCache =
-          GlobalCache.instance.getMutation<T, A>(stringKey);
+          _MutationCache.instance.getMutation<T, A>(stringKey);
       if (mutationFromCache != null) {
         return mutationFromCache;
       }
@@ -116,7 +114,7 @@ class Mutation<T, A> {
     OnStartMutateCallback<A>? onStartMutation,
     OnSuccessCallback<T, A>? onSuccess,
     OnErrorCallback<A>? onError,
-    required MutationCallback<T, A> queryFn,
+    required MutationQueryCallback<T, A> queryFn,
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
   }) {
@@ -131,8 +129,13 @@ class Mutation<T, A> {
     return mutation;
   }
 
+  /// Current [MutationState] of the mutation.
   MutationState<T> get state => _state;
 
+  /// Stream the state of the query.
+  ///
+  /// When the state is updated either by a mutation or a new query [stream]
+  /// will be notified.
   Stream<MutationState<T>> get stream {
     if (_streamController != null) {
       return _streamController!.stream;
@@ -143,7 +146,7 @@ class Mutation<T, A> {
         _streamController!.close();
         _streamController = null;
         if (key != null) {
-          GlobalCache.instance.deleteMutation(key!);
+          _cache.deleteMutation(key!);
         }
       },
     );
@@ -178,11 +181,11 @@ class Mutation<T, A> {
       _setState(_state.copyWith(status: QueryStatus.success, data: res));
       if (_invalidateQueries != null) {
         for (final k in _invalidateQueries!) {
-          GlobalCache.instance.invalidateCache(key: encodeKey(k));
+          CachedQuery.instance.invalidateCache(k);
         }
       }
       if (_refetchQueries != null) {
-        refetchQueries(_refetchQueries!.map(jsonEncode).toList());
+        CachedQuery.instance.refetchQueries(_refetchQueries!);
       }
       return res;
     } catch (e) {
@@ -207,19 +210,34 @@ class Mutation<T, A> {
   }
 }
 
+/// {@template mutationState}
+/// [MutationState] holds the current state of an [InfiniteQuery].
+///
+/// Should not be instantiated manually. Instead should be read from [Mutation].
+/// {@endTemplate}
 class MutationState<T> {
+  /// Response of the [MutationQueryCallback].
   final T? data;
+
+  /// Status of the [MutationQueryCallback].
   final QueryStatus status;
+
+  /// Whether the [MutationQueryCallback] is currently fetching.
   final bool isFetching;
+
+  /// Current error of the [MutationQueryCallback].
   final dynamic error;
 
+  /// {@macro mutationState}
   const MutationState({
     this.data,
     this.status = QueryStatus.initial,
     this.isFetching = false,
-    this.error = null,
+    this.error,
   });
 
+  /// Creates a copy of the current [MutationState] with the given filed
+  /// replaced.
   MutationState<T> copyWith({
     T? data,
     QueryStatus? status,
@@ -247,4 +265,29 @@ class MutationState<T> {
   @override
   int get hashCode =>
       data.hashCode ^ status.hashCode ^ isFetching.hashCode ^ error.hashCode;
+}
+
+class _MutationCache {
+  _MutationCache._();
+  static final instance = _MutationCache._();
+
+  Map<String, Mutation<dynamic, dynamic>> mutationCache = {};
+  Mutation<T, A>? getMutation<T, A>(String key) {
+    if (mutationCache.containsKey(key)) {
+      return mutationCache[key] as Mutation<T, A>;
+    }
+    return null;
+  }
+
+  void deleteMutation(String key) {
+    if (mutationCache.containsKey(key)) {
+      mutationCache.remove(key);
+    }
+  }
+
+  void addMutation<T, A>(Mutation<T, A> mutation) {
+    if (mutation.key != null) {
+      mutationCache[mutation.key!] = mutation;
+    }
+  }
 }

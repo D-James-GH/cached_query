@@ -1,42 +1,37 @@
 part of "./cached_query.dart";
 
+/// {@template stateBase}
+/// An Interface for both [QueryState] and [InfiniteQueryState].
+/// {@endTemplate}
 abstract class StateBase {
+  /// Current data of the query.
   Object? get data;
+
+  /// {@macro stateBase}
   const StateBase();
 }
 
+/// {@template queryBase}
+/// An Interface for both [Query] and [InfiniteQuery].
+/// {@endTemplate}
 abstract class QueryBase<T, State extends StateBase> {
+  /// The key used to store and access the query.
+  ///
+  /// This is created by calling jsonEncode on the passed dynamic key.
   final String key;
+
   final Serializer<T>? _serializer;
-
-  /// string encoded key
-  // final String _queryHash;
-
-  /// global cache singleton
-  final GlobalCache _globalCache = GlobalCache.instance;
-
-  /// garbage collection timer
+  final CachedQuery _globalCache = CachedQuery.instance;
   Timer? _deleteQueryTimer;
-
-  /// time before the query should be re-fetched
   final Duration _staleTime;
 
-  /// [_stale] marks the query as needing to refetch
   bool _stale = false;
-
-  /// Time after there are 0 subscribes before the query is deleted from cache
   final Duration _cacheTime;
-
-  /// if [_ignoreStaleTime] is true the data will never be re-fetched, unless forced to
-  final bool _ignoreStaleTime;
-
-  /// if [_ignoreCacheTime] is true the cache will never be deleted during the session
-  final bool _ignoreCacheTime;
-
-  /// current state of the query
+  final bool _ignoreRefetchDuration;
+  final bool _ignoreCacheDuration;
   State _state;
 
-  /// broadcast stream that reacts to changes to the query state
+  /// Broadcast stream controller that reacts to changes to the query state
   StreamController<State>? _streamController;
 
   QueryBase._internal({
@@ -47,23 +42,39 @@ abstract class QueryBase<T, State extends StateBase> {
     Duration? cacheDuration,
     required State state,
     Serializer<T>? serializer,
-  })  : _ignoreStaleTime = ignoreRefetchDuration,
-        _ignoreCacheTime = ignoreCacheDuration,
+  })  : _ignoreRefetchDuration = ignoreRefetchDuration,
+        _ignoreCacheDuration = ignoreCacheDuration,
         // _queryHash = jsonEncode(key),
-        _staleTime = refetchDuration ?? GlobalCache.instance.refetchDuration,
-        _cacheTime = cacheDuration ?? GlobalCache.instance.cacheDuration,
+        _staleTime = refetchDuration ?? CachedQuery.instance._refetchDuration,
+        _cacheTime = cacheDuration ?? CachedQuery.instance._cacheDuration,
         _state = state,
         _serializer = serializer;
 
+  /// The current state of the query.
   State get state => _state;
+
+  /// Whether the current query is marked as stale and therefore requires a
+  /// refetch.
   bool get stale => _stale;
+
+  /// Weather the query stream has any listeners.
   bool get hasListener => _streamController?.hasListener ?? false;
 
+  /// Stream the state of the query.
+  ///
+  /// When the state is updated either by a mutation or a new query [stream]
+  /// will be notified.
+  Stream<State> get stream => _getStream();
+
+  /// Get the result of calling the queryFn.
   Future<State> get result;
+
+  /// Refetch the query immediately.
+  ///
+  /// Returns the updated [State] and will notify the [stream].
   Future<State> refetch();
 
-  /// sets the new state. In case any additional logic needs to be added when
-  /// setting the state.
+  /// Sets the new state.
   void _setState(State newState) {
     _state = newState;
   }
@@ -74,21 +85,21 @@ abstract class QueryBase<T, State extends StateBase> {
   }
 
   void _saveToStorage() {
-    if (_globalCache.storage != null && _state.data != null) {
-      _globalCache.storage!.put<T>(key, item: _state.data! as T);
+    if (_globalCache._storage != null && _state.data != null) {
+      _globalCache._storage!.put<T>(key, item: _state.data! as T);
     }
   }
 
   Future<dynamic> _fetchFromStorage() async {
-    if (_globalCache.storage != null) {
-      final dynamic storedData = await _globalCache.storage?.get(key);
+    if (_globalCache._storage != null) {
+      final dynamic storedData = await _globalCache._storage?.get(key);
       if (storedData != null) {
         return _serializer == null ? storedData : _serializer!(storedData);
       }
     }
   }
 
-  Stream<State> get stream {
+  Stream<State> _getStream() {
     if (_streamController != null) {
       return _streamController!.stream;
     }
@@ -107,9 +118,9 @@ abstract class QueryBase<T, State extends StateBase> {
     return _streamController!.stream;
   }
 
-  /// After the [_cacheTime] is up remove the query from the [GlobalCache]
+  /// After the [_cacheTime] is up remove the query from the global cache.
   void _scheduleDelete() {
-    if (!_ignoreCacheTime) {
+    if (!_ignoreCacheDuration) {
       _deleteQueryTimer = Timer(_cacheTime, deleteQuery);
     }
   }
@@ -127,13 +138,15 @@ abstract class QueryBase<T, State extends StateBase> {
     }
   }
 
-  /// mark as stale so will force a fetch next time the query is accessed
+  /// Mark query as stale.
+  ///
+  /// Will force a fetch next time the query is accessed.
   void invalidateQuery() {
     _stale = true;
   }
 
-  /// delete the query and query key from cache
+  /// Delete the query and query key from cache
   void deleteQuery() {
-    _globalCache.deleteCache(key: key);
+    _globalCache.deleteCache(key);
   }
 }

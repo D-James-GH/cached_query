@@ -35,7 +35,9 @@ class JokeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.arrow_right_alt),
             onPressed: () => Navigator.pushReplacementNamed(
-                context, PostListScreen.routeName),
+              context,
+              PostListScreen.routeName,
+            ),
           )
         ],
       ),
@@ -58,13 +60,14 @@ class JokeScreen extends StatelessWidget {
                 ),
               Expanded(
                 child: Center(
-                    child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(child: Text(state.data?.joke ?? "")),
-                    if (state.isFetching) const CircularProgressIndicator(),
-                  ],
-                )),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(child: Text(state.data?.joke ?? "")),
+                      if (state.isFetching) const CircularProgressIndicator(),
+                    ],
+                  ),
+                ),
               ),
             ],
           );

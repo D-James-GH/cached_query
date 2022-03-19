@@ -5,7 +5,7 @@ class QueryMock {
   static const returnString = "I am a return string";
 
   Query<String> getQuery([Duration duration = Duration.zero]) {
-    return query(
+    return Query(
       key: key,
       cacheDuration: const Duration(seconds: 1),
       refetchDuration: const Duration(seconds: 2),

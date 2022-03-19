@@ -1,15 +1,38 @@
 import 'package:cached_query/cached_query.dart';
 
+/// {@template infiniteQueryState}
+/// [InfiniteQueryState] holds the current state of an [InfiniteQuery]
+/// {@endTemplate}
 class InfiniteQueryState<T> extends StateBase {
+  /// List of responses from the [queryFn]
   @override
   final List<T> data;
+
+  /// Current page index
   final int currentPage;
+
+  /// True if there are no more pages available to fetch.
+  ///
+  /// Set to true if [GetNextArg] has returned null.
   final bool hasReachedMax;
+
+  /// Status of the previous fetch.
   final QueryStatus? status;
+
+  /// True if the query is currently fetching.
   final bool isFetching;
+
+  /// Current error for the query.
+  ///
+  /// Equal to null if there is no error.
   final dynamic error;
+
+  /// Timestamp of the [InfiniteQuery]
+  ///
+  /// Time is reset if new data is fetched.
   final DateTime timeCreated;
 
+  /// {@macro infiniteQueryState}
   const InfiniteQueryState({
     this.hasReachedMax = false,
     required this.data,
@@ -20,8 +43,11 @@ class InfiniteQueryState<T> extends StateBase {
     required this.currentPage,
   });
 
+  /// Get the last page in the [data]
   T? get lastPage => data.isNotEmpty ? data[data.length - 1] : null;
 
+  /// Creates a copy of the current [InfiniteQueryState] with the given filed
+  /// replaced.
   InfiniteQueryState<T> copyWith({
     List<T>? data,
     QueryStatus? status,

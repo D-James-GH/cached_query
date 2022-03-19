@@ -16,12 +16,15 @@ class JokeBloc extends Bloc<JokeEvent, JokeState> {
   }
 
   FutureOr<void> _onJokeFetched(
-      JokeFetched event, Emitter<JokeState> emit) async {
+    JokeFetched event,
+    Emitter<JokeState> emit,
+  ) async {
     await emit.forEach<QueryState<JokeModel?>>(
       _repo.getJoke().stream,
       onData: (query) => state.copyWith(
-          joke: query.data,
-          status: query.isFetching ? JokeStatus.loading : JokeStatus.success),
+        joke: query.data,
+        status: query.isFetching ? JokeStatus.loading : JokeStatus.success,
+      ),
     );
   }
 }

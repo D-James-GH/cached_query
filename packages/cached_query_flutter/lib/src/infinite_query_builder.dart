@@ -1,14 +1,28 @@
-import 'dart:async';
-import 'package:cached_query/cached_query.dart';
-import 'package:flutter/material.dart';
+part of cached_query_flutter;
 
+// todo(Dan): add examples to docs.
+/// {@template infiniteQueryBuilder}
+/// Listen to changed in an [InfiniteQuery] and build the ui with the result.
+/// {@endTemplate infiniteQueryBuilder}
 class InfiniteQueryBuilder<T, A> extends StatefulWidget {
+  /// [InfiniteQuery] to listen to.
   final InfiniteQuery<T, A> query;
-  final Widget Function(BuildContext context, InfiniteQueryState<T> state,
-      InfiniteQuery<T, A> query) builder;
-  const InfiniteQueryBuilder(
-      {Key? key, required this.query, required this.builder})
-      : super(key: key);
+
+  /// The builder function is called on each widget build.
+  ///
+  /// Passes [BuildContext], [InfiniteQueryState] and [InfiniteQuery].
+  final Widget Function(
+    BuildContext context,
+    InfiniteQueryState<T> state,
+    InfiniteQuery<T, A> query,
+  ) builder;
+
+  /// {@macro infiniteQueryBuilder}
+  const InfiniteQueryBuilder({
+    Key? key,
+    required this.query,
+    required this.builder,
+  }) : super(key: key);
 
   @override
   _InfiniteQueryBuilderState<T, A> createState() =>

@@ -33,6 +33,7 @@ linter:
     join_return_with_assignment: true
     no_leading_underscores_for_local_identifiers: true
     prefer_final_in_for_each: true
+    public_member_api_docs: true
     prefer_final_locals: true
     prefer_interpolation_to_compose_strings: true
     sized_box_shrink_expand: true
@@ -70,7 +71,6 @@ dart_code_metrics:
     - no-equal-then-else
     - avoid-wrapping-in-padding
     #    below can have ignored named arguments passed to it
-    - prefer-extracting-callbacks
     - member-ordering-extended:
         order:
           - constructors

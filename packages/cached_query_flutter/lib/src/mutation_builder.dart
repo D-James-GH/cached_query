@@ -1,17 +1,30 @@
-import 'dart:async';
+part of cached_query_flutter;
 
-import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:flutter/material.dart';
-
+/// {@template mutationBuilder}
+/// Called on each widget build.
+///
+/// Passes [BuildContext], [MutationState], and a mutate function.
+///
+/// Calling [mutate] will start the mutation with the given arguments.
+/// {@endTemplate}
 typedef MutationBuilderCallback<T, A> = Widget Function(
   BuildContext context,
   MutationState<T> state,
   Future<T?> Function(A args) mutate,
 );
 
+// todo(Dan): add examples to docs.
+/// {@template mutationBuilder}
+/// Listen to changes in an [Mutation] and build the ui with the result.
+/// {@endTemplate}
 class MutationBuilder<T, A> extends StatefulWidget {
+  /// The [Mutation] to used to update the ui.
   final Mutation<T, A> mutation;
+
+  /// {@macro mutationBuilder}
   final MutationBuilderCallback<T, A> builder;
+
+  /// {@macro mutationBuilder}
   const MutationBuilder({
     Key? key,
     required this.mutation,

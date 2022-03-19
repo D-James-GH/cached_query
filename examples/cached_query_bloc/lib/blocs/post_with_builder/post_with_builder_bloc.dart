@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:stream_transform/stream_transform.dart';
@@ -18,16 +16,24 @@ class PostWithBuilderBloc
 
   PostWithBuilderBloc()
       : super(PostWithBuilderState(postsQuery: PostRepository().getPosts())) {
-    on<PostWithBuilderNextPage>(_onPostsNextPage,
-        transformer: throttleDroppable(const Duration(milliseconds: 300)));
+    on<PostWithBuilderNextPage>(
+      _onPostsNextPage,
+      transformer: throttleDroppable(const Duration(milliseconds: 300)),
+    );
     on<PostWithBuilderCreated>(_onPostCreated);
   }
 
-  void _onPostsNextPage(_, __) {
+  void _onPostsNextPage(
+    PostWithBuilderEvent _,
+    Emitter<PostWithBuilderState> __,
+  ) {
     _repo.getPosts().getNextPage();
   }
 
-  void _onPostCreated(PostWithBuilderCreated event, _) {
+  void _onPostCreated(
+    PostWithBuilderCreated event,
+    Emitter<PostWithBuilderState> _,
+  ) {
     _repo.createPost(event.post);
   }
 
