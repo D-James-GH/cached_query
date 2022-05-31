@@ -12,32 +12,61 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
         queryFn: repo.getPosts,
-        getNextArg: (pageIndex, lastPage) {
-          if (lastPage == null) return 1;
-          if (lastPage.isEmpty) return null;
-          return pageIndex + 1;
+        getNextArg: (state) {
+          if (state.lastPage == null) return 1;
+          if (state.lastPage!.isEmpty) return null;
+
+          return state.length + 1;
         },
       );
 
-      final queryFromCache = cachedQuery
-          .getInfiniteQuery<String, int>(InfiniteQueryTestRepository.key);
+      final queryFromCache =
+          cachedQuery.getQuery(InfiniteQueryTestRepository.key);
       expect(query, queryFromCache);
     });
   });
   group("Infinite query as a future", () {
-    tearDown(cachedQuery.deleteCache);
+    int fetchCount = 0;
+    tearDown(() {
+      fetchCount = 0;
+      cachedQuery.deleteCache();
+    });
     test("Should return an infinite query", () async {
       final query = InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
         queryFn: repo.getPosts,
-        getNextArg: (pageIndex, lastPage) {
-          if (lastPage == null) return 1;
-          if (lastPage.isEmpty) return null;
-          return pageIndex + 1;
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
         },
       );
       final res = await query.result;
       expect(res, isA<InfiniteQueryState<String>>());
+    });
+    test("Query result returns data", () async {
+      final query = InfiniteQuery<String, int>(
+        key: "Posts",
+        queryFn: repo.getPosts,
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
+        },
+      );
+      final res = await query.result;
+      expect(res.data?.isNotEmpty, true);
+    });
+    test("Query result returns data with refetch duration set", () async {
+      final query = InfiniteQuery<String, int>(
+        key: "Posts",
+        queryFn: repo.getPosts,
+        refetchDuration: const Duration(milliseconds: 200),
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
+        },
+      );
+      final res = await query.result;
+      expect(res.data?.isNotEmpty, true);
     });
     test("calling query result twice is de-duped", () async {
       final query = InfiniteQuery<String, int>(
@@ -46,10 +75,9 @@ void main() async {
           const Duration(seconds: 2),
           () => repo.getPosts(page),
         ),
-        getNextArg: (pageIndex, lastPage) {
-          if (lastPage == null) return 1;
-          if (lastPage.isEmpty) return null;
-          return pageIndex + 1;
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
         },
       );
       String res1 = "";
@@ -64,41 +92,94 @@ void main() async {
     });
     test("Adding refetchDuration means next result will come from cache.",
         () async {
+      int fetchCount = 0;
+      Future<String> createResponse(int page) {
+        fetchCount++;
+        return repo.getPosts(page);
+      }
+
       final query = InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
-        queryFn: repo.getPosts,
+        queryFn: createResponse,
         refetchDuration: const Duration(seconds: 5),
-        getNextArg: (pageIndex, lastPage) {
-          if (lastPage == null) return 1;
-          if (lastPage.isEmpty) return null;
-          return pageIndex + 1;
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
         },
       );
       final res1 = await query.result;
       final res2 = await InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
-        queryFn: repo.getPosts,
-        getNextArg: (pageIndex, lastPage) {
-          if (lastPage == null) return 1;
-          if (lastPage.isEmpty) return null;
-          return pageIndex + 1;
+        queryFn: createResponse,
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
         },
       ).result;
-      expect(res1.timeCreated, res2.timeCreated);
+      expect(fetchCount, 1);
     });
     test("re-fetching does not give the same result", () async {
+      int fetchCount = 0;
       final query = InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
-        queryFn: repo.getPosts,
-        getNextArg: (pageIndex, lastPage) {
-          if (lastPage == null) return 1;
-          if (lastPage.isEmpty) return null;
-          return pageIndex + 1;
+        queryFn: (page) {
+          fetchCount++;
+          return repo.getPosts(page);
+        },
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
         },
       );
       final res1 = await query.result;
       final res2 = await query.refetch();
-      expect(res1.timeCreated, isNot(res2.timeCreated));
+      expect(fetchCount, 2);
+    });
+    test("Should refetch list after refetchDuration", () async {
+      int fetchCount = 0;
+      final query = InfiniteQuery<String, int>(
+        key: "refetch list",
+        refetchDuration: Duration.zero,
+        getNextArg: (state) => state.length + 1,
+        queryFn: (page) {
+          fetchCount++;
+          return Future.value("$page");
+        },
+      );
+      final res1 = await query.result;
+      final res2 = await query.result;
+      expect(fetchCount, 2);
+    });
+  });
+  group("Infinite query args", () {
+    tearDown(cachedQuery.deleteCache);
+    test("Initial index", () async {
+      const initialIndex = 1;
+      final query = InfiniteQuery<int, int>(
+        key: "initialIndex",
+        queryFn: repo.getPage,
+        getNextArg: (state) {
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
+        },
+      );
+      final res = await query.result;
+      expect(res.data![0], 1);
+    });
+
+    test("Should get next page based on next args", () async {
+      const initialIndex = 1;
+      final query = InfiniteQuery<int, int>(
+        key: "nextPage",
+        queryFn: repo.getPage,
+        getNextArg: (state) {
+          if (state.length == 0) return initialIndex;
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      final res = await query.getNextPage();
+      expect(res!.lastPage, 2);
     });
   });
 }

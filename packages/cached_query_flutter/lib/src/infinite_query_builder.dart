@@ -38,6 +38,7 @@ class _InfiniteQueryBuilderState<T, A>
   void initState() {
     super.initState();
     _state = widget.query.state;
+
     _subscription = widget.query.stream.listen((event) {
       setState(() {
         _state = event;

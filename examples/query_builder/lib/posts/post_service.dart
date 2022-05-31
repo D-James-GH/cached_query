@@ -11,22 +11,22 @@ class PostService {
       serializer: (dynamic postJson) => PostModel.listFromJson(
         List<Map<String, dynamic>>.from(postJson as List<dynamic>),
       ),
-      initialIndex: 1,
-      cacheDuration: const Duration(seconds: 2),
       refetchDuration: const Duration(seconds: 2),
-      getNextArg: (pageIndex, lastPage) {
-        if (lastPage == null) return 1;
-        if (lastPage.isEmpty) return null;
-        return pageIndex + 1;
+      getNextArg: (state) {
+        if (state.lastPage?.isEmpty ?? false) return null;
+        return state.length + 1;
       },
       queryFn: (arg) async {
         final uri = Uri.parse(
           'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
         );
         final res = await http.get(uri);
-        return PostModel.listFromJson(
-          List<Map<String, dynamic>>.from(
-            jsonDecode(res.body) as List<dynamic>,
+        return Future.delayed(
+          const Duration(seconds: 1),
+          () => PostModel.listFromJson(
+            List<Map<String, dynamic>>.from(
+              jsonDecode(res.body) as List<dynamic>,
+            ),
           ),
         );
       },
@@ -50,7 +50,7 @@ class PostService {
         return PostModel.fromJson(res);
       },
       onSuccess: (args, newPost) {
-        CachedQuery.instance.updateInfiniteQuery<List<PostModel>, int>(
+        CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
           key: "posts",
           updateFn: (old) => [
             [newPost, ...old![0]],

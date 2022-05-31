@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:examples/repos/post_repo.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:bloc/bloc.dart';
@@ -33,7 +34,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       onData: (query) {
         return state.copyWith(
           posts: [...?state.posts, ...?query.lastPage],
-          status: query.isFetching ? PostStatus.loading : PostStatus.success,
+          status: query.status == QueryStatus.loading
+              ? PostStatus.loading
+              : PostStatus.success,
           hasReachedMax: query.hasReachedMax,
         );
       },

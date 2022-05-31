@@ -1,5 +1,14 @@
 part of 'cached_query.dart';
 
+/// The result of the [InfiniteQueryFunc] will be cached.
+typedef InfiniteQueryFunc<T, A> = Future<T> Function(A);
+
+/// Determines the parameters of the next page in an infinite query.
+///
+/// Return null if the last page has already been fetch and therefore trigger
+/// [InfiniteQueryState.hasReachedMax] to equal `true`.
+typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
+
 /// {@template infiniteQuery}
 /// [InfiniteQuery] caches a series of [Query]'s for use in an infinite list.
 ///
@@ -18,67 +27,65 @@ part of 'cached_query.dart';
 /// Use [prefetchPages] to fetch multiple pages on first call and use
 /// [initialIndex] to set the initial page of the query.
 ///
-/// Set the initial page index with [initialIndex]. Defaults to 0.
-/// {@endTemplate infiniteQuery}
+/// {@endtemplate infiniteQuery}
 class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
-  final Future<T> Function(A arg) _queryFn;
-  final GetNextArg<A, T> _getNextArg;
-  final int _initialIndex;
-  List<String> _queryKeys = [];
-  int _currentIndex;
-  Future<InfiniteQueryState<T>>? _currentNextPageFuture;
-  Future<InfiniteQueryState<T>>? _currentFuture;
+  final GetNextArg<T, A> _getNextArg;
+  final InfiniteQueryFunc<T, A> _queryFn;
+  Future<void>? _refetchFuture;
+
+  @override
+  Future<InfiniteQueryState<T>> get result => _getResult();
+
+  /// Get the last page in the [InfiniteQueryState.data]
+  T? get lastPage => state.lastPage;
 
   InfiniteQuery._internal({
-    required Future<T> Function(A arg) queryFn,
+    required InfiniteQueryFunc<T, A> queryFn,
     required String key,
-    required int initialIndex,
-    required GetNextArg<A, T> getNextArg,
+    required GetNextArg<T, A> getNextArg,
     bool ignoreRefetchDuration = false,
     bool ignoreCacheDuration = false,
+    required bool storeQuery,
     Serializer<T>? serializer,
     Duration? refetchDuration,
     Duration? cacheDuration,
-  })  : _queryFn = queryFn,
-        _initialIndex = initialIndex,
-        _currentIndex = initialIndex,
-        _getNextArg = getNextArg,
-        _queryKeys = [],
+  })  : _getNextArg = getNextArg,
+        _queryFn = queryFn,
         super._internal(
           key: key,
-          ignoreRefetchDuration: ignoreRefetchDuration,
+          storeQuery: storeQuery,
           ignoreCacheDuration: ignoreCacheDuration,
+          ignoreRefetchDuration: ignoreRefetchDuration,
+          refetchDuration: refetchDuration,
+          cacheDuration: cacheDuration,
           serializer: serializer,
           state: InfiniteQueryState<T>(
             data: [],
-            currentPage: initialIndex,
             timeCreated: DateTime.now(),
           ),
-          refetchDuration: refetchDuration,
-          cacheDuration: cacheDuration,
         );
 
   /// {@macro infiniteQuery}
   factory InfiniteQuery({
     required Object key,
     required Future<T> Function(A arg) queryFn,
-    required GetNextArg<A, T> getNextArg,
+    required GetNextArg<T, A> getNextArg,
     Serializer<T>? serializer,
     bool forceRefetch = false,
+    bool storeQuery = true,
     Duration? cacheDuration,
     Duration? refetchDuration,
-    int initialIndex = 0,
     List<A>? prefetchPages,
     bool ignoreRefetchDuration = false,
     bool ignoreCacheDuration = false,
   }) {
     final globalCache = CachedQuery.instance;
     final queryKey = encodeKey(key);
-    InfiniteQuery<T, A>? infiniteQuery = globalCache.getInfiniteQuery(queryKey);
-
-    if (infiniteQuery == null) {
-      infiniteQuery = InfiniteQuery<T, A>._internal(
+    var query = globalCache.getQuery(queryKey);
+    if (query == null || query is! InfiniteQuery<T, A>) {
+      query = InfiniteQuery<T, A>._internal(
         queryFn: queryFn,
+        storeQuery: storeQuery,
         ignoreRefetchDuration: ignoreRefetchDuration,
         ignoreCacheDuration: ignoreCacheDuration,
         serializer: serializer,
@@ -86,34 +93,61 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
         refetchDuration: refetchDuration,
         cacheDuration: cacheDuration,
         key: queryKey,
-        initialIndex: initialIndex,
       );
-      globalCache._addInfiniteQuery(infiniteQuery);
+      globalCache._addQuery(query);
+      query._getResult(forceRefetch: forceRefetch);
     }
 
     if (prefetchPages != null) {
-      infiniteQuery._preFetchPages(prefetchPages);
+      query._preFetchPages(prefetchPages);
     }
-    infiniteQuery._getResult(forceRefetch: forceRefetch);
 
-    return infiniteQuery;
+    return query;
+  }
+
+  /// Get the next page in an [InfiniteQuery] and cache the result.
+  Future<InfiniteQueryState<T>?> getNextPage() async {
+    if (state.hasReachedMax) return null;
+    _currentFuture ??= _fetch();
+    await _currentFuture;
+    return state;
+  }
+
+  /// Refetch the query immediately.
+  ///
+  /// Returns the updated [State] and will notify the [stream].
+  @override
+  Future<InfiniteQueryState<T>> refetch() async {
+    _refetchFuture ??= _fetchAll();
+    await _refetchFuture;
+    return state;
+  }
+
+  /// Delete the query and query key from cache
+  @override
+  void deleteQuery() {
+    _globalCache.deleteCache(key);
+  }
+
+  /// Update the current [InfiniteQuery] data.
+  ///
+  /// The [updateFn] passes the current query data and must return new data of
+  /// type [T]
+  void update(List<T> Function(List<T>?) updateFn) {
+    final newData = updateFn(_state.data);
+    _setState(_state.copyWith(data: newData));
+    _emit();
   }
 
   @override
-  Future<InfiniteQueryState<T>> get result => _getResult();
-
-  /// Get the last page in the [InfiniteQueryState.data]
-  T? get lastPage => _state.lastPage;
-
-  @override
-  Future<InfiniteQueryState<T>> refetch() => _getResult(forceRefetch: true);
-
   Future<InfiniteQueryState<T>> _getResult({bool forceRefetch = false}) async {
     if (!_stale &&
         !forceRefetch &&
         _state.status != QueryStatus.error &&
-        _state.data.isNotEmpty &&
-        _state.timeCreated.add(_staleTime).isAfter(DateTime.now())) {
+        _state.data != null &&
+        _state.data!.isNotEmpty &&
+        (_ignoreRefetchDuration ||
+            _state.timeCreated.add(_refetchDuration).isAfter(DateTime.now()))) {
       _emit();
       return _state;
     }
@@ -123,183 +157,99 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     return _state;
   }
 
-  Future<InfiniteQueryState<T>> _fetch() async {
-    _setState(_state.copyWith(status: QueryStatus.loading, isFetching: true));
+  Future<void> _fetchAll() async {
+    final previousState = _state.copyWith();
+    _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
-    // if the query is the first page
-    if (_queryKeys.isEmpty) {
-      final pageParam = _getNextArg(_currentIndex, null);
-      if (pageParam != null) {
-        // get initial page
-        final initialQuery =
-            await _getQuery(arg: pageParam)._getResult(forceRefetch: true);
-        _setState(
-          _state.copyWith(
-            data: initialQuery.data != null ? [initialQuery.data!] : [],
-            status: initialQuery.status == QueryStatus.error
-                ? QueryStatus.error
-                : QueryStatus.success,
-            isFetching: false,
-            timeCreated: DateTime.now(),
-            error: initialQuery.error,
-          ),
+    try {
+      var newState = _state.copyWith(data: []);
+      for (int i = 0; i < previousState.length; i++) {
+        final arg = _getNextArg(newState);
+        if (arg == null) {
+          newState = newState.copyWith(hasReachedMax: true);
+          break;
+        }
+        final res = await _queryFn(arg);
+        newState = newState.copyWith(
+          data: res != null ? [...?newState.data, res] : newState.data,
+          lastPage: res,
         );
-        _stale = false;
-        _emit();
-        _currentFuture = null;
-        return _state;
       }
-
-      // initial param was null, indicating there are no more pages, which is an error
       _setState(
-        _state.copyWith(
-          error: "Initial argument was null",
-          status: QueryStatus.error,
-          isFetching: false,
+        newState.copyWith(
+          status: QueryStatus.success,
+          timeCreated: DateTime.now(),
         ),
       );
+    } catch (e) {
+      // if failed return the previous state
+      _setState(
+        previousState.copyWith(
+          status: QueryStatus.error,
+          error: e,
+        ),
+      );
+    } finally {
+      _refetchFuture = null;
       _emit();
-      _currentFuture = null;
-      return _state;
     }
-
-    // not the first time this infinite query has been called
-    await _refetchAllQueries();
-    _emit();
-    _currentFuture = null;
-    return _state;
   }
 
-  /// Get the next page in an [InfiniteQuery] and cache the result.
-  Future<InfiniteQueryState<T>> getNextPage() {
-    if (_currentNextPageFuture != null) return _currentNextPageFuture!;
-    _currentNextPageFuture = _fetchNextPage();
-    return _currentNextPageFuture!;
-  }
-
-  // TODO(Dan): might be unnecessary to de-dupe
-  /// Private fetch function to help with de-duping next page requests.
-  Future<InfiniteQueryState<T>> _fetchNextPage() async {
-    if (_state.hasReachedMax) {
-      _emit();
-      return _state;
-    }
+  Future<void> _fetch({A? arg}) async {
     _setState(_state.copyWith(status: QueryStatus.loading));
-    final nextArg = _getNextArg(_currentIndex, lastPage);
-    if (nextArg == null) {
+    _emit();
+    try {
+      if (_state.data == null && storeQuery) {
+        // try to get any data from storage if the query has no data
+        final dynamic dataFromStorage = await _fetchFromStorage();
+        if (dataFromStorage is List<T>) {
+          _setState(_state.copyWith(data: dataFromStorage));
+          // Emit the data from storage
+          _emit();
+        }
+      }
+
+      arg ??= _getNextArg(state);
+      if (arg == null) {
+        _setState(
+          state.copyWith(
+            hasReachedMax: true,
+            status: QueryStatus.success,
+          ),
+        );
+        _emit();
+        return;
+      }
+
+      final res = await _queryFn(arg);
       _setState(
         _state.copyWith(
-          hasReachedMax: true,
+          data: [...?state.data, res],
+          lastPage: res,
+          timeCreated: DateTime.now(),
           status: QueryStatus.success,
         ),
       );
-      _emit();
-      return _state;
-    }
-    _setState(_state.copyWith(isFetching: true));
-    _emit();
-    _currentIndex++;
-    // add one to the current page to check whether it has data
-    final QueryState<T> query = await _getQuery(
-      key: key + (_currentIndex + 1).toString(),
-      arg: nextArg,
-    )._getResult();
-    _setState(
-      _state.copyWith(
-        data: [..._state.data, if (query.data != null) query.data!],
-        status: QueryStatus.success,
-        isFetching: false,
-      ),
-    );
-
-    _currentNextPageFuture = null;
-    _emit();
-    return _state;
-  }
-
-  void _preFetchPages(List<A> arguments) {
-    for (final arg in arguments) {
-      final queryKey = key + _currentIndex.toString();
-      Query(
-        key: queryKey,
-        queryFn: () => _queryFn(arg),
-        forceRefetch: true,
+      if (storeQuery) {
+        // save to local storage if exists
+        _saveToStorage();
+      }
+    } catch (e) {
+      _setState(
+        _state.copyWith(
+          status: QueryStatus.error,
+          error: e,
+        ),
       );
+    } finally {
+      _currentFuture = null;
+      _emit();
     }
   }
 
-  /// get all queries in the query key list
-  Future<void> _refetchAllQueries() async {
-    final List<Query<T>> queries = [];
-    for (final k in _queryKeys) {
-      final q = _globalCache.getQuery<T>(k);
-      if (q != null) {
-        queries.add(q);
-      }
+  void _preFetchPages(List<A> arguments) async {
+    for (final arg in arguments) {
+      await _fetch(arg: arg);
     }
-
-    final List<T> data = [];
-    var hasError = false;
-    await Future.forEach<Query<T>>(queries, (query) async {
-      final QueryState<T?> result = await query._getResult(forceRefetch: true);
-      if (result.status == QueryStatus.error) {
-        hasError = true;
-      }
-      if (result.data != null) {
-        data.add(result.data!);
-      }
-    });
-    _setState(
-      _state.copyWith(
-        data: data,
-        timeCreated: DateTime.now(),
-        isFetching: false,
-        status: hasError ? QueryStatus.error : QueryStatus.success,
-      ),
-    );
-  }
-
-  /// [_getQuery] gets a single query from the global cache
-  Query<T> _getQuery({String? key, required A arg}) {
-    key ??= this.key + _currentIndex.toString();
-    final q = Query<T>(
-      key: key,
-      serializer: _serializer,
-      queryFn: () => _queryFn(arg),
-    );
-    if (!_queryKeys.contains(q.key)) {
-      _queryKeys.add(q.key);
-    }
-
-    return q;
-  }
-
-  /// Update the current [InfiniteQuery] data.
-  ///
-  /// The [updateFn] passes the current query data and must return new data of
-  /// type [List<T>]
-  void update(List<T> Function(List<T>? oldData) updateFn) {
-    final newData = updateFn(_state.data);
-    _setState(_state.copyWith(data: newData));
-    _emit();
-  }
-
-  /// invalidate all queries in the infinite query
-  @override
-  void invalidateQuery() {
-    _stale = true;
-    for (final k in _queryKeys) {
-      _globalCache.invalidateCache(k);
-    }
-  }
-
-  @override
-  void deleteQuery() {
-    for (final k in _queryKeys) {
-      _globalCache.deleteCache(k);
-    }
-    _globalCache.deleteCache(key);
-    _queryKeys = [];
-    _currentIndex = _initialIndex;
   }
 }

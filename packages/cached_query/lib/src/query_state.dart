@@ -20,34 +20,33 @@ enum QueryStatus {
 ///
 /// Should not be instantiated manually.
 /// {@endTemplate}
-class QueryState<T> extends StateBase {
+class QueryState<T> implements StateBase {
   /// Current data of the query.
   @override
   final T? data;
 
-  /// Timestamp of the [InfiniteQuery]
+  /// Timestamp of the query.
   ///
   /// Time is reset if new data is fetched.
+  @override
   final DateTime timeCreated;
 
   /// Status of the previous fetch.
+  @override
   final QueryStatus status;
-
-  /// True if the query is currently fetching.
-  final bool isFetching;
 
   /// Current error for the query.
   ///
   /// Equal to null if there is no error.
+  @override
   final dynamic error;
 
   /// {@macro queryState}
-  const QueryState({
+  QueryState({
     this.error,
     this.data,
     required this.timeCreated,
     this.status = QueryStatus.initial,
-    this.isFetching = false,
   });
 
   /// Creates a copy of the current [QueryState] with the given filed
@@ -56,7 +55,6 @@ class QueryState<T> extends StateBase {
     T? data,
     DateTime? timeCreated,
     QueryStatus? status,
-    bool? isFetching,
     dynamic error,
   }) {
     return QueryState(
@@ -64,7 +62,6 @@ class QueryState<T> extends StateBase {
       timeCreated: timeCreated ?? this.timeCreated,
       status: status ?? this.status,
       error: error ?? this.error,
-      isFetching: isFetching ?? this.isFetching,
     );
   }
 
@@ -74,16 +71,11 @@ class QueryState<T> extends StateBase {
       other is QueryState &&
           runtimeType == other.runtimeType &&
           data == other.data &&
-          isFetching == other.isFetching &&
           timeCreated == other.timeCreated &&
           error == other.error &&
           status == other.status;
 
   @override
   int get hashCode =>
-      runtimeType.hashCode ^
-      data.hashCode ^
-      status.hashCode ^
-      isFetching.hashCode ^
-      error.hashCode;
+      runtimeType.hashCode ^ data.hashCode ^ status.hashCode ^ error.hashCode;
 }

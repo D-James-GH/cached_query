@@ -1,8 +1,6 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  plugins:
-    - dart_code_metrics
   errors:
     missing_required_param: error
     avoid_print: info
@@ -50,35 +48,3 @@ linter:
 
 #    overridden_fields: true
 
-dart_code_metrics:
-  metrics-exclude:
-    - test/**
-    - "**/*.g.dart"
-    - "**/*.gr.dart"
-    - "**/*.freezed.dart"
-  rules-exclude:
-    - test/**
-    - "**/*.g.dart"
-    - "**/*.gr.dart"
-    - "**/*.freezed.dart"
-  rules:
-    - newline-before-return
-    - avoid-unnecessary-setstate
-    - avoid-wrapping-in-padding
-    - avoid-unnecessary-type-casts
-    - avoid-unused-parameters
-    - no-equal-then-else
-    - avoid-wrapping-in-padding
-    #    below can have ignored named arguments passed to it
-    - prefer-extracting-callbacks
-    - member-ordering-extended:
-        order:
-          - constructors
-          - public-fields
-          - private-fields
-          - public-getters
-          - public-setters
-          - private-getters
-          - private-setters
-          - public-methods
-          - private-methods

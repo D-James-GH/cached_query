@@ -38,12 +38,13 @@ class _RetryOnConnect {
   StreamController<bool> connectionChangeController =
       StreamController<bool>.broadcast();
 
-  bool hasConnection = false;
+  // Assume the user has got internet connection to start.
+  bool hasConnection = true;
+  static final _RetryOnConnect instance = _RetryOnConnect._();
 
   final Connectivity _connectivity = Connectivity();
 
-  static final _RetryOnConnect instance = _RetryOnConnect._();
-
+  Stream<bool> get stream => connectionChangeController.stream;
   _RetryOnConnect._();
 
   void initialize() {
@@ -52,7 +53,6 @@ class _RetryOnConnect {
   }
 
   // stream current connection state
-  Stream<bool> get stream => connectionChangeController.stream;
 
   //The test to actually see if there is a connection
   Future<bool> checkConnection() async {
@@ -101,7 +101,7 @@ void _refetchCurrentQueries() {
   }
   // Check if any infinite queries have listeners and refetch.
   final infiniteQueries =
-      CachedQuery.instance.whereInfiniteQuery((query) => query.hasListener);
+      CachedQuery.instance.whereQuery((query) => query.hasListener);
   if (infiniteQueries != null) {
     for (final i in infiniteQueries) {
       i.refetch();

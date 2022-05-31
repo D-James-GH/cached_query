@@ -1,5 +1,8 @@
 part of 'cached_query.dart';
 
+/// The result of the [QueryFunc] will be cached.
+typedef QueryFunc<T> = Future<T> Function();
+
 /// {@template query}
 /// [Query] is will fetch and cache the response of the [queryFn].
 ///
@@ -17,21 +20,23 @@ part of 'cached_query.dart';
 ///
 /// {@endTemplate}
 class Query<T> extends QueryBase<T, QueryState<T>> {
-  final Future<T> Function() _queryFn;
-  Future<void>? _currentFuture;
+  final Function _queryFn;
 
   Query._internal({
     required String key,
-    required Future<T> Function() queryFn,
+    required Function queryFn,
+    required bool storeQuery,
     bool ignoreStaleTime = false,
     bool ignoreCacheTime = false,
     Serializer<T>? serializer,
     Duration? refetchDuration,
     Duration? cacheDuration,
+    QueryState<T>? state,
   })  : _queryFn = queryFn,
         super._internal(
           key: key,
-          state: QueryState<T>(timeCreated: DateTime.now()),
+          storeQuery: storeQuery,
+          state: state ?? QueryState<T>(timeCreated: DateTime.now()),
           ignoreCacheDuration: ignoreCacheTime,
           ignoreRefetchDuration: ignoreStaleTime,
           serializer: serializer,
@@ -43,6 +48,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   factory Query({
     required Object key,
     required Future<T> Function() queryFn,
+    bool storeQuery = true,
     Serializer<T>? serializer,
     Duration? refetchDuration,
     Duration? cacheDuration,
@@ -51,12 +57,13 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     bool ignoreCacheDuration = false,
   }) {
     final globalCache = CachedQuery.instance;
-    var query = globalCache.getQuery<T>(key);
+    var query = globalCache.getQuery(key) as Query<T>?;
 
     // if query is null check the storage
     if (query == null) {
       query = Query<T>._internal(
         key: encodeKey(key),
+        storeQuery: storeQuery,
         refetchDuration: refetchDuration,
         cacheDuration: cacheDuration,
         queryFn: queryFn,
@@ -71,22 +78,6 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     query._getResult(forceRefetch: forceRefetch);
 
     return query;
-  }
-
-  /// Get the result of calling the queryFn.
-  ///
-  /// If [result] is used when the [stream] has no listeners [result] will start
-  /// the delete timer. For full caching functionality see [stream].
-  @override
-  Future<QueryState<T>> get result {
-    _resetDeleteTimer();
-    // if there are no other listeners and result has been called schedule
-    // a delete.
-    if (_streamController?.hasListener != true &&
-        _deleteQueryTimer?.isActive != true) {
-      _scheduleDelete();
-    }
-    return _getResult();
   }
 
   /// Refetch the query immediately.
@@ -105,13 +96,14 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     _emit();
   }
 
+  @override
   Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
     if (!_stale &&
         !forceRefetch &&
         _state.status != QueryStatus.error &&
         _state.data != null &&
         (_ignoreRefetchDuration ||
-            _state.timeCreated.add(_staleTime).isAfter(DateTime.now()))) {
+            _state.timeCreated.add(_refetchDuration).isAfter(DateTime.now()))) {
       _emit();
       return _state;
     }
@@ -122,15 +114,10 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   }
 
   Future<void> _fetch() async {
-    _setState(
-      _state.copyWith(
-        status: QueryStatus.loading,
-        isFetching: true,
-      ),
-    );
+    _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
     try {
-      if (_state.data == null) {
+      if (_state.data == null && storeQuery) {
         // try to get any data from storage if the query has no data
         final dynamic dataFromStorage = await _fetchFromStorage();
         if (dataFromStorage is T && dataFromStorage != null) {
@@ -140,28 +127,27 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         }
       }
 
-      final res = await _queryFn();
+      final res = await (_queryFn() as Future<T>);
       _setState(
         _state.copyWith(
           data: res,
           timeCreated: DateTime.now(),
-          isFetching: false,
           status: QueryStatus.success,
         ),
       );
-      // save to local storage if exists
-      _saveToStorage();
+      if (storeQuery) {
+        // save to local storage if exists
+        _saveToStorage();
+      }
     } catch (e) {
       _setState(
         _state.copyWith(
           status: QueryStatus.error,
-          isFetching: false,
           error: e,
         ),
       );
     } finally {
       _currentFuture = null;
-      _setState(_state.copyWith(isFetching: false));
       _emit();
     }
   }

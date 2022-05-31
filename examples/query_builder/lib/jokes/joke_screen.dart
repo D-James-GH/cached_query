@@ -21,7 +21,7 @@ class JokeScreen extends StatelessWidget {
             QueryBuilder<JokeModel?>(
               query: service.getJoke(),
               builder: (_, state) {
-                if (state.isFetching) {
+                if (state.status == QueryStatus.loading) {
                   return const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   );
@@ -64,7 +64,8 @@ class JokeScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(child: Text(state.data?.joke ?? "")),
-                      if (state.isFetching) const CircularProgressIndicator(),
+                      if (state.status == QueryStatus.loading)
+                        const CircularProgressIndicator(),
                     ],
                   ),
                 ),

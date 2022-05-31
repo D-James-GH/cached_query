@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:examples/models/joke_model.dart';
 import 'package:examples/repos/joke_repo.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -23,7 +24,9 @@ class JokeBloc extends Bloc<JokeEvent, JokeState> {
       _repo.getJoke().stream,
       onData: (query) => state.copyWith(
         joke: query.data,
-        status: query.isFetching ? JokeStatus.loading : JokeStatus.success,
+        status: query.status == QueryStatus.loading
+            ? JokeStatus.loading
+            : JokeStatus.success,
       ),
     );
   }

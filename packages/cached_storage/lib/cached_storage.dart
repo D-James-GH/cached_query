@@ -13,14 +13,13 @@ import 'package:sqflite/sqflite.dart';
 /// create a custom storage class by extending [StorageInterface] from the
 /// [CachedQuery] package.
 class CachedStorage extends StorageInterface {
-  static const String _queryTable = "Query";
-  late final Database _db;
-
   /// True if the SqfLite  instance is open
   bool isOpen = false;
 
-  CachedStorage._();
+  static const String _queryTable = "Query";
   static final CachedStorage _instance = CachedStorage._();
+  late final Database _db;
+  CachedStorage._();
 
   /// Initialise [CachedStorage]. Must be initialised before any [Query]'s are
   /// called.
@@ -34,7 +33,6 @@ class CachedStorage extends StorageInterface {
         path,
         version: 1,
         onCreate: (db, version) async {
-          // TODO(dan): add expiry to stored data --> 24hrs?
           await db.execute(
             '''
           CREATE TABLE IF NOT EXISTS $_queryTable(
@@ -45,6 +43,7 @@ class CachedStorage extends StorageInterface {
           );
         },
       );
+      _instance.isOpen = true;
     }
     return _instance;
   }

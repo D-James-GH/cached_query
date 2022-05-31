@@ -23,6 +23,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner:
+  vm_service: ^8.2.2
   freezed:
   json_serializable:
   flutter_lints: ^1.0.4

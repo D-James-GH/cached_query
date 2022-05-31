@@ -53,6 +53,15 @@ class Mutation<T, A> {
   Future<T?>? _currentFuture;
   final _cache = _MutationCache.instance;
 
+  /// Current [MutationState] of the mutation.
+  MutationState<T> get state => _state;
+
+  /// Stream the state of the query.
+  ///
+  /// When the state is updated either by a mutation or a new query [stream]
+  /// will be notified.
+  Stream<MutationState<T>> get stream => _createStream();
+
   Mutation._internal({
     this.key,
     OnStartMutateCallback<A>? onStartMutation,
@@ -129,14 +138,19 @@ class Mutation<T, A> {
     return mutation;
   }
 
-  /// Current [MutationState] of the mutation.
-  MutationState<T> get state => _state;
-
-  /// Stream the state of the query.
+  /// Starts the mutation with the [arg].
   ///
-  /// When the state is updated either by a mutation or a new query [stream]
-  /// will be notified.
-  Stream<MutationState<T>> get stream {
+  /// The [mutate] is de-duplicated if called again while the future is completing.
+  /// After that [mutate] may be called again with different [arg]'s.
+  Future<T?> mutate(A arg) async {
+    if (_currentFuture != null) {
+      return _currentFuture!;
+    }
+    _currentFuture = _fetch(arg);
+    return _currentFuture!;
+  }
+
+  Stream<MutationState<T>> _createStream() {
     if (_streamController != null) {
       return _streamController!.stream;
     }
@@ -152,18 +166,6 @@ class Mutation<T, A> {
     );
 
     return _streamController!.stream;
-  }
-
-  /// Starts the mutation with the [arg].
-  ///
-  /// The [mutate] is de-duplicated if called again while the future is completing.
-  /// After that [mutate] may be called again with different [arg]'s.
-  Future<T?> mutate(A arg) async {
-    if (_currentFuture != null) {
-      return _currentFuture!;
-    }
-    _currentFuture = _fetch(arg);
-    return _currentFuture!;
   }
 
   Future<T?> _fetch(A arg) async {
@@ -268,10 +270,10 @@ class MutationState<T> {
 }
 
 class _MutationCache {
-  _MutationCache._();
   static final instance = _MutationCache._();
-
   Map<String, Mutation<dynamic, dynamic>> mutationCache = {};
+  _MutationCache._();
+
   Mutation<T, A>? getMutation<T, A>(String key) {
     if (mutationCache.containsKey(key)) {
       return mutationCache[key] as Mutation<T, A>;

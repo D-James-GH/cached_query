@@ -18,11 +18,13 @@ class PostListScreen extends StatefulWidget {
 class _PostListScreenState extends State<PostListScreen> {
   final _scrollController = ScrollController();
   final _postService = PostService();
+  late final InfiniteQuery<List<PostModel>, int> query;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    query = _postService.getPosts();
   }
 
   @override
@@ -30,11 +32,11 @@ class _PostListScreenState extends State<PostListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: InfiniteQueryBuilder(
-          query: _postService.getPosts(),
+          query: query,
           builder: (context, state, _) {
             return Row(
               children: [
-                if (state.isFetching)
+                if (state.status == QueryStatus.loading)
                   const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
@@ -78,10 +80,10 @@ class _PostListScreenState extends State<PostListScreen> {
         ],
       ),
       body: InfiniteQueryBuilder<List<PostModel>, int>(
-        query: _postService.getPosts(),
+        query: query,
         builder: (context, state, query) {
-          if (state.data.isNotEmpty) {
-            final allPosts = state.data.expand((e) => e).toList();
+          if (state.data != null && state.data!.isNotEmpty) {
+            final allPosts = state.data!.expand((e) => e).toList();
 
             return CustomScrollView(
               controller: _scrollController,
@@ -125,7 +127,7 @@ class _PostListScreenState extends State<PostListScreen> {
                     childCount: allPosts.length,
                   ),
                 ),
-                if (state.isFetching)
+                if (state.status == QueryStatus.loading)
                   const SliverToBoxAdapter(
                     child: Center(
                       child: SizedBox(
@@ -143,7 +145,7 @@ class _PostListScreenState extends State<PostListScreen> {
               ],
             );
           }
-          if (state.isFetching) {
+          if (state.status == QueryStatus.loading) {
             return const Center(
               child: SizedBox(
                 height: 40,
@@ -206,6 +208,7 @@ class _Post extends StatelessWidget {
                   post.title,
                   style: Theme.of(context).textTheme.headline6,
                 ),
+                Text(post.id.toString()),
                 Text(post.body),
               ],
             ),

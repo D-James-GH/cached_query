@@ -8,12 +8,9 @@ class PostRepository {
   InfiniteQuery<List<PostModel>, int> getPosts() {
     return InfiniteQuery<List<PostModel>, int>(
       key: 'posts',
-      getNextArg: (currentPage, lastPage) {
-        if (lastPage == null) return 1;
-        if (lastPage.isNotEmpty) {
-          return currentPage + 1;
-        }
-        return null;
+      getNextArg: (state) {
+        if (state.lastPage?.isEmpty ?? false) return null;
+        return state.length + 1;
       },
       queryFn: (page) async => PostModel.listFromJson(
         await _service.getPosts(page: page, limit: 20),
@@ -33,9 +30,12 @@ class PostRepository {
         return PostModel.fromJson(res);
       },
       onSuccess: (args, newPost) {
-        CachedQuery.instance.updateInfiniteQuery<PostModel, int>(
+        CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
           key: "posts",
-          updateFn: (old) => [newPost, ...?old],
+          updateFn: (old) => [
+            [newPost, ...old![0]],
+            ...old.sublist(1).toList()
+          ],
         );
         CachedQuery.instance.invalidateCache('posts');
       },
