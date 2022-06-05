@@ -50,17 +50,21 @@ class CachedStorage extends StorageInterface {
 
   @override
   void close() {
-    // TODO(Dan): implement close
+    _db.close();
   }
 
   @override
   void delete(String key) {
-    // TODO(Dan): implement delete
+    _db.delete(
+      _queryTable,
+      where: "queryKey = ?",
+      whereArgs: [key],
+    );
   }
 
   @override
   void deleteAll() {
-    // TODO(Dan): implement deleteAll
+    _db.rawDelete("DELETE FROM $_queryTable");
   }
 
   @override

@@ -28,7 +28,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     required bool storeQuery,
     bool ignoreStaleTime = false,
     bool ignoreCacheTime = false,
-    Serializer<T>? serializer,
+    Serializer? serializer,
     Duration? refetchDuration,
     Duration? cacheDuration,
     QueryState<T>? state,
@@ -49,7 +49,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     required Object key,
     required Future<T> Function() queryFn,
     bool storeQuery = true,
-    Serializer<T>? serializer,
+    Serializer? serializer,
     Duration? refetchDuration,
     Duration? cacheDuration,
     bool forceRefetch = false,
@@ -74,8 +74,13 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       globalCache._addQuery(query);
     }
 
+    // TODO(Dan): check this works
     // start the fetching process
-    query._getResult(forceRefetch: forceRefetch);
+    // Don't do anything if it rethrows in the constructor body.
+    // query._getResult(forceRefetch: forceRefetch).catchError((dynamic e) {
+    //   print(e);
+    //   return QueryState<T>(timeCreated: DateTime.now());
+    // });
 
     return query;
   }
@@ -137,7 +142,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       );
       if (storeQuery) {
         // save to local storage if exists
-        _saveToStorage();
+        _saveToStorage<T>();
       }
     } catch (e) {
       _setState(
@@ -146,6 +151,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
           error: e,
         ),
       );
+      if (CachedQuery.instance._config.shouldRethrow) {
+        rethrow;
+      }
     } finally {
       _currentFuture = null;
       _emit();

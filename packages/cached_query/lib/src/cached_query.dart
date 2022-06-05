@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/default_query_config.dart';
 import 'package:cached_query/src/util/encode_key.dart';
+import 'package:cached_query/src/util/list_extension.dart';
 import 'package:meta/meta.dart';
+import 'package:rxdart/rxdart.dart';
 
 part 'query.dart';
 part 'infinite_query.dart';
-part "./query_base.dart";
+part "query_base.dart";
 
 /// Should return true if a condition is met.
 ///
@@ -14,7 +17,7 @@ part "./query_base.dart";
 typedef WhereCallback = bool Function(QueryBase<dynamic, dynamic>);
 
 /// Used to serialize the query data when fetched from local storage.
-typedef Serializer<T> = T Function(dynamic json);
+typedef Serializer = dynamic Function(dynamic json);
 
 /// Update function used to update the data in a query.
 ///
@@ -26,11 +29,22 @@ class CachedQuery {
   /// Get the singleton instance of [CachedQuery].
   static final instance = CachedQuery._();
 
-  bool _defaultsSet = false;
-  StorageInterface? _storage;
-  Duration _refetchDuration = const Duration(seconds: 4);
-  Duration _cacheDuration = const Duration(minutes: 5);
+  bool _configSet = false;
+
+  DefaultQueryConfig _config = DefaultQueryConfig();
+
   Map<String, QueryBase<dynamic, dynamic>> _queryCache = {};
+
+  StorageInterface? _storage;
+
+  /// Get the current storage interface.
+  StorageInterface? get storage => _storage;
+
+  /// The current global config that is set.
+  QueryConfig get globalConfig => _config;
+
+  /// Whether global configs have been set.
+  bool get isConfigSet => _configSet;
 
   // This class should not be instantiated manually.
   CachedQuery._();
@@ -41,23 +55,38 @@ class CachedQuery {
     return CachedQuery._();
   }
 
+  /// Reset the singleton back to default settings.
+  @visibleForTesting
+  void reset() {
+    _configSet = false;
+    _config = DefaultQueryConfig();
+  }
+
+  /// {@template cachedQuery.config}
   /// Set the global default config which all queries will use.
-  void config({
-    Duration? cacheDuration,
-    Duration? refetchDuration,
-    StorageInterface? storage,
-  }) {
-    assert(_defaultsSet == false, "Config defaults must only be set once.");
-    if (!_defaultsSet) {
-      _storage = storage;
-      if (cacheDuration != null) {
-        _cacheDuration = cacheDuration;
-      }
-      if (refetchDuration != null) {
-        _refetchDuration = refetchDuration;
-      }
+  ///
+  /// Use [cacheDuration] to specify how long a query that has zero listeners
+  /// stays in memory. Defaults to 5 minutes.
+  ///
+  /// Use [refetchDuration] to specify how long before the query is re-fetched
+  /// in the background. Defaults to 4 seconds
+  ///
+  /// Pass a [StorageInterface] to automatically store queries for fast initial
+  /// fetches.
+  ///
+  /// [shouldRethrow] tells cached query whether it should rethrow any error
+  /// caught in the query. This is useful if you use try catches in your app for
+  /// error handling/logout. By default a query will catch all errors and exceptions
+  /// and update the state.
+  /// {@endtemplate}
+  void config({StorageInterface? storage, QueryConfig? config}) {
+    assert(_configSet == false, "Config defaults must only be set once.");
+    if (_configSet) return;
+    if (config != null) {
+      _config = _config.merge(config);
     }
-    _defaultsSet = true;
+    _storage = storage;
+    _configSet = true;
   }
 
   /// Get a [Query] at a given key.

@@ -175,7 +175,7 @@ packages:
       name: dart_code_metrics
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.13.0"
+    version: "4.15.2"
   dart_style:
     dependency: transitive
     description:
@@ -208,7 +208,7 @@ packages:
       name: flutter_lints
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.4"
+    version: "2.0.1"
   frontend_server_client:
     dependency: transitive
     description:
@@ -278,7 +278,7 @@ packages:
       name: lints
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.1"
+    version: "2.0.0"
   logging:
     dependency: transitive
     description:
@@ -320,7 +320,7 @@ packages:
       name: mockito
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.1.0"
+    version: "5.2.0"
   node_preamble:
     dependency: transitive
     description:
@@ -370,6 +370,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
+  rxdart:
+    dependency: "direct main"
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.27.4"
   shelf:
     dependency: transitive
     description:
@@ -472,7 +479,7 @@ packages:
       name: test
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.20.2"
+    version: "1.21.1"
   test_api:
     dependency: transitive
     description:
@@ -486,7 +493,7 @@ packages:
       name: test_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.11"
+    version: "0.4.13"
   timing:
     dependency: transitive
     description:
@@ -551,4 +558,4 @@ packages:
     source: hosted
     version: "3.1.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.17.0 <3.0.0"

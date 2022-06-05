@@ -1,4 +1,11 @@
-part of cached_query_flutter;
+import 'dart:async';
+import 'dart:io';
+
+import 'package:cached_query/cached_query.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter/material.dart';
+
+import 'query_config_flutter.dart';
 
 /// Flutter specific extension on [CachedQuery]
 extension CachedQueryExt on CachedQuery {
@@ -6,18 +13,12 @@ extension CachedQueryExt on CachedQuery {
   ///
   /// Set the global default config which all queries will use.
   void configFlutter({
-    Duration? cacheDuration,
-    Duration? refetchDuration,
     StorageInterface? storage,
-    bool refetchOnResume = true,
+    QueryConfigFlutter config = const QueryConfigFlutter(),
   }) {
-    CachedQuery.instance.config(
-      refetchDuration: refetchDuration,
-      cacheDuration: cacheDuration,
-      storage: storage,
-    );
+    CachedQuery.instance.config(config: config, storage: storage);
 
-    if (refetchOnResume) {
+    if (config.refetchOnResume) {
       _refetchOnResume();
     }
 
@@ -111,5 +112,5 @@ void _refetchCurrentQueries() {
 
 /// If the app comes back into the foreground refetch any queries that have listeners.
 void _refetchOnResume() {
-  WidgetsBinding.instance?.addObserver(_LifecycleObserver());
+  WidgetsBinding.instance.addObserver(_LifecycleObserver());
 }

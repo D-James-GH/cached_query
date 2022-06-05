@@ -28,7 +28,7 @@ typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 /// [initialIndex] to set the initial page of the query.
 ///
 /// {@endtemplate infiniteQuery}
-class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
+class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   final GetNextArg<T, A> _getNextArg;
   final InfiniteQueryFunc<T, A> _queryFn;
   Future<void>? _refetchFuture;
@@ -46,7 +46,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     bool ignoreRefetchDuration = false,
     bool ignoreCacheDuration = false,
     required bool storeQuery,
-    Serializer<T>? serializer,
+    Serializer? serializer,
     Duration? refetchDuration,
     Duration? cacheDuration,
   })  : _getNextArg = getNextArg,
@@ -70,7 +70,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     required Object key,
     required Future<T> Function(A arg) queryFn,
     required GetNextArg<T, A> getNextArg,
-    Serializer<T>? serializer,
+    Serializer? serializer,
     bool forceRefetch = false,
     bool storeQuery = true,
     Duration? cacheDuration,
@@ -181,6 +181,10 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
           timeCreated: DateTime.now(),
         ),
       );
+      if (storeQuery) {
+        // save to local storage if exists
+        _saveToStorage<List<T>>();
+      }
     } catch (e) {
       // if failed return the previous state
       _setState(
@@ -189,6 +193,9 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
           error: e,
         ),
       );
+      if (CachedQuery.instance._config.shouldRethrow) {
+        rethrow;
+      }
     } finally {
       _refetchFuture = null;
       _emit();
@@ -199,11 +206,11 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
     _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
     try {
-      if (_state.data == null && storeQuery) {
+      if (_state.data.isNullOrEmpty && storeQuery) {
         // try to get any data from storage if the query has no data
         final dynamic dataFromStorage = await _fetchFromStorage();
-        if (dataFromStorage is List<T>) {
-          _setState(_state.copyWith(data: dataFromStorage));
+        if (dataFromStorage != null) {
+          _setState(_state.copyWith(data: dataFromStorage as List<T>));
           // Emit the data from storage
           _emit();
         }
@@ -232,7 +239,7 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
       );
       if (storeQuery) {
         // save to local storage if exists
-        _saveToStorage();
+        _saveToStorage<List<T>>();
       }
     } catch (e) {
       _setState(
@@ -241,6 +248,9 @@ class InfiniteQuery<T, A> extends QueryBase<T, InfiniteQueryState<T>> {
           error: e,
         ),
       );
+      if (CachedQuery.instance._config.shouldRethrow) {
+        rethrow;
+      }
     } finally {
       _currentFuture = null;
       _emit();

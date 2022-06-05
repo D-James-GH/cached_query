@@ -1,6 +1,8 @@
-part of cached_query_flutter;
+import 'dart:async';
 
-// todo(Dan): add examples to docs.
+import 'package:cached_query/cached_query.dart';
+import 'package:flutter/material.dart';
+
 /// {@template queryBuilder}
 /// Listen to changes in an [Mutation] and build the ui with the result.
 /// {@endTemplate}

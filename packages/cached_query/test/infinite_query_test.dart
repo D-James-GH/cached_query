@@ -1,7 +1,10 @@
+import 'dart:convert';
+
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
 import 'repos/infinite_query_test_repo.dart';
+import 'repos/storage_test.dart';
 
 void main() async {
   final repo = InfiniteQueryTestRepository();
@@ -180,6 +183,139 @@ void main() async {
       await query.result;
       final res = await query.getNextPage();
       expect(res!.lastPage, 2);
+    });
+  });
+  group("Infinite Query storage", () {
+    final storage = StorageTest();
+    setUpAll(() => CachedQuery.instance.config(storage: storage));
+    tearDown(() {
+      storage.deleteAll();
+      cachedQuery.deleteCache();
+    });
+
+    test("Should store infinite query on fetch", () async {
+      const key = "store";
+      storage.deleteAll();
+
+      final query = InfiniteQuery<int, int>(
+        key: key,
+        queryFn: repo.getPage,
+        getNextArg: (state) {
+          if (state.length == 0) return 0;
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      expect(storage.store.length, 1);
+      expect(storage.store[key], jsonEncode([0]));
+    });
+
+    test("Should not store infinite query if specified", () async {
+      storage.deleteAll();
+      const key = "store";
+      final query = InfiniteQuery<int, int>(
+        key: key,
+        storeQuery: false,
+        queryFn: repo.getPage,
+        getNextArg: (state) {
+          if (state.length == 0) return 0;
+          return state.length + 1;
+        },
+      );
+      final res = await query.result;
+      expect(storage.store.length, 0);
+    });
+
+    test("Should get Infinite Query initial data from storage before queryFn",
+        () async {
+      const key = "getInitial";
+      const initialData = [3];
+      // Make sure the storage has initial data
+      storage.put(key, item: initialData);
+      final query = InfiniteQuery<int, int>(
+        key: key,
+        queryFn: repo.getPage,
+        getNextArg: (state) {
+          if (state.length == 0) return 0;
+          return state.length + 1;
+        },
+      );
+
+      final output = <List<int>>[];
+      query.stream.listen(
+        expectAsync1(
+          (event) {
+            if (event.data != null && event.data!.isNotEmpty) {
+              output.add(event.data!);
+            }
+            if (output.length == 1) {
+              expect(output[0], initialData);
+            }
+          },
+          max: 3,
+        ),
+      );
+    });
+
+    test("Should serialize data if a serialize function is provided", () async {
+      const key = "serialize";
+      // Make sure the storage has initial data
+      storage.put(key, item: jsonEncode([Serializable(StorageTest.data)]));
+      final query = InfiniteQuery<Serializable, int>(
+        key: key,
+        queryFn: (i) => Future.value(Serializable("$i")),
+        serializer: (dynamic json) {
+          return Serializable.listFromJson(json as List<dynamic>);
+        },
+        getNextArg: (state) {
+          if (state.length == 0) return 0;
+          return state.length + 1;
+        },
+      );
+
+      int count = 1;
+      final output = <dynamic>[];
+      query.stream.listen(
+        expectAsync1(
+          (event) {
+            if (event.data != null && event.data!.isNotEmpty) {
+              output.add(event.data!);
+            }
+            if (output.length == 1 || count == 2) {
+              expect(output[0], isA<List<Serializable>>());
+              expect(
+                (output[0] as List<Serializable>).first.name,
+                StorageTest.data,
+              );
+            }
+            count++;
+          },
+          max: 3,
+          count: 2,
+        ),
+      );
+    });
+    test("Storage should update on each fetch", () async {
+      int count = 0;
+      const key = "updateStore";
+      final query = InfiniteQuery<int, int>(
+        key: key,
+        getNextArg: (state) {
+          if (state.length == 0) return 0;
+          return state.length + 1;
+        },
+        queryFn: (page) {
+          count++;
+          return Future.value(count);
+        },
+      );
+      final res1 = await query.result;
+      final res2 = await query.refetch();
+      expect((jsonDecode(storage.store[key]!) as List).first, count);
+      expect(
+        (jsonDecode(storage.store[key]!) as List).first,
+        res2.data!.first,
+      );
     });
   });
 }

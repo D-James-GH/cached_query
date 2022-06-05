@@ -1,6 +1,10 @@
-part of cached_query_flutter;
-
 // todo(Dan): add examples to docs.
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+
+import '../cached_query_flutter.dart';
+
 /// {@template infiniteQueryBuilder}
 /// Listen to changed in an [InfiniteQuery] and build the ui with the result.
 /// {@endTemplate infiniteQueryBuilder}

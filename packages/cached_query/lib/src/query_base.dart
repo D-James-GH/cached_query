@@ -1,4 +1,4 @@
-part of "./cached_query.dart";
+part of "cached_query.dart";
 
 /// {@template stateBase}
 /// An Interface for both [QueryState] and [InfiniteQueryState].
@@ -35,7 +35,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// Only effective when [CachedQuery] storage is set.
   final bool storeQuery;
 
-  final Serializer<T>? _serializer;
+  final Serializer? _serializer;
   final CachedQuery _globalCache = CachedQuery.instance;
   Timer? _deleteQueryTimer;
   final Duration _refetchDuration;
@@ -48,7 +48,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   State _state;
 
   /// Broadcast stream controller that reacts to changes to the query state
-  StreamController<State>? _streamController;
+  BehaviorSubject<State>? _streamController;
 
   /// The current state of the query.
   State get state => _state;
@@ -89,13 +89,14 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     Duration? refetchDuration,
     Duration? cacheDuration,
     required State state,
-    Serializer<T>? serializer,
+    Serializer? serializer,
   })  : _ignoreRefetchDuration = ignoreRefetchDuration,
         _ignoreCacheDuration = ignoreCacheDuration,
         // _queryHash = jsonEncode(key),
         _refetchDuration =
-            refetchDuration ?? CachedQuery.instance._refetchDuration,
-        _cacheTime = cacheDuration ?? CachedQuery.instance._cacheDuration,
+            refetchDuration ?? CachedQuery.instance._config.refetchDuration,
+        _cacheTime =
+            cacheDuration ?? CachedQuery.instance._config.cacheDuration,
         _state = state,
         _serializer = serializer;
 
@@ -128,15 +129,16 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     _streamController?.add(_state);
   }
 
-  void _saveToStorage() {
-    if (_globalCache._storage != null && _state.data != null) {
-      _globalCache._storage!.put<T>(key, item: _state.data! as T);
+  void _saveToStorage<StorageType>() {
+    if (_globalCache.storage != null && _state.data != null) {
+      _globalCache._storage!
+          .put<StorageType>(key, item: _state.data! as StorageType);
     }
   }
 
   Future<dynamic> _fetchFromStorage() async {
-    if (_globalCache._storage != null) {
-      final dynamic storedData = await _globalCache._storage?.get(key);
+    if (_globalCache.storage != null) {
+      final dynamic storedData = await _globalCache.storage?.get(key);
       if (storedData != null) {
         return _serializer == null ? storedData : _serializer!(storedData);
       }
@@ -147,17 +149,15 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     if (_streamController != null) {
       return _streamController!.stream;
     }
-    _streamController = StreamController.broadcast(
-      onListen: () {
-        _emit();
-        _cancelDelete();
-      },
+    _streamController = BehaviorSubject(
+      onListen: _cancelDelete,
       onCancel: () {
         _streamController!.close();
         _streamController = null;
         _scheduleDelete();
       },
     );
+    _getResult();
 
     return _streamController!.stream;
   }
