@@ -41,24 +41,12 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
 
   InfiniteQuery._internal({
     required InfiniteQueryFunc<T, A> queryFn,
-    required String key,
+    required super.key,
     required GetNextArg<T, A> getNextArg,
-    bool ignoreRefetchDuration = false,
-    bool ignoreCacheDuration = false,
-    required bool storeQuery,
-    Serializer? serializer,
-    Duration? refetchDuration,
-    Duration? cacheDuration,
+    super.config,
   })  : _getNextArg = getNextArg,
         _queryFn = queryFn,
         super._internal(
-          key: key,
-          storeQuery: storeQuery,
-          ignoreCacheDuration: ignoreCacheDuration,
-          ignoreRefetchDuration: ignoreRefetchDuration,
-          refetchDuration: refetchDuration,
-          cacheDuration: cacheDuration,
-          serializer: serializer,
           state: InfiniteQueryState<T>(
             data: [],
             timeCreated: DateTime.now(),
@@ -70,14 +58,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     required Object key,
     required Future<T> Function(A arg) queryFn,
     required GetNextArg<T, A> getNextArg,
-    Serializer? serializer,
     bool forceRefetch = false,
-    bool storeQuery = true,
-    Duration? cacheDuration,
-    Duration? refetchDuration,
     List<A>? prefetchPages,
-    bool ignoreRefetchDuration = false,
-    bool ignoreCacheDuration = false,
+    QueryConfig? config,
   }) {
     final globalCache = CachedQuery.instance;
     final queryKey = encodeKey(key);
@@ -85,14 +68,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     if (query == null || query is! InfiniteQuery<T, A>) {
       query = InfiniteQuery<T, A>._internal(
         queryFn: queryFn,
-        storeQuery: storeQuery,
-        ignoreRefetchDuration: ignoreRefetchDuration,
-        ignoreCacheDuration: ignoreCacheDuration,
-        serializer: serializer,
         getNextArg: getNextArg,
-        refetchDuration: refetchDuration,
-        cacheDuration: cacheDuration,
         key: queryKey,
+        config: config,
       );
       globalCache._addQuery(query);
       query._getResult(forceRefetch: forceRefetch);
@@ -146,8 +124,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _state.status != QueryStatus.error &&
         _state.data != null &&
         _state.data!.isNotEmpty &&
-        (_ignoreRefetchDuration ||
-            _state.timeCreated.add(_refetchDuration).isAfter(DateTime.now()))) {
+        (_state.timeCreated
+            .add(config.refetchDuration)
+            .isAfter(DateTime.now()))) {
       _emit();
       return _state;
     }
@@ -181,7 +160,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
           timeCreated: DateTime.now(),
         ),
       );
-      if (storeQuery) {
+      if (config.storeQuery) {
         // save to local storage if exists
         _saveToStorage<List<T>>();
       }
@@ -206,7 +185,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
     try {
-      if (_state.data.isNullOrEmpty && storeQuery) {
+      if (_state.data.isNullOrEmpty && config.storeQuery) {
         // try to get any data from storage if the query has no data
         final dynamic dataFromStorage = await _fetchFromStorage();
         if (dataFromStorage != null) {
@@ -237,7 +216,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
           status: QueryStatus.success,
         ),
       );
-      if (storeQuery) {
+      if (config.storeQuery) {
         // save to local storage if exists
         _saveToStorage<List<T>>();
       }

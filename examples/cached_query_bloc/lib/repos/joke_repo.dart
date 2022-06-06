@@ -8,7 +8,6 @@ class JokeRepository {
   Query<JokeModel?> getJoke() {
     return Query<JokeModel>(
       key: 'joke',
-      refetchDuration: const Duration(seconds: 5),
       queryFn: () async => JokeModel.fromJson(await _service.getJoke()),
     );
   }

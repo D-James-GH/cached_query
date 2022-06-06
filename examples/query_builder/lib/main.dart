@@ -8,7 +8,7 @@ import 'posts/post_list_screen.dart';
 void main() async {
   CachedQuery.instance.configFlutter(
     storage: await CachedStorage.ensureInitialized(),
-    config: const QueryConfigFlutter(
+    config: const QueryConfig(
       shouldRethrow: true,
     ),
   );

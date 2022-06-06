@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:query_builder/jokes/joke_model/joke_model.dart';
 
@@ -10,9 +10,11 @@ class JokeService {
   Query<JokeModel?> getJoke() {
     return Query<JokeModel>(
       key: 'joke',
-      refetchDuration: const Duration(seconds: 4),
-      serializer: (dynamic json) =>
-          JokeModel.fromJson(json as Map<String, dynamic>),
+      config: QueryConfig(
+        refetchDuration: const Duration(seconds: 4),
+        serializer: (dynamic json) =>
+            JokeModel.fromJson(json as Map<String, dynamic>),
+      ),
       queryFn: () async {
         final req = client.get(
           Uri.parse("https://icanhazdadjoke.com/"),

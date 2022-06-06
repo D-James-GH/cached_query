@@ -59,7 +59,9 @@ void main() {
       int fetchCount = 0;
       final query1 = Query(
         key: "de-dupe",
-        refetchDuration: const Duration(seconds: 2),
+        config: const QueryConfig(
+          refetchDuration: Duration(seconds: 2),
+        ),
         queryFn: () {
           fetchCount++;
           return fetchFunction();
@@ -190,7 +192,9 @@ void main() {
       final query = Query<String>(
         key: "noStore",
         queryFn: () async => Future.value("data"),
-        storeQuery: false,
+        config: const QueryConfig(
+          storeQuery: false,
+        ),
       );
       await query.result;
       expect(storage.store.length, 0);
@@ -233,8 +237,10 @@ void main() {
       final query = Query<Serializable>(
         key: key,
         queryFn: () async => Future.value(Serializable("Fetched")),
-        serializer: (dynamic json) =>
-            Serializable.fromJson(json as Map<String, dynamic>),
+        config: QueryConfig(
+          serializer: (dynamic json) =>
+              Serializable.fromJson(json as Map<String, dynamic>),
+        ),
       );
 
       final output = <dynamic>[];

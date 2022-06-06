@@ -62,7 +62,9 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: "Posts",
         queryFn: repo.getPosts,
-        refetchDuration: const Duration(milliseconds: 200),
+        config: const QueryConfig(
+          refetchDuration: Duration(milliseconds: 200),
+        ),
         getNextArg: (state) {
           if (state.lastPage == null && state.length != 0) return null;
           return state.length + 1;
@@ -104,7 +106,9 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
         queryFn: createResponse,
-        refetchDuration: const Duration(seconds: 5),
+        config: const QueryConfig(
+          refetchDuration: Duration(seconds: 5),
+        ),
         getNextArg: (state) {
           if (state.lastPage == null && state.length != 0) return null;
           return state.length + 1;
@@ -142,7 +146,9 @@ void main() async {
       int fetchCount = 0;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
-        refetchDuration: Duration.zero,
+        config: const QueryConfig(
+          refetchDuration: Duration.zero,
+        ),
         getNextArg: (state) => state.length + 1,
         queryFn: (page) {
           fetchCount++;
@@ -215,7 +221,7 @@ void main() async {
       const key = "store";
       final query = InfiniteQuery<int, int>(
         key: key,
-        storeQuery: false,
+        config: const QueryConfig(storeQuery: false),
         queryFn: repo.getPage,
         getNextArg: (state) {
           if (state.length == 0) return 0;
@@ -264,9 +270,11 @@ void main() async {
       final query = InfiniteQuery<Serializable, int>(
         key: key,
         queryFn: (i) => Future.value(Serializable("$i")),
-        serializer: (dynamic json) {
-          return Serializable.listFromJson(json as List<dynamic>);
-        },
+        config: QueryConfig(
+          serializer: (dynamic json) {
+            return Serializable.listFromJson(json as List<dynamic>);
+          },
+        ),
         getNextArg: (state) {
           if (state.length == 0) return 0;
           return state.length + 1;

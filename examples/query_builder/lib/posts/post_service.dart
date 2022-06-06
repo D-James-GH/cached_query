@@ -8,14 +8,16 @@ class PostService {
   InfiniteQuery<List<PostModel>, int> getPosts() {
     return InfiniteQuery<List<PostModel>, int>(
       key: 'posts',
-      serializer: (dynamic postJson) {
-        return (postJson as List<dynamic>)
-            .map(
-              (dynamic page) => PostModel.listFromJson(page as List<dynamic>),
-            )
-            .toList();
-      },
-      refetchDuration: const Duration(seconds: 2),
+      config: QueryConfig(
+        refetchDuration: const Duration(seconds: 2),
+        serializer: (dynamic postJson) {
+          return (postJson as List<dynamic>)
+              .map(
+                (dynamic page) => PostModel.listFromJson(page as List<dynamic>),
+              )
+              .toList();
+        },
+      ),
       getNextArg: (state) {
         if (state.lastPage?.isEmpty ?? false) return null;
         return state.length + 1;

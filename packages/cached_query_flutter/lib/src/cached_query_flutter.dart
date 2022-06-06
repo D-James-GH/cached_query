@@ -5,20 +5,22 @@ import 'package:cached_query/cached_query.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
-import 'query_config_flutter.dart';
-
 /// Flutter specific extension on [CachedQuery]
 extension CachedQueryExt on CachedQuery {
-  /// Override the dart specific initialize function with a flutter specific one.
+  /// Initialise [CachedQuery] with flutter specific configs.
+  ///
+  /// [refetchOnResume] is whether the onscreen query should refetch when the
+  /// app comes back into view.
   ///
   /// Set the global default config which all queries will use.
   void configFlutter({
+    bool refetchOnResume = true,
     StorageInterface? storage,
-    QueryConfigFlutter config = const QueryConfigFlutter(),
+    QueryConfig? config,
   }) {
     CachedQuery.instance.config(config: config, storage: storage);
 
-    if (config.refetchOnResume) {
+    if (refetchOnResume) {
       _refetchOnResume();
     }
 

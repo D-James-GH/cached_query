@@ -42,7 +42,7 @@ class QueryState<T> implements StateBase {
   final dynamic error;
 
   /// {@macro queryState}
-  QueryState({
+  const QueryState({
     this.error,
     this.data,
     required this.timeCreated,

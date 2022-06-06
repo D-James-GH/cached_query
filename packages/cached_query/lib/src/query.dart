@@ -23,38 +23,21 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   final Function _queryFn;
 
   Query._internal({
-    required String key,
+    required super.key,
+    super.config,
     required Function queryFn,
-    required bool storeQuery,
-    bool ignoreStaleTime = false,
-    bool ignoreCacheTime = false,
-    Serializer? serializer,
-    Duration? refetchDuration,
-    Duration? cacheDuration,
     QueryState<T>? state,
   })  : _queryFn = queryFn,
         super._internal(
-          key: key,
-          storeQuery: storeQuery,
           state: state ?? QueryState<T>(timeCreated: DateTime.now()),
-          ignoreCacheDuration: ignoreCacheTime,
-          ignoreRefetchDuration: ignoreStaleTime,
-          serializer: serializer,
-          refetchDuration: refetchDuration,
-          cacheDuration: cacheDuration,
         );
 
   /// {@macro query}
   factory Query({
     required Object key,
     required Future<T> Function() queryFn,
-    bool storeQuery = true,
-    Serializer? serializer,
-    Duration? refetchDuration,
-    Duration? cacheDuration,
     bool forceRefetch = false,
-    bool ignoreRefetchDuration = false,
-    bool ignoreCacheDuration = false,
+    QueryConfig? config,
   }) {
     final globalCache = CachedQuery.instance;
     var query = globalCache.getQuery(key) as Query<T>?;
@@ -63,13 +46,8 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     if (query == null) {
       query = Query<T>._internal(
         key: encodeKey(key),
-        storeQuery: storeQuery,
-        refetchDuration: refetchDuration,
-        cacheDuration: cacheDuration,
         queryFn: queryFn,
-        serializer: serializer,
-        ignoreStaleTime: ignoreRefetchDuration,
-        ignoreCacheTime: ignoreCacheDuration,
+        config: config,
       );
       globalCache._addQuery(query);
     }
@@ -107,8 +85,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         !forceRefetch &&
         _state.status != QueryStatus.error &&
         _state.data != null &&
-        (_ignoreRefetchDuration ||
-            _state.timeCreated.add(_refetchDuration).isAfter(DateTime.now()))) {
+        (_state.timeCreated
+            .add(config.refetchDuration)
+            .isAfter(DateTime.now()))) {
       _emit();
       return _state;
     }
@@ -122,7 +101,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
     try {
-      if (_state.data == null && storeQuery) {
+      if (_state.data == null && config.storeQuery) {
         // try to get any data from storage if the query has no data
         final dynamic dataFromStorage = await _fetchFromStorage();
         if (dataFromStorage is T && dataFromStorage != null) {
@@ -140,7 +119,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
           status: QueryStatus.success,
         ),
       );
-      if (storeQuery) {
+      if (config.storeQuery) {
         // save to local storage if exists
         _saveToStorage<T>();
       }

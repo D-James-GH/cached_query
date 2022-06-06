@@ -9,6 +9,11 @@ class QueryConfig {
   /// Defaults to 4 seconds
   final Duration? refetchDuration;
 
+  /// Whether a query should be stored or not. Defaults to true;
+  ///
+  /// Only effective when [CachedQuery] storage is set.
+  final bool? storeQuery;
+
   /// Specify how long a query that has zero listeners stays in memory.
   ///
   /// Defaults to 5 minutes.
@@ -26,36 +31,37 @@ class QueryConfig {
   /// change the stored value to the query value.
   final Serializer? serializer;
 
+  /// If set to true the query(ies) will never be removed from cache.
+  final bool? ignoreCacheDuration;
+
   /// {@macro queryConfig}
   const QueryConfig({
     this.serializer,
+    this.ignoreCacheDuration,
+    this.storeQuery,
     this.refetchDuration,
     this.cacheDuration,
     this.shouldRethrow,
   });
 
-  /// Merges a different QueryConfig with this.
-  QueryConfig merge(QueryConfig other) {
-    return copyWith(
-      cacheDuration: other.cacheDuration,
-      serializer: other.serializer,
-      refetchDuration: other.refetchDuration,
-      shouldRethrow: other.shouldRethrow,
-    );
-  }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is QueryConfig &&
+          runtimeType == other.runtimeType &&
+          refetchDuration == other.refetchDuration &&
+          storeQuery == other.storeQuery &&
+          cacheDuration == other.cacheDuration &&
+          shouldRethrow == other.shouldRethrow &&
+          serializer == other.serializer &&
+          ignoreCacheDuration == other.ignoreCacheDuration;
 
-  /// Creates a copy of the config with the given fields replaced by new ones.
-  QueryConfig copyWith({
-    Duration? refetchDuration,
-    Duration? cacheDuration,
-    bool? shouldRethrow,
-    Serializer? serializer,
-  }) {
-    return QueryConfig(
-      refetchDuration: refetchDuration ?? this.refetchDuration,
-      cacheDuration: cacheDuration ?? this.cacheDuration,
-      shouldRethrow: shouldRethrow ?? this.shouldRethrow,
-      serializer: serializer ?? this.serializer,
-    );
-  }
+  @override
+  int get hashCode =>
+      refetchDuration.hashCode ^
+      storeQuery.hashCode ^
+      cacheDuration.hashCode ^
+      shouldRethrow.hashCode ^
+      serializer.hashCode ^
+      ignoreCacheDuration.hashCode;
 }

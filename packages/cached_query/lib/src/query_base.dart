@@ -30,32 +30,15 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// This is created by calling jsonEncode on the passed dynamic key.
   final String key;
 
-  /// Whether the query should be stored in persistent storage.
-  ///
-  /// Only effective when [CachedQuery] storage is set.
-  final bool storeQuery;
-
-  final Serializer? _serializer;
-  final CachedQuery _globalCache = CachedQuery.instance;
-  Timer? _deleteQueryTimer;
-  final Duration _refetchDuration;
-  Future<void>? _currentFuture;
-  // Initialise the query as stale so the first fetch is guaranteed to happen
-  bool _stale = true;
-  final Duration _cacheTime;
-  final bool _ignoreRefetchDuration;
-  final bool _ignoreCacheDuration;
-  State _state;
-
-  /// Broadcast stream controller that reacts to changes to the query state
-  BehaviorSubject<State>? _streamController;
-
   /// The current state of the query.
   State get state => _state;
 
   /// Whether the current query is marked as stale and therefore requires a
   /// refetch.
   bool get stale => _stale;
+
+  /// The config for this specific query.
+  final DefaultQueryConfig config;
 
   /// Weather the query stream has any listeners.
   bool get hasListener => _streamController?.hasListener ?? false;
@@ -81,24 +64,22 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     return _getResult();
   }
 
+  /// Broadcast stream controller that reacts to changes to the query state
+  BehaviorSubject<State>? _streamController;
+
+  final CachedQuery _globalCache = CachedQuery.instance;
+  Timer? _deleteQueryTimer;
+  Future<void>? _currentFuture;
+  // Initialise the query as stale so the first fetch is guaranteed to happen
+  bool _stale = true;
+  State _state;
+
   QueryBase._internal({
     required this.key,
-    required bool ignoreRefetchDuration,
-    required bool ignoreCacheDuration,
-    required this.storeQuery,
-    Duration? refetchDuration,
-    Duration? cacheDuration,
     required State state,
-    Serializer? serializer,
-  })  : _ignoreRefetchDuration = ignoreRefetchDuration,
-        _ignoreCacheDuration = ignoreCacheDuration,
-        // _queryHash = jsonEncode(key),
-        _refetchDuration =
-            refetchDuration ?? CachedQuery.instance._config.refetchDuration,
-        _cacheTime =
-            cacheDuration ?? CachedQuery.instance._config.cacheDuration,
-        _state = state,
-        _serializer = serializer;
+    QueryConfig? config,
+  })  : config = CachedQuery.instance.defaultConfig.merge(config),
+        _state = state;
 
   /// Refetch the query immediately.
   ///
@@ -140,7 +121,9 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     if (_globalCache.storage != null) {
       final dynamic storedData = await _globalCache.storage?.get(key);
       if (storedData != null) {
-        return _serializer == null ? storedData : _serializer!(storedData);
+        return config.serializer == null
+            ? storedData
+            : config.serializer!(storedData);
       }
     }
   }
@@ -164,8 +147,8 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 
   /// After the [_cacheTime] is up remove the query from the global cache.
   void _scheduleDelete() {
-    if (!_ignoreCacheDuration) {
-      _deleteQueryTimer = Timer(_cacheTime, deleteQuery);
+    if (!config.ignoreCacheDuration) {
+      _deleteQueryTimer = Timer(config.cacheDuration, deleteQuery);
     }
   }
 
@@ -178,7 +161,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   void _resetDeleteTimer() {
     if (_deleteQueryTimer?.isActive ?? false) {
       _deleteQueryTimer!.cancel();
-      _deleteQueryTimer = Timer(_cacheTime, deleteQuery);
+      _deleteQueryTimer = Timer(config.cacheDuration, deleteQuery);
     }
   }
 }

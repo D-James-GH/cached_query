@@ -41,7 +41,7 @@ class CachedQuery {
   StorageInterface? get storage => _storage;
 
   /// The current global config that is set.
-  QueryConfig get globalConfig => _config;
+  DefaultQueryConfig get defaultConfig => _config;
 
   /// Whether global configs have been set.
   bool get isConfigSet => _configSet;
@@ -82,9 +82,8 @@ class CachedQuery {
   void config({StorageInterface? storage, QueryConfig? config}) {
     assert(_configSet == false, "Config defaults must only be set once.");
     if (_configSet) return;
-    if (config != null) {
-      _config = _config.merge(config);
-    }
+
+    _config = _config.merge(config);
     _storage = storage;
     _configSet = true;
   }
