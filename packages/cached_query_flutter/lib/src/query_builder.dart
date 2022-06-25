@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 /// {@template queryBuilder}
 /// Listen to changes in an [Mutation] and build the ui with the result.
-/// {@endTemplate}
+/// {@endtemplate}
 class QueryBuilder<T> extends StatefulWidget {
   /// The [Query] to used to update the ui.
   final Query<T> query;
@@ -23,12 +23,12 @@ class QueryBuilder<T> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _QueryBuilderState<T> createState() => _QueryBuilderState<T>();
+  State<QueryBuilder<T>> createState() => _QueryBuilderState<T>();
 }
 
 class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
   late QueryState<T> _state;
-  late StreamSubscription<QueryState<T>> _subscription;
+  StreamSubscription<QueryState<T>>? _subscription;
   @override
   void initState() {
     super.initState();
@@ -47,7 +47,8 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _subscription!.cancel();
+    _subscription = null;
     super.dispose();
   }
 }

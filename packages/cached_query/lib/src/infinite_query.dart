@@ -41,14 +41,17 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
 
   InfiniteQuery._internal({
     required InfiniteQueryFunc<T, A> queryFn,
-    required super.key,
+    required String key,
     required GetNextArg<T, A> getNextArg,
-    super.config,
+    required QueryConfig? config,
+    required List<T>? initialData,
   })  : _getNextArg = getNextArg,
         _queryFn = queryFn,
         super._internal(
+          key: key,
+          config: config,
           state: InfiniteQueryState<T>(
-            data: [],
+            data: initialData ?? [],
             timeCreated: DateTime.now(),
           ),
         );
@@ -61,6 +64,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     bool forceRefetch = false,
     List<A>? prefetchPages,
     QueryConfig? config,
+    List<T>? initialData,
   }) {
     final globalCache = CachedQuery.instance;
     final queryKey = encodeKey(key);
@@ -70,9 +74,10 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         queryFn: queryFn,
         getNextArg: getNextArg,
         key: queryKey,
+        initialData: initialData,
         config: config,
       );
-      globalCache._addQuery(query);
+      globalCache.addQuery(query);
       query._getResult(forceRefetch: forceRefetch);
     }
 
@@ -99,12 +104,6 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     _refetchFuture ??= _fetchAll();
     await _refetchFuture;
     return state;
-  }
-
-  /// Delete the query and query key from cache
-  @override
-  void deleteQuery() {
-    _globalCache.deleteCache(key);
   }
 
   /// Update the current [InfiniteQuery] data.

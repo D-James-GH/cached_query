@@ -14,38 +14,34 @@ import 'package:sqflite/sqflite.dart';
 /// [CachedQuery] package.
 class CachedStorage extends StorageInterface {
   /// True if the SqfLite  instance is open
-  bool isOpen = false;
 
   static const String _queryTable = "Query";
-  static final CachedStorage _instance = CachedStorage._();
-  late final Database _db;
-  CachedStorage._();
+  final Database _db;
+  CachedStorage._(this._db);
 
   /// Initialise [CachedStorage]. Must be initialised before any [Query]'s are
   /// called.
   static Future<CachedStorage> ensureInitialized() async {
     WidgetsFlutterBinding.ensureInitialized();
-    if (!_instance.isOpen) {
-      final databasesPath = await getDatabasesPath();
-      final String path = join(databasesPath, 'query_storage.db');
+    final databasesPath = await getDatabasesPath();
+    final String path = join(databasesPath, 'query_storage.db');
 
-      _instance._db = await openDatabase(
-        path,
-        version: 1,
-        onCreate: (db, version) async {
-          await db.execute(
-            '''
+    final db = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await db.execute(
+          '''
           CREATE TABLE IF NOT EXISTS $_queryTable(
            queryKey TEXT PRIMARY KEY,
            queryData TEXT
           )
           ''',
-          );
-        },
-      );
-      _instance.isOpen = true;
-    }
-    return _instance;
+        );
+      },
+    );
+
+    return CachedStorage._(db);
   }
 
   @override

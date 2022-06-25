@@ -4,7 +4,7 @@ version: 0.0.1
 homepage:
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
@@ -16,5 +16,7 @@ dependencies:
 
 dev_dependencies:
   flutter_lints: ^2.0.1
+  mockito: ^5.2.0
+  build_runner:
   flutter_test:
     sdk: flutter

@@ -7,6 +7,7 @@ import 'package:query_builder/posts/post_list_screen.dart';
 
 class JokeScreen extends StatelessWidget {
   static const routeName = '/screenTwo';
+  final Color color = Colors.white;
   final JokeService service = JokeService();
 
   JokeScreen({Key? key}) : super(key: key);

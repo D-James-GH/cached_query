@@ -23,19 +23,25 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   final Function _queryFn;
 
   Query._internal({
-    required super.key,
-    super.config,
+    required String key,
+    required QueryConfig? config,
     required Function queryFn,
-    QueryState<T>? state,
+    required T? initialData,
   })  : _queryFn = queryFn,
         super._internal(
-          state: state ?? QueryState<T>(timeCreated: DateTime.now()),
+          config: config,
+          key: key,
+          state: QueryState<T>(
+            timeCreated: DateTime.now(),
+            data: initialData,
+          ),
         );
 
   /// {@macro query}
   factory Query({
     required Object key,
     required Future<T> Function() queryFn,
+    T? initialData,
     bool forceRefetch = false,
     QueryConfig? config,
   }) {
@@ -47,18 +53,11 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       query = Query<T>._internal(
         key: encodeKey(key),
         queryFn: queryFn,
+        initialData: initialData,
         config: config,
       );
-      globalCache._addQuery(query);
+      globalCache.addQuery(query);
     }
-
-    // TODO(Dan): check this works
-    // start the fetching process
-    // Don't do anything if it rethrows in the constructor body.
-    // query._getResult(forceRefetch: forceRefetch).catchError((dynamic e) {
-    //   print(e);
-    //   return QueryState<T>(timeCreated: DateTime.now());
-    // });
 
     return query;
   }
@@ -130,7 +129,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
           error: e,
         ),
       );
-      if (CachedQuery.instance._config.shouldRethrow) {
+      if (config.shouldRethrow) {
         rethrow;
       }
     } finally {

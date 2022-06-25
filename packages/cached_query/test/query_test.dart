@@ -1,8 +1,8 @@
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
+import 'mock_storage.dart';
 import 'repos/query_test_repo.dart';
-import 'repos/storage_test.dart';
 
 void main() {
   final cachedQuery = CachedQuery.instance;
@@ -32,6 +32,14 @@ void main() {
       );
       await Future.wait<dynamic>([query1.result, query2.result]);
       expect(fetchCount, 1);
+    });
+    test("Can create with initial data", () {
+      final query = Query<String>(
+        key: "initial",
+        queryFn: () async => "data",
+        initialData: "initial",
+      );
+      expect(query.state.data, "initial");
     });
   });
 
@@ -83,6 +91,15 @@ void main() {
       ).stream.first;
       expect(state, isA<QueryState<String>>());
     });
+    test("Initial data is sent first", () async {
+      const initialData = "initial data";
+      final state = await Query(
+        key: "initialStream",
+        queryFn: fetchFunction,
+        initialData: initialData,
+      ).stream.first;
+      expect(state.data, initialData);
+    });
     test(
         'stream emits 2 values while fetching, loading/currentData then new result',
         () async {
@@ -108,6 +125,7 @@ void main() {
             ),
           );
     });
+
     test('refetch causes loading then new query', () async {
       int i = 0;
       QueryState<String>? firstQuery;
@@ -292,7 +310,7 @@ void main() {
     test("Result should rethrow if specified ", () async {
       cachedQuery
         ..reset()
-        ..config(config: QueryConfig(shouldRethrow: true));
+        ..config(config: const QueryConfig(shouldRethrow: true));
       try {
         final query = Query<String>(
           key: "error2",
@@ -306,5 +324,14 @@ void main() {
         expect(e, "this is an error");
       }
     });
+  });
+  test("Can set local query config", () {
+    final query = Query(
+      key: "local",
+      config: const QueryConfig(shouldRethrow: true),
+      queryFn: () async => "",
+    );
+
+    expect(query.config.shouldRethrow, true);
   });
 }

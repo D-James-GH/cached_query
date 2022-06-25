@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query/src/default_query_config.dart';
 import 'package:cached_query/src/util/encode_key.dart';
@@ -7,8 +8,8 @@ import 'package:cached_query/src/util/list_extension.dart';
 import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
-part 'query.dart';
 part 'infinite_query.dart';
+part 'query.dart';
 part "query_base.dart";
 
 /// Should return true if a condition is met.
@@ -163,15 +164,21 @@ class CachedQuery {
   ///
   /// Pass a key to delete a query at the given key. Will invalidate both
   /// infinite queries and queries.
-  void deleteCache([Object? objectKey]) {
-    if (objectKey != null) {
-      final key = encodeKey(objectKey);
-      if (_queryCache.containsKey(key)) {
-        _queryCache.remove(key);
+  void deleteCache({Object? key, bool deleteStorage = false}) {
+    if (key != null) {
+      final stringKey = encodeKey(key);
+      if (_queryCache.containsKey(stringKey)) {
+        _queryCache.remove(stringKey);
+      }
+      if (deleteStorage && storage != null) {
+        storage!.delete(stringKey);
       }
     } else {
       // other wise invalidate the whole cache
       _queryCache = {};
+      if (deleteStorage && storage != null) {
+        storage!.deleteAll();
+      }
     }
   }
 
@@ -185,7 +192,11 @@ class CachedQuery {
     }
   }
 
-  void _addQuery(QueryBase<dynamic, dynamic> query) {
+  /// Add a query to the cache.
+  ///
+  /// Shouldn't normally need to add a query manually. Queries are automatically
+  /// added to the cache when they are constructed.
+  void addQuery(QueryBase<dynamic, dynamic> query) {
     _queryCache[query.key] = query;
   }
 }

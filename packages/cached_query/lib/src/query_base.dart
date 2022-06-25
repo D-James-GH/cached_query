@@ -77,7 +77,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   QueryBase._internal({
     required this.key,
     required State state,
-    QueryConfig? config,
+    required QueryConfig? config,
   })  : config = CachedQuery.instance.defaultConfig.merge(config),
         _state = state;
 
@@ -94,8 +94,8 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   }
 
   /// Delete the query and query key from cache
-  void deleteQuery() {
-    _globalCache.deleteCache(key);
+  void deleteQuery({bool deleteStorage = false}) {
+    _globalCache.deleteCache(key: key, deleteStorage: deleteStorage);
   }
 
   Future<State> _getResult();

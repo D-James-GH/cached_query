@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
+import 'mock_storage.dart';
 import 'repos/infinite_query_test_repo.dart';
-import 'repos/storage_test.dart';
 
 void main() async {
   final repo = InfiniteQueryTestRepository();
@@ -26,6 +26,24 @@ void main() async {
       final queryFromCache =
           cachedQuery.getQuery(InfiniteQueryTestRepository.key);
       expect(query, queryFromCache);
+    });
+    test("Can set initial data", () {
+      final query = InfiniteQuery<String, int>(
+        key: "initial",
+        queryFn: repo.getPosts,
+        getNextArg: (state) => 1,
+        initialData: ["initialData"],
+      );
+      expect(query.state.data!.first, "initialData");
+    });
+    test("Initial data is first in stream", () async {
+      final initialQuery = await InfiniteQuery<String, int>(
+        key: "initial",
+        queryFn: repo.getPosts,
+        getNextArg: (state) => 1,
+        initialData: ["initialData"],
+      ).stream.first;
+      expect(initialQuery.data!.first, "initialData");
     });
   });
   group("Infinite query as a future", () {

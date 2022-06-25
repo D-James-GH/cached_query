@@ -1,4 +1,3 @@
-// todo(Dan): add examples to docs.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -9,7 +8,7 @@ import '../cached_query_flutter.dart';
 /// Listen to changed in an [InfiniteQuery] and build the ui with the result.
 /// {@endTemplate infiniteQueryBuilder}
 class InfiniteQueryBuilder<T, A> extends StatefulWidget {
-  /// [InfiniteQuery] to listen to.
+  /// The [InfiniteQuery] to watch.
   final InfiniteQuery<T, A> query;
 
   /// The builder function is called on each widget build.
@@ -29,7 +28,7 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _InfiniteQueryBuilderState<T, A> createState() =>
+  State<InfiniteQueryBuilder<T, A>> createState() =>
       _InfiniteQueryBuilderState<T, A>();
 }
 

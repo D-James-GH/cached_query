@@ -39,6 +39,7 @@ class DefaultQueryConfig implements QueryConfig {
       return this;
     }
     return copyWith(
+      ignoreCacheDuration: other.ignoreCacheDuration,
       cacheDuration: other.cacheDuration,
       serializer: other.serializer,
       refetchDuration: other.refetchDuration,
