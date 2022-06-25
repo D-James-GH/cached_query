@@ -47,11 +47,7 @@ void main() async {
     });
   });
   group("Infinite query as a future", () {
-    int fetchCount = 0;
-    tearDown(() {
-      fetchCount = 0;
-      cachedQuery.deleteCache();
-    });
+    tearDown(cachedQuery.deleteCache);
     test("Should return an infinite query", () async {
       final query = InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
@@ -132,8 +128,8 @@ void main() async {
           return state.length + 1;
         },
       );
-      final res1 = await query.result;
-      final res2 = await InfiniteQuery<String, int>(
+      await query.result;
+      await InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
         queryFn: createResponse,
         getNextArg: (state) {
@@ -156,8 +152,8 @@ void main() async {
           return state.length + 1;
         },
       );
-      final res1 = await query.result;
-      final res2 = await query.refetch();
+      await query.result;
+      await query.refetch();
       expect(fetchCount, 2);
     });
     test("Should refetch list after refetchDuration", () async {
@@ -173,15 +169,14 @@ void main() async {
           return Future.value("$page");
         },
       );
-      final res1 = await query.result;
-      final res2 = await query.result;
+      await query.result;
+      await query.result;
       expect(fetchCount, 2);
     });
   });
   group("Infinite query args", () {
     tearDown(cachedQuery.deleteCache);
     test("Initial index", () async {
-      const initialIndex = 1;
       final query = InfiniteQuery<int, int>(
         key: "initialIndex",
         queryFn: repo.getPage,
@@ -210,7 +205,7 @@ void main() async {
     });
   });
   group("Infinite Query storage", () {
-    final storage = StorageTest();
+    final storage = MockStorage();
     setUpAll(() => CachedQuery.instance.config(storage: storage));
     tearDown(() {
       storage.deleteAll();
@@ -246,7 +241,7 @@ void main() async {
           return state.length + 1;
         },
       );
-      final res = await query.result;
+      await query.result;
       expect(storage.store.length, 0);
     });
 
@@ -284,7 +279,7 @@ void main() async {
     test("Should serialize data if a serialize function is provided", () async {
       const key = "serialize";
       // Make sure the storage has initial data
-      storage.put(key, item: jsonEncode([Serializable(StorageTest.data)]));
+      storage.put(key, item: jsonEncode([Serializable(MockStorage.data)]));
       final query = InfiniteQuery<Serializable, int>(
         key: key,
         queryFn: (i) => Future.value(Serializable("$i")),
@@ -311,7 +306,7 @@ void main() async {
               expect(output[0], isA<List<Serializable>>());
               expect(
                 (output[0] as List<Serializable>).first.name,
-                StorageTest.data,
+                MockStorage.data,
               );
             }
             count++;
@@ -335,7 +330,7 @@ void main() async {
           return Future.value(count);
         },
       );
-      final res1 = await query.result;
+      await query.result;
       final res2 = await query.refetch();
       expect((jsonDecode(storage.store[key]!) as List).first, count);
       expect(

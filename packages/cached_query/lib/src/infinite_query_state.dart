@@ -1,5 +1,4 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/util/list_extension.dart';
 
 /// {@template infiniteQueryState}
 /// [InfiniteQueryState] holds the current state of an [InfiniteQuery]

@@ -16,5 +16,5 @@ class PostModel with _$PostModel {
       _$PostModelFromJson(json);
 
   static List<PostModel> listFromJson(List<Map<String, dynamic>> json) =>
-      json.map((e) => PostModel.fromJson(e)).toList();
+      json.map(PostModel.fromJson).toList();
 }

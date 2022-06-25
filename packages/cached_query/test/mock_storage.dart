@@ -3,18 +3,14 @@ import 'dart:convert';
 
 import 'package:cached_query/cached_query.dart';
 
-class StorageTest extends StorageInterface {
+class MockStorage extends StorageInterface {
   static const data = "storage";
   var store = <String, String>{};
   @override
-  void close() {
-    // TODO: implement close
-  }
+  void close() {}
 
   @override
-  void delete(String key) {
-    // TODO: implement delete
-  }
+  void delete(String key) {}
 
   @override
   void deleteAll() {

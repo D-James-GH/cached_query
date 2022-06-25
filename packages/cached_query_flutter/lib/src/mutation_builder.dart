@@ -35,7 +35,7 @@ class MutationBuilder<T, A> extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MutationBuilderState<T, A> createState() => _MutationBuilderState<T, A>();
+  State<MutationBuilder<T, A>> createState() => _MutationBuilderState<T, A>();
 }
 
 class _MutationBuilderState<T, A> extends State<MutationBuilder<T, A>> {

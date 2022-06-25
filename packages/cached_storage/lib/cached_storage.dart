@@ -19,6 +19,10 @@ class CachedStorage extends StorageInterface {
   final Database _db;
   CachedStorage._(this._db);
 
+  /// Manual constructor for testing
+  @visibleForTesting
+  CachedStorage(this._db);
+
   /// Initialise [CachedStorage]. Must be initialised before any [Query]'s are
   /// called.
   static Future<CachedStorage> ensureInitialized() async {
@@ -84,9 +88,10 @@ class CachedStorage extends StorageInterface {
   @override
   void put<T>(String key, {required T item}) async {
     try {
+      final payload = jsonEncode(item);
       await _db.insert(
         _queryTable,
-        {"queryKey": key, "queryData": jsonEncode(item)},
+        {"queryKey": key, "queryData": payload},
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {

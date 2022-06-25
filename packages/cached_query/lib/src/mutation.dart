@@ -52,7 +52,6 @@ class Mutation<T, A> {
   final List<Object>? _refetchQueries;
   MutationState<T> _state;
   StreamController<MutationState<T>>? _streamController;
-  Future<T?>? _currentFuture;
   final _cache = MutationCache.instance;
 
   /// Current [MutationState] of the mutation.
@@ -169,7 +168,6 @@ class Mutation<T, A> {
 
       return null;
     } finally {
-      _currentFuture = null;
       _setState(_state.copyWith(isFetching: false));
       _emit();
     }

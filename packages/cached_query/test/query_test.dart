@@ -188,7 +188,7 @@ void main() {
   });
 
   group("Fetch from storage", () {
-    final storage = StorageTest();
+    final storage = MockStorage();
     setUpAll(() => CachedQuery.instance.config(storage: storage));
     tearDown(cachedQuery.deleteCache);
 
@@ -221,7 +221,7 @@ void main() {
     test("Should get initial data from storage before queryFn", () async {
       const key = "getInitial";
       // Make sure the storage has initial data
-      storage.put(key, item: StorageTest.data);
+      storage.put(key, item: MockStorage.data);
       final query = Query<String>(
         key: key,
         queryFn: () async => Future.value("data"),
@@ -235,7 +235,7 @@ void main() {
               output.add(event.data!);
             }
             if (output.length == 1) {
-              expect(output[0], StorageTest.data);
+              expect(output[0], MockStorage.data);
             }
           },
           max: 3,
@@ -249,7 +249,7 @@ void main() {
       storage.put(
         key,
         item: {
-          key: {"name": StorageTest.data}
+          key: {"name": MockStorage.data}
         },
       );
       final query = Query<Serializable>(
@@ -270,7 +270,7 @@ void main() {
             }
             if (output.length == 1) {
               expect(output[0], isA<Serializable>());
-              expect((output[0] as Serializable).name, StorageTest.data);
+              expect((output[0] as Serializable).name, MockStorage.data);
             }
           },
           max: 3,

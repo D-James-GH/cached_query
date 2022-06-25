@@ -78,7 +78,7 @@ void main() {
       final query = MockQuery<String>();
       when(query.key).thenReturn("delete");
       final storage = MockStorageInterface();
-      final cachedQuery = CachedQuery.asNewInstance()
+      CachedQuery.asNewInstance()
         ..config(storage: storage)
         ..addQuery(query)
         ..deleteCache(deleteStorage: true);
@@ -103,7 +103,7 @@ void main() {
     test("update query", () {
       final query = MockQuery<String>();
       when(query.key).thenReturn("update");
-      final cachedQuery = CachedQuery.asNewInstance()
+      CachedQuery.asNewInstance()
         ..addQuery(query)
         ..updateQuery<String>(
           key: "update",
@@ -114,7 +114,7 @@ void main() {
     test("update infinite query", () {
       final query = MockInfiniteQuery<String, int>();
       when(query.key).thenReturn("update");
-      final cachedQuery = CachedQuery.asNewInstance()
+      CachedQuery.asNewInstance()
         ..addQuery(query)
         ..updateInfiniteQuery<String>(
           key: "update",

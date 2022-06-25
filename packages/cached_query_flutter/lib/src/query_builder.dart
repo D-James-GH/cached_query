@@ -47,7 +47,7 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
 
   @override
   void dispose() {
-    _subscription!.cancel();
+    _subscription?.cancel();
     _subscription = null;
     super.dispose();
   }
