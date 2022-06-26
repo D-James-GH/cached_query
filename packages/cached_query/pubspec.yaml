@@ -15,7 +15,6 @@ dependencies:
 dev_dependencies:
   test: ^1.21.1
   flutter_lints: ^2.0.1
-  dart_code_metrics: ^4.15.2
   build_runner:
   mockito: ^5.2.0
 
