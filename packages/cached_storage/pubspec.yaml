@@ -1,8 +1,7 @@
 name: cached_storage
 description: A storage addon for cached_query
 version: 0.0.1-dev.1
-homepage:
-publish_to: none
+repository: https://github.com/D-James-GH/cached_query/tree/main/packages/cached_query_flutter
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -11,8 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cached_query:
-    path: ../cached_query
+  cached_query: ^0.0.1
   sqflite: ^2.0.2+1
   path: ^1.8.1
 
