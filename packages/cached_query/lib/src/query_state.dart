@@ -19,7 +19,7 @@ enum QueryStatus {
 /// [InfiniteQueryState] holds the current state of an [InfiniteQuery]
 ///
 /// Should not be instantiated manually.
-/// {@endTemplate}
+/// {@endtemplate}
 class QueryState<T> implements StateBase {
   /// Current data of the query.
   @override

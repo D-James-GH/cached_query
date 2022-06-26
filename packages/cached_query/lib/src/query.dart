@@ -18,7 +18,7 @@ typedef QueryFunc<T> = Future<T> Function();
 /// Use [forceRefetch] to force the query to be run again regardless of whether
 /// the query is stale or not.
 ///
-/// {@endTemplate}
+/// {@endtemplate}
 class Query<T> extends QueryBase<T, QueryState<T>> {
   final Function _queryFn;
 

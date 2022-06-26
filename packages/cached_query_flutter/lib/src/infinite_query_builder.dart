@@ -6,7 +6,7 @@ import '../cached_query_flutter.dart';
 
 /// {@template infiniteQueryBuilder}
 /// Listen to changed in an [InfiniteQuery] and build the ui with the result.
-/// {@endTemplate infiniteQueryBuilder}
+/// {@endtemplate infiniteQueryBuilder}
 class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   /// The [InfiniteQuery] to watch.
   final InfiniteQuery<T, A> query;

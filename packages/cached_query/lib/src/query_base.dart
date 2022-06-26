@@ -2,7 +2,7 @@ part of "cached_query.dart";
 
 /// {@template stateBase}
 /// An Interface for both [QueryState] and [InfiniteQueryState].
-/// {@endTemplate}
+/// {@endtemplate}
 abstract class StateBase {
   /// Current data of the query.
   dynamic get data;
@@ -23,7 +23,7 @@ abstract class StateBase {
 
 /// {@template queryBase}
 /// An Interface for both [Query] and [InfiniteQuery].
-/// {@endTemplate}
+/// {@endtemplate}
 abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// The key used to store and access the query.
   ///

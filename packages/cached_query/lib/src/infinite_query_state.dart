@@ -2,7 +2,7 @@ import 'package:cached_query/cached_query.dart';
 
 /// {@template infiniteQueryState}
 /// [InfiniteQueryState] holds the current state of an [InfiniteQuery]
-/// {@endTemplate}
+/// {@endtemplate}
 class InfiniteQueryState<T> extends QueryState<List<T>> {
   /// True if there are no more pages available to fetch.
   ///

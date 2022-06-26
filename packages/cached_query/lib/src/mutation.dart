@@ -186,7 +186,7 @@ class Mutation<T, A> {
 /// [MutationState] holds the current state of an [InfiniteQuery].
 ///
 /// Should not be instantiated manually. Instead should be read from [Mutation].
-/// {@endTemplate}
+/// {@endtemplate}
 class MutationState<T> {
   /// Response of the [MutationQueryCallback].
   final T? data;

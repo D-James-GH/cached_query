@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 /// Passes [BuildContext], [MutationState], and a mutate function.
 ///
 /// Calling [mutate] will start the mutation with the given arguments.
-/// {@endTemplate}
+/// {@endtemplate}
 typedef MutationBuilderCallback<T, A> = Widget Function(
   BuildContext context,
   MutationState<T> state,
@@ -19,7 +19,7 @@ typedef MutationBuilderCallback<T, A> = Widget Function(
 // todo(Dan): add examples to docs.
 /// {@template mutationBuilder}
 /// Listen to changes in an [Mutation] and build the ui with the result.
-/// {@endTemplate}
+/// {@endtemplate}
 class MutationBuilder<T, A> extends StatefulWidget {
   /// The [Mutation] to used to update the ui.
   final Mutation<T, A> mutation;
