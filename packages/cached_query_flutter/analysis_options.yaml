@@ -5,10 +5,7 @@ analyzer:
     missing_required_param: error
     avoid_print: info
   exclude:
-    - "build/**"
-    - "**/*.g.dart"
-    - "**/*.gr.dart"
-    - "**/*.freezed.dart"
+    - "README.md"
   language:
     strict-raw-types: true
   strong-mode:

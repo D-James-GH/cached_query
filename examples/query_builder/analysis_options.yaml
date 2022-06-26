@@ -9,6 +9,7 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.gr.dart"
     - "**/*.freezed.dart"
+    - "README.md"
   language:
     strict-raw-types: true
   strong-mode:

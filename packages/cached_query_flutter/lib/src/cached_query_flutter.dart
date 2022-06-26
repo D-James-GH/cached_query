@@ -12,6 +12,7 @@ extension CachedQueryExt on CachedQuery {
   /// Set the global default config which all queries will use.
   void configFlutter({
     bool refetchOnResume = true,
+    bool refetchOnConnection = true,
     StorageInterface? storage,
     QueryConfig? config,
   }) {
@@ -21,7 +22,9 @@ extension CachedQueryExt on CachedQuery {
       _refetchOnResume();
     }
 
-    ConnectivityController.instance.initialize();
+    if (refetchOnConnection) {
+      ConnectivityController.instance.initialize();
+    }
   }
 
   /// Refetch all queries and infinite queries with listeners.

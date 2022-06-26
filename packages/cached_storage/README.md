@@ -1,39 +1,58 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Cached Storage
+A Storage addon to the [CachedQuery](https://pub.dev/packages/cached_query) package.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+Built on top of [Sqflite](https://pub.dev/packages/sqflite).
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+* Persist queries to disk
+* Accepts any json serializable data.
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Initialized cached query with the storage interface. This must be initialized before any query is called.
 
 ```dart
-const like = 'sample';
+
+void main() async {
+  CachedQuery.instance.configFlutter(
+    storage: await CachedStorage.ensureInitialized(),
+  );
+}
+
 ```
+
+Queries will then automatically be persisted.
+
+## Serialization
+
+Cached Storage uses `jsonEncode` to convert the data of a query to json, which is then stored. If you are returning 
+dart objects from the `queryFn` you will need to serialized the json back into the dart object. To do this, pass a 
+`serilizer` to the QueryConfig which will be used to turn the stored data back into a dart object.
+
+```dart
+ Query<JokeModel>(
+  key: 'joke',
+  config: QueryConfig(
+    // Use a serializer to transform the store json to an object.
+    serializer: (dynamic json) =>
+        JokeModel.fromJson(json as Map<String, dynamic>),
+  ),
+  queryFn: () async {
+    final req = client.get(
+      Uri.parse("https://icanhazdadjoke.com/"),
+      headers: {"Accept": "application/json"},
+    );
+    final res = await req;
+    return JokeModel.fromJson(
+        jsonDecode(res.body) as Map<String, dynamic>,
+    );
+  },
+);
+```
+
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+This package is an addon for [Cached Query](https://pub.dev/packages/cached_query). For persistent storage take a look at
+[Cached Storage].

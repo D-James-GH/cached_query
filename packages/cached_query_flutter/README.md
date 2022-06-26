@@ -1,39 +1,88 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+# Cached Query Flutter
+A set of useful widgets and additions to Cached Query for use with flutter. 
+For more information visit [Cached Query](https://pub.dev/packages/cached_query).
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+* Refetch queries when connection is re-established.
+* Refetch queries when the app comes back into the foreground.
+* Builders for Query's, InfiniteQuery's and Mutations.
+
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Configure the CachedQuery with `configFlutter` instead of `config`. This has two additional options; `refetchOnResume` 
+and `refetchOnConnection`.
+
+```dart
+CachedQuery.instance.configFlutter(
+    refetchOnResume: true,
+    refetchOnConnection: true,
+    storage: await CachedStorage.ensureInitialized(),
+    config: const QueryConfig(),
+);
+```
+
+The *refetchOnResume* option re-fetches any query or infinite query that has listeners when the app resumes. 
+
+The *refetchOnConnection* option uses the connectivity package to detect when the device connection status changes, it 
+then pings example.com to confirm the connection. If the device has connection after the check, all current queries are 
+re-fetched.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+There are three builders that come with this package. Each of them is essentially a stream builder configured specifically 
+for Cached Query.
+
+## QueryBuilder
+
+Query builder rebuilds the builder whenever the state of the query changes.
 
 ```dart
-const like = 'sample';
+QueryBuilder<JokeModel?>(
+    query: service.getJoke(),
+    builder: (context, state) {
+        if (state.status == QueryStatus.loading) {
+            return const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            );
+        }
+        return Text(state.data?.joke ?? "");
+    },
+);
+```
+
+## InfiniteQueryBuilder
+
+Infinite query builder calls the builder function whenever the state of the infinite query changes. In addition to the 
+current state and build context, InfiniteQueryBuilder also passes the InfiniteQuery object as well. This means you can 
+call `getNextPage` from within the builder function.
+
+```dart
+InfiniteQueryBuilder<List<PostModel>, int>(
+    query: query,
+    builder: (context, state, query) {
+      return Widget();
+    },
+)
+```
+
+Full example of using a custom scroll view with the infinite query to create an infinite list can be found 
+[here](https://github.com/D-James-GH/cached_query/tree/main/examples/query_builder). 
+
+## MutationBuilder
+
+Much the same as the query builder. It will call the builder function when the mutation state changes.
+```dart
+ MutationBuilder<PostModel, PostModel>(
+    mutation: _postService.createPost(),
+    builder: (context, state, mutate) {
+      // Can use the mutate() function directly in the builder.
+    },
+  ),
 ```
 
 ## Additional information
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+This package is an addon for [Cached Query](https://pub.dev/packages/cached_query). For persistent storage take a look at
+[Cached Storage].
