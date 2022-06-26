@@ -1,7 +1,6 @@
 name: cached_query
-description: A new Flutter project.
+description: A simple library for dealing with server state in dart and flutter.
 version: 0.0.1
-homepage:
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

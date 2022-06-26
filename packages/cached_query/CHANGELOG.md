@@ -1,3 +1,3 @@
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Cached query, a simple library for dealing with server state in dart and flutter.
