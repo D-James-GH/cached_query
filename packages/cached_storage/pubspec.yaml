@@ -1,6 +1,6 @@
 name: cached_storage
 description: A storage addon for cached_query
-version: 0.0.1
+version: 0.0.1-dev.1
 homepage:
 publish_to: none
 

@@ -1,4 +1,7 @@
 import 'package:cached_query/cached_query.dart';
+//ignore_for_file:avoid_print
+
+// Full project example here: https://github.com/D-James-GH/cached_query/tree/main/examples/query_builder
 
 void main() async {
   // Optionally initialise cached query with a config
@@ -22,6 +25,7 @@ void main() async {
 
   // Can force a refetch and await the result
   final refetchResult = await sameQuery.refetch();
+  print(refetchResult);
 }
 
 Query<String> getFilmTitle() {
