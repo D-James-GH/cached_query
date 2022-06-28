@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:examples/repos/post_repo.dart';
-import 'package:stream_transform/stream_transform.dart';
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:equatable/equatable.dart';
 import 'package:examples/models/post_model.dart';
+import 'package:examples/repos/post_repo.dart';
 import 'package:meta/meta.dart';
+import 'package:stream_transform/stream_transform.dart';
 
 part 'post_event.dart';
 part 'post_state.dart';
@@ -31,13 +31,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   ) async {
     await emit.forEach<InfiniteQueryState<List<PostModel>>>(
       _repo.getPosts().stream,
-      onData: (query) {
+      onData: (queryState) {
         return state.copyWith(
-          posts: [...?state.posts, ...?query.lastPage],
-          status: query.status == QueryStatus.loading
+          posts: [...?state.posts, ...?queryState.lastPage],
+          status: queryState.status == QueryStatus.loading
               ? PostStatus.loading
               : PostStatus.success,
-          hasReachedMax: query.hasReachedMax,
+          hasReachedMax: queryState.hasReachedMax,
         );
       },
     );

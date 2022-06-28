@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PostService {
-  Future<List<Map<String, dynamic>>> getPosts({
+  Future<List<dynamic>> getPosts({
     required int limit,
     required int page,
   }) async {
@@ -12,7 +12,7 @@ class PostService {
     );
     final res = await http.get(uri);
     // extra delay for testing purposes
-    return jsonDecode(res.body) as List<Map<String, dynamic>>;
+    return jsonDecode(res.body) as List<dynamic>;
   }
 
   Future<Map<String, dynamic>> createPost({

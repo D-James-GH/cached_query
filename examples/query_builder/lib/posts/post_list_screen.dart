@@ -161,7 +161,10 @@ class _PostListScreenState extends State<PostListScreen> {
   }
 
   void _onScroll() {
-    if (_isBottom) _postService.getPosts().getNextPage();
+    final query = _postService.getPosts();
+    if (_isBottom && query.state.status != QueryStatus.loading) {
+      query.getNextPage();
+    }
   }
 
   bool get _isBottom {
