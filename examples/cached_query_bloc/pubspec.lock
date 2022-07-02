@@ -109,10 +109,10 @@ packages:
   cached_query:
     dependency: transitive
     description:
-      name: cached_query
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.0.1"
+      path: "../../packages/cached_query"
+      relative: true
+    source: path
+    version: "0.0.2-dev.2"
   cached_query_flutter:
     dependency: "direct main"
     description:

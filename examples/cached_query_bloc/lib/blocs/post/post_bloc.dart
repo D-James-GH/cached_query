@@ -28,12 +28,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   FutureOr<void> _onPostsFetched(
     PostsStreamFetched event,
     Emitter<PostState> emit,
-  ) async {
-    await emit.forEach<InfiniteQueryState<List<PostModel>>>(
+  ) {
+    // Subscribe to the stream from the infinite query.
+    return emit.forEach<InfiniteQueryState<List<PostModel>>>(
       _repo.getPosts().stream,
       onData: (queryState) {
         return state.copyWith(
-          posts: [...?state.posts, ...?queryState.lastPage],
+          posts: queryState.data?.expand((page) => page).toList() ?? [],
           status: queryState.status == QueryStatus.loading
               ? PostStatus.loading
               : PostStatus.success,
@@ -44,6 +45,8 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   }
 
   void _onPostsNextPage(PostEvent _, Emitter<PostState> __) {
+    // No need to store the query in a variable as calling getPosts() again will
+    // retrieve the same instance of infinite query.
     _repo.getPosts().getNextPage();
   }
 
