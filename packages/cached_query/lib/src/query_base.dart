@@ -132,7 +132,8 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     if (_streamController != null) {
       return _streamController!.stream;
     }
-    _streamController = BehaviorSubject(
+    _streamController = BehaviorSubject.seeded(
+      _state,
       onListen: _cancelDelete,
       onCancel: () {
         _streamController!.close();
