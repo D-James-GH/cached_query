@@ -204,6 +204,19 @@ The Stored data is used to populate the initial data of a query. It is then upda
 
 Create a custom storage object using your favourite package by extending the `StorageInterface`. 
 
+## Error handling
+
+By default, any errors throw during the `queryFn` are caught by the `Query`. These are then added to the state and sent 
+down the query stream. Sometimes in development it is useful to rethrow errors for better visibility. Any query (or globally)
+can be set to rethrow any error it catches.
+```dart
+  CachedQuery.instance.configFlutter(
+    config: const QueryConfig(shouldRethrow: true),
+  );
+```
+*:warning: Warning: This may cause some unexpected functionality in queries, so it is recommended to only use this as a development
+tool.*
+
 ## Additional information
 
 Inspired by fantastic packages from the react world. Read more information about them here:
