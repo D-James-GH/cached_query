@@ -130,6 +130,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 
   Stream<State> _getStream() {
     if (_streamController != null) {
+      _getResult();
       return _streamController!.stream;
     }
     _streamController = BehaviorSubject.seeded(
@@ -164,5 +165,11 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
       _deleteQueryTimer!.cancel();
       _deleteQueryTimer = Timer(config.cacheDuration, deleteQuery);
     }
+  }
+
+  /// Closes the stream and therefore starts the delete timer.
+  Future<void> close() async {
+    await _streamController?.close();
+    _streamController = null;
   }
 }
