@@ -9,6 +9,9 @@ extension CachedQueryExt on CachedQuery {
   /// [refetchOnResume] is whether the onscreen query should refetch when the
   /// app comes back into view.
   ///
+  /// Use [refetchOnConnection] to re-fetch any query that has a listener when
+  /// the connection changes from no connection to connection.
+  ///
   /// Set the global default config which all queries will use.
   void configFlutter({
     bool refetchOnResume = true,
