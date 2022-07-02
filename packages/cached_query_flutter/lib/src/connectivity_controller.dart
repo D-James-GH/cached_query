@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:cached_query_flutter/src/connectivity_service.dart';
@@ -56,7 +55,9 @@ class ConnectivityController {
   /// Initialise the connectivity stream and check connection.
   Future<void> initialize() async {
     _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen((_) => checkConnection());
+        _connectivity.onConnectivityChanged.listen((event) {
+      checkConnection();
+    });
     await checkConnection();
   }
 
@@ -69,7 +70,7 @@ class ConnectivityController {
     try {
       final result = await _connectivityService.lookup();
       hasConnection = result;
-    } on SocketException catch (_) {
+    } catch (_) {
       hasConnection = false;
     }
 

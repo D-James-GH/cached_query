@@ -6,9 +6,8 @@ class ConnectivityService {
   ///
   /// Returns true if a host could be found.
   Future<bool> lookup() async {
-    final future = InternetAddress.lookup('example.com')
-      ..timeout(const Duration(seconds: 5));
-    final res = await future;
+    final res = await InternetAddress.lookup('example.com')
+        .timeout(const Duration(seconds: 5));
     return res.isNotEmpty && res.first.rawAddress.isNotEmpty;
   }
 }
