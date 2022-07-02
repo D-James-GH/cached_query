@@ -9,8 +9,8 @@ Cache any the response of any asynchronous function (usually external api reques
 experience. 
 
 Accompanying packages:
-* cached_query_flutter - Useful flutter additions, including connectivity status. 
-* cached_storage - an implementation of the `CachedQuery StorageInterface` using `sqflite`
+* [cached_query_flutter](https://pub.dev/packages/cached_query_flutter) - Useful flutter additions, including connectivity status. 
+* [cached_storage](https://pub.dev/packages/cached_storage) - an implementation of the `CachedQuery StorageInterface` using `sqflite`
 
 ## Features
 
