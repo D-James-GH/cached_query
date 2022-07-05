@@ -1,6 +1,4 @@
 # Cached Query
-
-> :warning: **This is still early stage software**
  
 A small collection of dart and flutter libraries inspired by tools such as SWR, RTKQuery, React Query, Urql and apollo
 from the React world.
@@ -9,8 +7,22 @@ Cache any the response of any asynchronous function (usually external api reques
 experience. 
 
 Accompanying packages:
-* [cached_query_flutter](https://pub.dev/packages/cached_query_flutter) - Useful flutter additions, including connectivity status. 
-* [cached_storage](https://pub.dev/packages/cached_storage) - an implementation of the `CachedQuery StorageInterface` using `sqflite`
+* 📱 [Cached Query Flutter](https://pub.dev/packages/cached_query_flutter) - Useful flutter additions, including connectivity status. 
+* 💽 [Cached Storage](https://pub.dev/packages/cached_storage) - an implementation of the `CachedQuery StorageInterface` using `sqflite`
+
+## Contents
+
+* [Features](#features)
+* [Getting Started](#getting-started)
+* [Config](#config)
+* [Re-fetching and Invalidation](#re-fetching-and-invalidation)
+* [Infinite Query](#infinitequery)
+* [Mutations](#mutation)
+  * [Optimistic Updates](#optimistic-updates)
+  * [Updating Cached Data](#updating-the-query-cache)
+* [Persisting Data](#persistent-storage)
+* [Error Handling](#error-handling)
+* [Additional Information](#additional-information)
 
 ## Features
 
@@ -22,6 +34,7 @@ Accompanying packages:
 * Can be used alongside state management options (Bloc, Provider, etc...)
 * Refetch when connection is resumed (flutter only)
 * Refetch when app comes into the foreground (flutter only)
+
 
 ## Getting started
 
@@ -76,7 +89,7 @@ A Query can be forced to re-fetched at anytime using `Query.refetch()`.
 
 After the `refetchDuration` is finished the query will be marked as stale. This is what causes a refetch the next time 
 the query is requested. A query can be manually be invalidated with `Query.invalidate()` or a list of queries can be
-invalidated at once with `CachedQuery.instance.invalidateCache`, this is useful during [mutations](#Mutation).
+invalidated at once with `CachedQuery.instance.invalidateCache`, this is useful during [Mutations](#mutation).
 
 ## InfiniteQuery
 
@@ -148,7 +161,7 @@ Because the above mutation has a key the instance of Mutation returned from `cre
 therefore the state can be observed from anywhere.
 
 
-## Optimistic updates
+### Optimistic updates
 
 There are a few useful callbacks that enable optimistic updates. 
 
@@ -172,7 +185,7 @@ Mutation<PostModel, PostModel>(
     },
 );
 ```
-## Updating the query cache.
+### Updating the query cache.
 
  All the versions of updating a query require an update function. An update function passes through the current cached 
  data and must return the new data of the same type. 
