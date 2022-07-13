@@ -1,3 +1,6 @@
+## 0.0.3
+docs: better readme layout
+
 ## 0.0.2 
 * fix: try to fetch anytime the stream is requested
 
