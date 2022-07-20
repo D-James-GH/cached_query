@@ -33,6 +33,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   final InfiniteQueryFunc<T, A> _queryFn;
   Future<void>? _refetchFuture;
 
+
+
+
   @override
   Future<InfiniteQueryState<T>> get result => _getResult();
 
