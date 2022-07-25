@@ -9,12 +9,12 @@ export const config: ReadonlyArray<Link> = [
 		slug: 'getting-started',
 		children: [
 			{
-				title: 'Installation',
-				slug: 'installation'
+				title: 'Introduction',
+				slug: 'introduction'
 			},
 			{
-				title: 'Basic Setup',
-				slug: 'basic-setup'
+				title: 'Quick Start',
+				slug: 'quick-start'
 			}
 		]
 	},

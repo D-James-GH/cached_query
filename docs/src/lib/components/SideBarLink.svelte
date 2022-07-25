@@ -7,8 +7,6 @@
 	export let baseUrl: string | undefined = '';
 
 	let open = false;
-	let linkClass =
-		'w-full flex items-center px-2 py-1 text-base font-normal  rounded-lg  hover:bg-gray-100 dark:hover:bg-gray-700';
 
 	function handleOpen() {
 		open = !open;
@@ -17,12 +15,7 @@
 
 <li class="my-1">
 	{#if link.children}
-		<button
-			class={linkClass}
-			on:click={handleOpen}
-			class:dark:bg-gray-700={open}
-			class:bg-gray-100={open}
-		>
+		<button on:click={handleOpen} class="link text-color" class:open>
 			{link.title}
 			<span class="ml-auto transition duration-200" class:rotate-180={open}>
 				<Icon name="chevron-down" />
@@ -37,8 +30,17 @@
 			</div>
 		{/if}
 	{:else}
-		<a class={linkClass} href={`${baseUrl}/${link.slug}`}>
+		<a class="link text-color" href={`${baseUrl}/${link.slug}`}>
 			{link.title}
 		</a>
 	{/if}
 </li>
+
+<style type="text/postcss">
+	.link {
+		@apply flex w-full items-center rounded-lg px-2 py-1 font-normal   hover:bg-grey-200  dark:hover:bg-grey-700;
+	}
+	.open {
+		@apply bg-grey-200 dark:bg-grey-700;
+	}
+</style>

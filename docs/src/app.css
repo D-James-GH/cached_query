@@ -1,18 +1,75 @@
+@import 'prism-theme-vars/base.css';
+@import 'prism-theme-vars/themes/vitesse-light.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-	h1 {
-		@apply text-3xl;
+	body {
+		@apply bg-base-light dark:bg-base-dark;
 	}
-	h2 {
-		@apply text-2xl;
+	.btn {
+		@apply transform rounded-md px-4 py-3 text-grey-800 outline-none transition-transform  hover:bg-grey-200 active:scale-75 dark:text-grey-50  dark:hover:bg-grey-700;
 	}
-	h3 {
-		@apply text-xl;
+	.text-color {
+		@apply text-grey-800 dark:text-grey-50;
 	}
-	h4 {
-		@apply text-xl;
+	@media (prefers-color-scheme: dark) {
+		html:root {
+			--prism-background: theme(colors.grey.800);
+			--prism-scheme: dark;
+			--prism-foreground: theme(colors.grey.50);
+			--prism-comment: #758575;
+			--prism-string: #c3e88d;
+			--prism-literal: #429988;
+			--prism-keyword: #c792ea;
+			--prism-boolean: #c792ea;
+			--prism-number: #fd9170;
+			--prism-variable: #c2b36e;
+			--prism-function: #82aaff;
+			--prism-deleted: #f07178;
+			--prism-class: #ffcb6b;
+			--prism-builtin: #e0a569;
+			--prism-property: #80cbc4;
+			--prism-namespace: #c3cee3;
+			--prism-punctuation: #89ddff;
+			--prism-decorator: theme(colors.grey.50);
+			--prism-regex: #f2ff00;
+			--prism-json-property: #6b8b9e;
+			--prism-line-number: #888888;
+			--prism-line-number-gutter: #eeeeee;
+			--prism-line-highlight-background: #444444;
+			--prism-selection-background: #444444;
+		}
+		code {
+			@apply rounded bg-grey-800 px-2 py-[2px];
+		}
+	}
+
+	@media (prefers-color-scheme: light) {
+		html:root {
+			--prism-foreground: #393a34;
+			--prism-background: theme(colors.grey.100);
+			--prism-comment: #a0ada0;
+			--prism-string: #b56959;
+			--prism-literal: #2f8a89;
+			--prism-number: #296aa3;
+			--prism-keyword: #1c6b48;
+			--prism-function: #6c7834;
+			--prism-boolean: #1c6b48;
+			--prism-constant: #a65e2b;
+			--prism-deleted: #a14f55;
+			--prism-class: #2993a3;
+			--prism-builtin: #ab5959;
+			--prism-property: #b58451;
+			--prism-namespace: #b05a78;
+			--prism-punctuation: #8e8f8b;
+			--prism-decorator: #bd8f8f;
+			--prism-regex: #ab5e3f;
+			--prism-json-property: #698c96;
+		}
+		code {
+			@apply rounded bg-grey-200 px-1 py-[2px];
+		}
 	}
 }
