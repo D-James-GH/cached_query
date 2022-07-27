@@ -1,2 +1,0 @@
-# Cached Query
-
