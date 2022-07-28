@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/oceanicNext");
 const config = {
   title: "Cached Query",
   tagline: "Create fast user interfaces with Cached Query and Flutter",
-  url: "https://your-docusaurus-test-site.com",
+  url: "https://d-james-gh.github.io/cached-query",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -81,7 +81,7 @@ const config = {
         links: [
           {
             label: "Docs",
-            to: "/docs",
+            to: "/docs/overview",
           },
           {
             label: "Github",
