@@ -18,7 +18,7 @@ dependencies:
 
 ## Basic Usage
 
-This code snippet showcases the use of a [Query](/guides/query), [offline persistence](/docs/flutter-additions) and [configuration](/docs/guides/configuration).
+This code snippet showcases the use of a [Query](/docs/guides/query), [offline persistence](/docs/flutter-additions) and [configuration](/docs/guides/configuration).
 
 ```dart
 import 'package:cached_query_flutter/cached_query_flutter.dart';
