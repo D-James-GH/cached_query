@@ -42,7 +42,6 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     required Object key,
     required Future<T> Function() queryFn,
     T? initialData,
-    bool forceRefetch = false,
     QueryConfig? config,
   }) {
     final globalCache = CachedQuery.instance;
