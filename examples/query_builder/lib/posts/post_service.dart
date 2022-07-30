@@ -23,11 +23,6 @@ class PostService {
         if (state.lastPage?.isEmpty ?? false) return null;
         return state.length + 1;
       },
-      initialData: [
-        [
-          const PostModel(id: 102, title: "initial", body: "body", userId: 39),
-        ]
-      ],
       queryFn: (arg) async {
         debugPrint("fetching... $arg");
         final uri = Uri.parse(

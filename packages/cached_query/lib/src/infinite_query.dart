@@ -140,7 +140,12 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       // try to get any data from storage if the query has no data
       final dataFromStorage = await _fetchFromStorage() as List<dynamic>?;
       if (dataFromStorage != null) {
-        _setState(_state.copyWith(data: dataFromStorage.cast<T>()));
+        _setState(
+          _state.copyWith(
+            data: dataFromStorage.cast<T>(),
+            status: QueryStatus.success,
+          ),
+        );
         // Emit the data from storage
         _emit();
       }
