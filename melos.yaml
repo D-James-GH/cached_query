@@ -1,0 +1,23 @@
+name: cached_query
+
+packages:
+  - packages/**
+  - examples/**
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  analyze:
+    exec: dart analyze .
+  test:
+    run: |
+      melos exec -c 6 --fail-fast -- \
+        "flutter test --no-pub"
+    description: Run `flutter test` for a specific package.
+    select-package:
+      dir-exists:
+        - test
+      ignore:
+        - 'examples/**'

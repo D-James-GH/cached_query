@@ -271,7 +271,7 @@ void main() async {
               expect(output[0], initialData);
             }
           },
-          max: 3,
+          max: 10,
         ),
       );
     });
@@ -311,7 +311,7 @@ void main() async {
             }
             count++;
           },
-          max: 3,
+          max: 10,
           count: 2,
         ),
       );
