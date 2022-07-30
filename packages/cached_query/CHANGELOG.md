@@ -1,4 +1,8 @@
-## 0.0.3+1
+## 0.1.0
+
+ - Bump "cached_query" to `0.1.0`.
+
+## 0.1.0
 
  - **FIX**: Infinite query not re-fetching in order.
  - **FIX**: try to get result each time a stream is requested.

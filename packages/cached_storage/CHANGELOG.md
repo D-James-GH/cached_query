@@ -1,4 +1,8 @@
-## 0.0.2+1
+## 0.0.2+2
+
+ - Update a dependency to the latest release.
+
+## 0.1.0
 
  - **FIX**: Infinite query not re-fetching in order.
 
