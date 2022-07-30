@@ -4,9 +4,6 @@ packages:
   - packages/**
   - examples/**
 
-command:
-  bootstrap:
-    usePubspecOverrides: true
 
 scripts:
   analyze:
