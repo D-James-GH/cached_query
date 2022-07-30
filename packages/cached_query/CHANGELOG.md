@@ -1,3 +1,7 @@
+## 0.1.0+1
+
+ - **FIX**: Infinite query doesn't fetch all pages from storage.
+
 ## 0.1.0
 
  - Bump "cached_query" to `0.1.0`.
