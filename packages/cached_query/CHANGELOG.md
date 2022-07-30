@@ -1,3 +1,14 @@
+## 0.0.3+1
+
+ - **FIX**: Infinite query not re-fetching in order.
+ - **FIX**: try to get result each time a stream is requested.
+ - **FIX**: seeded the stream with the current state.
+ - **DOCS**: docusaurus and query page.
+ - **DOCS**: initial commit.
+ - **DOCS**: update contents.
+ - **DOCS**: add links to readme.
+ - **DOCS**: error handling.
+
 ## 0.0.3
 docs: better readme layout
 
