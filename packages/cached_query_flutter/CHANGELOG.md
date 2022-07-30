@@ -1,3 +1,7 @@
+## 0.1.0
+
+ - Bump "cached_query_flutter" to `0.1.0`.
+
 ## 0.0.2+2
 
  - Update a dependency to the latest release.
