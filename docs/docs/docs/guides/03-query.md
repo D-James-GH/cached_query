@@ -18,7 +18,6 @@ final query = Query(
 Each Query must have a queryFn. This is an asynchronous function that can return any custom or built in type. The return 
 value of the queryFn will be cached. 
 
-
 A query must be given a unique key which can be any json serializable value. Each unique key will create a new query in
 the cache. Initial data can be passed to the query. On the first request this initial data will be emitted as part of the state 
 rather than null. Any global query configuration can be overridden when instantiating a new query. See [configuration](/docs/guides/configuration)
@@ -31,8 +30,14 @@ on updating a query see [optimistic updates](/docs/guides/optimistic-updates)
 `QueryState` is the object containing the current state of the query. It holds the **data** returned from the queryFn
 along with the current status of the query (loading, success, error, initial), the time of the last fetch and any errors
 throw in the fetch.
+```dart
+final state = query.state;
+final isLoading = state.status == QueryStatus.loading;
+final data = state.data;
+```
 
-A query will not invoke the queryFn until one of two things is used:
+A query can only hold one future at a time. This is so that the result can be requested from many places at once but only
+one call to the queryFn will be made. A query will not invoke the queryFn until one of two things is used:
 
 1. The `result` is requested via the future `Query.result`
 2. A listener is added to the query stream.
@@ -77,3 +82,8 @@ background fetches.
 As the Queries use streams to detect how many listeners they have left, using `Query.result` never adds a 
 listener to the query. So, when the future is requested the [cache duration](/docs/guides/configuration) timer is started
 immediately if there are no other listeners attached.
+
+## Error Handling
+
+If a query, infinite query or a mutation throws an error or exception it will be caught and the current state will be
+updated with the error. 

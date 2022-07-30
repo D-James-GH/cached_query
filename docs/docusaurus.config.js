@@ -8,8 +8,8 @@ const darkCodeTheme = require("prism-react-renderer/themes/oceanicNext");
 const config = {
   title: "Cached Query",
   tagline: "Create fast user interfaces with Cached Query and Flutter",
-  url: "https://d-james-gh.github.io",
-  baseUrl: "/cached_query/",
+  url: "https://www.cachedquery.dev",
+  baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
@@ -88,7 +88,7 @@ const config = {
             href: "https://github.com/D-James-GH/cached_query/tree/main/packages/cached_query",
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Cached Query, Inc. Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,
