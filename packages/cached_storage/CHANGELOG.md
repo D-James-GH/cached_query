@@ -1,3 +1,7 @@
+## 0.1.0+2
+
+ - **DOCS**: Readmes updated to show documentation link.
+
 ## 0.1.0+1
 
  - Update a dependency to the latest release.
