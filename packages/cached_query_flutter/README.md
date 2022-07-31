@@ -1,4 +1,7 @@
-# Cached Query Flutter
+<h1 align="center"><a  href="https://cachedquery.dev">Cached Query Flutter</a></h1>
+
+<p align="center">Visit the <a href="https://cachedquery.dev/">documentation</a> for more information.</p>
+
 A set of useful widgets and additions to Cached Query for use with flutter. 
 For more information on how the caching works visit [Cached Query](https://pub.dev/packages/cached_query).
 

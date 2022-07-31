@@ -1,5 +1,4 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/default_query_config.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';

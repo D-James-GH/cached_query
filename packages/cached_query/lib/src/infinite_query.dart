@@ -21,8 +21,8 @@ typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 /// Each [InfiniteQuery] can override the global defaults for [refetchDuration]
 /// and [cacheDuration], see [CachedQuery.config] for more info.
 ///
-/// Use [forceRefetch] to force the query to be run again regardless of whether
-/// the query is stale or not.
+/// Use [forceRevalidateAll] to force the infinite query to refetch all pages
+/// when it becomes stale, rather than comparing the first page.
 ///
 /// {@endtemplate infiniteQuery}
 class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
