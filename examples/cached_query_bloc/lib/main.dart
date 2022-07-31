@@ -1,5 +1,5 @@
-import 'package:examples/screens/post_list.screen.dart';
 import 'package:examples/screens/joke.screen.dart';
+import 'package:examples/screens/post_list.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       routes: {
         PostListScreen.routeName: (_) => BlocProvider(
-              create: (_) => PostBloc()..add(PostsStreamFetched()),
+              create: (_) => PostBloc()..add(PostsFetched()),
               child: const PostListScreen(),
             ),
         JokeScreen.routeName: (_) => BlocProvider(

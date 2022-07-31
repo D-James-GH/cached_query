@@ -13,14 +13,14 @@ class PostRepository {
         return state.length + 1;
       },
       queryFn: (page) async => PostModel.listFromJson(
-        await _service.getPosts(page: page, limit: 20),
+        await _service.getPosts(page: page, limit: 10),
       ),
     );
   }
 
-  Mutation<PostModel, PostModel> createPost(PostModel post) {
+  Mutation<PostModel, PostModel> createPostMutation() {
     return Mutation<PostModel, PostModel>(
-      key: ['posts', post.id],
+      refetchQueries: ["posts"],
       queryFn: (post) async {
         final res = await _service.createPost(
           title: post.title,
@@ -29,18 +29,15 @@ class PostRepository {
         );
         return PostModel.fromJson(res);
       },
-      onSuccess: (args, newPost) {
+      onStartMutation: (postArg) {
         CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
           key: "posts",
           updateFn: (old) => [
-            [newPost, ...old![0]],
+            [postArg, ...old![0]],
             ...old.sublist(1).toList()
           ],
         );
-        CachedQuery.instance.invalidateCache('posts');
       },
     );
-    // get query and return after invalidation;
-    // return getInfiniteQuery('posts');
   }
 }

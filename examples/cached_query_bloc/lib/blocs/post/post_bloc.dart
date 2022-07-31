@@ -17,16 +17,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   final _repo = PostRepository();
 
   PostBloc() : super(const PostState()) {
-    on<PostsStreamFetched>(_onPostsFetched);
-    on<PostsStreamNextPage>(
-      _onPostsNextPage,
-      transformer: throttleDroppable(const Duration(milliseconds: 300)),
-    );
-    on<PostStreamCreated>(_onPostCreated);
+    on<PostsFetched>(_onPostsFetched);
+    on<PostsNextPage>(_onPostsNextPage);
+    on<PostCreated>(_onPostCreated);
   }
 
   FutureOr<void> _onPostsFetched(
-    PostsStreamFetched event,
+    PostsFetched event,
     Emitter<PostState> emit,
   ) {
     // Subscribe to the stream from the infinite query.
@@ -50,8 +47,19 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     _repo.getPosts().getNextPage();
   }
 
-  void _onPostCreated(PostStreamCreated event, Emitter<PostState> _) {
-    _repo.createPost(event.post);
+  Future<void> _onPostCreated(
+    PostCreated event,
+    Emitter<PostState> emit,
+  ) async {
+    final mutation = _repo.createPostMutation()..mutate(event.post);
+    return emit.forEach<MutationState<PostModel>>(
+      mutation.stream,
+      onData: (mutationState) {
+        return state.copyWith(
+          isMutationLoading: mutationState.isFetching,
+        );
+      },
+    );
   }
 
   EventTransformer<E> throttleDroppable<E>(Duration duration) {

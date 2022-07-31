@@ -12,7 +12,10 @@ class PostService {
     );
     final res = await http.get(uri);
     // extra delay for testing purposes
-    return jsonDecode(res.body) as List<dynamic>;
+    return Future.delayed(
+      const Duration(seconds: 1),
+      () => jsonDecode(res.body) as List<dynamic>,
+    );
   }
 
   Future<Map<String, dynamic>> createPost({
