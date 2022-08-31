@@ -1,5 +1,5 @@
-# cached_query
-Simple caching for dart and flutter apps. Insipred by tools like SWR, React Query and RTKQuery. 
+# Cached Query
+Simple caching for dart and flutter apps. Inspired by tools like SWR, React Query and RTKQuery. 
 
 The repo is made of three packages:
 

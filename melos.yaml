@@ -2,10 +2,16 @@ name: cached_query
 
 packages:
   - packages/**
-  - examples/**
 
+ignore:
+  # e.g. ignore example apps
+  - "packages/**/example"
+ide:
+  intellij: false
 
 scripts:
+  get:
+    exec: dart pub get
   analyze:
     exec: dart analyze .
   test:

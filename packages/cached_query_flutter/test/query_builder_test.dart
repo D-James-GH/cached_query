@@ -1,55 +1,9 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class TitleRepo {
-  final String response;
-  final Duration? queryDelay;
-  const TitleRepo({this.queryDelay, required this.response});
-
-  Query<String> fetchTitle({String? initialTitle}) {
-    return Query<String>(
-      key: "title",
-      queryFn: () =>
-          Future.delayed(queryDelay ?? Duration.zero, () => response),
-      initialData: initialTitle,
-      config: const QueryConfig(ignoreCacheDuration: true),
-    );
-  }
-}
-
-class Title extends StatelessWidget {
-  final String response;
-  final String? initialTitle;
-  final void Function()? onBuild;
-  final Duration? queryDelay;
-  const Title({
-    Key? key,
-    required this.response,
-    this.onBuild,
-    this.initialTitle,
-    this.queryDelay,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: QueryBuilder<String>(
-        query: TitleRepo(response: response, queryDelay: queryDelay)
-            .fetchTitle(initialTitle: initialTitle),
-        builder: (context, state) {
-          if (onBuild != null) {
-            onBuild!();
-          }
-          if (state.data == null) {
-            return const SizedBox();
-          }
-          return Text(state.data!, key: const Key("title-text"));
-        },
-      ),
-    );
-  }
-}
+import 'components/title.dart';
+import 'components/title_value.dart';
+import 'repo/query_repo.dart';
 
 void main() {
   group("Query builder", () {
@@ -57,7 +11,7 @@ void main() {
 
     testWidgets("Builds widget based on query state", (tester) async {
       const response = "My Title";
-      await tester.pumpWidget(const Title(response: response));
+      await tester.pumpWidget(const TitleValue(response: response));
       await tester.pumpAndSettle();
       final titleFinder = find.text(response);
       expect(titleFinder, findsOneWidget);
@@ -66,7 +20,7 @@ void main() {
     testWidgets("Builds twice, once loading second state", (tester) async {
       int buildCount = 0;
       await tester.pumpWidget(
-        Title(
+        TitleValue(
           response: "title",
           onBuild: () => buildCount++,
         ),
@@ -79,7 +33,7 @@ void main() {
       int buildCount = 0;
       const response = "My Title";
       await tester.pumpWidget(
-        Title(
+        TitleValue(
           response: response,
           queryDelay: const Duration(seconds: 2),
           onBuild: () => buildCount++,
@@ -92,6 +46,18 @@ void main() {
       final titleFinder = find.text(response);
       expect(titleFinder, findsOneWidget);
       expect(buildCount, 2);
+    });
+    testWidgets("Query is build from a key", (tester) async {
+      const title = "title here";
+      const TitleRepo(response: title).fetchTitle();
+      await tester.pumpWidget(
+        const Title(
+          queryKey: TitleRepo.key,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final titleFinder = find.text(title);
+      expect(titleFinder, findsOneWidget);
     });
   });
 }

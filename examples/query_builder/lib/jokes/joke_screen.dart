@@ -1,8 +1,9 @@
 import 'dart:io';
+
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:query_builder/jokes/joke_service.dart';
 import 'package:query_builder/jokes/joke_model/joke_model.dart';
+import 'package:query_builder/jokes/joke_service.dart';
 import 'package:query_builder/posts/post_list_screen.dart';
 
 class JokeScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class JokeScreen extends StatelessWidget {
         title: Row(
           children: [
             const Text('jokes'),
-            QueryBuilder<JokeModel?>(
+            QueryBuilder<JokeModel?>.value(
               query: service.getJoke(),
               builder: (_, state) {
                 if (state.status == QueryStatus.loading) {
@@ -42,7 +43,7 @@ class JokeScreen extends StatelessWidget {
           )
         ],
       ),
-      body: QueryBuilder<JokeModel?>(
+      body: QueryBuilder<JokeModel?>.value(
         query: service.getJoke(),
         builder: (_, state) {
           return Column(

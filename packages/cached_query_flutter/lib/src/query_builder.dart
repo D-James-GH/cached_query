@@ -1,10 +1,19 @@
 import 'dart:async';
 
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 
+/// Called on each widget build.
+///
+/// Passes [BuildContext], [QueryState].
+typedef QueryBuilderFunc<T> = Widget Function(
+  BuildContext context,
+  QueryState<T> state,
+);
+
 /// {@template queryBuilder}
-/// Listen to changes in an [Mutation] and build the ui with the result.
+/// Listen to changes in an [Query] and build the ui with the result.
 /// {@endtemplate}
 class QueryBuilder<T> extends StatefulWidget {
   /// The [Query] to used to update the ui.
@@ -13,10 +22,30 @@ class QueryBuilder<T> extends StatefulWidget {
   /// Called on each widget build.
   ///
   /// Passes [BuildContext], [QueryState].
-  final Widget Function(BuildContext context, QueryState<T> state) builder;
+  final QueryBuilderFunc<T> builder;
 
   /// {@macro queryBuilder}
-  const QueryBuilder({
+  factory QueryBuilder({
+    Key? key,
+    required Object queryKey,
+    required QueryBuilderFunc<T> builder,
+  }) {
+    final query = CachedQuery.instance.getQuery(queryKey);
+    assert(query != null, "No Query found.");
+    assert(
+      query is Query<T>,
+      "Query is not type $T, is the key an infinite query?",
+    );
+    return QueryBuilder.value(
+      builder: builder,
+      query: query as Query<T>,
+    );
+  }
+
+  /// {@macro queryBuilder}
+  ///
+  /// The value constructor takes Query object
+  const QueryBuilder.value({
     Key? key,
     required this.query,
     required this.builder,
