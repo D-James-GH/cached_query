@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
@@ -35,6 +36,22 @@ void main() async {
         initialData: ["initialData"],
       );
       expect(query.state.data!.first, "initialData");
+    });
+    test("Initial data should not effect query args", () async {
+      int? pageNum;
+      final query = InfiniteQuery<String, int>(
+        key: "initial args",
+        initialData: ["initialData"],
+        queryFn: (page) {
+          pageNum = page;
+          return Future.value("$page");
+        },
+        getNextArg: (state) {
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      expect(pageNum, 1);
     });
     test("Initial data is first in stream", () async {
       final initialQuery = await InfiniteQuery<String, int>(
@@ -156,6 +173,9 @@ void main() async {
       await query.refetch();
       expect(fetchCount, 2);
     });
+  });
+  group("Infinite refetching", () {
+    tearDown(cachedQuery.deleteCache);
     test("Should refetch list after refetchDuration", () async {
       int fetchCount = 0;
       final query = InfiniteQuery<String, int>(
@@ -172,6 +192,117 @@ void main() async {
       await query.result;
       await query.result;
       expect(fetchCount, 2);
+    });
+    test("Page should be the same on refetch", () async {
+      int fetchCount = 0;
+      int? page1;
+      int? page2;
+      final query = InfiniteQuery<String, int>(
+        key: "refetch list",
+        config: const QueryConfig(
+          refetchDuration: Duration.zero,
+        ),
+        getNextArg: (state) => state.length + 1,
+        queryFn: (page) {
+          if (fetchCount == 0) {
+            page1 = page;
+          }
+          if (fetchCount == 1) {
+            page2 = page;
+          }
+
+          fetchCount++;
+
+          return Future.value("$page");
+        },
+      );
+      await query.result;
+      await query.result;
+      expect(page1, page2);
+    });
+    test('Should check first page equality when re-fetching', () async {
+      int page1Count = 0;
+      int page2Count = 0;
+      final query = InfiniteQuery<String, int>(
+        key: "refetch list",
+        config: const QueryConfig(
+          refetchDuration: Duration.zero,
+        ),
+        getNextArg: (state) => state.length + 1,
+        queryFn: (page) {
+          if (page == 1) {
+            page1Count++;
+          }
+          if (page == 2) {
+            page2Count++;
+          }
+          return Future.value("$page");
+        },
+      );
+      await query.result;
+      await query.getNextPage();
+      await query.result;
+      // page1 should be re-fetched but page2 shouldn't as the data from page1 will
+      // not have changed
+      expect(page1Count, 2);
+      expect(page2Count, 1);
+    });
+
+    test("If the first page changes re-fetch all pages", () async {
+      int page1Count = 0;
+      int page2Count = 0;
+      final query = InfiniteQuery<String, int>(
+        key: "refetch list",
+        config: const QueryConfig(
+          refetchDuration: Duration.zero,
+        ),
+        getNextArg: (state) => state.length + 1,
+        queryFn: (page) {
+          if (page == 1) {
+            page1Count++;
+          }
+          if (page == 2) {
+            page2Count++;
+          }
+          final randomNum = Random().nextInt(1000);
+          return Future.value("$page$randomNum");
+        },
+      );
+      await query.result;
+      await query.getNextPage();
+      await query.result;
+      // page1 should be re-fetched but page2 shouldn't as the data from page1 will
+      // not have changed
+      expect(page1Count, 2);
+      expect(page2Count, 2);
+    });
+    test("Can force re-fetch all pages", () async {
+      int page1Count = 0;
+      int page2Count = 0;
+      final query = InfiniteQuery<String, int>(
+        key: "refetch list",
+        config: const QueryConfig(
+          refetchDuration: Duration.zero,
+        ),
+        forceRevalidateAll: true,
+        getNextArg: (state) => state.length + 1,
+        queryFn: (page) {
+          if (page == 1) {
+            page1Count++;
+          }
+          if (page == 2) {
+            page2Count++;
+          }
+          return Future.value("$page");
+        },
+      );
+      await query.result;
+      await query.getNextPage();
+      await query.refetch();
+      // page1 should be re-fetched but page2 shouldn't as the data from page1 will
+      // not have changed
+      expect(page1Count, 2);
+      expect(page2Count, 2);
     });
   });
   group("Infinite query args", () {
