@@ -32,7 +32,7 @@ class _PostListScreenState extends State<PostListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: InfiniteQueryBuilder(
-          query: query,
+          queryKey: 'posts',
           builder: (context, state, _) {
             return Row(
               children: [
