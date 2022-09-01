@@ -33,7 +33,7 @@ class ListValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: InfiniteQueryBuilder<String, int>.value(
+      home: InfiniteQueryBuilder<String, int>(
         query: InfiniteQueryRepo(response: response).fetchList(),
         builder: (context, state, query) {
           if (onBuild != null) {

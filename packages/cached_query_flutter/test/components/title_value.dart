@@ -19,16 +19,14 @@ class TitleValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: QueryBuilder<String>.value(
+      home: QueryBuilder<String>(
         query: TitleRepo(response: response, queryDelay: queryDelay)
             .fetchTitle(initialTitle: initialTitle),
         builder: (context, state) {
           if (onBuild != null) {
             onBuild!();
           }
-          if (state.data == null) {
-            return const SizedBox();
-          }
+          if (state.data == null) return const SizedBox();
           return Text(state.data!, key: const Key("title-text"));
         },
       ),

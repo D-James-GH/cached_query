@@ -59,5 +59,7 @@ void main() {
       final titleFinder = find.text(title);
       expect(titleFinder, findsOneWidget);
     });
+    testWidgets("Can update query key to update query", (tester) async {});
+    testWidgets("Can update query to update query", (tester) async {});
   });
 }
