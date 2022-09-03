@@ -1,3 +1,7 @@
+## 0.1.1
+
+ - **FEAT**: add a fallback to onError.
+
 ## 0.1.0+2
 
  - **DOCS**: Readmes updated to show documentation link.
