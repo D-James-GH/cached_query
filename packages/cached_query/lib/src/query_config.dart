@@ -1,7 +1,9 @@
 import '../cached_query.dart';
 
 /// {@template queryConfig}
+///
 /// Global config for all queries and infinite queries.
+///
 /// {@endtemplate}
 class QueryConfig {
   /// Specify how long before the query is re-fetched in the background.

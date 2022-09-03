@@ -10,6 +10,7 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A);
 typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 
 /// {@template infiniteQuery}
+///
 /// [InfiniteQuery] caches a series of [Query]'s for use in an infinite list.
 ///
 /// The [queryFn] must be asynchronous and the result is cached.
@@ -27,7 +28,7 @@ typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 /// Use [forceRevalidateAll] to force the infinite query to refetch all pages
 /// when it becomes stale, rather than comparing the first page.
 ///
-/// {@endtemplate infiniteQuery}
+/// {@endtemplate}
 class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   final GetNextArg<T, A> _getNextArg;
   final InfiniteQueryFunc<T, A> _queryFn;
