@@ -1,3 +1,9 @@
+## 0.3.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: reset infinite query data if first pages aren't equal, option to turn off.
+
 ## 0.2.0+1
 
  - Update a dependency to the latest release.

@@ -1,3 +1,10 @@
+## 0.2.0
+
+> Note: This release has breaking changes.
+
+ - **DOCS**: update spacing.
+ - **BREAKING** **FEAT**: reset infinite query data if first pages aren't equal, option to turn off.
+
 ## 0.1.1
 
  - **FEAT**: add a fallback to onError.
