@@ -57,13 +57,25 @@ class PostService {
         );
         return PostModel.fromJson(res);
       },
-      onSuccess: (args, newPost) {
+      onStartMutation: (newPost) {
+        final fallback = (CachedQuery.instance.getQuery("posts")
+                as InfiniteQuery<List<PostModel>, int>)
+            .state
+            .data;
         CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
           key: "posts",
           updateFn: (old) => [
             [newPost, ...old![0]],
             ...old.sublist(1).toList()
           ],
+        );
+        return fallback;
+      },
+      onSuccess: (args, newPost) {},
+      onError: (arg, error, fallback) {
+        CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
+          key: "posts",
+          updateFn: (old) => fallback as List<List<PostModel>>,
         );
       },
     );
