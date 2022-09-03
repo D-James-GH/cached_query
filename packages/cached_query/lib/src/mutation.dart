@@ -9,10 +9,14 @@ import 'mutation_cache.dart';
 typedef OnSuccessCallback<T, A> = FutureOr<void> Function(T res, A arg);
 
 /// Called when the [queryFn] as completed with an error.
-typedef OnErrorCallback<A> = FutureOr<void> Function(A arg, Object error);
+typedef OnErrorCallback<A> = FutureOr<void> Function(
+  A arg,
+  Object error,
+  Object? fallback,
+);
 
 /// Called when [Mutation] has started.
-typedef OnStartMutateCallback<A> = FutureOr<void> Function(A arg);
+typedef OnStartMutateCallback<A> = FutureOr<dynamic> Function(A arg);
 
 /// The asynchronous query function.
 typedef MutationQueryCallback<T, A> = Future<T> Function(A arg);
@@ -141,8 +145,9 @@ class Mutation<T, A> {
   Future<T?> _fetch(A arg) async {
     _setState(_state.copyWith(status: QueryStatus.loading, isFetching: true));
     _emit();
+    dynamic startMutationResponse;
     if (_onStartMutation != null) {
-      await _onStartMutation!(arg);
+      startMutationResponse = await _onStartMutation!(arg);
     }
     // call query fn
     try {
@@ -162,7 +167,7 @@ class Mutation<T, A> {
       return res;
     } catch (e) {
       if (_onError != null) {
-        await _onError!(arg, e);
+        await _onError!(arg, e, startMutationResponse);
       }
       _setState(_state.copyWith(status: QueryStatus.error));
 
