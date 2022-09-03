@@ -21,6 +21,9 @@ typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 /// Each [InfiniteQuery] can override the global defaults for [refetchDuration]
 /// and [cacheDuration], see [CachedQuery.config] for more info.
 ///
+/// Use [revalidateAll] to sequentially refetch all cached pages if the first two
+/// pages are not equal.
+///
 /// Use [forceRevalidateAll] to force the infinite query to refetch all pages
 /// when it becomes stale, rather than comparing the first page.
 ///
@@ -28,7 +31,13 @@ typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   final GetNextArg<T, A> _getNextArg;
   final InfiniteQueryFunc<T, A> _queryFn;
-  final bool _forceRevalidateAll;
+
+  /// Whether the Query should always refetch all pages, not just check the first
+  /// for changes.
+  final bool forceRevalidateAll;
+
+  /// If the fist page has changed then revalidate all pages. Defaults to false.
+  final bool revalidateAll;
 
   @override
   Future<InfiniteQueryState<T>> get result => _getResult();
@@ -42,10 +51,10 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     required GetNextArg<T, A> getNextArg,
     required QueryConfig? config,
     required List<T>? initialData,
-    required bool forceRevalidateAll,
+    required this.forceRevalidateAll,
+    required this.revalidateAll,
   })  : _getNextArg = getNextArg,
         _queryFn = queryFn,
-        _forceRevalidateAll = forceRevalidateAll,
         super._internal(
           key: key,
           config: config,
@@ -64,6 +73,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     QueryConfig? config,
     List<T>? initialData,
     bool forceRevalidateAll = false,
+    bool revalidateAll = false,
   }) {
     final globalCache = CachedQuery.instance;
     final queryKey = encodeKey(key);
@@ -73,6 +83,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         queryFn: queryFn,
         getNextArg: getNextArg,
         forceRevalidateAll: forceRevalidateAll,
+        revalidateAll: revalidateAll,
         key: queryKey,
         initialData: initialData,
         config: config,
@@ -177,7 +188,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       final firstPage = await _queryFn(initialArg);
 
       // Check first page for changes.
-      if (!_forceRevalidateAll &&
+      if (!forceRevalidateAll &&
           _state.data.isNotNullOrEmpty &&
           pageEquality(firstPage, _state.data![0])) {
         // As the first pages are equal assume data hasn't changed
@@ -186,19 +197,26 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         return;
       }
 
-      var newState = _state.copyWith(data: [firstPage]);
+      var newState = _state.copyWith(
+        data: [firstPage],
+        lastPage: firstPage,
+      );
 
-      for (int i = 1; i < previousState.length; i++) {
-        final arg = _getNextArg(newState);
-        if (arg == null) {
-          newState = newState.copyWith(hasReachedMax: true);
-          break;
+      // Note: Removed re-fetching all pages if the first page has changed unless force revalidate is on.
+      // this was taking too long and didn't seam worth it.
+      if (forceRevalidateAll || revalidateAll) {
+        for (int i = 1; i < previousState.length; i++) {
+          final arg = _getNextArg(newState);
+          if (arg == null) {
+            newState = newState.copyWith(hasReachedMax: true);
+            break;
+          }
+          final res = await _queryFn(arg);
+          newState = newState.copyWith(
+            data: res != null ? [...?newState.data, res] : newState.data,
+            lastPage: res,
+          );
         }
-        final res = await _queryFn(arg);
-        newState = newState.copyWith(
-          data: res != null ? [...?newState.data, res] : newState.data,
-          lastPage: res,
-        );
       }
       _setState(
         newState.copyWith(

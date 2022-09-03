@@ -248,11 +248,61 @@ void main() async {
       expect(page2Count, 1);
     });
 
-    test("If the first page changes re-fetch all pages", () async {
+    test("If the first page changes re-fetch first pages", () async {
       int page1Count = 0;
       int page2Count = 0;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
+        config: const QueryConfig(
+          refetchDuration: Duration.zero,
+        ),
+        getNextArg: (state) => state.length + 1,
+        queryFn: (page) {
+          if (page == 1) {
+            page1Count++;
+          }
+          if (page == 2) {
+            page2Count++;
+          }
+          final randomNum = Random().nextInt(1000);
+          return Future.value("$page$randomNum");
+        },
+      );
+      await query.result;
+      await query.getNextPage();
+      await query.result;
+      // page1 should be re-fetched but page2 shouldn't as the data from page1 will
+      // not have changed
+      expect(page1Count, 2);
+      expect(page2Count, 1);
+    });
+    test("revalidating resets the timestamp", () async {
+      final query = InfiniteQuery<String, int>(
+        key: "refetch list",
+        revalidateAll: true,
+        config: const QueryConfig(
+          refetchDuration: Duration.zero,
+        ),
+        getNextArg: (state) => state.length + 1,
+        queryFn: (page) {
+          final randomNum = Random().nextInt(1000);
+          return Future.value("$page$randomNum");
+        },
+      );
+      final res1 = await query.result;
+      final time1 = res1.timeCreated;
+      final res2 = await query.refetch();
+      final time2 = res2.timeCreated;
+      expect(time2, isNot(time1));
+    });
+
+    test("If the first page changes re-fetch all pages with revalidateAll",
+        () async {
+      int page1Count = 0;
+      int page2Count = 0;
+      final query = InfiniteQuery<String, int>(
+        key: "refetch list",
+        revalidateAll: true,
         config: const QueryConfig(
           refetchDuration: Duration.zero,
         ),

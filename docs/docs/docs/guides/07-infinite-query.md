@@ -73,14 +73,15 @@ the need for a throttle in an infinite list.
 
 ## Invalidation and Re-fetching
 
-Re-fetching an infinite query re-fetches each page individually starting with the first page. This is to make sure every
-page is upto date and there are no duplicate entries.
-
 When an infinite query becomes stale it needs to be refreshed, just like a query. By default, to prevent unnecessary api 
 calls, the infinite query will fetch the first page only and check to see if it is different to the cached first page.
-If the pages are different, then all pages will be re-fetched sequentially, if they are equal then the infinite query 
-will not re-fetch anything else. You can turn this feature off and force pages always to refetch sequentially using
-`forceRevalidateAll = true`.
+If they are equal then the infinite query will not re-fetch anything else.
+
+If the first two pages are different from each other there are two options: 
+1. If `revalidateAll` (Default) is false then the cached data will be reset to the first page only. 
+2. If `revalidateAll` is true then each cached page will be re-fetched sequentially.
+
+You can always re-fetch every page regardless of the first page equality by setting `forceRevalidateAll = true`.
 
 
 The first page will be compared to prevent re-fetching if list hasn't changed:
