@@ -65,7 +65,7 @@ const config = {
           },
           {
             type: "doc",
-            docId: "examples/query-builder",
+            docId: "examples/overview",
             position: "left",
             label: "Examples",
           },

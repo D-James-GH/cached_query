@@ -43,7 +43,10 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
     super.initState();
     if (widget.queryKey != null) {
       final q = CachedQuery.instance.getQuery(widget.queryKey!);
-      assert(q != null, "No query found with the key ${widget.queryKey}");
+      assert(
+        q != null,
+        "No query found with the key ${widget.queryKey}, have you created it yet?",
+      );
       assert(q is Query<T>, "Query found is not of type $T");
       _query = q! as Query<T>;
     }

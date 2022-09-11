@@ -12,7 +12,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cached_query: ^0.2.0
+#  cached_query: ^0.2.0
+  cached_query:
+    path: ../cached_query
   connectivity_plus: ^2.3.5
 
 dev_dependencies:
