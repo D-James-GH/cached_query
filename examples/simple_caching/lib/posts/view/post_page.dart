@@ -25,7 +25,7 @@ class _PostPageState extends State<PostPage> {
               return Text(
                 state.status == QueryStatus.loading ? "loading..." : "",
               );
-            }),
+            },),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

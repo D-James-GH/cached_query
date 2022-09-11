@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_list_with_bloc/post/blocs/post/post_bloc.dart';
+import 'package:infinite_list_with_bloc/post/pages/details_page.dart';
 import 'package:infinite_list_with_bloc/post/pages/posts_with_builder.dart';
 
 import '../widgets/post.dart';
@@ -44,7 +45,7 @@ class PostListPage extends StatelessWidget {
               icon: const Icon(Icons.arrow_right_alt),
               onPressed: () => Navigator.pushReplacementNamed(
                 context,
-                PostListWithBuilderPage.routeName,
+                DetailsPage.routeName,
               ),
             )
           ],

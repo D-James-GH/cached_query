@@ -40,7 +40,7 @@ const config = {
           // Remove this to remove the "edit this page" links.
           // Todo: change url
           editUrl:
-            "https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/",
+            "https://github.com/D-James-GH/cached_query/tree/main/docs",
         },
 
         blog: false,
