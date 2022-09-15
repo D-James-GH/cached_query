@@ -20,12 +20,13 @@ class _PostPageState extends State<PostPage> {
       appBar: AppBar(
         centerTitle: true,
         title: QueryBuilder(
-            query: service.getPostById(currentId),
-            builder: (context, state) {
-              return Text(
-                state.status == QueryStatus.loading ? "loading..." : "",
-              );
-            },),
+          query: service.getPostById(currentId),
+          builder: (context, state) {
+            return Text(
+              state.status == QueryStatus.loading ? "loading..." : "",
+            );
+          },
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
