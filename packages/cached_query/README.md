@@ -239,4 +239,4 @@ Inspired by fantastic packages from the react world. Read more information about
 * [React Query](https://react-query.tanstack.com/)
 * [RTKQuery](https://redux-toolkit.js.org/rtk-query/overview)
 
-Full example found in the repo [here](https://github.com/D-James-GH/cached_query/tree/main/examples/query_builder)
+Full example found in the repo [here](https://github.com/D-James-GH/cached_query/tree/main/examples/full)

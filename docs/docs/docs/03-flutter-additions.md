@@ -33,7 +33,8 @@ CachedQuery.instance.configFlutter(
 Three builders are added for ease of use. They act very similar to a `StreamBuilder`. 
 
 ### QueryBuilder
-QueryBuilder takes a query and will call the builder method whenever the query state changes
+QueryBuilder takes a query and will call the builder method whenever the query state changes.
+
 ```dart
  QueryBuilder<DataModel?>(
   query: Query(
@@ -52,8 +53,26 @@ QueryBuilder takes a query and will call the builder method whenever the query s
 ),
 ```
 
+If you know that a query has already been instantiated then you can pass a key to the Query Builder instead, however this will fail if there is no query in the cache with that key.
+
+```dart
+ QueryBuilder<DataModel?>(
+  queryKey: "a query key",
+  builder: (context, state) {
+    return Column(
+      children: [
+        if(state.status == QuerStatus.loading)
+          const CircularProgressIndicator(),
+        const DisplayData(data: state.data)
+      ],
+    );
+  },
+),
+```
+
 ### InfiniteQueryBuilder
-InfiniteQueryBuilder takes an infinite query and will call the builder method whenever the query state changes
+InfiniteQueryBuilder takes an infinite query and will call the builder method whenever the query state changes.
+
 ```dart
  InfiniteQueryBuilder<DataModel?>(
   query: InfiniteQuery(
@@ -109,6 +128,24 @@ InfiniteQueryBuilder takes an infinite query and will call the builder method wh
         )
       ],
     );
+  },
+)
+```
+
+Similar to the query builder you can also pass a key to the `InfiniteQueryBuilder` if you know there is a query available.
+
+```dart
+ InfiniteQueryBuilder<DataModel?>(
+  query: InfiniteQuery(
+    key: "a query key",
+    queryFn: () async => _api.getData(),
+    getNextArg: (state) {
+      if (state.lastPage?.isEmpty ?? false) return null;
+      return state.length + 1;
+    },
+  ),
+  builder: (context, state) {
+    //...build ui
   },
 )
 ```
