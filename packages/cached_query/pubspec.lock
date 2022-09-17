@@ -247,7 +247,7 @@ packages:
     source: hosted
     version: "0.12.11"
   meta:
-    dependency: "direct main"
+    dependency: "direct dev"
     description:
       name: meta
       url: "https://pub.dartlang.org"
@@ -315,7 +315,7 @@ packages:
       name: rxdart
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.27.4"
+    version: "0.27.5"
   shelf:
     dependency: transitive
     description:
