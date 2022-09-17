@@ -1,3 +1,7 @@
+## 0.3.0+1
+
+ - **DOCS**: add base projects and infinite query with bloc.
+
 ## 0.3.0
 
 > Note: This release has breaking changes.
