@@ -79,6 +79,20 @@ void main() {
       await query1.result;
       expect(fetchCount, 1);
     });
+
+    test("onSuccess should be called if successful", () async {
+      const response = "this is a response";
+      String? res;
+      final query = Query<String>(
+        key: "onSuccess",
+        onSuccess: (dynamic r) => res = r as String,
+        queryFn: () async {
+          return response;
+        },
+      );
+      await query.result;
+      expect(res, response);
+    });
   });
 
   group("Stream query", () {
@@ -323,6 +337,18 @@ void main() {
       } catch (e) {
         expect(e, "this is an error");
       }
+    });
+    test("onError should be called", () async {
+      String? error;
+      final query = Query<String>(
+        key: "error2",
+        onError: (dynamic e) => error = e as String,
+        queryFn: () async {
+          throw "this is an error";
+        },
+      );
+      await query.result;
+      expect(error, "this is an error");
     });
   });
   test("Can set local query config", () {

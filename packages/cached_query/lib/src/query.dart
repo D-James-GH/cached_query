@@ -18,16 +18,33 @@ typedef QueryFunc<T> = Future<T> Function();
 /// Use [forceRefetch] to force the query to be run again regardless of whether
 /// the query is stale or not.
 ///
+/// To run side effects if the query function is successful or not use [onSuccess] and
+/// [onError].
+///
 /// {@endtemplate}
 class Query<T> extends QueryBase<T, QueryState<T>> {
   final Function _queryFn;
 
+  /// On success is called when the query function is executed successfully.
+  ///
+  /// Passes the returned data.
+  final OnQuerySuccessCallback<T>? _onSuccess;
+
+  /// On success is called when the query function is executed successfully.
+  ///
+  /// Passes the error through.
+  final OnQueryErrorCallback<T>? _onError;
+
   Query._internal({
+    OnQueryErrorCallback<T>? onError,
+    OnQuerySuccessCallback<T>? onSuccess,
     required String key,
     required QueryConfig? config,
     required Function queryFn,
     required T? initialData,
   })  : _queryFn = queryFn,
+        _onError = onError,
+        _onSuccess = onSuccess,
         super._internal(
           config: config,
           key: key,
@@ -41,6 +58,8 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   factory Query({
     required Object key,
     required Future<T> Function() queryFn,
+    OnQueryErrorCallback<T>? onError,
+    OnQuerySuccessCallback<T>? onSuccess,
     T? initialData,
     QueryConfig? config,
   }) {
@@ -52,6 +71,8 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       query = Query<T>._internal(
         key: encodeKey(key),
         queryFn: queryFn,
+        onError: onError,
+        onSuccess: onSuccess,
         initialData: initialData,
         config: config,
       );
@@ -110,6 +131,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       }
 
       final res = await (_queryFn() as Future<T>);
+      if (_onSuccess != null) {
+        _onSuccess!(res);
+      }
       _setState(
         _state.copyWith(
           data: res,
@@ -122,6 +146,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         _saveToStorage<T>();
       }
     } catch (e) {
+      if (_onError != null) {
+        _onError!(e);
+      }
       _setState(
         _state.copyWith(
           status: QueryStatus.error,

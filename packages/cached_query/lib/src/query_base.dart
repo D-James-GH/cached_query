@@ -1,5 +1,15 @@
 part of "cached_query.dart";
 
+/// On success is called when the query function is executed successfully.
+///
+/// Passes the returned data.
+typedef OnQuerySuccessCallback<T> = void Function(T);
+
+/// On success is called when the query function is executed successfully.
+///
+/// Passes the error through.
+typedef OnQueryErrorCallback<T> = void Function(dynamic);
+
 /// {@template stateBase}
 /// An Interface for both [QueryState] and [InfiniteQueryState].
 /// {@endtemplate}
@@ -36,6 +46,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// Whether the current query is marked as stale and therefore requires a
   /// refetch.
   bool get stale => _stale;
+
 
   /// The config for this specific query.
   final DefaultQueryConfig config;
