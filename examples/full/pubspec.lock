@@ -93,26 +93,26 @@ packages:
     source: hosted
     version: "8.1.3"
   cached_query:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../packages/cached_query"
-      relative: true
-    source: path
-    version: "0.1.0+2"
+      name: cached_query
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.0"
   cached_query_flutter:
     dependency: "direct main"
     description:
-      path: "../../packages/cached_query_flutter"
-      relative: true
-    source: path
-    version: "0.1.0+2"
+      name: cached_query_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.0"
   cached_storage:
     dependency: "direct main"
     description:
-      path: "../../packages/cached_storage"
-      relative: true
-    source: path
-    version: "0.1.0+2"
+      name: cached_storage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0+4"
   characters:
     dependency: transitive
     description:
