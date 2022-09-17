@@ -125,6 +125,28 @@ void main() {
       await mutation.mutate();
       expect(responses.first, onStart);
     });
+    test("Return object of onSuccess should be passed to onError", () async {
+      var responses = <String>[];
+      const res = "response";
+      const onStart = "onstart";
+
+      Future<String> query(void _) async {
+        responses.add(res);
+        throw "something went wrong";
+      }
+
+      final mutation = Mutation<String, void>(
+        queryFn: query,
+        onStartMutation: (_) {
+          final initialData = [...responses];
+          responses.add(onStart);
+          return initialData;
+        },
+        onError: (arg, error, fallback) => responses = fallback as List<String>,
+      );
+      await mutation.mutate();
+      expect(responses, <String>[]);
+    });
 
     test("onSuccess should be called after the queryFn", () async {
       final responses = <String>[];
@@ -149,7 +171,7 @@ void main() {
       int errorCount = 0;
       final mutation = Mutation<String, void>(
         queryFn: (_) async => throw "Should throw",
-        onError: (_, __) {
+        onError: (_, __, ___) {
           errorCount++;
         },
       );

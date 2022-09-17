@@ -1,4 +1,6 @@
-# Cached Query
+<h1 align="center"><a  href="https://cachedquery.dev">Cached Query</a></h1>
+
+<p align="center">Visit the <a href="https://cachedquery.dev/">documentation</a> for more information.</p>
  
 A small collection of dart and flutter libraries inspired by tools such as SWR, RTKQuery, React Query, Urql and apollo
 from the React world.
@@ -237,4 +239,4 @@ Inspired by fantastic packages from the react world. Read more information about
 * [React Query](https://react-query.tanstack.com/)
 * [RTKQuery](https://redux-toolkit.js.org/rtk-query/overview)
 
-Full example found in the repo [here](https://github.com/D-James-GH/cached_query/tree/main/examples/query_builder)
+Full example found in the repo [here](https://github.com/D-James-GH/cached_query/tree/main/examples/full)

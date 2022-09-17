@@ -1,3 +1,37 @@
+## 0.2.0
+
+> Note: This release has breaking changes.
+
+ - **DOCS**: update spacing.
+ - **BREAKING** **FEAT**: reset infinite query data if first pages aren't equal, option to turn off.
+
+## 0.1.1
+
+ - **FEAT**: add a fallback to onError.
+
+## 0.1.0+2
+
+ - **DOCS**: Readmes updated to show documentation link.
+
+## 0.1.0+1
+
+ - **FIX**: Infinite query doesn't fetch all pages from storage.
+
+## 0.1.0
+
+ - Bump "cached_query" to `0.1.0`.
+
+## 0.1.0
+
+ - **FIX**: Infinite query not re-fetching in order.
+ - **FIX**: try to get result each time a stream is requested.
+ - **FIX**: seeded the stream with the current state.
+ - **DOCS**: docusaurus and query page.
+ - **DOCS**: initial commit.
+ - **DOCS**: update contents.
+ - **DOCS**: add links to readme.
+ - **DOCS**: error handling.
+
 ## 0.0.3
 docs: better readme layout
 

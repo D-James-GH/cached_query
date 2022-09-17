@@ -4,28 +4,43 @@ import 'package:flutter/material.dart';
 
 import '../cached_query_flutter.dart';
 
+/// {@template infiniteQueryBuilderFunc}
+/// The builder function is called on each widget build.
+///
+/// Passes [BuildContext], [InfiniteQueryState] and [InfiniteQuery].
+/// {@endtemplate}
+typedef InfiniteQueryBuilderFunc<T, A> = Widget Function(
+  BuildContext context,
+  InfiniteQueryState<T> state,
+  InfiniteQuery<T, A> query,
+);
+
 /// {@template infiniteQueryBuilder}
 /// Listen to changed in an [InfiniteQuery] and build the ui with the result.
-/// {@endtemplate infiniteQueryBuilder}
+/// {@endtemplate}
 class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   /// The [InfiniteQuery] to watch.
-  final InfiniteQuery<T, A> query;
+  final InfiniteQuery<T, A>? query;
 
-  /// The builder function is called on each widget build.
-  ///
-  /// Passes [BuildContext], [InfiniteQueryState] and [InfiniteQuery].
-  final Widget Function(
-    BuildContext context,
-    InfiniteQueryState<T> state,
-    InfiniteQuery<T, A> query,
-  ) builder;
+  /// Get a query by the queryKey.
+  final Object? queryKey;
+
+  /// {@macro infiniteQueryBuilderFunc}
+  final InfiniteQueryBuilderFunc<T, A> builder;
 
   /// {@macro infiniteQueryBuilder}
+  ///
+  /// The value constructor takes an infinite query rather than a key.
   const InfiniteQueryBuilder({
     Key? key,
-    required this.query,
+    this.query,
+    this.queryKey,
     required this.builder,
-  }) : super(key: key);
+  })  : assert(
+          query != null || queryKey != null,
+          "Query key or a infinite query must be provided.",
+        ),
+        super(key: key);
 
   @override
   State<InfiniteQueryBuilder<T, A>> createState() =>
@@ -34,29 +49,70 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
 
 class _InfiniteQueryBuilderState<T, A>
     extends State<InfiniteQueryBuilder<T, A>> {
+  late InfiniteQuery<T, A> _query;
   late InfiniteQueryState<T> _state;
-  late StreamSubscription<InfiniteQueryState<T>> _subscription;
+
+  StreamSubscription<InfiniteQueryState<T>>? _subscription;
 
   @override
   void initState() {
     super.initState();
-    _state = widget.query.state;
+    if (widget.queryKey != null) {
+      final q = CachedQuery.instance.getQuery(widget.queryKey!);
+      assert(q != null, "No query found with the key ${widget.queryKey}");
+      assert(q is InfiniteQuery<T, A>, "Query found is not of type $T");
+      _query = q! as InfiniteQuery<T, A>;
+    }
+    if (widget.query != null) {
+      _query = widget.query!;
+    }
+    _subscribe();
+    _state = _query.state;
+  }
 
-    _subscription = widget.query.stream.listen((event) {
-      setState(() {
-        _state = event;
-      });
-    });
+  @override
+  void didUpdateWidget(covariant InfiniteQueryBuilder<T, A> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final oldQuery =
+        oldWidget.query ?? CachedQuery.instance.getQuery(oldWidget.queryKey!);
+    final currentQuery =
+        widget.query ?? CachedQuery.instance.getQuery(widget.queryKey!);
+    assert(
+      currentQuery is InfiniteQuery<T, A>,
+      "Query found is not of type InfiniteQuery<$T, $A>",
+    );
+    if (oldQuery != currentQuery) {
+      if (_subscription != null) {
+        _unsubscribe();
+        _query = currentQuery as InfiniteQuery<T, A>;
+        _state = _query.state;
+      }
+      _subscribe();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context, _state, widget.query);
+    return widget.builder(context, _state, _query);
   }
 
   @override
   void dispose() {
-    _subscription.cancel();
+    _unsubscribe();
     super.dispose();
+  }
+
+  void _subscribe() {
+    _state = _query.state;
+    _subscription = _query.stream.listen((state) {
+      setState(() {
+        _state = state;
+      });
+    });
+  }
+
+  void _unsubscribe() {
+    _subscription?.cancel();
+    _subscription = null;
   }
 }

@@ -24,8 +24,8 @@ void main() async {
   final sameQuery = getFilmTitle();
 
   // Can force a refetch and await the result
+  // ignore: unused_local_variable
   final refetchResult = await sameQuery.refetch();
-  print(refetchResult);
 }
 
 Query<String> getFilmTitle() {

@@ -57,8 +57,8 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     _resetDeleteTimer();
     // if there are no other listeners and result has been called schedule
     // a delete.
-    if (_streamController?.hasListener != true &&
-        _deleteQueryTimer?.isActive != true) {
+    if (!(_streamController?.hasListener ?? false) &&
+        !(_deleteQueryTimer?.isActive ?? false)) {
       _scheduleDelete();
     }
     return _getResult();

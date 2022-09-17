@@ -1,4 +1,7 @@
-# Cached Storage
+<h1 align="center"><a  href="https://cachedquery.dev">Cached Storage</a></h1>
+
+<p align="center">Visit the <a href="https://cachedquery.dev/">documentation</a> for more information.</p>
+
 A Storage addon to the [CachedQuery](https://pub.dev/packages/cached_query) package.
 
 Built on top of [Sqflite](https://pub.dev/packages/sqflite).
