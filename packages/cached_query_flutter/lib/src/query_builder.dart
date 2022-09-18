@@ -14,6 +14,11 @@ class QueryBuilder<T> extends StatefulWidget {
   ///
   /// Passes [BuildContext], [QueryState].
   final Widget Function(BuildContext context, QueryState<T> state) builder;
+
+  /// The key of the query to build.
+  ///
+  /// If a key is past the builder will look for the corresponding query in the
+  /// cache. If no query is found it will through an error.
   final Object? queryKey;
 
   /// {@macro queryBuilder}
