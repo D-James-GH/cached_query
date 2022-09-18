@@ -1,6 +1,6 @@
 name: cached_query_flutter
 description: Assortment of builders and addons for use with Cached Query in flutter.
-version: 0.3.0
+version: 0.3.0+2
 repository: https://github.com/D-James-GH/cached_query/tree/main/packages/cached_query_flutter
 documentation: https://cachedquery.dev/
 homepage: https://cachedquery.dev/
@@ -12,10 +12,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-#  cached_query: ^0.2.0
-  cached_query:
-    path: ../cached_query
-  connectivity_plus: ^2.3.5
+  cached_query: ^0.2.1
+  connectivity_plus: ^2.3.7
 
 dev_dependencies:
   flutter_lints: ^2.0.1

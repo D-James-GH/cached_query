@@ -1,3 +1,8 @@
+## 0.2.1
+
+ - **FEAT**: add query and infinite query onSuccess and onError callbacks.
+ - **DOCS**: update builder docs to include querykey.
+
 ## 0.2.0
 
 > Note: This release has breaking changes.

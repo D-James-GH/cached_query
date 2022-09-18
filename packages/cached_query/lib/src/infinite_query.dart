@@ -1,5 +1,15 @@
 part of 'cached_query.dart';
 
+/// On success is called when the query function is executed successfully.
+///
+/// Passes the returned data.
+typedef OnInfiniteQuerySuccessCallback<T> = void Function(T);
+
+/// On success is called when the query function is executed successfully.
+///
+/// Passes the error through.
+typedef OnInfiniteQueryErrorCallback<T> = void Function(dynamic);
+
 /// The result of the [InfiniteQueryFunc] will be cached.
 typedef InfiniteQueryFunc<T, A> = Future<T> Function(A);
 
@@ -28,8 +38,21 @@ typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 /// Use [forceRevalidateAll] to force the infinite query to refetch all pages
 /// when it becomes stale, rather than comparing the first page.
 ///
+/// To run side effects if the query function is successful or not use [onSuccess] and
+/// [onError].
+///
 /// {@endtemplate}
 class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
+  /// On success is called when the query function is executed successfully.
+  ///
+  /// Passes the returned data.
+  final OnQuerySuccessCallback<T>? _onSuccess;
+
+  /// On success is called when the query function is executed successfully.
+  ///
+  /// Passes the error through.
+  final OnQueryErrorCallback<T>? _onError;
+
   final GetNextArg<T, A> _getNextArg;
   final InfiniteQueryFunc<T, A> _queryFn;
 
@@ -54,8 +77,12 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     required List<T>? initialData,
     required this.forceRevalidateAll,
     required this.revalidateAll,
+    OnQueryErrorCallback<T>? onError,
+    OnQuerySuccessCallback<T>? onSuccess,
   })  : _getNextArg = getNextArg,
         _queryFn = queryFn,
+        _onSuccess = onSuccess,
+        _onError = onError,
         super._internal(
           key: key,
           config: config,
@@ -75,6 +102,8 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     List<T>? initialData,
     bool forceRevalidateAll = false,
     bool revalidateAll = false,
+    OnQueryErrorCallback<T>? onError,
+    OnQuerySuccessCallback<T>? onSuccess,
   }) {
     final globalCache = CachedQuery.instance;
     final queryKey = encodeKey(key);
@@ -85,6 +114,8 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         getNextArg: getNextArg,
         forceRevalidateAll: forceRevalidateAll,
         revalidateAll: revalidateAll,
+        onError: onError,
+        onSuccess: onSuccess,
         key: queryKey,
         initialData: initialData,
         config: config,
@@ -193,6 +224,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
           _state.data.isNotNullOrEmpty &&
           pageEquality(firstPage, _state.data![0])) {
         // As the first pages are equal assume data hasn't changed
+        if (_onSuccess != null) {
+          _onSuccess!(firstPage);
+        }
         _setState(_state.copyWith(status: QueryStatus.success));
         _emit();
         return;
@@ -219,6 +253,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
           );
         }
       }
+
       _setState(
         newState.copyWith(
           status: QueryStatus.success,
@@ -230,6 +265,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _saveToStorage<List<T>>();
       }
     } catch (e) {
+      if (_onError != null) {
+        _onError!(e);
+      }
       // if failed return the previous state
       _setState(
         previousState.copyWith(
@@ -268,6 +306,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       }
 
       final res = await _queryFn(arg);
+      if (_onSuccess != null) {
+        _onSuccess!(res);
+      }
       _setState(
         _state.copyWith(
           data: [...?newSate.data, res],
@@ -281,6 +322,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _saveToStorage<List<T>>();
       }
     } catch (e) {
+      if (_onError != null) {
+        _onError!(e);
+      }
       _setState(
         _state.copyWith(
           status: QueryStatus.error,
