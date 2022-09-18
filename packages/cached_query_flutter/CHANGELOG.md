@@ -1,3 +1,7 @@
+## 0.4.0+1
+
+ - **FIX**: export query observer.
+
 ## 0.4.0
 
 > Note: This release has breaking changes.
