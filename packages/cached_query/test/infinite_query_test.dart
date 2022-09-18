@@ -520,4 +520,81 @@ void main() async {
       );
     });
   });
+  group("Side Effects", () {
+    tearDown(CachedQuery.instance.reset);
+    test("onSuccess is called when initial succeeds", () async {
+      String? response;
+      final query = InfiniteQuery<String, int>(
+        key: "succeeds",
+        queryFn: (page) {
+          return Future.value(page.toString());
+        },
+        onSuccess: (dynamic r) => response = r.toString(),
+        getNextArg: (state) {
+          return state.length + 1;
+        },
+      );
+      final res = await query.result;
+      expect(response, res.data?.first);
+    });
+
+    test("onSuccess is called when getNext page succeeds", () async {
+      String? response;
+      final query = InfiniteQuery<String, int>(
+        key: "succeeds",
+        queryFn: (page) {
+          return Future.value(page.toString());
+        },
+        onSuccess: (dynamic r) => response = r.toString(),
+        getNextArg: (state) {
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      final res = await query.getNextPage();
+      expect(response, res?.data?.last);
+    });
+
+    test("onError is called when initial fails", () async {
+      String? response;
+      dynamic error;
+      final query = InfiniteQuery<String, int>(
+        key: "fails",
+        queryFn: (page) {
+          throw "error";
+        },
+        onSuccess: (dynamic r) => response = r.toString(),
+        onError: (dynamic e) => error = e,
+        getNextArg: (state) {
+          return state.length + 1;
+        },
+      );
+      final res = await query.result;
+      expect(response, isNull);
+      expect(error, res.error);
+    });
+
+    test("onError is called when getNext page fails", () async {
+      dynamic error;
+      int count = 0;
+      final query = InfiniteQuery<String, int>(
+        key: "fails",
+        queryFn: (page) {
+          if (page == 2) {
+            throw "error";
+          }
+          return Future.value(page.toString());
+        },
+        onError: (dynamic e) => error = e,
+        onSuccess: (_) => count++,
+        getNextArg: (state) {
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      final res = await query.getNextPage();
+      expect(count, 1);
+      expect(res?.error, error);
+    });
+  });
 }

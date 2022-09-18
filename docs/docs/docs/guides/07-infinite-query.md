@@ -109,6 +109,25 @@ final postsQuery = InfiniteQuery<List<PostModel>, int>(
 );
 ```
 
+## Side Effects
+
+There are two side effects that can be passed to a query.
+- `onSuccess` - This is called after the query function succeeds but before the query state is updated.
+- `onError` - This is called if the query function fails but before the query state is updated.
+```dart
+final query = InfiniteQuery<String>(
+  key: "sideEffects",
+  onSuccess: (dynamic r) { 
+    // do something with the response
+  },
+  onError: (dynamic e){
+    // do something with the error
+  },
+  queryFn: () async {
+    //...queryFn
+  },
+);
+```
 
 
 
