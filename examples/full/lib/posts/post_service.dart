@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:query_builder/posts/post_model/post_model.dart';
 
@@ -24,7 +23,6 @@ class PostService {
         return state.length + 1;
       },
       queryFn: (arg) async {
-        debugPrint("fetching... $arg");
         final uri = Uri.parse(
           'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
         );

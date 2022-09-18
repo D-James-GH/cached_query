@@ -18,8 +18,13 @@ extension CachedQueryExt on CachedQuery {
     bool refetchOnConnection = true,
     StorageInterface? storage,
     QueryConfig? config,
+    QueryObserver? observer,
   }) {
-    this.config(config: config, storage: storage);
+    this.config(
+      config: config,
+      storage: storage,
+      observer: observer,
+    );
 
     if (refetchOnResume) {
       _refetchOnResume();

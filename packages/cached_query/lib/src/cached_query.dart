@@ -95,7 +95,7 @@ class CachedQuery {
     _config = _config.merge(config);
     _storage = storage;
     _configSet = true;
-    observer = observer;
+    this.observer = observer ?? _DefaultQueryObserver();
   }
 
   /// Get a [Query] at a given key.
@@ -174,6 +174,7 @@ class CachedQuery {
   /// Pass a key to delete a query at the given key. Will invalidate both
   /// infinite queries and queries.
   void deleteCache({Object? key, bool deleteStorage = false}) {
+    observer.onQueryDeletion(key);
     if (key != null) {
       final stringKey = encodeKey(key);
       if (_queryCache.containsKey(stringKey)) {
@@ -206,6 +207,7 @@ class CachedQuery {
   /// Shouldn't normally need to add a query manually. Queries are automatically
   /// added to the cache when they are constructed.
   void addQuery(QueryBase<dynamic, dynamic> query) {
+    observer.onQueryCreation(query);
     _queryCache[query.key] = query;
   }
 }

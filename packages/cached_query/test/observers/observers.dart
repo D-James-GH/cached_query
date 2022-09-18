@@ -1,5 +1,41 @@
 import 'package:cached_query/cached_query.dart';
 
+class SimpleObserver extends QueryObserver {}
+
+class CreationObserver extends QueryObserver {
+  final void Function(QueryBase<dynamic, dynamic>) onCreate;
+
+  CreationObserver(this.onCreate);
+  @override
+  void onQueryCreation(QueryBase<dynamic, dynamic> query) {
+    onCreate(query);
+    super.onQueryCreation(query);
+  }
+}
+
+class DeletionObserver extends QueryObserver {
+  final void Function(Object?) onDelete;
+
+  DeletionObserver(this.onDelete);
+
+  @override
+  void onQueryDeletion(Object? key) {
+    onDelete(key);
+    super.onQueryDeletion(key);
+  }
+}
+
+class MutationCreationObserver extends QueryObserver {
+  final void Function(Mutation<dynamic, dynamic>) onCreate;
+
+  MutationCreationObserver(this.onCreate);
+  @override
+  void onMutationCreation(Mutation<dynamic, dynamic> mutation) {
+    onCreate(mutation);
+    super.onMutationCreation(mutation);
+  }
+}
+
 class QueryChangeObserver extends QueryObserver {
   final void Function(
     QueryBase<dynamic, dynamic> query,

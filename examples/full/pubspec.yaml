@@ -14,14 +14,14 @@ dependencies:
     sdk: flutter
   http: ^0.13.5
   freezed_annotation:
-  cached_query_flutter: ^0.4.0
+  cached_query_flutter:
+    path: ../../packages/cached_query_flutter
   cached_storage:
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner:
-  vm_service: ^8.3.0
   freezed:
   json_serializable:
   flutter_lints: ^2.0.1

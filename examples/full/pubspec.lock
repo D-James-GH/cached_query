@@ -98,14 +98,14 @@ packages:
       name: cached_query
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.0"
+    version: "0.3.0+1"
   cached_query_flutter:
     dependency: "direct main"
     description:
-      name: cached_query_flutter
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.4.0"
+      path: "../../packages/cached_query_flutter"
+      relative: true
+    source: path
+    version: "0.4.0+2"
   cached_storage:
     dependency: "direct main"
     description:
@@ -595,13 +595,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
-  vm_service:
-    dependency: "direct dev"
-    description:
-      name: vm_service
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "8.3.0"
   watcher:
     dependency: transitive
     description:

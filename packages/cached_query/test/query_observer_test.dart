@@ -6,6 +6,70 @@ import 'observers/observers.dart';
 void main() {
   group("Query observer", () {
     tearDown(CachedQuery.instance.reset);
+    test("Can set query observer with config", () async {
+      CachedQuery.instance.config(observer: SimpleObserver());
+      expect(CachedQuery.instance.observer, isA<SimpleObserver>());
+    });
+    test("Creating a query is observed", () {
+      QueryBase<dynamic, dynamic>? query;
+      CachedQuery.instance.config(observer: CreationObserver((q) => query = q));
+      Query(
+        key: "query creation",
+        queryFn: () => Future.value("res"),
+      );
+      expect(query, isA<Query<String>>());
+    });
+    test("Creating an infinite query is observed", () {
+      QueryBase<dynamic, dynamic>? query;
+      CachedQuery.instance.config(observer: CreationObserver((q) => query = q));
+      InfiniteQuery<String, int>(
+        key: "query creation",
+        queryFn: (_) => Future.value("res"),
+        getNextArg: (a) => 1,
+      );
+      expect(query, isA<InfiniteQuery<String, int>>());
+    });
+    test("Deleting an infinite query is observed", () {
+      Object? key;
+      CachedQuery.instance.config(observer: DeletionObserver((k) => key = k));
+      InfiniteQuery<String, int>(
+        key: "infiniteQueryKey",
+        queryFn: (_) => Future.value("res"),
+        getNextArg: (a) => 1,
+      ).deleteQuery();
+      expect(key, "infiniteQueryKey");
+    });
+    test("Deleting a query is observed", () {
+      Object? key;
+      CachedQuery.instance.config(observer: DeletionObserver((k) => key = k));
+      Query<String>(
+        key: "queryKey",
+        queryFn: () => Future.value("res"),
+      ).deleteQuery();
+      expect(key, "queryKey");
+    });
+    test("Creating a mutation is observed", () {
+      Mutation<dynamic, dynamic>? m;
+      CachedQuery.instance.config(
+        observer: MutationCreationObserver((mutation) => m = mutation),
+      );
+      final mutation = Mutation<String, void>(
+        queryFn: (_) => Future.value("res"),
+      );
+      expect(m, same(mutation));
+    });
+
+    test("Creating a mutation with key is observed", () {
+      Mutation<dynamic, dynamic>? m;
+      CachedQuery.instance.config(
+        observer: MutationCreationObserver((mutation) => m = mutation),
+      );
+      final mutation = Mutation<String, void>(
+        key: "mutation",
+        queryFn: (_) => Future.value("res"),
+      );
+      expect(m, same(mutation));
+    });
     test("Should be called when a query is loading", () async {
       int count = 0;
       QueryBase<dynamic, dynamic>? queryChange;

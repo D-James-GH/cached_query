@@ -103,10 +103,11 @@ class Mutation<T, A> {
       final mutationFromCache =
           MutationCache.instance.getMutation<T, A>(stringKey);
       if (mutationFromCache != null) {
+        CachedQuery.instance.observer.onMutationCreation(mutationFromCache);
         return mutationFromCache;
       }
     }
-    return Mutation._internal(
+    final mutation = Mutation._internal(
       key: stringKey,
       onStartMutation: onStartMutation,
       onSuccess: onSuccess,
@@ -115,6 +116,8 @@ class Mutation<T, A> {
       refetchQueries: refetchQueries,
       queryFn: queryFn,
     );
+    CachedQuery.instance.observer.onMutationCreation(mutation);
+    return mutation;
   }
 
   /// Starts the mutation with the given [arg].
