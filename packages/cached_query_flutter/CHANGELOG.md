@@ -1,3 +1,10 @@
+## 0.4.0
+
+> Note: This release has breaking changes.
+
+ - **DOCS**: document query builder key.
+ - **BREAKING** **FEAT**: add observer.
+
 ## 0.3.0+2
 
 - Update Cached Query to the latest release.

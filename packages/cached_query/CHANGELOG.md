@@ -1,3 +1,10 @@
+## 0.3.0
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: initial commit.
+ - **BREAKING** **FEAT**: add observer.
+
 ## 0.2.1
 
  - **FEAT**: add query and infinite query onSuccess and onError callbacks.
