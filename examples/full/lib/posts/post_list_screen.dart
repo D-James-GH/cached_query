@@ -53,7 +53,7 @@ class _PostListScreenState extends State<PostListScreen> {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  if (state.isFetching)
+                  if (state.status == QueryStatus.loading)
                     const CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
@@ -105,7 +105,7 @@ class _PostListScreenState extends State<PostListScreen> {
                   child: MutationBuilder<PostModel, PostModel>(
                     mutation: _postService.createPost(),
                     builder: (context, state, _) {
-                      if (state.isFetching) {
+                      if (state.status == QueryStatus.loading) {
                         return Container(
                           color: Colors.teal,
                           child: const Text(

@@ -1,5 +1,4 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/query_observer.dart';
 
 class QueryChangeObserver extends QueryObserver {
   final void Function(

@@ -3,7 +3,8 @@
 > Note: This release has breaking changes.
 
  - **FEAT**: initial commit.
- - **BREAKING** **FEAT**: add observer.
+ - **FEAT**: add observer.
+ - **BREAKING** **FEAT**: remove isFetching from mutation, use status == QueryStatus.loading. This brings it into line with query and infinite query.
 
 ## 0.2.1
 
