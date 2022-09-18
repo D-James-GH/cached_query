@@ -1,3 +1,7 @@
+## 0.4.1
+
+ - **FEAT**: add creation and deletion observers.
+
 ## 0.4.0+1
 
  - **FIX**: export query observer.
