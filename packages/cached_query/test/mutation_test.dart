@@ -71,7 +71,7 @@ void main() {
         expectAsync1(
           (event) {
             if (count == 1) {
-              expect(event.isFetching, true);
+              expect(event.status, QueryStatus.loading);
             }
             count++;
           },

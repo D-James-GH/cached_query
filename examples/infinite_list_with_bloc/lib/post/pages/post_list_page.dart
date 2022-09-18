@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_list_with_bloc/post/blocs/post/post_bloc.dart';
 import 'package:infinite_list_with_bloc/post/pages/details_page.dart';
-import 'package:infinite_list_with_bloc/post/pages/posts_with_builder.dart';
 
 import '../widgets/post.dart';
 

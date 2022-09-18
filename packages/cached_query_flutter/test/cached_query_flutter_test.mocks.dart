@@ -2,10 +2,9 @@
 // in cached_query_flutter/test/cached_query_flutter_test.dart.
 // Do not manually edit this file.
 
-import 'dart:async' as _i4;
+import 'dart:async' as _i3;
 
-import 'package:cached_query/cached_query.dart' as _i3;
-import 'package:cached_query/src/default_query_config.dart' as _i2;
+import 'package:cached_query/cached_query.dart' as _i2;
 import 'package:mockito/mockito.dart' as _i1;
 
 // ignore_for_file: type=lint
@@ -21,15 +20,15 @@ import 'package:mockito/mockito.dart' as _i1;
 class _FakeDefaultQueryConfig_0 extends _i1.Fake
     implements _i2.DefaultQueryConfig {}
 
-class _FakeQueryState_1<T> extends _i1.Fake implements _i3.QueryState<T> {}
+class _FakeQueryState_1<T> extends _i1.Fake implements _i2.QueryState<T> {}
 
 class _FakeInfiniteQueryState_2<T> extends _i1.Fake
-    implements _i3.InfiniteQueryState<T> {}
+    implements _i2.InfiniteQueryState<T> {}
 
 /// A class which mocks [Query].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockQuery<T> extends _i1.Mock implements _i3.Query<T> {
+class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
   MockQuery() {
     _i1.throwOnMissingStub(this);
   }
@@ -42,8 +41,8 @@ class MockQuery<T> extends _i1.Mock implements _i3.Query<T> {
       (super.noSuchMethod(Invocation.getter(#config),
           returnValue: _FakeDefaultQueryConfig_0()) as _i2.DefaultQueryConfig);
   @override
-  _i3.QueryState<T> get state => (super.noSuchMethod(Invocation.getter(#state),
-      returnValue: _FakeQueryState_1<T>()) as _i3.QueryState<T>);
+  _i2.QueryState<T> get state => (super.noSuchMethod(Invocation.getter(#state),
+      returnValue: _FakeQueryState_1<T>()) as _i2.QueryState<T>);
   @override
   bool get stale =>
       (super.noSuchMethod(Invocation.getter(#stale), returnValue: false)
@@ -53,22 +52,22 @@ class MockQuery<T> extends _i1.Mock implements _i3.Query<T> {
       (super.noSuchMethod(Invocation.getter(#hasListener), returnValue: false)
           as bool);
   @override
-  _i4.Stream<_i3.QueryState<T>> get stream =>
+  _i3.Stream<_i2.QueryState<T>> get stream =>
       (super.noSuchMethod(Invocation.getter(#stream),
-              returnValue: Stream<_i3.QueryState<T>>.empty())
-          as _i4.Stream<_i3.QueryState<T>>);
+              returnValue: Stream<_i2.QueryState<T>>.empty())
+          as _i3.Stream<_i2.QueryState<T>>);
   @override
-  _i4.Future<_i3.QueryState<T>> get result => (super.noSuchMethod(
+  _i3.Future<_i2.QueryState<T>> get result => (super.noSuchMethod(
           Invocation.getter(#result),
-          returnValue: Future<_i3.QueryState<T>>.value(_FakeQueryState_1<T>()))
-      as _i4.Future<_i3.QueryState<T>>);
+          returnValue: Future<_i2.QueryState<T>>.value(_FakeQueryState_1<T>()))
+      as _i3.Future<_i2.QueryState<T>>);
   @override
-  _i4.Future<_i3.QueryState<T>> refetch() => (super.noSuchMethod(
+  _i3.Future<_i2.QueryState<T>> refetch() => (super.noSuchMethod(
           Invocation.method(#refetch, []),
-          returnValue: Future<_i3.QueryState<T>>.value(_FakeQueryState_1<T>()))
-      as _i4.Future<_i3.QueryState<T>>);
+          returnValue: Future<_i2.QueryState<T>>.value(_FakeQueryState_1<T>()))
+      as _i3.Future<_i2.QueryState<T>>);
   @override
-  void update(_i3.UpdateFunc<T>? updateFn) =>
+  void update(_i2.UpdateFunc<T>? updateFn) =>
       super.noSuchMethod(Invocation.method(#update, [updateFn]),
           returnValueForMissingStub: null);
   @override
@@ -79,23 +78,35 @@ class MockQuery<T> extends _i1.Mock implements _i3.Query<T> {
   void deleteQuery({bool? deleteStorage = false}) => super.noSuchMethod(
       Invocation.method(#deleteQuery, [], {#deleteStorage: deleteStorage}),
       returnValueForMissingStub: null);
+  @override
+  _i3.Future<void> close() => (super.noSuchMethod(Invocation.method(#close, []),
+      returnValue: Future<void>.value(),
+      returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
 }
 
 /// A class which mocks [InfiniteQuery].
 ///
 /// See the documentation for Mockito's code generation for more information.
 class MockInfiniteQuery<T, A> extends _i1.Mock
-    implements _i3.InfiniteQuery<T, A> {
+    implements _i2.InfiniteQuery<T, A> {
   MockInfiniteQuery() {
     _i1.throwOnMissingStub(this);
   }
 
   @override
-  _i4.Future<_i3.InfiniteQueryState<T>> get result =>
+  bool get forceRevalidateAll =>
+      (super.noSuchMethod(Invocation.getter(#forceRevalidateAll),
+          returnValue: false) as bool);
+  @override
+  bool get revalidateAll =>
+      (super.noSuchMethod(Invocation.getter(#revalidateAll), returnValue: false)
+          as bool);
+  @override
+  _i3.Future<_i2.InfiniteQueryState<T>> get result =>
       (super.noSuchMethod(Invocation.getter(#result),
-              returnValue: Future<_i3.InfiniteQueryState<T>>.value(
+              returnValue: Future<_i2.InfiniteQueryState<T>>.value(
                   _FakeInfiniteQueryState_2<T>()))
-          as _i4.Future<_i3.InfiniteQueryState<T>>);
+          as _i3.Future<_i2.InfiniteQueryState<T>>);
   @override
   String get key =>
       (super.noSuchMethod(Invocation.getter(#key), returnValue: '') as String);
@@ -104,10 +115,10 @@ class MockInfiniteQuery<T, A> extends _i1.Mock
       (super.noSuchMethod(Invocation.getter(#config),
           returnValue: _FakeDefaultQueryConfig_0()) as _i2.DefaultQueryConfig);
   @override
-  _i3.InfiniteQueryState<T> get state =>
+  _i2.InfiniteQueryState<T> get state =>
       (super.noSuchMethod(Invocation.getter(#state),
               returnValue: _FakeInfiniteQueryState_2<T>())
-          as _i3.InfiniteQueryState<T>);
+          as _i2.InfiniteQueryState<T>);
   @override
   bool get stale =>
       (super.noSuchMethod(Invocation.getter(#stale), returnValue: false)
@@ -117,21 +128,21 @@ class MockInfiniteQuery<T, A> extends _i1.Mock
       (super.noSuchMethod(Invocation.getter(#hasListener), returnValue: false)
           as bool);
   @override
-  _i4.Stream<_i3.InfiniteQueryState<T>> get stream =>
+  _i3.Stream<_i2.InfiniteQueryState<T>> get stream =>
       (super.noSuchMethod(Invocation.getter(#stream),
-              returnValue: Stream<_i3.InfiniteQueryState<T>>.empty())
-          as _i4.Stream<_i3.InfiniteQueryState<T>>);
+              returnValue: Stream<_i2.InfiniteQueryState<T>>.empty())
+          as _i3.Stream<_i2.InfiniteQueryState<T>>);
   @override
-  _i4.Future<_i3.InfiniteQueryState<T>?> getNextPage() =>
+  _i3.Future<_i2.InfiniteQueryState<T>?> getNextPage() =>
       (super.noSuchMethod(Invocation.method(#getNextPage, []),
-              returnValue: Future<_i3.InfiniteQueryState<T>?>.value())
-          as _i4.Future<_i3.InfiniteQueryState<T>?>);
+              returnValue: Future<_i2.InfiniteQueryState<T>?>.value())
+          as _i3.Future<_i2.InfiniteQueryState<T>?>);
   @override
-  _i4.Future<_i3.InfiniteQueryState<T>> refetch() =>
+  _i3.Future<_i2.InfiniteQueryState<T>> refetch() =>
       (super.noSuchMethod(Invocation.method(#refetch, []),
-              returnValue: Future<_i3.InfiniteQueryState<T>>.value(
+              returnValue: Future<_i2.InfiniteQueryState<T>>.value(
                   _FakeInfiniteQueryState_2<T>()))
-          as _i4.Future<_i3.InfiniteQueryState<T>>);
+          as _i3.Future<_i2.InfiniteQueryState<T>>);
   @override
   void update(List<T> Function(List<T>?)? updateFn) =>
       super.noSuchMethod(Invocation.method(#update, [updateFn]),
@@ -144,12 +155,16 @@ class MockInfiniteQuery<T, A> extends _i1.Mock
   void deleteQuery({bool? deleteStorage = false}) => super.noSuchMethod(
       Invocation.method(#deleteQuery, [], {#deleteStorage: deleteStorage}),
       returnValueForMissingStub: null);
+  @override
+  _i3.Future<void> close() => (super.noSuchMethod(Invocation.method(#close, []),
+      returnValue: Future<void>.value(),
+      returnValueForMissingStub: Future<void>.value()) as _i3.Future<void>);
 }
 
 /// A class which mocks [CachedQuery].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockCachedQuery extends _i1.Mock implements _i3.CachedQuery {
+class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
   MockCachedQuery() {
     _i1.throwOnMissingStub(this);
   }
@@ -166,31 +181,31 @@ class MockCachedQuery extends _i1.Mock implements _i3.CachedQuery {
   void reset() => super.noSuchMethod(Invocation.method(#reset, []),
       returnValueForMissingStub: null);
   @override
-  void config({_i3.StorageInterface? storage, _i3.QueryConfig? config}) =>
+  void config({_i2.StorageInterface? storage, _i2.QueryConfig? config}) =>
       super.noSuchMethod(
           Invocation.method(#config, [], {#storage: storage, #config: config}),
           returnValueForMissingStub: null);
   @override
-  _i3.QueryBase<dynamic, dynamic>? getQuery(Object? key) =>
+  _i2.QueryBase<dynamic, dynamic>? getQuery(Object? key) =>
       (super.noSuchMethod(Invocation.method(#getQuery, [key]))
-          as _i3.QueryBase<dynamic, dynamic>?);
+          as _i2.QueryBase<dynamic, dynamic>?);
   @override
-  void updateQuery<Data>({Object? key, _i3.UpdateFunc<Data>? updateFn}) =>
+  void updateQuery<Data>({Object? key, _i2.UpdateFunc<Data>? updateFn}) =>
       super.noSuchMethod(
           Invocation.method(#updateQuery, [], {#key: key, #updateFn: updateFn}),
           returnValueForMissingStub: null);
   @override
   void updateInfiniteQuery<Data>(
-          {Object? key, _i3.UpdateFunc<List<Data>>? updateFn}) =>
+          {Object? key, _i2.UpdateFunc<List<Data>>? updateFn}) =>
       super.noSuchMethod(
           Invocation.method(
               #updateInfiniteQuery, [], {#key: key, #updateFn: updateFn}),
           returnValueForMissingStub: null);
   @override
-  List<_i3.QueryBase<dynamic, dynamic>>? whereQuery(
-          _i3.WhereCallback? findCallback) =>
+  List<_i2.QueryBase<dynamic, dynamic>>? whereQuery(
+          _i2.WhereCallback? findCallback) =>
       (super.noSuchMethod(Invocation.method(#whereQuery, [findCallback]))
-          as List<_i3.QueryBase<dynamic, dynamic>>?);
+          as List<_i2.QueryBase<dynamic, dynamic>>?);
   @override
   void invalidateCache([Object? key]) =>
       super.noSuchMethod(Invocation.method(#invalidateCache, [key]),
@@ -206,7 +221,7 @@ class MockCachedQuery extends _i1.Mock implements _i3.CachedQuery {
       super.noSuchMethod(Invocation.method(#refetchQueries, [keys]),
           returnValueForMissingStub: null);
   @override
-  void addQuery(_i3.QueryBase<dynamic, dynamic>? query) =>
+  void addQuery(_i2.QueryBase<dynamic, dynamic>? query) =>
       super.noSuchMethod(Invocation.method(#addQuery, [query]),
           returnValueForMissingStub: null);
 }

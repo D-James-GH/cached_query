@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/query_observer.dart';
 import 'package:cached_query/src/util/encode_key.dart';
 import 'package:cached_query/src/util/list_extension.dart';
 import 'package:cached_query/src/util/page_equality.dart';
@@ -29,6 +30,9 @@ typedef UpdateFunc<T> = T Function(T? oldData);
 class CachedQuery {
   /// Get the singleton instance of [CachedQuery].
   static final instance = CachedQuery._();
+
+  /// The current query observer.
+  QueryObserver observer = _DefaultQueryObserver();
 
   bool _configSet = false;
 
@@ -61,6 +65,7 @@ class CachedQuery {
   void reset() {
     _configSet = false;
     _config = DefaultQueryConfig();
+    deleteCache();
   }
 
   /// {@template cachedQuery.config}
@@ -80,13 +85,18 @@ class CachedQuery {
   /// error handling/logout. By default a query will catch all errors and exceptions
   /// and update the state.
   /// {@endtemplate}
-  void config({StorageInterface? storage, QueryConfig? config}) {
+  void config({
+    StorageInterface? storage,
+    QueryConfig? config,
+    QueryObserver? observer,
+  }) {
     assert(_configSet == false, "Config defaults must only be set once.");
     if (_configSet) return;
 
     _config = _config.merge(config);
     _storage = storage;
     _configSet = true;
+    observer = observer;
   }
 
   /// Get a [Query] at a given key.
@@ -200,3 +210,5 @@ class CachedQuery {
     _queryCache[query.key] = query;
   }
 }
+
+class _DefaultQueryObserver extends QueryObserver {}

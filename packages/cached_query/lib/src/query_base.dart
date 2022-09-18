@@ -112,8 +112,12 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   Future<State> _getResult();
 
   /// Sets the new state.
-  void _setState(State newState) {
+  void _setState(State newState, [StackTrace? stackTrace]) {
+    CachedQuery.instance.observer.onChange(this, newState);
     _state = newState;
+    if(stackTrace != null){
+      CachedQuery.instance.observer.onError(this, stackTrace);
+    }
   }
 
   /// Emits the current state down the stream.

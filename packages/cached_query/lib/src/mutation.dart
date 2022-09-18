@@ -143,7 +143,7 @@ class Mutation<T, A> {
   }
 
   Future<T?> _fetch(A arg) async {
-    _setState(_state.copyWith(status: QueryStatus.loading, isFetching: true));
+    _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
     dynamic startMutationResponse;
     if (_onStartMutation != null) {
@@ -165,21 +165,27 @@ class Mutation<T, A> {
         CachedQuery.instance.refetchQueries(_refetchQueries!);
       }
       return res;
-    } catch (e) {
+    } catch (e, trace) {
       if (_onError != null) {
         await _onError!(arg, e, startMutationResponse);
       }
-      _setState(_state.copyWith(status: QueryStatus.error));
+      _setState(
+        _state.copyWith(status: QueryStatus.error, error: e),
+        trace,
+      );
 
       return null;
     } finally {
-      _setState(_state.copyWith(isFetching: false));
       _emit();
     }
   }
 
-  void _setState(MutationState<T> newState) {
+  void _setState(MutationState<T> newState, [StackTrace? stackTrace]) {
+    CachedQuery.instance.observer.onMutationChange(this, newState);
     _state = newState;
+    if (stackTrace != null) {
+      CachedQuery.instance.observer.onMutationError(this, stackTrace);
+    }
   }
 
   void _emit() {
@@ -199,9 +205,6 @@ class MutationState<T> {
   /// Status of the [MutationQueryCallback].
   final QueryStatus status;
 
-  /// Whether the [MutationQueryCallback] is currently fetching.
-  final bool isFetching;
-
   /// Current error of the [MutationQueryCallback].
   final dynamic error;
 
@@ -209,7 +212,6 @@ class MutationState<T> {
   const MutationState({
     this.data,
     this.status = QueryStatus.initial,
-    this.isFetching = false,
     this.error,
   });
 
@@ -218,13 +220,11 @@ class MutationState<T> {
   MutationState<T> copyWith({
     T? data,
     QueryStatus? status,
-    bool? isFetching,
     dynamic error,
   }) {
     return MutationState(
       data: data ?? this.data,
       status: status ?? this.status,
-      isFetching: isFetching ?? this.isFetching,
       error: error ?? this.error,
     );
   }
@@ -236,10 +236,8 @@ class MutationState<T> {
           runtimeType == other.runtimeType &&
           data == other.data &&
           status == other.status &&
-          isFetching == other.isFetching &&
           error == other.error;
 
   @override
-  int get hashCode =>
-      data.hashCode ^ status.hashCode ^ isFetching.hashCode ^ error.hashCode;
+  int get hashCode => data.hashCode ^ status.hashCode ^ error.hashCode;
 }

@@ -145,7 +145,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         // save to local storage if exists
         _saveToStorage<T>();
       }
-    } catch (e) {
+    } catch (e, trace) {
       if (_onError != null) {
         _onError!(e);
       }
@@ -154,6 +154,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
           status: QueryStatus.error,
           error: e,
         ),
+        trace,
       );
       if (config.shouldRethrow) {
         rethrow;

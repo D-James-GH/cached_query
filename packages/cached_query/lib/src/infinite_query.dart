@@ -264,7 +264,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         // save to local storage if exists
         _saveToStorage<List<T>>();
       }
-    } catch (e) {
+    } catch (e, trace) {
       if (_onError != null) {
         _onError!(e);
       }
@@ -274,6 +274,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
           status: QueryStatus.error,
           error: e,
         ),
+        trace,
       );
       if (CachedQuery.instance._config.shouldRethrow) {
         rethrow;
@@ -321,7 +322,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         // save to local storage if exists
         _saveToStorage<List<T>>();
       }
-    } catch (e) {
+    } catch (e, trace) {
       if (_onError != null) {
         _onError!(e);
       }
@@ -330,6 +331,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
           status: QueryStatus.error,
           error: e,
         ),
+        trace,
       );
       if (CachedQuery.instance._config.shouldRethrow) {
         rethrow;
