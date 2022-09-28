@@ -39,8 +39,7 @@ const config = {
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
           // Todo: change url
-          editUrl:
-            "https://github.com/D-James-GH/cached_query/tree/main/docs",
+          editUrl: "https://github.com/D-James-GH/cached_query/tree/main/docs",
         },
 
         blog: false,
@@ -54,6 +53,27 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      algolia: {
+        // The application ID provided by Algolia
+        appId: "MDO9CERRRH",
+
+        // Public API key: it is safe to commit it
+        apiKey: "376a219c65e17b14fb64c68bd8de3915",
+
+        indexName: "cachedquery",
+
+        // Optional: see doc section below
+        contextualSearch: true,
+
+        // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+        externalUrlRegex: "external\\.com|domain\\.com",
+
+        // Optional: Algolia search parameters
+        searchParameters: {},
+
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        searchPagePath: "search",
+      },
       navbar: {
         title: "Cached Query",
         items: [
