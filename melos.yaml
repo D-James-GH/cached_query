@@ -10,10 +10,9 @@ ide:
   intellij: false
 
 scripts:
-  get:
-    exec: dart pub get
   analyze:
     exec: dart analyze .
+  get:examples: "find ./examples/ -maxdepth 1 -mindepth 1 -type d -exec flutter pub get {} \\;"
   test:
     run: |
       melos exec -c 6 --fail-fast -- \
