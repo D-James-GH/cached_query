@@ -7,23 +7,7 @@ There are two options when integrating cached query with flutter bloc.
 The code for this example can be found here: 
 https://github.com/D-James-GH/cached_query/tree/main/examples/infinite_list_with_bloc
 
-1. Map the query state to bloc state in the bloc.
-
-    Pro:
-
-    - Easy to integrate into existing apps as only the repository and bloc layers need adjusting, the presentation layer will remain the same.
-
-    Con:
-    - The query key will always have a subscriber if the bloc is still in memory. When using a `InfiniteQueryBuilder` the subscriber will be removed as soon as the component is removed from the widget tree.
-
-2. Hold the Infinite Query in the bloc state and use a `InfiniteQueryBuilder` in the UI.
-
-    Pro:
-    - As soon as the `InfiniteQueryBuilder` is removed from the widget tree the subscriber is removed, allowing for more effective cache management.
-
-    Con:
-    - Needs an Infinite Query to be used directly in the UI, either with a `InfiniteQueryBuilder` or by listening/disposing of the stream.
-
+There are two implementation options to consider when using Cached Query with Flutter Bloc. In this example will go through using both the query builder and mapping a query into bloc state. For more information on the pros and cons of each way go to [Flutter Bloc Query](/examples/with-flutter-bloc#how-to-integrate)
 
 ## Data Layers
 
