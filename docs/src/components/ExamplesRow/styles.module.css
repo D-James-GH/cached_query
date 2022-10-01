@@ -1,0 +1,10 @@
+.githubLink {
+  margin-left: 10px;
+}
+.githubIcon {
+  color: black;
+}
+
+[data-theme="dark"] .githubIcon {
+  color: white;
+}
