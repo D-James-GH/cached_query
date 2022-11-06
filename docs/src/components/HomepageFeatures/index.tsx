@@ -11,7 +11,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
+    Svg: require('@site/static/img/undraw_home_run_re_rqli.svg').default,
     description: (
       <>
           Cached query has been designed to be minimal and easy to integrate into
@@ -21,7 +21,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Works with Bloc',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
+    Svg: require('@site/static/img/undraw_server_cluster_jwwq.svg').default,
     description: (
       <>
           Complements any architecture you may already be using.
@@ -30,7 +30,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Improve UX',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    Svg: require('@site/static/img/undraw_my_app_re_gxtj.svg').default,
     description: (
       <>
           Easily improve the user experience of any flutter app by keeping data local,
