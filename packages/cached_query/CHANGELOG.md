@@ -1,3 +1,7 @@
+## 0.3.1+1
+
+ - **DOCS**: added observer and side effect docs.
+
 ## 0.3.1
 
  - **FEAT**: add creation and deletion observers.
