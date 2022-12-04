@@ -1,3 +1,7 @@
+## 0.3.1+3
+
+ - **FIX**: update rxdart.
+
 ## 0.3.1+2
 
  - **FIX**: remove collection and update rxdart.
