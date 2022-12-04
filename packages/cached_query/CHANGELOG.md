@@ -2,10 +2,6 @@
 
  - **FIX**: update rxdart.
 
-## 0.3.1+2
-
- - **FIX**: remove collection and update rxdart.
-
 ## 0.3.1+1
 
  - **DOCS**: added observer and side effect docs.

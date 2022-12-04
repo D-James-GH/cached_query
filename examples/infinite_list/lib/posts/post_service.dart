@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:query_builder/posts/post_model/post_model.dart';
+import 'package:infinite_list/posts/post_model/post_model.dart';
 
 class PostService {
   InfiniteQuery<List<PostModel>, int> getPosts() {
