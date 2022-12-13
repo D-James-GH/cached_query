@@ -63,7 +63,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// Get the result of calling the queryFn.
   ///
   /// If [result] is used when the [stream] has no listeners [result] will start
-  /// the delete timer. For full caching functionality see [stream].
+  /// the delete timer once complete. For full caching functionality see [stream].
   Future<State> get result {
     _resetDeleteTimer();
     // if there are no other listeners and result has been called schedule

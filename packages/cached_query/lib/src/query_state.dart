@@ -16,8 +16,9 @@ enum QueryStatus {
 }
 
 /// {@template queryState}
-/// [InfiniteQueryState] holds the current state of an [InfiniteQuery]
+/// [QueryState] holds the current state of a [Query]
 ///
+/// Is returned as the result of a query and emitted down the query stream.
 /// Should not be instantiated manually.
 /// {@endtemplate}
 class QueryState<T> implements StateBase {

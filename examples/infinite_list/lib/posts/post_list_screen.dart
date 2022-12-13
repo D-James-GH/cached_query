@@ -8,6 +8,7 @@ import 'post_model/post_model.dart';
 
 class PostListScreen extends StatefulWidget {
   static const routeName = '/';
+
   const PostListScreen({Key? key}) : super(key: key);
 
   @override
@@ -16,14 +17,11 @@ class PostListScreen extends StatefulWidget {
 
 class _PostListScreenState extends State<PostListScreen> {
   final _scrollController = ScrollController();
-  final _postService = PostService();
-  late final InfiniteQuery<List<PostModel>, int> query;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    query = _postService.getPosts();
   }
 
   @override
@@ -45,82 +43,38 @@ class _PostListScreenState extends State<PostListScreen> {
           },
         ),
         centerTitle: true,
-        actions: [
-          MutationBuilder<PostModel, PostModel>(
-            mutation: _postService.createPost(),
-            builder: (context, state, mutate) {
-              return Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  if (state.status == QueryStatus.loading)
-                    const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  IconButton(
-                    icon: const Icon(Icons.create),
-                    onPressed: () => mutate(
-                      const PostModel(
-                        id: 1234,
-                        title: "new post",
-                        userId: 1,
-                        body: 'this is the body of the post',
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
       ),
       body: InfiniteQueryBuilder<List<PostModel>, int>(
-        query: query,
-        builder: (context, state, query) {
-          if (state.data != null && state.data!.isNotEmpty) {
-            final allPosts = state.data!.expand((e) => e).toList();
-
+          query: getPosts(),
+          builder: (context, state, query) {
+            final allPosts = state.data?.expand((e) => e).toList();
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
-                if (state.status == QueryStatus.error &&
-                    state.error is SocketException)
+                if (state.status == QueryStatus.error)
                   SliverToBoxAdapter(
                     child: DecoratedBox(
                       decoration:
                           BoxDecoration(color: Theme.of(context).errorColor),
-                      child: const Text(
-                        "No internet connection",
-                        style: TextStyle(color: Colors.white),
+                      child: Text(
+                        state.error is SocketException
+                            ? "No internet connection"
+                            : state.error.toString(),
+                        style: const TextStyle(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-                SliverToBoxAdapter(
-                  child: MutationBuilder<PostModel, PostModel>(
-                    mutation: _postService.createPost(),
-                    builder: (context, state, _) {
-                      if (state.status == QueryStatus.loading) {
-                        return Container(
-                          color: Colors.teal,
-                          child: const Text(
-                            "This will show when the mutation is loading.",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        );
-                      }
-                      return const SizedBox();
-                    },
-                  ),
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) => _Post(
-                      post: allPosts[i],
-                      index: i,
+                if (allPosts != null)
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) => _Post(
+                        post: allPosts[i],
+                        index: i,
+                      ),
+                      childCount: allPosts.length,
                     ),
-                    childCount: allPosts.length,
                   ),
-                ),
                 if (state.status == QueryStatus.loading)
                   const SliverToBoxAdapter(
                     child: Center(
@@ -138,24 +92,12 @@ class _PostListScreenState extends State<PostListScreen> {
                 )
               ],
             );
-          }
-          if (state.status == QueryStatus.loading) {
-            return const Center(
-              child: SizedBox(
-                height: 40,
-                width: 40,
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-          return const Text("no posts found");
-        },
-      ),
+          }),
     );
   }
 
   void _onScroll() {
-    final query = _postService.getPosts();
+    final query = getPosts();
     if (_isBottom && query.state.status != QueryStatus.loading) {
       query.getNextPage();
     }
