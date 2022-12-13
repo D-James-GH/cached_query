@@ -1,3 +1,7 @@
+## 0.3.1+4
+
+ - **DOCS**: correction to api docs and infinite query example.
+
 ## 0.3.1+3
 
  - **FIX**: update rxdart.
