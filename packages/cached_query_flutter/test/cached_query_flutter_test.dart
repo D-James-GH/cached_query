@@ -78,10 +78,12 @@ void main() {
     });
     test("Can set refetch config per query", () async {
       final query = MockQuery<String>();
-      when(query.config).thenReturn(QueryConfigFlutter(
-        refetchOnResume: true,
-        refetchOnConnection: true,
-      ));
+      when(query.config).thenReturn(
+        QueryConfigFlutter(
+          refetchOnResume: true,
+          refetchOnConnection: true,
+        ),
+      );
       when(query.hasListener).thenReturn(true);
       when(query.key).thenReturn("hasListeners");
       when(query.refetch()).thenAnswer((realInvocation) async {
@@ -97,10 +99,12 @@ void main() {
 
     test("Can set refetch to false per query", () async {
       final query = MockQuery<String>();
-      when(query.config).thenReturn(QueryConfigFlutter(
-        refetchOnResume: false,
-        refetchOnConnection: false,
-      ));
+      when(query.config).thenReturn(
+        QueryConfigFlutter(
+          refetchOnResume: false,
+          refetchOnConnection: false,
+        ),
+      );
       when(query.hasListener).thenReturn(true);
       when(query.key).thenReturn("hasListeners");
       when(query.refetch()).thenAnswer((realInvocation) async {
