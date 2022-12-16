@@ -1,3 +1,9 @@
+## 0.4.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: allow refetch config per query.
+
 ## 0.3.1+4
 
  - **DOCS**: correction to api docs and infinite query example.

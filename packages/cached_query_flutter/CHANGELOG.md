@@ -1,3 +1,9 @@
+## 0.5.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: allow refetch config per query.
+
 ## 0.4.1+4
 
  - Update a dependency to the latest release.
