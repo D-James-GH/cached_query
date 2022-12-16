@@ -13,7 +13,7 @@ class InfiniteQueryRepo {
       },
       key: queryKey,
       queryFn: (page) async => response,
-      config: const QueryConfig(ignoreCacheDuration: true),
+      config: QueryConfig(ignoreCacheDuration: true),
     );
   }
 }

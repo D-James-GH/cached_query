@@ -18,18 +18,15 @@ void main() {
   group("Config", () {
     test("Should be able to set config", () {
       final cachedQuery = CachedQuery.asNewInstance()
-        ..config(config: const QueryConfig());
+        ..config(config: QueryConfig());
       expect(cachedQuery.isConfigSet, true);
     });
-    test("Should be able to merge query config with default config", () {
-      const config = QueryConfig(ignoreCacheDuration: false);
-      final merged =
-          DefaultQueryConfig(ignoreCacheDuration: true).merge(config);
-      expect(merged.ignoreCacheDuration, false);
+    test("Defaults should be set", () {
+      final config = QueryConfig();
+      expect(config, QueryConfig.defaults());
     });
     test("Should be able to override default values", () async {
-      final defaultConfig = DefaultQueryConfig();
-      const config = QueryConfig(
+      final config = QueryConfig(
         storeQuery: false,
         shouldRethrow: true,
         refetchDuration: Duration.zero,
@@ -37,7 +34,7 @@ void main() {
         ignoreCacheDuration: true,
       );
       final cachedQuery = CachedQuery.asNewInstance()..config(config: config);
-      expect(cachedQuery.defaultConfig, defaultConfig.merge(config));
+      expect(cachedQuery.defaultConfig, config);
     });
   });
   group("Invalidate cache", () {

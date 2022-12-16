@@ -12,7 +12,7 @@ class TitleRepo {
       queryFn: () =>
           Future.delayed(queryDelay ?? Duration.zero, () => response),
       initialData: initialTitle,
-      config: const QueryConfig(ignoreCacheDuration: true),
+      config: QueryConfig(ignoreCacheDuration: true),
     );
   }
 }

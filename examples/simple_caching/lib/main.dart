@@ -5,8 +5,8 @@ import 'package:simple_caching/posts/view/post_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
-    config: const QueryConfig(
-      refetchDuration: Duration(seconds: 4),
+    config: QueryConfigFlutter(
+      refetchDuration: const Duration(seconds: 4),
     ),
   );
   runApp(const MyApp());

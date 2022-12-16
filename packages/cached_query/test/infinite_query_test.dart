@@ -93,8 +93,8 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: "Posts",
         queryFn: repo.getPosts,
-        config: const QueryConfig(
-          refetchDuration: Duration(milliseconds: 200),
+        config: QueryConfig(
+          refetchDuration: const Duration(milliseconds: 200),
         ),
         getNextArg: (state) {
           if (state.lastPage == null && state.length != 0) return null;
@@ -137,8 +137,8 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: InfiniteQueryTestRepository.key,
         queryFn: createResponse,
-        config: const QueryConfig(
-          refetchDuration: Duration(seconds: 5),
+        config: QueryConfig(
+          refetchDuration: const Duration(seconds: 5),
         ),
         getNextArg: (state) {
           if (state.lastPage == null && state.length != 0) return null;
@@ -174,13 +174,13 @@ void main() async {
       expect(fetchCount, 2);
     });
   });
-  group("Infinite refetching", () {
+  group("Infinite re-fetching", () {
     tearDown(cachedQuery.deleteCache);
     test("Should refetch list after refetchDuration", () async {
       int fetchCount = 0;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
-        config: const QueryConfig(
+        config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
         getNextArg: (state) => state.length + 1,
@@ -199,7 +199,7 @@ void main() async {
       int? page2;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
-        config: const QueryConfig(
+        config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
         getNextArg: (state) => state.length + 1,
@@ -225,7 +225,7 @@ void main() async {
       int page2Count = 0;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
-        config: const QueryConfig(
+        config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
         getNextArg: (state) => state.length + 1,
@@ -253,7 +253,7 @@ void main() async {
       int page2Count = 0;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
-        config: const QueryConfig(
+        config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
         getNextArg: (state) => state.length + 1,
@@ -280,7 +280,7 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
         revalidateAll: true,
-        config: const QueryConfig(
+        config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
         getNextArg: (state) => state.length + 1,
@@ -303,7 +303,7 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
         revalidateAll: true,
-        config: const QueryConfig(
+        config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
         getNextArg: (state) => state.length + 1,
@@ -331,7 +331,7 @@ void main() async {
       int page2Count = 0;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
-        config: const QueryConfig(
+        config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
         forceRevalidateAll: true,
@@ -415,7 +415,7 @@ void main() async {
       const key = "store";
       final query = InfiniteQuery<int, int>(
         key: key,
-        config: const QueryConfig(storeQuery: false),
+        config: QueryConfig(storeQuery: false),
         queryFn: repo.getPage,
         getNextArg: (state) {
           if (state.length == 0) return 0;

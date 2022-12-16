@@ -15,8 +15,10 @@ dependencies:
   http: ^0.13.5
   freezed_annotation:
   meta: ^1.8.0
-  cached_query_flutter: ^0.4.1+1
+  cached_query_flutter:
+    path: ../../packages/cached_query_flutter
   cached_storage:
+    path: ../../packages/cached_storage
 
 dev_dependencies:
   flutter_test:

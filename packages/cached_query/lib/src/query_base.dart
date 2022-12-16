@@ -47,9 +47,8 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// refetch.
   bool get stale => _stale;
 
-
   /// The config for this specific query.
-  final DefaultQueryConfig config;
+  final QueryConfig config;
 
   /// Weather the query stream has any listeners.
   bool get hasListener => _streamController?.hasListener ?? false;
@@ -89,7 +88,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     required this.key,
     required State state,
     required QueryConfig? config,
-  })  : config = CachedQuery.instance.defaultConfig.merge(config),
+  })  : config = config ?? CachedQuery.instance.defaultConfig,
         _state = state;
 
   /// Refetch the query immediately.
@@ -115,7 +114,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   void _setState(State newState, [StackTrace? stackTrace]) {
     CachedQuery.instance.observer.onChange(this, newState);
     _state = newState;
-    if(stackTrace != null){
+    if (stackTrace != null) {
       CachedQuery.instance.observer.onError(this, stackTrace);
     }
   }

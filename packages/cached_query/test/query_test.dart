@@ -67,8 +67,8 @@ void main() {
       int fetchCount = 0;
       final query1 = Query(
         key: "de-dupe",
-        config: const QueryConfig(
-          refetchDuration: Duration(seconds: 2),
+        config: QueryConfig(
+          refetchDuration: const Duration(seconds: 2),
         ),
         queryFn: () {
           fetchCount++;
@@ -224,7 +224,7 @@ void main() {
       final query = Query<String>(
         key: "noStore",
         queryFn: () async => Future.value("data"),
-        config: const QueryConfig(
+        config: QueryConfig(
           storeQuery: false,
         ),
       );
@@ -324,7 +324,7 @@ void main() {
     test("Result should rethrow if specified ", () async {
       cachedQuery
         ..reset()
-        ..config(config: const QueryConfig(shouldRethrow: true));
+        ..config(config: QueryConfig(shouldRethrow: true));
       try {
         final query = Query<String>(
           key: "error2",
@@ -354,7 +354,7 @@ void main() {
   test("Can set local query config", () {
     final query = Query(
       key: "local",
-      config: const QueryConfig(shouldRethrow: true),
+      config: QueryConfig(shouldRethrow: true),
       queryFn: () async => "",
     );
 

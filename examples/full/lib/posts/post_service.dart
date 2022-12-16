@@ -9,7 +9,8 @@ class PostService {
   InfiniteQuery<List<PostModel>, int> getPosts() {
     return InfiniteQuery<List<PostModel>, int>(
       key: 'posts',
-      config: QueryConfig(
+      config: QueryConfigFlutter(
+        refetchOnResume: true,
         refetchDuration: const Duration(seconds: 2),
         serializer: (dynamic postJson) {
           return (postJson as List<dynamic>)

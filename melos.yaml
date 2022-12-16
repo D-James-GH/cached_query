@@ -4,7 +4,6 @@ packages:
   - packages/**
 
 ignore:
-  # e.g. ignore example apps
   - "packages/**/example"
 ide:
   intellij: false
@@ -13,6 +12,9 @@ scripts:
   analyze:
     exec: dart analyze .
   get:examples: "find ./examples/ -maxdepth 1 -mindepth 1 -type d -exec flutter pub get {} \\;"
+  gen:
+    run: melos exec -c 1 --depends-on="build_runner" --flutter -- "flutter pub run build_runner build --delete-conflicting-outputs"
+    description: Build all generated files for Flutter packages in this project.
   test:
     run: |
       melos exec -c 6 --fail-fast -- \

@@ -6,8 +6,8 @@ import 'package:cached_query/cached_query.dart';
 void main() async {
   // Optionally initialise cached query with a config
   CachedQuery.instance.config(
-    config: const QueryConfig(
-      cacheDuration: Duration(minutes: 5),
+    config: QueryConfig(
+      cacheDuration: const Duration(minutes: 5),
     ),
   );
   final filmTitle = getFilmTitle();
@@ -32,8 +32,8 @@ Query<String> getFilmTitle() {
   return Query<String>(
     key: 'title',
     // Override the global config here
-    config: const QueryConfig(
-      cacheDuration: Duration(seconds: 4),
+    config: QueryConfig(
+      cacheDuration: const Duration(seconds: 4),
     ),
     queryFn: () => Future.delayed(
       const Duration(milliseconds: 400),

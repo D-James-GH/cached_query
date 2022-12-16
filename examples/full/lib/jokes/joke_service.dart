@@ -10,7 +10,7 @@ class JokeService {
   Query<JokeModel?> getJoke() {
     return Query<JokeModel>(
       key: 'joke',
-      config: QueryConfig(
+      config: QueryConfigFlutter(
         refetchDuration: const Duration(seconds: 4),
         serializer: (dynamic json) =>
             JokeModel.fromJson(json as Map<String, dynamic>),

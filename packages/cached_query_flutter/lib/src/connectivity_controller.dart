@@ -29,8 +29,9 @@ class ConnectivityController {
     bool? initialConnection,
   })  : _connectivity = connectivity ?? Connectivity(),
         hasConnection = initialConnection ?? true,
-        _refetchCurrentQueries =
-            refetchCurrentQueries ?? CachedQuery.instance.refetchCurrentQueries,
+        _refetchCurrentQueries = refetchCurrentQueries ??
+            (() => CachedQuery.instance
+                .refetchCurrentQueries(RefetchReason.connectivity)),
         _connectivityService = service ?? ConnectivityService();
 
   /// Allow the creation of new instances for testing purposes
