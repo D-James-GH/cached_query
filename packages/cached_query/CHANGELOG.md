@@ -2,7 +2,7 @@
 
 > Note: This release has breaking changes.
 
- - **BREAKING** **FEAT**: allow refetch config per query.
+ - **BREAKING** **FEAT**: allow refetch config per query. QueryConfig can no longer be const.
 
 ## 0.3.1+4
 

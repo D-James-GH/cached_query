@@ -14,15 +14,15 @@ For more information on how the caching works visit [Cached Query](https://pub.d
 
 ## Getting started
 
-Configure the CachedQuery with `configFlutter` instead of `config`. This has two additional options; `refetchOnResume` 
-and `refetchOnConnection`.
+Configure the CachedQuery with `configFlutter` instead of `config`. 
 
 ```dart
 CachedQuery.instance.configFlutter(
-    refetchOnResume: true,
-    refetchOnConnection: true,
+    config: QueryConfigFlutter(
+        refetchOnConnection: true,
+        refetchOnResume: true,
+    ),
     storage: await CachedStorage.ensureInitialized(),
-    config: const QueryConfig(),
 );
 ```
 
@@ -31,6 +31,8 @@ The *refetchOnResume* option re-fetches any query or infinite query that has lis
 The *refetchOnConnection* option uses the connectivity package to detect when the device connection status changes, it 
 then pings example.com to confirm the connection. If the device has connection after the check, all current queries are 
 re-fetched.
+
+Each of these options can be configured globally or in the query using `QueryConfigFlutter` as the config option.
 
 ## Usage
 

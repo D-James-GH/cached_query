@@ -39,7 +39,7 @@ are called.
 
 ```dart
 CachedQuery.instance.config(
-  config: const QueryConfig(
+  config: QueryConfig(
     refetchDuration: Duration(seconds: 10),
     cacheDuration: Duration(minutes: 2),
   ),

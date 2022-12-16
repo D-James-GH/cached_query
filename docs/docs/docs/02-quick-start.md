@@ -31,7 +31,7 @@ void main() async {
   CachedQuery.instance.configFlutter(
     // Initialize Cached Storage to persist the cache to disk
     storage: await CachedStorage.ensureInitialized(),
-    config: const QueryConfig(
+    config: QueryConfig(
       // Globally set the refetch duration
       refetchDuration: Duration(seconds: 4),
     ),

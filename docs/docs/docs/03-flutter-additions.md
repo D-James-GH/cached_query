@@ -5,7 +5,7 @@ To globally configure Cached Query Flutter use `CachedQuery.configFlutter` inste
 ```dart
 CachedQuery.instance.configFlutter(
   storage: await CachedStorage.ensureInitialized(),
-  config: const QueryConfig(),
+  config: QueryConfig(),
 );
 ```
 
@@ -16,19 +16,47 @@ connection status. Any Query or Infinite Query that has listeners will be consid
 re-fetched if the connection is restored. Use the config to turn this off. 
 ```dart
 CachedQuery.instance.configFlutter(
-  refetchOnConnection: false,
+  config: QueryConfigFlutter(
+    refetchOnConnection: true,
+  ),
 );
 ```
+This can be configured in the individual query.
+```dart
+Query(
+  key: "a query key",
+  queryFn: () async => _api.getData(),
+  config: QueryConfigFlutter(
+    refetchOnResume: false,
+    refetchOnConnection: true,
+  ),
+),
+```
+
 ## Refetch On Resume
 Cached Query Flutter uses the `WidgetsBindingObserver` to monitor the lifecycle state of the app. If the app state is 
 resumed any active queries will be re-fetched. Turn this off with the global flutter config.
 
 ```dart
 CachedQuery.instance.configFlutter(
-  refetchOnConnection: false,
-  refetchOnResume: false,
+  config: QueryConfigFlutter(
+    refetchOnResume: false,
+    refetchOnConnection: true,
+  ),
 );
 ```
+This can be configured in the individual query.
+```dart
+Query(
+  key: "a query key",
+  queryFn: () async => _api.getData(),
+  config: QueryConfigFlutter(
+    refetchOnResume: false,
+    refetchOnConnection: true,
+  ),
+),
+```
+
 ## Builders
 Three builders are added for ease of use. They act very similar to a `StreamBuilder`. 
 

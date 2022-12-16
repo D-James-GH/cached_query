@@ -67,7 +67,7 @@ A default config can be set once, so it is best to do this at the start of the a
 void main() async {
   CachedQuery.instance.config(
     storage: ImpementsStorageInterface(),
-    config: const QueryConfig(
+    config: QueryConfig(
       refetchDuration: Duration(seconds: 4),
       cacheDuration: Duration(minutes: 5),
     ),
@@ -226,7 +226,7 @@ down the query stream. Sometimes in development it is useful to rethrow errors f
 can be set to rethrow any error it catches.
 ```dart
   CachedQuery.instance.configFlutter(
-    config: const QueryConfig(shouldRethrow: true),
+    config: QueryConfig(shouldRethrow: true),
   );
 ```
 *:warning: Warning: This may cause some unexpected functionality in queries, so it is recommended to only use this as a development

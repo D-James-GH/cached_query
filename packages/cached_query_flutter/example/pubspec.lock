@@ -23,18 +23,18 @@ packages:
     source: hosted
     version: "2.1.0"
   cached_query:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../../cached_query"
-      relative: true
-    source: path
+      name: cached_query
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.3.1+4"
   cached_query_flutter:
     dependency: "direct main"
     description:
-      path: ".."
-      relative: true
-    source: path
+      name: cached_query_flutter
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "0.4.1+4"
   characters:
     dependency: transitive
