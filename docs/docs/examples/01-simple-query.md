@@ -17,11 +17,13 @@ The setup is optional but to take full advantage of cached query we need to call
 The `config` function lets cached query know that it should re-fetch queries if the connectivity is established and if
 the app comes back into view.
 ```dart
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
-    refetchOnResume: true,
-    refetchOnConnection: true,
+    config: QueryConfigFlutter(
+      refetchOnResume: true,
+      refetchOnConnection: true,
+    ),
   );
   runApp(const MyApp());
 }

@@ -98,21 +98,21 @@ packages:
       name: cached_query
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.1+4"
+    version: "0.4.0"
   cached_query_flutter:
     dependency: "direct main"
     description:
       name: cached_query_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.1+4"
+    version: "0.5.0"
   cached_storage:
     dependency: "direct main"
     description:
       name: cached_storage
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.0+12"
+    version: "0.2.0"
   characters:
     dependency: transitive
     description:
@@ -475,7 +475,7 @@ packages:
       name: sqflite
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.2.1"
+    version: "2.2.2"
   sqflite_common:
     dependency: transitive
     description:

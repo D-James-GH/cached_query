@@ -221,12 +221,14 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 In order to take advantage of re-fetch on connection and re-fetching when the app comes back into view we need to configure Cached Query Flutter. 
 
 ```dart
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-
-  CachedQuery.instance
-      .configFlutter(refetchOnResume: true, refetchOnConnection: true);
-
+  CachedQuery.instance.configFlutter(
+    config: QueryConfigFlutter(
+      refetchOnResume: true,
+      refetchOnConnection: true,
+    ),
+  );
   runApp(const MyApp());
 }
 

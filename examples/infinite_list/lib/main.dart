@@ -1,12 +1,16 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
+import 'package:cached_storage/cached_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:infinite_list/posts/post_list_screen.dart';
+import 'package:infinite_list/posts/view/post_list_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
-    refetchOnResume: true,
-    refetchOnConnection: true,
+    storage: await CachedStorage.ensureInitialized(),
+    config: QueryConfigFlutter(
+      refetchOnResume: true,
+      refetchOnConnection: true,
+    ),
   );
   runApp(const MyApp());
 }
