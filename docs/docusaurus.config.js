@@ -124,7 +124,7 @@ const config = {
             href: "https://github.com/D-James-GH/cached_query/tree/main/packages/cached_query",
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Cached Query, Inc. Built with Docusaurus.`,
+        copyright: `Built with Docusaurus.`,
       },
       prism: {
         theme: lightCodeTheme,

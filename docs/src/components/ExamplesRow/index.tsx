@@ -17,15 +17,19 @@ const examples: Props[] = [
     slug: "with-flutter-bloc",
     name: "Simple Query with Flutter Bloc",
     repo: "https://github.com/D-James-GH/cached_query/tree/main/examples/simple_caching_with_bloc",
-    description:
-      "The simplest and quickest way to get up and running with Cached Query.",
+    description: "Caching with Flutter Bloc",
+  },
+  {
+    slug: "infinite-list",
+    name: "Infinite List",
+    repo: "https://github.com/D-James-GH/cached_query/tree/main/examples/infinite_list",
+    description: "Easily create an Infinite list with InfiniteQuery",
   },
   {
     slug: "infinite-list-with-bloc",
     name: "Infinite List with Bloc",
     repo: "https://github.com/D-James-GH/cached_query/tree/main/examples/infinite_list_with_bloc",
-    description:
-      "The simplest and quickest way to get up and running with Cached Query.",
+    description: "Create an Infinite list with flutter bloc and Infinite Query",
   },
 ];
 
