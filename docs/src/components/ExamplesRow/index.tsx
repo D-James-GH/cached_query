@@ -20,7 +20,7 @@ const examples: Props[] = [
     description: "Caching with Flutter Bloc",
   },
   {
-    slug: "infinite-list",
+    slug: "infinite-query",
     name: "Infinite List",
     repo: "https://github.com/D-James-GH/cached_query/tree/main/examples/infinite_list",
     description: "Easily create an Infinite list with InfiniteQuery",
