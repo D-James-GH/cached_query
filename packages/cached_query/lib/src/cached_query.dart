@@ -9,7 +9,9 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 part 'infinite_query.dart';
+
 part 'query.dart';
+
 part "query_base.dart";
 
 /// Should return true if a condition is met.
@@ -19,6 +21,9 @@ typedef WhereCallback = bool Function(QueryBase<dynamic, dynamic>);
 
 /// Used to serialize the query data when fetched from local storage.
 typedef Serializer = dynamic Function(dynamic json);
+
+/// Used to match multiple queries.
+typedef KeyFilterFunc = bool Function(dynamic unencodedKey, String key);
 
 /// Update function used to update the data in a query.
 ///
@@ -109,13 +114,30 @@ class CachedQuery {
     return null;
   }
 
+  ///
+
   /// Update the data of an [Query] at a given key.
+  ///
+  /// Optionally use the [filterFn] to update multiple queries at once.
   void updateQuery<Data>({
-    required Object key,
+    Object? key,
+    KeyFilterFunc? filterFn,
     required UpdateFunc<Data> updateFn,
   }) {
-    final query = getQuery(key);
-    if (query != null) {
+    assert(
+      key != null || filterFn != null,
+      "key or filterFn must not be null",
+    );
+    List<QueryBase<dynamic, dynamic>> queries = [];
+    if (filterFn != null) {
+      queries = _filterQueryKey(filter: filterFn);
+    } else if (key != null) {
+      final query = getQuery(key);
+      if (query != null) {
+        queries.add(query);
+      }
+    }
+    for (final query in queries) {
       assert(
         query is! InfiniteQuery,
         "Query at key $key is an InfiniteQuery. To update an InfiniteQuery use updateInfiniteQuery",
@@ -127,11 +149,26 @@ class CachedQuery {
 
   /// Update the data of an [InfiniteQuery] at a given key.
   void updateInfiniteQuery<Data>({
-    required Object key,
+    Object? key,
+    KeyFilterFunc? filterFn,
     required UpdateFunc<List<Data>> updateFn,
   }) {
-    final query = getQuery(key);
-    if (query != null) {
+    assert(
+      key != null || filterFn != null,
+      "key or filterFn must not be null",
+    );
+    List<QueryBase<dynamic, dynamic>> queries = [];
+
+    if (filterFn != null) {
+      queries = _filterQueryKey(filter: filterFn);
+    } else if (key != null) {
+      final query = getQuery(key);
+      if (query != null) {
+        queries.add(query);
+      }
+    }
+
+    for (final query in queries) {
       assert(
         query is! Query,
         "InfiniteQuery at key $key is an Query. To update a Query use updateQuery",
@@ -211,6 +248,14 @@ class CachedQuery {
   void addQuery(QueryBase<dynamic, dynamic> query) {
     observer.onQueryCreation(query);
     _queryCache[query.key] = query;
+  }
+
+  List<QueryBase<dynamic, dynamic>> _filterQueryKey({
+    required KeyFilterFunc filter,
+  }) {
+    return _queryCache.values
+        .where((element) => filter(element.unencodedKey, element.key))
+        .toList();
   }
 }
 

@@ -72,6 +72,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   InfiniteQuery._internal({
     required InfiniteQueryFunc<T, A> queryFn,
     required String key,
+    required Object unencodedKey,
     required GetNextArg<T, A> getNextArg,
     required QueryConfig? config,
     required List<T>? initialData,
@@ -85,6 +86,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _onError = onError,
         super._internal(
           key: key,
+          unencodedKey: unencodedKey,
           config: config,
           state: InfiniteQueryState<T>(
             data: initialData ?? [],
@@ -111,6 +113,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     if (query == null || query is! InfiniteQuery<T, A>) {
       query = InfiniteQuery<T, A>._internal(
         queryFn: queryFn,
+        unencodedKey: key,
         getNextArg: getNextArg,
         forceRevalidateAll: forceRevalidateAll,
         revalidateAll: revalidateAll,
@@ -152,7 +155,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   ///
   /// The [updateFn] passes the current query data and must return new data of
   /// type [T]
-  void update(List<T> Function(List<T>?) updateFn) {
+  void update(UpdateFunc<List<T>> updateFn) {
     final newData = updateFn(_state.data);
     _setState(_state.copyWith(data: newData));
     _emit();

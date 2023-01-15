@@ -35,10 +35,13 @@ abstract class StateBase {
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
 abstract class QueryBase<T, State extends QueryState<dynamic>> {
-  /// The key used to store and access the query.
+  /// The key used to store and access the query. Encoded using jsonEncode.
   ///
   /// This is created by calling jsonEncode on the passed dynamic key.
   final String key;
+
+  /// The original key.
+  final Object unencodedKey;
 
   /// The current state of the query.
   State get state => _state;
@@ -86,6 +89,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 
   QueryBase._internal({
     required this.key,
+    required this.unencodedKey,
     required State state,
     required QueryConfig? config,
   })  : config = config ?? CachedQuery.instance.defaultConfig,

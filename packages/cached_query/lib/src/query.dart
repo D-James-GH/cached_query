@@ -39,6 +39,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
     required String key,
+    required Object unencodedKey,
     required QueryConfig? config,
     required Function queryFn,
     required T? initialData,
@@ -47,6 +48,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         _onSuccess = onSuccess,
         super._internal(
           config: config,
+          unencodedKey: unencodedKey,
           key: key,
           state: QueryState<T>(
             timeCreated: DateTime.now(),
@@ -70,6 +72,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     if (query == null) {
       query = Query<T>._internal(
         key: encodeKey(key),
+        unencodedKey: key,
         queryFn: queryFn,
         onError: onError,
         onSuccess: onSuccess,
