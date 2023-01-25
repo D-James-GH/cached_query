@@ -2,9 +2,10 @@ import 'dart:io';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:query_builder/jokes/joke_screen.dart';
-import 'package:query_builder/posts/post_service.dart';
+import 'package:full/posts/post_service.dart' as service;
+import 'package:full/posts/single_post_screen.dart';
 
+import '../jokes/joke_screen.dart';
 import 'post_model/post_model.dart';
 
 class PostListScreen extends StatefulWidget {
@@ -17,14 +18,13 @@ class PostListScreen extends StatefulWidget {
 
 class _PostListScreenState extends State<PostListScreen> {
   final _scrollController = ScrollController();
-  final _postService = PostService();
   late final InfiniteQuery<List<PostModel>, int> query;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    query = _postService.getPosts();
+    query = service.getPosts();
   }
 
   @override
@@ -48,7 +48,7 @@ class _PostListScreenState extends State<PostListScreen> {
         centerTitle: true,
         actions: [
           MutationBuilder<PostModel, PostModel>(
-            mutation: _postService.createPost(),
+            mutation: service.createPost(),
             builder: (context, state, mutate) {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -92,8 +92,9 @@ class _PostListScreenState extends State<PostListScreen> {
                     state.error is SocketException)
                   SliverToBoxAdapter(
                     child: DecoratedBox(
-                      decoration:
-                          BoxDecoration(color: Theme.of(context).errorColor),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                       child: const Text(
                         "No internet connection",
                         style: TextStyle(color: Colors.white),
@@ -103,7 +104,7 @@ class _PostListScreenState extends State<PostListScreen> {
                   ),
                 SliverToBoxAdapter(
                   child: MutationBuilder<PostModel, PostModel>(
-                    mutation: _postService.createPost(),
+                    mutation: service.createPost(),
                     builder: (context, state, _) {
                       if (state.status == QueryStatus.loading) {
                         return Container(
@@ -161,7 +162,7 @@ class _PostListScreenState extends State<PostListScreen> {
   }
 
   void _onScroll() {
-    final query = _postService.getPosts();
+    final query = service.getPosts();
     if (_isBottom && query.state.status != QueryStatus.loading) {
       query.getNextPage();
     }
@@ -192,31 +193,38 @@ class _Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-      decoration: const BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.black12)),
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<SinglePostScreen>(
+          builder: (context) => SinglePostScreen(id: post.id),
+        ),
       ),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Text(index.toString()),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  post.title,
-                  style: Theme.of(context).textTheme.headline6,
-                ),
-                Text(post.id.toString()),
-                Text(post.body),
-              ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+        decoration: const BoxDecoration(
+          border: Border(bottom: BorderSide(color: Colors.black12)),
+        ),
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text(index.toString()),
             ),
-          ),
-        ],
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    post.title,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Text(post.id.toString()),
+                  Text(post.body),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:examples/models/post_model.dart';
-import 'package:examples/services/post.service.dart';
+
+import '../models/post_model.dart';
+import '../services/post.service.dart';
 
 class PostRepository {
   final _service = PostService();

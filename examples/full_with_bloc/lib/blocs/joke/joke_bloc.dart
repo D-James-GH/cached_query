@@ -3,9 +3,10 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:examples/models/joke_model.dart';
-import 'package:examples/repos/joke_repo.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+
+import '../../models/joke_model.dart';
+import '../../repos/joke_repo.dart';
 
 part 'joke_bloc.freezed.dart';
 part 'joke_event.dart';

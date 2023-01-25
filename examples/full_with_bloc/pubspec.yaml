@@ -1,4 +1,4 @@
-name: examples
+name: full_with_bloc
 description: A new Flutter project.
 
 publish_to: "none"
@@ -10,13 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.0.1
-  equatable: ^2.0.3
+  flutter_bloc: ^8.1.1
+  equatable: ^2.0.5
   get_it: 7.2.0
   freezed_annotation:
-  cached_query_flutter:
-    path: ../../packages/cached_query_flutter
-  http: ^0.13.4
+  cached_query_flutter: ^0.5.0
+  http: ^0.13.5
   bloc_concurrency: ^0.2.0
 
 dev_dependencies:

@@ -70,7 +70,7 @@ class _ListState extends State<_List> {
                       SliverToBoxAdapter(
                         child: DecoratedBox(
                           decoration: BoxDecoration(
-                              color: Theme.of(context).errorColor),
+                              color: Theme.of(context).colorScheme.error),
                           child: const Text(
                             "No internet connection",
                             style: TextStyle(color: Colors.white),

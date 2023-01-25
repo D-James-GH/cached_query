@@ -19,8 +19,8 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeQueryConfig_0 extends _i1.SmartFake implements _i2.QueryConfig {
-  _FakeQueryConfig_0(
+class _FakeObject_0 extends _i1.SmartFake implements Object {
+  _FakeObject_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -29,8 +29,18 @@ class _FakeQueryConfig_0 extends _i1.SmartFake implements _i2.QueryConfig {
         );
 }
 
-class _FakeQueryState_1<T> extends _i1.SmartFake implements _i2.QueryState<T> {
-  _FakeQueryState_1(
+class _FakeQueryConfig_1 extends _i1.SmartFake implements _i2.QueryConfig {
+  _FakeQueryConfig_1(
+    Object parent,
+    Invocation parentInvocation,
+  ) : super(
+          parent,
+          parentInvocation,
+        );
+}
+
+class _FakeQueryState_2<T> extends _i1.SmartFake implements _i2.QueryState<T> {
+  _FakeQueryState_2(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -53,9 +63,17 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
         returnValue: '',
       ) as String);
   @override
+  Object get unencodedKey => (super.noSuchMethod(
+        Invocation.getter(#unencodedKey),
+        returnValue: _FakeObject_0(
+          this,
+          Invocation.getter(#unencodedKey),
+        ),
+      ) as Object);
+  @override
   _i2.QueryConfig get config => (super.noSuchMethod(
         Invocation.getter(#config),
-        returnValue: _FakeQueryConfig_0(
+        returnValue: _FakeQueryConfig_1(
           this,
           Invocation.getter(#config),
         ),
@@ -63,7 +81,7 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
   @override
   _i2.QueryState<T> get state => (super.noSuchMethod(
         Invocation.getter(#state),
-        returnValue: _FakeQueryState_1<T>(
+        returnValue: _FakeQueryState_2<T>(
           this,
           Invocation.getter(#state),
         ),
@@ -86,7 +104,7 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
   @override
   _i3.Future<_i2.QueryState<T>> get result => (super.noSuchMethod(
         Invocation.getter(#result),
-        returnValue: _i3.Future<_i2.QueryState<T>>.value(_FakeQueryState_1<T>(
+        returnValue: _i3.Future<_i2.QueryState<T>>.value(_FakeQueryState_2<T>(
           this,
           Invocation.getter(#result),
         )),
@@ -97,7 +115,7 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
           #refetch,
           [],
         ),
-        returnValue: _i3.Future<_i2.QueryState<T>>.value(_FakeQueryState_1<T>(
+        returnValue: _i3.Future<_i2.QueryState<T>>.value(_FakeQueryState_2<T>(
           this,
           Invocation.method(
             #refetch,
