@@ -1,7 +1,7 @@
-import 'package:examples/screens/joke.screen.dart';
-import 'package:examples/screens/post_list.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:full_with_bloc/screens/joke.screen.dart';
+import 'package:full_with_bloc/screens/post_list.screen.dart';
 
 import 'blocs/joke/joke_bloc.dart';
 import 'blocs/post/post_bloc.dart';

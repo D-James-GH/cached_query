@@ -161,7 +161,7 @@ class Mutation<T, A> {
       _setState(_state.copyWith(status: QueryStatus.success, data: res));
       if (_invalidateQueries != null) {
         for (final k in _invalidateQueries!) {
-          CachedQuery.instance.invalidateCache(k);
+          CachedQuery.instance.invalidateCache(key: k);
         }
       }
       if (_refetchQueries != null) {

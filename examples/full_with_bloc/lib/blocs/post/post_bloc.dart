@@ -5,9 +5,10 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:equatable/equatable.dart';
-import 'package:examples/models/post_model.dart';
-import 'package:examples/repos/post_repo.dart';
 import 'package:meta/meta.dart';
+
+import '../../models/post_model.dart';
+import '../../repos/post_repo.dart';
 
 part 'post_event.dart';
 part 'post_state.dart';

@@ -2,7 +2,8 @@ import 'dart:convert';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:query_builder/jokes/joke_model/joke_model.dart';
+
+import 'joke_model/joke_model.dart';
 
 class JokeService {
   final http.Client client = http.Client();

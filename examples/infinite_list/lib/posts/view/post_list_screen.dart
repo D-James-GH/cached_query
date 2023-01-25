@@ -55,8 +55,8 @@ class _PostListScreenState extends State<PostListScreen> {
                 if (state.status == QueryStatus.error)
                   SliverToBoxAdapter(
                     child: DecoratedBox(
-                      decoration:
-                          BoxDecoration(color: Theme.of(context).errorColor),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.error),
                       child: Text(
                         state.error is SocketException
                             ? "No internet connection"

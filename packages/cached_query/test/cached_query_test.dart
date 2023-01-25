@@ -47,6 +47,32 @@ void main() {
       verify(query.invalidateQuery());
     });
 
+    test("Invalidate using filter", () async {
+      final query = MockQuery<String>();
+      final query2 = MockQuery<String>();
+      final query3 = MockQuery<String>();
+      when(query.key).thenReturn("query");
+      when(query.unencodedKey).thenReturn("query");
+      when(query2.key).thenReturn("query2");
+      when(query2.unencodedKey).thenReturn("query2");
+      when(query3.key).thenReturn("other_key");
+      when(query3.unencodedKey).thenReturn("other_key");
+      CachedQuery.asNewInstance()
+        ..addQuery(query)
+        ..addQuery(query2)
+        ..addQuery(query3)
+        ..invalidateCache(
+          filterFn: (unencodedKey, key) {
+            if (key.contains("query")) {
+              return true;
+            }
+            return false;
+          },
+        );
+      verify(query.invalidateQuery());
+      verify(query2.invalidateQuery());
+      verifyNever(query3.invalidateQuery());
+    });
     test("Invalidate the query", () async {
       final query = MockQuery<String>();
       when(query.key).thenReturn("query");
@@ -56,7 +82,7 @@ void main() {
       CachedQuery.asNewInstance()
         ..addQuery(query)
         ..addQuery(query)
-        ..invalidateCache("query");
+        ..invalidateCache(key: "query");
       verify(query.invalidateQuery());
       verifyNever(query2.invalidateQuery());
     });
@@ -69,6 +95,53 @@ void main() {
         ..addQuery(query)
         ..deleteCache();
       expect(cachedQuery.getQuery("delete"), isNull);
+    });
+
+    test("Delete using filter", () async {
+      final query = MockQuery<String>();
+      final query2 = MockQuery<String>();
+      final query3 = MockQuery<String>();
+      when(query.key).thenReturn("query");
+      when(query.unencodedKey).thenReturn("query");
+      when(query2.key).thenReturn("query2");
+      when(query2.unencodedKey).thenReturn("query2");
+      when(query3.key).thenReturn("other_key");
+      when(query3.unencodedKey).thenReturn("other_key");
+      final cache = CachedQuery.asNewInstance()
+        ..addQuery(query)
+        ..addQuery(query2)
+        ..addQuery(query3)
+        ..deleteCache(
+          filterFn: (unencodedKey, key) {
+            if (key.contains("query")) {
+              return true;
+            }
+            return false;
+          },
+        );
+      expect(cache.getQuery("query"), isNull);
+      expect(cache.getQuery("query2"), isNull);
+      expect(cache.getQuery("other_key"), isNotNull);
+    });
+
+    test("Delete using filter with storage", () async {
+      final query = MockQuery<String>();
+      final storage = MockStorageInterface();
+      when(query.key).thenReturn("query");
+      when(query.unencodedKey).thenReturn("query");
+      CachedQuery.asNewInstance()
+        ..config(storage: storage)
+        ..addQuery(query)
+        ..deleteCache(
+          deleteStorage: true,
+          filterFn: (unencodedKey, key) {
+            if (key.contains("query")) {
+              return true;
+            }
+            return false;
+          },
+        );
+      verify(storage.delete("query"));
     });
     test("Delete whole cache and storage", () async {
       final query = MockQuery<String>();
@@ -107,6 +180,30 @@ void main() {
         );
       verify(query.update(any));
     });
+
+    test("update query multiple queries with filter", () {
+      final query = MockQuery<String>();
+      final query2 = MockQuery<String>();
+      final query3 = MockQuery<String>();
+      when(query.key).thenReturn("query");
+      when(query.unencodedKey).thenReturn("query");
+      when(query2.key).thenReturn("query2");
+      when(query2.unencodedKey).thenReturn("query2");
+      when(query3.key).thenReturn("other_key");
+      when(query3.unencodedKey).thenReturn("other_key");
+      CachedQuery.asNewInstance()
+        ..addQuery(query)
+        ..addQuery(query2)
+        ..addQuery(query3)
+        ..updateQuery<String>(
+          filterFn: (unencodedKey, key) => key.startsWith("query"),
+          updateFn: (value) => "",
+        );
+      verify(query.update(any));
+      verify(query2.update(any));
+      verifyNever(query3.update(any));
+    });
+
     test("update infinite query", () {
       final query = MockInfiniteQuery<String, int>();
       when(query.key).thenReturn("update");

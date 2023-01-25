@@ -23,12 +23,12 @@ typedef WhereCallback = bool Function(QueryBase<dynamic, dynamic>);
 typedef Serializer = dynamic Function(dynamic json);
 
 /// Used to match multiple queries.
-typedef KeyFilterFunc = bool Function(dynamic unencodedKey, String key);
+typedef KeyFilterFunc = bool Function(Object unencodedKey, String key);
 
 /// Update function used to update the data in a query.
 ///
 /// Must return the new data.
-typedef UpdateFunc<T> = T Function(T? oldData);
+typedef UpdateFunc<T> = T? Function(T? oldData);
 
 ///[CachedQuery] is a singleton that keeps track of all the cached queries
 class CachedQuery {
@@ -140,10 +140,11 @@ class CachedQuery {
     for (final query in queries) {
       assert(
         query is! InfiniteQuery,
-        "Query at key $key is an InfiniteQuery. To update an InfiniteQuery use updateInfiniteQuery",
+        "Query is an InfiniteQuery. To update an InfiniteQuery use updateInfiniteQuery",
       );
-      if (query is InfiniteQuery) return;
-      (query as Query<Data>).update(updateFn);
+      if (query is Query) {
+        (query as Query<Data>).update(updateFn);
+      }
     }
   }
 
@@ -174,8 +175,9 @@ class CachedQuery {
         "InfiniteQuery at key $key is an Query. To update a Query use updateQuery",
       );
 
-      if (query is Query) return;
-      (query as InfiniteQuery<Data, dynamic>).update(updateFn);
+      if (query is InfiniteQuery) {
+        (query as InfiniteQuery<Data, dynamic>).update(updateFn);
+      }
     }
   }
 
@@ -194,8 +196,17 @@ class CachedQuery {
   ///
   /// Pass a key to invalidate a query at the given key. Will invalidate both
   /// infinite queries and queries.
-  void invalidateCache([Object? key]) {
-    if (key != null) {
+  void invalidateCache({
+    Object? key,
+    KeyFilterFunc? filterFn,
+  }) {
+    if (filterFn != null) {
+      final queries = _filterQueryKey(filter: filterFn);
+      // other wise invalidate the whole cache
+      for (final query in queries) {
+        query.invalidateQuery();
+      }
+    } else if (key != null) {
       final k = encodeKey(key);
       if (_queryCache.containsKey(k)) {
         _queryCache[k]?.invalidateQuery();
@@ -212,9 +223,21 @@ class CachedQuery {
   ///
   /// Pass a key to delete a query at the given key. Will invalidate both
   /// infinite queries and queries.
-  void deleteCache({Object? key, bool deleteStorage = false}) {
+  void deleteCache({
+    Object? key,
+    bool deleteStorage = false,
+    KeyFilterFunc? filterFn,
+  }) {
     observer.onQueryDeletion(key);
-    if (key != null) {
+    if (filterFn != null) {
+      final queries = _filterQueryKey(filter: filterFn);
+      for (final query in queries) {
+        _queryCache.remove(query.key);
+        if (deleteStorage && storage != null) {
+          storage!.delete(query.key);
+        }
+      }
+    } else if (key != null) {
       final stringKey = encodeKey(key);
       if (_queryCache.containsKey(stringKey)) {
         _queryCache.remove(stringKey);

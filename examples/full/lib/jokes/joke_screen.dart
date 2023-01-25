@@ -2,9 +2,10 @@ import 'dart:io';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:query_builder/jokes/joke_model/joke_model.dart';
-import 'package:query_builder/jokes/joke_service.dart';
-import 'package:query_builder/posts/post_list_screen.dart';
+
+import '../posts/post_list_screen.dart';
+import 'joke_model/joke_model.dart';
+import 'joke_service.dart';
 
 class JokeScreen extends StatelessWidget {
   static const routeName = '/screenTwo';
@@ -53,7 +54,7 @@ class JokeScreen extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   decoration:
-                      BoxDecoration(color: Theme.of(context).errorColor),
+                      BoxDecoration(color: Theme.of(context).colorScheme.error),
                   child: const Text(
                     "No internet connection",
                     style: TextStyle(color: Colors.white),

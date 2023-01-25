@@ -1,7 +1,7 @@
-import 'package:examples/blocs/joke/joke_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../blocs/joke/joke_bloc.dart';
 import 'post_list.screen.dart';
 
 class JokeScreen extends StatelessWidget {

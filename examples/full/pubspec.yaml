@@ -1,4 +1,4 @@
-name: query_builder
+name: full
 description: A new Flutter project.
 
 # Prevent accidental publishing to pub.dev.
@@ -13,26 +13,22 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.5
-  freezed_annotation:
   meta: ^1.8.0
-  cached_query_flutter:
-    path: ../../packages/cached_query_flutter
-  cached_storage:
-    path: ../../packages/cached_storage
+  json_annotation: ^4.8.0
+  freezed_annotation: ^2.2.0
+  cached_query_flutter: ^0.5.0
+  cached_storage: ^0.2.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner:
-  freezed:
-  json_serializable:
+  build_runner: ^2.3.3
+  freezed: ^2.3.2
+  json_serializable: ^6.6.0
   flutter_lints: ^2.0.1
 
 flutter:
   uses-material-design: true
-
-  # Enable generation of localized Strings from arb files.
-  generate: true
 
   assets:
     # Add assets from the images directory to the application.

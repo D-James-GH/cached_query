@@ -1,6 +1,7 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:examples/models/joke_model.dart';
-import 'package:examples/services/joke.service.dart';
+
+import '../models/joke_model.dart';
+import '../services/joke.service.dart';
 
 class JokeRepository {
   final _service = JokeService();
