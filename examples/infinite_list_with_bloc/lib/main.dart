@@ -8,8 +8,10 @@ import 'post/pages/post_list_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
-    refetchOnResume: true,
-    refetchOnConnection: true,
+    config: QueryConfigFlutter(
+      refetchOnResume: true,
+      refetchOnConnection: true,
+    ),
   );
   runApp(const MyApp());
 }

@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/post_model.dart';
 
-class Post extends StatelessWidget 
-{
+class Post extends StatelessWidget {
   final PostModel post;
 
   const Post({Key? key, required this.post}) : super(key: key);
@@ -27,7 +26,7 @@ class Post extends StatelessWidget
               children: [
                 Text(
                   post.title,
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.headlineSmall,
                 ),
                 Text(post.body),
               ],

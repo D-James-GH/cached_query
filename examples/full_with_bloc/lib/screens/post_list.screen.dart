@@ -1,8 +1,9 @@
-import 'package:examples/blocs/post/post_bloc.dart';
-import 'package:examples/models/post_model.dart';
-import 'package:examples/screens/joke.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../blocs/post/post_bloc.dart';
+import '../models/post_model.dart';
+import 'joke.screen.dart';
 
 class PostListScreen extends StatefulWidget {
   static const routeName = '/';
@@ -174,7 +175,7 @@ class _Post extends StatelessWidget {
               children: [
                 Text(
                   post.title,
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
                 Text(post.body),
               ],
