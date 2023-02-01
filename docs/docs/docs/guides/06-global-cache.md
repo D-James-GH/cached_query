@@ -41,7 +41,7 @@ CachedQuery.instance.deleteCache(deleteStorage: true);
 ```
 
 ## Manually Adding and Removing Queries 
-You can manually add or get a query from the cache, although it is not normally necessary to add as the query will call
+You can manually add or get a query from the cache, although it is not normally necessary to add it as the query will call
 this for you.
 
 To add a query or infinite query to cache: 
@@ -68,4 +68,23 @@ CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
 );
 ```
 
+## Query Key Filter Function
 
+Many of the functions on the CachedQuery instance take a key or a filterFn. A key is a direct reference to a cached query where as the `filterFn` allows for selecting multiple queries at once. 
+
+For example, say you have a list of todos, and each todo has been fetched with the key `"todos/${id}"`, if a user selects a "complete all" button then we will want to find all the todos in the cache and update them, regardless of their id.
+```dart
+CachedQuery.instance.updateQuery<Todo>(
+  updateFn: (oldData) => oldData?.copyWith(complete: true),
+  filterFn: (unencodedKey, key) => key.startsWith("todos/"),
+);
+```
+
+Notice that the `filterFn` passes through two arguments; `unencodedKey` and `key`. The `unencodedKey` is the original key the you passed to the query. The `key` is the json-encoded string of the `unencodedKey`. Using the example above, if the todo keys were altered to be `["todo", id]` then we could use the unencoded key to filter the queries.
+
+```dart
+CachedQuery.instance.updateQuery<Todo>(
+  updateFn: (oldData) => oldData?.copyWith(complete: true),
+  filterFn: (unencodedKey, key) => unencodedKey is List && unencodedKey.first == "todo",
+);
+```
