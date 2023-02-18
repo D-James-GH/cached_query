@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-02-18
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v0.5.0`](#cached_query---v050)
+ - [`cached_query_flutter` - `v0.6.0`](#cached_query_flutter---v060)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v0.2.0+2`](#cached_storage---v0202)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v0.2.0+2`
+
+---
+
+#### `cached_query` - `v0.5.0`
+
+ - **BREAKING** **FEAT**: combine updateInfiniteQuery and updateQuery in the global CachedQuery object. ([e8fd8602](https://github.com/D-James-GH/cached_query/commit/e8fd86029af9cebc9f06f0d20e432865a02db69e))
+
+#### `cached_query_flutter` - `v0.6.0`
+
+ - **BREAKING** **FEAT**: combine updateInfiniteQuery and updateQuery in the global CachedQuery object. ([e8fd8602](https://github.com/D-James-GH/cached_query/commit/e8fd86029af9cebc9f06f0d20e432865a02db69e))
+
+
 ## 2023-01-25
 
 ### Changes
