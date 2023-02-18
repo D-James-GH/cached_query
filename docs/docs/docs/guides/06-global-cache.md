@@ -56,17 +56,29 @@ CachedQuery.instance.getQuery(key);
 ## Updating the Cache
 It is often useful to be able to update the cache manually, for example, when performing [optimistic updates](/docs/guides/optimistic-updates)
 
-Either use `updateQuery` or `updateInfiniteQuery` to update a query. Any changes will be emitted down the query stream.
-Both update functions require a key and a callback which will be passed the current data and return the result.
+Use `updateQuery` to update a query or an infinite query. Any changes will be emitted down the query stream.
+The update function requires either a `key` or a `filterFn` to select the query to update. The `updateFn` is then called with the current data and should return the new data.
+
 ```dart
-CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
+CachedQuery.instance.updateQuery(
   key: "posts",
-  updateFn: (old) => [
-    [response, ...old![0]],
-    ...old.sublist(1).toList()
-  ],
+  updateFn: (dynamic old) {
+    if (old is List<List<PostModel>>) {
+      return <List<PostModel>>[
+        [newPost, ...old[0]],
+        ...old.sublist(1).toList()
+      ];
+    }
+  },
 );
 ```
+
+:::info
+As an alternative to using `CachedQuery.instance.updateQuery` you can also use the `whereQuery` method in tandem with the `update` method on the query object itself.  
+
+This would have better type safety but would result in more code.
+``
+:::
 
 ## Query Key Filter Function
 
@@ -74,8 +86,12 @@ Many of the functions on the CachedQuery instance take a key or a filterFn. A ke
 
 For example, say you have a list of todos, and each todo has been fetched with the key `"todos/${id}"`, if a user selects a "complete all" button then we will want to find all the todos in the cache and update them, regardless of their id.
 ```dart
-CachedQuery.instance.updateQuery<Todo>(
-  updateFn: (oldData) => oldData?.copyWith(complete: true),
+CachedQuery.instance.updateQuery(
+  updateFn: (dynamic oldData){ 
+    if(oldData is Todo){
+      return oldData?.copyWith(complete: true);
+    }
+  },
   filterFn: (unencodedKey, key) => key.startsWith("todos/"),
 );
 ```
@@ -84,7 +100,11 @@ Notice that the `filterFn` passes through two arguments; `unencodedKey` and `key
 
 ```dart
 CachedQuery.instance.updateQuery<Todo>(
-  updateFn: (oldData) => oldData?.copyWith(complete: true),
+  updateFn: (dynamic oldData){ 
+    if(oldData is Todo){
+      return oldData?.copyWith(complete: true);
+    }
+  },
   filterFn: (unencodedKey, key) => unencodedKey is List && unencodedKey.first == "todo",
 );
 ```

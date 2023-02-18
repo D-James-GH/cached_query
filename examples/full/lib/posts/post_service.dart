@@ -73,21 +73,17 @@ Mutation<PostModel, PostModel> createPost() {
       return PostModel.fromJson(res);
     },
     onStartMutation: (newPost) {
-      final fallback = (CachedQuery.instance.getQuery("posts")
-              as InfiniteQuery<List<PostModel>, int>)
-          .state
-          .data;
-      CachedQuery.instance.updateQuery(
-        key: "posts",
-        updateFn: (dynamic old) {
-          if (old is List<List<PostModel>>) {
-            return <List<PostModel>>[
-              [newPost, ...old[0]],
-              ...old.sublist(1).toList()
-            ];
-          }
-        },
+      final query = CachedQuery.instance.getQuery("posts")
+          as InfiniteQuery<List<PostModel>, int>;
+
+      final fallback = query.state.data;
+      query.update(
+        (old) => [
+          [newPost, ...?old?.first],
+          ...?old?.sublist(1).toList()
+        ],
       );
+
       return fallback;
     },
     onSuccess: (args, newPost) {},

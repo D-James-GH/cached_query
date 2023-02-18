@@ -18,12 +18,16 @@ Mutation<PostModel, PostModel>(
     return PostModel.fromJson(res);
   },
   onStartMutation: (postArg) {
-    CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
+    CachedQuery.instance.updateQuery(
       key: "posts",
-      updateFn: (old) => [
-        [postArg, ...old![0]],
-        ...old.sublist(1).toList()
-      ],
+      updateFn: (dynamic old) {
+        if (old is List<List<PostModel>>) {
+          return <List<PostModel>>[
+            [newPost, ...old[0]],
+            ...old.sublist(1).toList()
+          ];
+        }
+      },
     );
   },
 );
@@ -34,39 +38,45 @@ Anything that is returned from the `onStartMutation` hook will be passed as the 
 to rollback changes if something fails.
 
 ```dart
-Mutation<PostModel, PostModel>(
-  refetchQueries: ["posts"],
-  queryFn: (post) async {
-    final res = await _service.createPost(
-      title: post.title,
-      userId: post.userId,
-      body: post.body,
-    );
-    return PostModel.fromJson(res);
-  },
-  onStartMutation: (postArg) {
-   final fallback = (CachedQuery.instance.getQuery("posts")
-        as InfiniteQuery<List<PostModel>, int>)
-    .state
-    .data;
- 
-    CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
-      key: "posts",
-      updateFn: (old) => [
-        [postArg, ...old![0]],
-        ...old.sublist(1).toList()
-      ],
-    );
-    return fallback;
-  },
-  onError: (arg, error, fallback){
-    // Set the data back to the original state.
-    CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
-      key: "posts",
-      updateFn: (old) => fallback as List<List<PostModel>>,
-    );
-  } 
-);
+Mutation<PostModel, PostModel> createPost() {
+  return Mutation<PostModel, PostModel>(
+    key: "createPost",
+    invalidateQueries: ['posts'],
+    queryFn: (post) async {
+      final res = await Future.delayed(
+        const Duration(milliseconds: 400),
+        () => {
+          "id": 123,
+          "title": post.title,
+          "userId": post.userId,
+          "body": post.body,
+        },
+      );
+      return PostModel.fromJson(res);
+    },
+    onStartMutation: (newPost) {
+      final query = CachedQuery.instance.getQuery("posts")
+          as InfiniteQuery<List<PostModel>, int>;
+
+      final fallback = query.state.data;
+      query.update(
+        (old) => [
+          [newPost, ...?old?.first],
+          ...?old?.sublist(1).toList()
+        ],
+      );
+
+      return fallback;
+    },
+    onSuccess: (args, newPost) {},
+    onError: (arg, error, fallback) {
+      CachedQuery.instance.updateQuery(
+        key: "posts",
+        updateFn: (dynamic old) => fallback as List<List<PostModel>>,
+      );
+    },
+  );
+}
 ```
 In the above example we optimistically update the posts query with a new entry and return the old data from `onStartMutation`.
 If the queryFn throws an error then we set the infinite query data to be the same as it was before the mutation.
@@ -76,6 +86,7 @@ Often the response of a post request is the correct data, so you may want to upd
 Use `onSuccess` to do just that.
 
 The example below updated the cache after the mutation has completed using the response.
+
 ```dart
 Mutation<PostModel, PostModel>(
   refetchQueries: ["posts"],
@@ -88,12 +99,18 @@ Mutation<PostModel, PostModel>(
     return PostModel.fromJson(res);
   },
   onSuccess: (response, postArg) {
-    CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
+    CachedQuery.instance.updateQuery(
       key: "posts",
-      updateFn: (old) => [
-        [response, ...old![0]],
-        ...old.sublist(1).toList()
-      ],
+      updateFn: (dynamic old) {
+        if(old is! List<List<PostModel>>) {
+          return old;
+        }
+        
+        return [
+          [response, ...old[0]],
+          ...old.sublist(1).toList()
+        ],
+      }
     );
   },
 );

@@ -167,34 +167,58 @@ therefore the state can be observed from anywhere.
 
 There are a few useful callbacks that enable optimistic updates. 
 
-The order of execution is: `onStartMutation -> queryFn -> onSuccess`. `onError` is called if the mutation fails.  
+The order of execution is: `onStartMutation -> queryFn -> onSuccess`. `onError` is called if the mutation fails and can be used to rollback changes.  
+Anything returned from onStartMutation will be passed to onError as the fallback.
 
 ```dart
-Mutation<PostModel, PostModel>(
+Mutation<PostModel, PostModel> createPost() {
+  return Mutation<PostModel, PostModel>(
     key: "createPost",
-    queryFn: (post) => createPost(post),
-    onStartMutation: (post) {
-      CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
-        key: "posts",
-        updateFn: (old) => [
-          [newPost, ...old![0]],
-          ...old.sublist(1).toList()
+    invalidateQueries: ['posts'],
+    queryFn: (post) async {
+      final res = await Future.delayed(
+        const Duration(milliseconds: 400),
+        () => {
+          "id": 123,
+          "title": post.title,
+          "userId": post.userId,
+          "body": post.body,
+        },
+      );
+      return PostModel.fromJson(res);
+    },
+    onStartMutation: (newPost) {
+      final query = CachedQuery.instance.getQuery("posts")
+          as InfiniteQuery<List<PostModel>, int>;
+
+      final fallback = query.state.data;
+      query.update(
+        (old) => [
+          [newPost, ...?old?.first],
+          ...?old?.sublist(1).toList()
         ],
       );
+
+      return fallback;
     },
-    onSuccess: (argument, returnedValue) {
-      // Do something with the returned value. 
+    onSuccess: (args, newPost) {},
+    onError: (arg, error, fallback) {
+      CachedQuery.instance.updateQuery(
+        key: "posts",
+        updateFn: (dynamic old) => fallback as List<List<PostModel>>,
+      );
     },
-);
+  );
+}
 ```
+
 ### Updating the query cache.
 
  All the versions of updating a query require an update function. An update function passes through the current cached 
  data and must return the new data of the same type. 
 
  There are a few ways to update the query cache.
-* If you know the key of the query you can use: `CachedQuery.instance.updateInfiniteQuery` or 
-`CachedQuery.instance.updateQuery`. Using the key will get the query from cache and call the update function on it.
+* If you know the key of the query you can use: `CachedQuery.instance.updateQuery`. Using the key will get the query from cache and call the update function on it.
 * If you have an instance of a query or infinite query, you can call update directly on it. 
 `Query.update((current) => current + 1)`
 
