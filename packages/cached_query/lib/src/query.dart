@@ -95,6 +95,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   ///
   /// The [updateFn] passes the current query data and must return new data of
   /// type [T]
+  @override
   void update(UpdateFunc<T> updateFn) {
     final newData = updateFn(_state.data);
     _setState(_state.copyWith(data: newData));

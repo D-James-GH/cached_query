@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class SinglePostScreen extends StatelessWidget {
   final int id;
+
   const SinglePostScreen({super.key, required this.id});
 
   @override
@@ -16,9 +17,12 @@ class SinglePostScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              CachedQuery.instance.updateQuery<PostModel>(
-                updateFn: (oldData) =>
-                    oldData?.copyWith(title: "Changed title"),
+              CachedQuery.instance.updateQuery(
+                updateFn: (dynamic oldData) {
+                  if (oldData is PostModel) {
+                    return oldData.copyWith(title: "Changed title");
+                  }
+                },
                 filterFn: (dynamic unencodedKey, key) =>
                     key.startsWith("posts/"),
               );

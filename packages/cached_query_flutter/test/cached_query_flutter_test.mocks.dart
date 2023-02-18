@@ -381,10 +381,10 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
         [key],
       )) as _i2.QueryBase<dynamic, dynamic>?);
   @override
-  void updateQuery<Data>({
+  void updateQuery({
     Object? key,
     _i2.KeyFilterFunc? filterFn,
-    required _i2.UpdateFunc<Data>? updateFn,
+    required _i2.UpdateFunc<dynamic>? updateFn,
   }) =>
       super.noSuchMethod(
         Invocation.method(

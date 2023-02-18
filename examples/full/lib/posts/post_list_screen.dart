@@ -10,6 +10,7 @@ import 'post_model/post_model.dart';
 
 class PostListScreen extends StatefulWidget {
   static const routeName = '/';
+
   const PostListScreen({Key? key}) : super(key: key);
 
   @override
@@ -98,6 +99,20 @@ class _PostListScreenState extends State<PostListScreen> {
                       child: const Text(
                         "No internet connection",
                         style: TextStyle(color: Colors.white),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                if (state.status == QueryStatus.error &&
+                    state.error is! SocketException)
+                  SliverToBoxAdapter(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                      child: Text(
+                        "Error: ${state.error}",
+                        style: const TextStyle(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
                     ),

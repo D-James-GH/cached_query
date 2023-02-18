@@ -174,9 +174,9 @@ void main() {
       when(query.key).thenReturn("update");
       CachedQuery.asNewInstance()
         ..addQuery(query)
-        ..updateQuery<String>(
+        ..updateQuery(
           key: "update",
-          updateFn: (value) => "",
+          updateFn: (dynamic value) => "",
         );
       verify(query.update(any));
     });
@@ -195,13 +195,26 @@ void main() {
         ..addQuery(query)
         ..addQuery(query2)
         ..addQuery(query3)
-        ..updateQuery<String>(
+        ..updateQuery(
           filterFn: (unencodedKey, key) => key.startsWith("query"),
-          updateFn: (value) => "",
+          updateFn: (dynamic value) => "",
         );
       verify(query.update(any));
       verify(query2.update(any));
       verifyNever(query3.update(any));
+    });
+
+    test("<Deprecated> update infinite query ", () {
+      final query = MockInfiniteQuery<String, int>();
+      when(query.key).thenReturn("update");
+      CachedQuery.asNewInstance()
+        ..addQuery(query)
+        // ignore: deprecated_member_use_from_same_package
+        ..updateInfiniteQuery<String>(
+          key: "update",
+          updateFn: (value) => [],
+        );
+      verify(query.update(any));
     });
 
     test("update infinite query", () {
@@ -209,9 +222,13 @@ void main() {
       when(query.key).thenReturn("update");
       CachedQuery.asNewInstance()
         ..addQuery(query)
-        ..updateInfiniteQuery<String>(
+        ..updateQuery(
           key: "update",
-          updateFn: (value) => [],
+          updateFn: (dynamic value) {
+            if (value is List<String>) {
+              return <String>[];
+            }
+          },
         );
       verify(query.update(any));
     });

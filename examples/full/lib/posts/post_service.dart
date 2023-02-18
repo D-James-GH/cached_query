@@ -28,8 +28,8 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
         'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
       );
       final res = await http.get(uri);
-      if (Random().nextInt(1000) % 2 == 0) {
-        throw "An Error has Occurred";
+      if (Random().nextInt(1000) % 4 == 0) {
+        throw "A random error has occurred ⚠️";
       }
       return Future.delayed(
         const Duration(seconds: 1),
@@ -77,20 +77,24 @@ Mutation<PostModel, PostModel> createPost() {
               as InfiniteQuery<List<PostModel>, int>)
           .state
           .data;
-      CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
+      CachedQuery.instance.updateQuery(
         key: "posts",
-        updateFn: (old) => [
-          [newPost, ...old![0]],
-          ...old.sublist(1).toList()
-        ],
+        updateFn: (dynamic old) {
+          if (old is List<List<PostModel>>) {
+            return <List<PostModel>>[
+              [newPost, ...old[0]],
+              ...old.sublist(1).toList()
+            ];
+          }
+        },
       );
       return fallback;
     },
     onSuccess: (args, newPost) {},
     onError: (arg, error, fallback) {
-      CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
+      CachedQuery.instance.updateQuery(
         key: "posts",
-        updateFn: (old) => fallback as List<List<PostModel>>,
+        updateFn: (dynamic old) => fallback as List<List<PostModel>>,
       );
     },
   );

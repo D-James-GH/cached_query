@@ -31,12 +31,16 @@ class PostRepository {
         return PostModel.fromJson(res);
       },
       onStartMutation: (postArg) {
-        CachedQuery.instance.updateInfiniteQuery<List<PostModel>>(
+        CachedQuery.instance.updateQuery(
           key: "posts",
-          updateFn: (old) => [
-            [postArg, ...old![0]],
-            ...old.sublist(1).toList()
-          ],
+          updateFn: (dynamic old) {
+            if (old is List<List<PostModel>>) {
+              return <List<PostModel>>[
+                [postArg, ...old[0]],
+                ...old.sublist(1).toList()
+              ];
+            }
+          },
         );
       },
     );

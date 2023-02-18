@@ -100,6 +100,12 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// Returns the updated [State] and will notify the [stream].
   Future<State> refetch();
 
+  /// Update the current [Query] data.
+  ///
+  /// The [updateFn] passes the current query data and must return new data of
+  /// the same type as the original query/infiniteQuery.
+  void update(UpdateFunc<T> updateFn);
+
   /// Mark query as stale.
   ///
   /// Will force a fetch next time the query is accessed.

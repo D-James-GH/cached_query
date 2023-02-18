@@ -155,6 +155,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   ///
   /// The [updateFn] passes the current query data and must return new data of
   /// type [T]
+  @override
   void update(UpdateFunc<List<T>> updateFn) {
     final newData = updateFn(_state.data);
     _setState(_state.copyWith(data: newData));

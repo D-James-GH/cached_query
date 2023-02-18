@@ -114,15 +114,13 @@ class CachedQuery {
     return null;
   }
 
-  ///
-
   /// Update the data of an [Query] at a given key.
   ///
   /// Optionally use the [filterFn] to update multiple queries at once.
-  void updateQuery<Data>({
+  void updateQuery({
     Object? key,
     KeyFilterFunc? filterFn,
-    required UpdateFunc<Data> updateFn,
+    required UpdateFunc<dynamic> updateFn,
   }) {
     assert(
       key != null || filterFn != null,
@@ -138,17 +136,12 @@ class CachedQuery {
       }
     }
     for (final query in queries) {
-      assert(
-        query is! InfiniteQuery,
-        "Query is an InfiniteQuery. To update an InfiniteQuery use updateInfiniteQuery",
-      );
-      if (query is Query) {
-        (query as Query<Data>).update(updateFn);
-      }
+      query.update(updateFn);
     }
   }
 
   /// Update the data of an [InfiniteQuery] at a given key.
+  @Deprecated("Use updateQuery instead.")
   void updateInfiniteQuery<Data>({
     Object? key,
     KeyFilterFunc? filterFn,
