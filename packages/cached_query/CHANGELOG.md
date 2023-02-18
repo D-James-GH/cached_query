@@ -1,3 +1,7 @@
+## 0.5.0+1
+
+ - **DOCS**: update docs for the depreciation of updateInfiniteQuery. ([9fa99ef6](https://github.com/D-James-GH/cached_query/commit/9fa99ef62735e512d5b24c4beb05fa7f23481c4d))
+
 ## 0.5.0
 
 > Note: This release has breaking changes.
