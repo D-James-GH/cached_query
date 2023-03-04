@@ -19,12 +19,19 @@ Use the Cached Query instance to easily invalidate or re-fetch the whole cache o
 
 Refetch multiple queries at once by passing a list of keys.
 ```dart
-CachedQuery.instance.refetchQueries(["posts"]);
+CachedQuery.instance.refetchQueries(keys: ["posts"]);
+```
+
+Refetch multiple queries at once by passing a filter.
+```dart
+CachedQuery.instance.refetchQueries(
+    filterFn: (unencodedKey, key) => key.startsWith("todos/"),
+);
 ```
 
 Invalidating will mark the specified key as stale. To invalidate the whole cache don't pass a key.
 ```dart
-CachedQuery.instance.invalidateCache("posts");
+CachedQuery.instance.invalidateCache(key: "posts");
 
 // Invalidate the whole cache
 CachedQuery.instance.invalidateCache();

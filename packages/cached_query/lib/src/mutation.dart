@@ -165,7 +165,7 @@ class Mutation<T, A> {
         }
       }
       if (_refetchQueries != null) {
-        CachedQuery.instance.refetchQueries(_refetchQueries!);
+        CachedQuery.instance.refetchQueries(keys: _refetchQueries!);
       }
       return res;
     } catch (e, trace) {

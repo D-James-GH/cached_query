@@ -233,24 +233,66 @@ void main() {
       verify(query.update(any));
     });
   });
-  test("Refetch queries", () {
-    final query = MockQuery<String>();
-    when(query.key).thenReturn("query");
-    when(query.refetch()).thenAnswer(
-      (_) async => QueryState(timeCreated: DateTime.now()),
-    );
-    final query2 = MockQuery<String>();
-    when(query2.key).thenReturn("query2");
 
-    when(query2.refetch()).thenAnswer(
-      (_) async => QueryState(timeCreated: DateTime.now()),
-    );
-    CachedQuery.asNewInstance()
-      ..addQuery(query)
-      ..addQuery(query2)
-      ..refetchQueries(["query", "query2"]);
-    verify(query.refetch());
-    verify(query2.refetch());
+  group("Refetch Queries", () {
+    test("Refetch using filter", () async {
+      final query = MockQuery<String>();
+      final query2 = MockInfiniteQuery<int, String>();
+      final query3 = MockQuery<String>();
+      when(query.key).thenReturn("query");
+      when(query.unencodedKey).thenReturn("query");
+      when(query2.key).thenReturn("query2");
+      when(query2.unencodedKey).thenReturn("query2");
+      when(query3.key).thenReturn("other_key");
+      when(query3.unencodedKey).thenReturn("other_key");
+
+      when(query.refetch()).thenAnswer(
+        (_) async => QueryState(timeCreated: DateTime.now()),
+      );
+
+      when(query2.refetch()).thenAnswer(
+        (_) async => InfiniteQueryState(timeCreated: DateTime.now()),
+      );
+
+      when(query3.refetch()).thenAnswer(
+        (_) async => QueryState(timeCreated: DateTime.now()),
+      );
+      CachedQuery.asNewInstance()
+        ..addQuery(query)
+        ..addQuery(query2)
+        ..addQuery(query3)
+        ..refetchQueries(
+          filterFn: (unencodedKey, key) {
+            if (key.contains("query")) {
+              return true;
+            }
+            return false;
+          },
+        );
+
+      verify(query.refetch());
+      verify(query2.refetch());
+      verifyNever(query3.refetch());
+    });
+    test("Refetch queries", () {
+      final query = MockQuery<String>();
+      when(query.key).thenReturn("query");
+      when(query.refetch()).thenAnswer(
+        (_) async => QueryState(timeCreated: DateTime.now()),
+      );
+      final query2 = MockQuery<String>();
+      when(query2.key).thenReturn("query2");
+
+      when(query2.refetch()).thenAnswer(
+        (_) async => QueryState(timeCreated: DateTime.now()),
+      );
+      CachedQuery.asNewInstance()
+        ..addQuery(query)
+        ..addQuery(query2)
+        ..refetchQueries(keys: ["query", "query2"]);
+      verify(query.refetch());
+      verify(query2.refetch());
+    });
   });
   test("Where query", () {
     final query = MockQuery<String>();

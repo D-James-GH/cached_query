@@ -248,11 +248,26 @@ class CachedQuery {
   }
 
   /// Refetch multiple queries.
-  void refetchQueries(List<Object> keys) {
-    for (final key in keys) {
-      final k = encodeKey(key);
-      if (_queryCache.containsKey(k)) {
-        _queryCache[k]!.refetch();
+  ///
+  /// Pass a List of keys to refetch specific queries.
+  /// Pass a [filterFn] to "fuzzy" match queries to refetch.
+  void refetchQueries({KeyFilterFunc? filterFn, List<Object>? keys}) {
+    assert(
+      filterFn != null || keys != null,
+      "Either filterFn or keys must not be null",
+    );
+    if (filterFn != null) {
+      final queries = _filterQueryKey(filter: filterFn);
+      for (final query in queries) {
+        query.refetch();
+      }
+    }
+    if (keys != null) {
+      for (final key in keys) {
+        final k = encodeKey(key);
+        if (_queryCache.containsKey(k)) {
+          _queryCache[k]!.refetch();
+        }
       }
     }
   }
