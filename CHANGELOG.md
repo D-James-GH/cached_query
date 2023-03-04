@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-03-04
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v0.6.0`](#cached_query---v060)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v0.2.0+4`](#cached_storage---v0204)
+ - [`cached_query_flutter` - `v0.6.0+2`](#cached_query_flutter---v0602)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v0.2.0+4`
+ - `cached_query_flutter` - `v0.6.0+2`
+
+---
+
+#### `cached_query` - `v0.6.0`
+
+ - **BREAKING** **FEAT**: add filterFn to CachedQuery.instance.refetchQueries(). ([1d452bba](https://github.com/D-James-GH/cached_query/commit/1d452bba691a112be92b5658fbf6c30b628e78d2))
+
+
 ## 2023-02-18
 
 ### Changes

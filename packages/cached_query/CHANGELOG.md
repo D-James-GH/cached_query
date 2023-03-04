@@ -1,3 +1,9 @@
+## 0.6.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: add filterFn to CachedQuery.instance.refetchQueries(). ([1d452bba](https://github.com/D-James-GH/cached_query/commit/1d452bba691a112be92b5658fbf6c30b628e78d2))
+
 ## 0.5.0+1
 
  - **DOCS**: update docs for the depreciation of updateInfiniteQuery. ([9fa99ef6](https://github.com/D-James-GH/cached_query/commit/9fa99ef62735e512d5b24c4beb05fa7f23481c4d))
