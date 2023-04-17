@@ -16,7 +16,6 @@ typedef MutationBuilderCallback<T, A> = Widget Function(
   Future<T?> Function(A args) mutate,
 );
 
-// todo(Dan): add examples to docs.
 /// {@template mutationBuilder}
 /// Listen to changes in an [Mutation] and build the ui with the result.
 /// {@endtemplate}
