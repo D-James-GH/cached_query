@@ -7,6 +7,7 @@ analyzer:
   exclude:
     - "README.md"
     - "example/main.dart"
+    - "**/*.mocks.dart"
   language:
     strict-raw-types: true
   strong-mode:

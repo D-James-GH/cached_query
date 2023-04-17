@@ -6,6 +6,7 @@ analyzer:
     avoid_print: info
   exclude:
     - "README.md"
+    - "**/*.mocks.dart"
   language:
     strict-raw-types: true
   strong-mode:
