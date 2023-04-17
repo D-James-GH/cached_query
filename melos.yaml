@@ -26,6 +26,8 @@ scripts:
       melos exec -c 10 -- \
         flutter analyze --fatal-infos
     description: Run `flutter analyze` for all packages.
+    packageFilters:
+      noPrivate: true
   get:
     run: melos exec flutter pub get
     description: Run `flutter pub get` for all packages.
