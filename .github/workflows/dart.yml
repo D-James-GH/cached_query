@@ -7,7 +7,7 @@ name: Flutter test and analyze
 
 on:
   push:
-    branches: [ "main", "workflow/initial" ]
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
