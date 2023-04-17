@@ -9,12 +9,6 @@ ide:
   intellij: false
 
 command:
-  bootstrap:
-    # It seems so that running "pub get" in parallel has some issues (like
-    # https://github.com/dart-lang/pub/issues/3404). Disabling this feature
-    # makes the CI much more stable.
-    runPubGetInParallel: false
-    usePubspecOverrides: true
   version:
     # Generate commit links in package changelogs.
     linkToCommits: true
@@ -32,6 +26,14 @@ scripts:
       melos exec -c 10 -- \
         flutter analyze --fatal-infos
     description: Run `flutter analyze` for all packages.
+  get:
+    run: melos exec flutter pub get
+    description: Run `flutter pub get` for all packages.
+  format:check:
+    run: melos exec dart format . --output=none --set-exit-if-changed
+    description: Run `dart format` for all packages.
+    packageFilters:
+      noPrivate: true
   format:
     run: melos exec dart format . --fix
     description: Run `dart format` for all packages.
@@ -40,16 +42,16 @@ scripts:
     run: flutter pub run build_runner build --delete-conflicting-outputs
     exec:
       concurrency: 1
-    select-package:
-      depends-on: build_runner
+    packageFilters:
+      dependsOn: build_runner
     description: Build all generated files for Flutter packages in this project.
   test:
     run: |
       melos exec -c 6 --fail-fast -- \
         "flutter test --no-pub"
     description: Run `flutter test` for a specific package.
-    select-package:
-      dir-exists:
+    packageFilters:
+      dirExists:
         - test
       ignore:
         - "examples/**"

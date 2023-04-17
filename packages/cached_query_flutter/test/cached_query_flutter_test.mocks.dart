@@ -458,10 +458,18 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
         returnValueForMissingStub: null,
       );
   @override
-  void refetchQueries(List<Object>? keys) => super.noSuchMethod(
+  void refetchQueries({
+    _i2.KeyFilterFunc? filterFn,
+    List<Object>? keys,
+  }) =>
+      super.noSuchMethod(
         Invocation.method(
           #refetchQueries,
-          [keys],
+          [],
+          {
+            #filterFn: filterFn,
+            #keys: keys,
+          },
         ),
         returnValueForMissingStub: null,
       );
