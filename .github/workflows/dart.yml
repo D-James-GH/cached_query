@@ -27,18 +27,18 @@ jobs:
         run: dart pub global activate melos
         
       - name: Bootstrap melos
-        run: flutter pub run melos bs
+        run: dart pub run melos bs
         
       - name: Verify formatting
-        run: flutter pub run melos run format:check --no-select
+        run: dart pub run melos run format:check --no-select
 
       # Consider passing '--fatal-infos' for slightly stricter analysis.
       - name: Analyze project source
-        run: flutter pub run melos run analyze --no-select
+        run: dart pub run melos run analyze --no-select
 
       # Your project will need to have tests in test/ and a dependency on
       # package:test for this step to succeed. Note that Flutter projects will
       # want to change this to 'flutter test'.
       - name: Run tests
-        run: flutter pub run melos run test --no-select
+        run: dart pub run melos run test --no-select
 
