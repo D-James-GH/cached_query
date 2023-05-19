@@ -13,7 +13,7 @@ void main() {
   group("Refetch current queries", () {
     test("Should refetch query if hasListeners", () async {
       final query = MockQuery<String>();
-      when(query.config).thenReturn(QueryConfigFlutter());
+      when(query.config).thenReturn(QueryConfigFlutter<String>());
       when(query.hasListener).thenReturn(true);
       when(query.key).thenReturn("hasListeners");
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
@@ -27,7 +27,7 @@ void main() {
     });
     test("Should refetch infinite query if hasListeners", () async {
       final query = MockInfiniteQuery<String, int>();
-      when(query.config).thenReturn(QueryConfigFlutter());
+      when(query.config).thenReturn(QueryConfigFlutter<List<String>>());
       when(query.key).thenReturn("infinite");
       when(query.hasListener).thenReturn(true);
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
@@ -41,7 +41,7 @@ void main() {
     });
     test("Should ignore infinite query if !hasListeners", () async {
       final query = MockInfiniteQuery<String, int>();
-      when(query.config).thenReturn(QueryConfigFlutter());
+      when(query.config).thenReturn(QueryConfigFlutter<List<String>>());
       when(query.key).thenReturn("infinite");
       when(query.hasListener).thenReturn(false);
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
@@ -56,8 +56,8 @@ void main() {
     test("Should ignore queries that don't have listeners", () async {
       final query = MockQuery<String>();
       final query2 = MockQuery<String>();
-      when(query.config).thenReturn(QueryConfigFlutter());
-      when(query2.config).thenReturn(QueryConfigFlutter());
+      when(query.config).thenReturn(QueryConfigFlutter<String>());
+      when(query2.config).thenReturn(QueryConfigFlutter<String>());
       when(query.hasListener).thenReturn(true);
       when(query2.hasListener).thenReturn(false);
       when(query.key).thenReturn("hasListeners");
@@ -79,7 +79,7 @@ void main() {
     test("Can set refetch config per query", () async {
       final query = MockQuery<String>();
       when(query.config).thenReturn(
-        QueryConfigFlutter(
+        QueryConfigFlutter<String>(
           refetchOnResume: true,
           refetchOnConnection: true,
         ),
@@ -100,7 +100,7 @@ void main() {
     test("Can set refetch to false per query", () async {
       final query = MockQuery<String>();
       when(query.config).thenReturn(
-        QueryConfigFlutter(
+        QueryConfigFlutter<String>(
           refetchOnResume: false,
           refetchOnConnection: false,
         ),
@@ -119,7 +119,7 @@ void main() {
     });
     test("Can override global config", () {
       CachedQuery.instance.configFlutter(
-        config: QueryConfigFlutter(refetchOnResume: false),
+        config: CachedQueryConfigFlutter(refetchOnResume: false),
       );
       final q = Query<String>(
         key: "global",
@@ -127,6 +127,19 @@ void main() {
         config: QueryConfigFlutter(refetchOnResume: true),
       );
       expect((q.config as QueryConfigFlutter).refetchOnResume, true);
+    });
+    test("Query config inherits global defaults", () {
+      CachedQuery.instance.configFlutter(
+        config: CachedQueryConfigFlutter(
+          refetchOnResume: false,
+          refetchOnConnection: true,
+        ),
+      );
+
+      final queryConfig = QueryConfigFlutter<String>();
+
+      expect(queryConfig.refetchOnResume, false);
+      expect(queryConfig.refetchOnConnection, true);
     });
   });
 }

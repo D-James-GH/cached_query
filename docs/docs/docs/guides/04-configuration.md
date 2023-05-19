@@ -6,7 +6,8 @@ final config = QueryConfig(
   refetchDuration: Duration(seconds: 4),
   cacheDuration: Duration(minutes: 5),
   ignoreCacheDuration: false,
-  serializer: (dynamic data) {},
+  deserializer: (dynamic data) {},
+  serializer: (data) {},
   shouldRethrow: false,
   storeQuery: false,
 );

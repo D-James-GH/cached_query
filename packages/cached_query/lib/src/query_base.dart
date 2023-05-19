@@ -51,7 +51,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   bool get stale => _stale;
 
   /// The config for this specific query.
-  final QueryConfig config;
+  final QueryConfig<T> config;
 
   /// Weather the query stream has any listeners.
   bool get hasListener => _streamController?.hasListener ?? false;
@@ -91,8 +91,8 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     required this.key,
     required this.unencodedKey,
     required State state,
-    required QueryConfig? config,
-  })  : config = config ?? CachedQuery.instance.defaultConfig,
+    required QueryConfig<T>? config,
+  })  : config = config ?? QueryConfig<T>(),
         _state = state;
 
   /// Refetch the query immediately.
@@ -134,20 +134,28 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     _streamController?.add(_state);
   }
 
-  void _saveToStorage<StorageType>() {
+  void _saveToStorage() {
     if (_globalCache.storage != null && _state.data != null) {
-      _globalCache._storage!
-          .put<StorageType>(key, item: _state.data! as StorageType);
+      final T? data = _state.data! as T?;
+
+      final serialized = config.serializer == null
+          ? jsonEncode(data)
+          : config.serializer!(data);
+
+      _globalCache._storage!.put(
+        key,
+        item: serialized,
+      );
     }
   }
 
   Future<dynamic> _fetchFromStorage() async {
     if (_globalCache.storage != null) {
-      final dynamic storedData = await _globalCache.storage?.get(key);
+      final String? storedData = await _globalCache.storage?.get(key);
       if (storedData != null) {
-        return config.serializer == null
-            ? storedData
-            : config.serializer!(storedData);
+        return config.deserializer == null
+            ? jsonDecode(storedData)
+            : config.deserializer!(storedData);
       }
     }
   }

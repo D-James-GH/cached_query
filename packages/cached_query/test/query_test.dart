@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
@@ -65,7 +67,7 @@ void main() {
     });
     test("Query does not refetch if refetch duration is not up.", () async {
       int fetchCount = 0;
-      final query1 = Query(
+      final query1 = Query<String>(
         key: "de-dupe",
         config: QueryConfig(
           refetchDuration: const Duration(seconds: 2),
@@ -216,7 +218,7 @@ void main() {
       );
       await query.result;
       expect(storage.store.length, 1);
-      expect(storage.store[key], data);
+      expect(jsonDecode(storage.store[key]!), data);
     });
 
     test("Should not store query if specified", () async {
@@ -262,15 +264,15 @@ void main() {
       // Make sure the storage has initial data
       storage.put(
         key,
-        item: {
+        item: jsonEncode({
           key: {"name": MockStorage.data}
-        },
+        }),
       );
       final query = Query<Serializable>(
         key: key,
         queryFn: () async => Future.value(Serializable("Fetched")),
         config: QueryConfig(
-          serializer: (dynamic json) =>
+          deserializer: (dynamic json) =>
               Serializable.fromJson(json as Map<String, dynamic>),
         ),
       );
@@ -324,7 +326,7 @@ void main() {
     test("Result should rethrow if specified ", () async {
       cachedQuery
         ..reset()
-        ..config(config: QueryConfig(shouldRethrow: true));
+        ..config(config: CachedQueryConfig(shouldRethrow: true));
       try {
         final query = Query<String>(
           key: "error2",
@@ -352,7 +354,7 @@ void main() {
     });
   });
   test("Can set local query config", () {
-    final query = Query(
+    final query = Query<String>(
       key: "local",
       config: QueryConfig(shouldRethrow: true),
       queryFn: () async => "",

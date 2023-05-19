@@ -40,7 +40,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     OnQuerySuccessCallback<T>? onSuccess,
     required String key,
     required Object unencodedKey,
-    required QueryConfig? config,
+    required QueryConfig<T>? config,
     required Function queryFn,
     required T? initialData,
   })  : _queryFn = queryFn,
@@ -63,7 +63,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
     T? initialData,
-    QueryConfig? config,
+    QueryConfig<T>? config,
   }) {
     final globalCache = CachedQuery.instance;
     var query = globalCache.getQuery(key) as Query<T>?;
@@ -147,7 +147,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       );
       if (config.storeQuery) {
         // save to local storage if exists
-        _saveToStorage<T>();
+        _saveToStorage();
       }
     } catch (e, trace) {
       if (_onError != null) {

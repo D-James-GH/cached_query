@@ -1,11 +1,11 @@
 import '../cached_query.dart';
 
-/// {@template queryConfig}
+/// {@template cachedQueryConfig}
 ///
 /// Global config for all queries and infinite queries.
 ///
 /// {@endtemplate}
-class QueryConfig {
+class CachedQueryConfig {
   /// Specify how long before the query is re-fetched in the background.
   ///
   /// Defaults to 4 seconds
@@ -29,63 +29,40 @@ class QueryConfig {
   /// and update the state.
   final bool shouldRethrow;
 
-  /// The serializer is called when the query is fetched from storage. Use it to
-  /// change the stored value to the query value.
-  final Serializer? serializer;
-
   /// If set to true the query(ies) will never be removed from cache.
   final bool ignoreCacheDuration;
 
-  const QueryConfig._({
-    required this.serializer,
-    required this.ignoreCacheDuration,
-    required this.storeQuery,
-    required this.refetchDuration,
-    required this.cacheDuration,
-    required this.shouldRethrow,
-  });
-
   /// Returns a query config with the default values.
-  factory QueryConfig.defaults() => const QueryConfig._(
-        serializer: null,
+  factory CachedQueryConfig.defaults() => CachedQueryConfig(
         ignoreCacheDuration: false,
         storeQuery: true,
-        refetchDuration: Duration(seconds: 4),
-        cacheDuration: Duration(minutes: 5),
+        refetchDuration: const Duration(seconds: 4),
+        cacheDuration: const Duration(minutes: 5),
         shouldRethrow: false,
       );
 
-  /// {@macro queryConfig}
-  QueryConfig({
-    Serializer? serializer,
+  /// {@macro baseQueryConfig}
+  CachedQueryConfig({
     bool? ignoreCacheDuration,
     bool? storeQuery,
     Duration? refetchDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
-  })  : serializer =
-            serializer ?? CachedQuery.instance.defaultConfig.serializer,
-        ignoreCacheDuration = ignoreCacheDuration ??
-            CachedQuery.instance.defaultConfig.ignoreCacheDuration,
-        storeQuery =
-            storeQuery ?? CachedQuery.instance.defaultConfig.storeQuery,
-        refetchDuration = refetchDuration ??
-            CachedQuery.instance.defaultConfig.refetchDuration,
-        cacheDuration =
-            cacheDuration ?? CachedQuery.instance.defaultConfig.cacheDuration,
-        shouldRethrow =
-            shouldRethrow ?? CachedQuery.instance.defaultConfig.shouldRethrow;
+  })  : ignoreCacheDuration = ignoreCacheDuration ?? CachedQuery.instance.defaultConfig.ignoreCacheDuration,
+        storeQuery = storeQuery ?? CachedQuery.instance.defaultConfig.storeQuery,
+        refetchDuration = refetchDuration ?? CachedQuery.instance.defaultConfig.refetchDuration,
+        cacheDuration = cacheDuration ?? CachedQuery.instance.defaultConfig.cacheDuration,
+        shouldRethrow = shouldRethrow ?? CachedQuery.instance.defaultConfig.shouldRethrow;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QueryConfig &&
+      other is CachedQueryConfig &&
           runtimeType == other.runtimeType &&
           refetchDuration == other.refetchDuration &&
           storeQuery == other.storeQuery &&
           cacheDuration == other.cacheDuration &&
           shouldRethrow == other.shouldRethrow &&
-          serializer == other.serializer &&
           ignoreCacheDuration == other.ignoreCacheDuration;
 
   @override
@@ -94,6 +71,53 @@ class QueryConfig {
       storeQuery.hashCode ^
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^
-      serializer.hashCode ^
       ignoreCacheDuration.hashCode;
+
+  @override
+  String toString() {
+    return 'CachedQueryConfig{refetchDuration: $refetchDuration, storeQuery: $storeQuery, cacheDuration: $cacheDuration, shouldRethrow: $shouldRethrow, ignoreCacheDuration: $ignoreCacheDuration}';
+  }
+}
+
+/// {@template queryConfig}
+///
+/// Config for a specific query
+///
+/// {@endtemplate}
+class QueryConfig<T> extends CachedQueryConfig {
+  /// The deserializer is called when the query is fetched from storage. Use it to
+  /// change the stored value to the query value.
+  final Deserializer<T>? deserializer;
+
+  /// The serializer is called when the query is being written to storage. Typically
+  /// this should convert the query data into json.
+  final Serializer<T?>? serializer;
+
+  /// {@macro queryConfig}
+  QueryConfig({
+    this.deserializer,
+    this.serializer,
+    super.ignoreCacheDuration,
+    super.storeQuery,
+    super.refetchDuration,
+    super.cacheDuration,
+    super.shouldRethrow,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      super == other &&
+          other is QueryConfig &&
+          runtimeType == other.runtimeType &&
+          deserializer == other.deserializer &&
+          serializer == other.serializer;
+
+  @override
+  int get hashCode => super.hashCode ^ deserializer.hashCode ^ serializer.hashCode;
+
+  @override
+  String toString() {
+    return 'QueryConfig{deserializer: $deserializer, serializer: $serializer}';
+  }
 }

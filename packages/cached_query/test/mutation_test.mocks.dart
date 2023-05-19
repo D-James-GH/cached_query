@@ -29,7 +29,8 @@ class _FakeObject_0 extends _i1.SmartFake implements Object {
         );
 }
 
-class _FakeQueryConfig_1 extends _i1.SmartFake implements _i2.QueryConfig {
+class _FakeQueryConfig_1<T> extends _i1.SmartFake
+    implements _i2.QueryConfig<T> {
   _FakeQueryConfig_1(
     Object parent,
     Invocation parentInvocation,
@@ -71,13 +72,13 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
         ),
       ) as Object);
   @override
-  _i2.QueryConfig get config => (super.noSuchMethod(
+  _i2.QueryConfig<T> get config => (super.noSuchMethod(
         Invocation.getter(#config),
-        returnValue: _FakeQueryConfig_1(
+        returnValue: _FakeQueryConfig_1<T>(
           this,
           Invocation.getter(#config),
         ),
-      ) as _i2.QueryConfig);
+      ) as _i2.QueryConfig<T>);
   @override
   _i2.QueryState<T> get state => (super.noSuchMethod(
         Invocation.getter(#state),

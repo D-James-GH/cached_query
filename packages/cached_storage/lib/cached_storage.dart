@@ -1,7 +1,5 @@
 library cached_storage;
 
-import 'dart:convert';
-
 import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
@@ -68,7 +66,7 @@ class CachedStorage extends StorageInterface {
   }
 
   @override
-  Future<dynamic> get(String key) async {
+  Future<String?> get(String key) async {
     final dbQuery = await _db.query(
       _queryTable,
       where: 'queryKey = ?',
@@ -79,16 +77,16 @@ class CachedStorage extends StorageInterface {
     if (dbQuery.isNotEmpty) {
       final item = dbQuery.first["queryData"];
       if (item is String) {
-        return jsonDecode(item);
+        return item;
       }
     }
     return null;
   }
 
   @override
-  void put<T>(String key, {required T item}) async {
+  void put(String key, {required String item}) async {
     try {
-      final payload = jsonEncode(item);
+      final payload = item;
       await _db.insert(
         _queryTable,
         {"queryKey": key, "queryData": payload},

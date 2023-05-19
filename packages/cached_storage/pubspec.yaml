@@ -1,12 +1,12 @@
 name: cached_storage
 description: A storage addon for cached_query. Built on top of the Sqflite package.
-version: 0.2.0+4
+version: 0.3.0
 repository: https://github.com/D-James-GH/cached_query/tree/main/packages/cached_query_flutter
 documentation: https://cachedquery.dev/
 homepage: https://cachedquery.dev/
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:

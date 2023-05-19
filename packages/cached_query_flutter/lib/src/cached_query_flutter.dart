@@ -29,7 +29,7 @@ extension CachedQueryExt on CachedQuery {
   void configFlutter({
     bool neverCheckConnection = false,
     StorageInterface? storage,
-    QueryConfigFlutter? config,
+    CachedQueryConfigFlutter? config,
     QueryObserver? observer,
   }) {
     this.config(

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cached_query/cached_query.dart';
 
@@ -18,18 +17,14 @@ class MockStorage extends StorageInterface {
   }
 
   @override
-  FutureOr<dynamic> get(String key) {
+  FutureOr<String?> get(String key) {
     if (!store.containsKey(key)) return null;
-    return jsonDecode(store[key]!);
+    return store[key]!;
   }
 
   @override
-  void put<T>(String key, {required T item}) {
-    if (item is String) {
-      store[key] = item;
-    } else {
-      store[key] = jsonEncode(item);
-    }
+  void put(String key, {required String item}) {
+    store[key] = item;
   }
 }
 

@@ -19,8 +19,11 @@ part "query_base.dart";
 /// Similar to List.where.
 typedef WhereCallback = bool Function(QueryBase<dynamic, dynamic>);
 
-/// Used to serialize the query data when fetched from local storage.
-typedef Serializer = dynamic Function(dynamic json);
+/// Used to deserialize the query data when fetched from local storage.
+typedef Deserializer<T> = T Function(String json);
+
+/// Used to serialize the query data when fetched from network.
+typedef Serializer<T> = String Function(T item);
 
 /// Used to match multiple queries.
 typedef KeyFilterFunc = bool Function(Object unencodedKey, String key);
@@ -40,7 +43,7 @@ class CachedQuery {
 
   bool _configSet = false;
 
-  QueryConfig _config = QueryConfig.defaults();
+  CachedQueryConfig _config = CachedQueryConfig.defaults();
 
   Map<String, QueryBase<dynamic, dynamic>> _queryCache = {};
 
@@ -50,7 +53,7 @@ class CachedQuery {
   StorageInterface? get storage => _storage;
 
   /// The current global config that is set.
-  QueryConfig get defaultConfig => _config;
+  CachedQueryConfig get defaultConfig => _config;
 
   /// Whether global configs have been set.
   bool get isConfigSet => _configSet;
@@ -68,7 +71,7 @@ class CachedQuery {
   @visibleForTesting
   void reset() {
     _configSet = false;
-    _config = QueryConfig.defaults();
+    _config = CachedQueryConfig.defaults();
     deleteCache();
   }
 
@@ -91,7 +94,7 @@ class CachedQuery {
   /// {@endtemplate}
   void config({
     StorageInterface? storage,
-    QueryConfig? config,
+    CachedQueryConfig? config,
     QueryObserver? observer,
   }) {
     assert(_configSet == false, "Config defaults must only be set once.");

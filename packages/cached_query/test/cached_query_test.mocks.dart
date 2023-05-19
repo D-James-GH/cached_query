@@ -29,7 +29,8 @@ class _FakeObject_0 extends _i1.SmartFake implements Object {
         );
 }
 
-class _FakeQueryConfig_1 extends _i1.SmartFake implements _i2.QueryConfig {
+class _FakeQueryConfig_1<T> extends _i1.SmartFake
+    implements _i2.QueryConfig<T> {
   _FakeQueryConfig_1(
     Object parent,
     Invocation parentInvocation,
@@ -69,11 +70,11 @@ class MockStorageInterface extends _i1.Mock implements _i2.StorageInterface {
   }
 
   @override
-  _i3.FutureOr<dynamic> get(String? key) =>
+  _i3.FutureOr<String?> get(String? key) =>
       (super.noSuchMethod(Invocation.method(
         #get,
         [key],
-      )) as _i3.FutureOr<dynamic>);
+      )) as _i3.FutureOr<String?>);
   @override
   void delete(String? key) => super.noSuchMethod(
         Invocation.method(
@@ -83,9 +84,9 @@ class MockStorageInterface extends _i1.Mock implements _i2.StorageInterface {
         returnValueForMissingStub: null,
       );
   @override
-  void put<T>(
+  void put(
     String? key, {
-    required T? item,
+    required String? item,
   }) =>
       super.noSuchMethod(
         Invocation.method(
@@ -135,13 +136,13 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
         ),
       ) as Object);
   @override
-  _i2.QueryConfig get config => (super.noSuchMethod(
+  _i2.QueryConfig<T> get config => (super.noSuchMethod(
         Invocation.getter(#config),
-        returnValue: _FakeQueryConfig_1(
+        returnValue: _FakeQueryConfig_1<T>(
           this,
           Invocation.getter(#config),
         ),
-      ) as _i2.QueryConfig);
+      ) as _i2.QueryConfig<T>);
   @override
   _i2.QueryState<T> get state => (super.noSuchMethod(
         Invocation.getter(#state),
@@ -265,13 +266,13 @@ class MockInfiniteQuery<T, A> extends _i1.Mock
         ),
       ) as Object);
   @override
-  _i2.QueryConfig get config => (super.noSuchMethod(
+  _i2.QueryConfig<List<T>> get config => (super.noSuchMethod(
         Invocation.getter(#config),
-        returnValue: _FakeQueryConfig_1(
+        returnValue: _FakeQueryConfig_1<List<T>>(
           this,
           Invocation.getter(#config),
         ),
-      ) as _i2.QueryConfig);
+      ) as _i2.QueryConfig<List<T>>);
   @override
   _i2.InfiniteQueryState<T> get state => (super.noSuchMethod(
         Invocation.getter(#state),

@@ -41,7 +41,7 @@
 //     return copyWith(
 //       ignoreCacheDuration: other.ignoreCacheDuration,
 //       cacheDuration: other.cacheDuration,
-//       serializer: other.serializer,
+//       deserializer: other.serializer,
 //       refetchDuration: other.refetchDuration,
 //       shouldRethrow: other.shouldRethrow,
 //       storeQuery: other.storeQuery,
@@ -62,7 +62,7 @@
 //       storeQuery: storeQuery ?? this.storeQuery,
 //       cacheDuration: cacheDuration ?? this.cacheDuration,
 //       refetchDuration: refetchDuration ?? this.refetchDuration,
-//       serializer: serializer ?? this.serializer,
+//       sdeerializer: serializer ?? this.serializer,
 //       shouldRethrow: shouldRethrow ?? this.shouldRethrow,
 //     );
 //   }

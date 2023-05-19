@@ -77,7 +77,7 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
     config: QueryConfig(
       refetchDuration: const Duration(seconds: 2),
       // use a serializer for cached storage
-      serializer: (dynamic postJson) {
+      deserializer: (dynamic postJson) {
         return (postJson as List<dynamic>)
             .map(
               (dynamic page) => PostModel.listFromJson(page as List<dynamic>),

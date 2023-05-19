@@ -74,7 +74,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     required String key,
     required Object unencodedKey,
     required GetNextArg<T, A> getNextArg,
-    required QueryConfig? config,
+    required QueryConfig<List<T>>? config,
     required List<T>? initialData,
     required this.forceRevalidateAll,
     required this.revalidateAll,
@@ -100,7 +100,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     required Future<T> Function(A arg) queryFn,
     required GetNextArg<T, A> getNextArg,
     List<A>? prefetchPages,
-    QueryConfig? config,
+    QueryConfig<List<T>>? config,
     List<T>? initialData,
     bool forceRevalidateAll = false,
     bool revalidateAll = false,
@@ -266,7 +266,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       );
       if (config.storeQuery) {
         // save to local storage if exists
-        _saveToStorage<List<T>>();
+        _saveToStorage();
       }
     } catch (e, trace) {
       if (_onError != null) {
@@ -324,7 +324,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       );
       if (config.storeQuery) {
         // save to local storage if exists
-        _saveToStorage<List<T>>();
+        _saveToStorage();
       }
     } catch (e, trace) {
       if (_onError != null) {

@@ -1,13 +1,13 @@
 name: cached_query
 description: A simple library for dealing with server state in dart and flutter.
-version: 0.6.0
+version: 0.7.0
 repository: https://github.com/D-James-GH/cached_query
 documentation: https://cachedquery.dev/
 homepage: https://cachedquery.dev/
 
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.17.0 <3.0.0"
 
 dependencies:
   rxdart: ^0.27.7

@@ -5,7 +5,7 @@ import 'package:mutation/posts/pages/post_page.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance
-      .configFlutter(config: QueryConfigFlutter(shouldRethrow: true));
+      .configFlutter(config: CachedQueryConfigFlutter(shouldRethrow: true));
   runApp(const MyApp());
 }
 

@@ -5,13 +5,13 @@ import 'dart:async';
 /// Used by the [CachedStorage] plugin to save the current cache.
 abstract class StorageInterface {
   /// Get stored data from the storage instance.
-  FutureOr<dynamic> get(String key);
+  FutureOr<String?> get(String key);
 
   /// Delete the cache at a given key.
   void delete(String key);
 
   /// Update or add data with a given key.
-  void put<T>(String key, {required T item});
+  void put(String key, {required String item});
 
   /// Delete all stored data.
   void deleteAll();

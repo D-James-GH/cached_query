@@ -14,7 +14,7 @@ Query<JokeModel?> getJoke() {
   return Query<JokeModel>(
     key: 'joke',
     config: QueryConfig(
-      serializer: (dynamic json) =>
+      deserializer: (dynamic json) =>
           JokeModel.fromJson(json as Map<String, dynamic>),
     ),
     queryFn: () async {

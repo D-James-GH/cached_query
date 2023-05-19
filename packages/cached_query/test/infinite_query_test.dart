@@ -431,7 +431,7 @@ void main() async {
       const key = "getInitial";
       const initialData = [3];
       // Make sure the storage has initial data
-      storage.put(key, item: initialData);
+      storage.put(key, item: jsonEncode(initialData));
       final query = InfiniteQuery<int, int>(
         key: key,
         queryFn: repo.getPage,
@@ -465,8 +465,8 @@ void main() async {
         key: key,
         queryFn: (i) => Future.value(Serializable("$i")),
         config: QueryConfig(
-          serializer: (dynamic json) {
-            return Serializable.listFromJson(json as List<dynamic>);
+          deserializer: (json) {
+            return Serializable.listFromJson(jsonDecode(json) as List<dynamic>);
           },
         ),
         getNextArg: (state) {

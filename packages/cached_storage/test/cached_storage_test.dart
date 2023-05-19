@@ -17,7 +17,8 @@ void main() async {
         db.insert(any, any, conflictAlgorithm: anyNamed("conflictAlgorithm")),
       ).thenAnswer((realInvocation) async => 1);
 
-      CachedStorage(db).put("key", item: {"something": "something else"});
+      CachedStorage(db)
+          .put("key", item: jsonEncode({"something": "something else"}));
       final dynamic captured = verify(
         db.insert(
           any,
@@ -46,9 +47,9 @@ void main() async {
       );
 
       final storage = CachedStorage(db);
-      final dynamic fromStorage = await storage.get("dbKey");
+      final fromStorage = await storage.get("dbKey");
 
-      expect(fromStorage, data);
+      expect(jsonDecode(fromStorage!), data);
     });
   });
 }
