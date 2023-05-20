@@ -14,14 +14,22 @@ class QueryConfigFlutter<T> extends QueryConfig<T> {
   QueryConfigFlutter({
     this.refetchOnResume,
     this.refetchOnConnection,
-    super.serializer,
-    super.deserializer,
-    super.ignoreCacheDuration,
-    super.storeQuery,
-    super.refetchDuration,
-    super.cacheDuration,
-    super.shouldRethrow,
-  });
+    Deserializer<T>? deserializer,
+    Serializer<T?>? serializer,
+    bool? ignoreCacheDuration,
+    bool? storeQuery,
+    Duration? refetchDuration,
+    Duration? cacheDuration,
+    bool? shouldRethrow,
+  }) : super(
+          deserializer: deserializer,
+          serializer: serializer,
+          ignoreCacheDuration: ignoreCacheDuration,
+          storeQuery: storeQuery,
+          refetchDuration: refetchDuration,
+          cacheDuration: cacheDuration,
+          shouldRethrow: shouldRethrow,
+        );
 
   @override
   bool operator ==(Object other) =>
@@ -33,13 +41,14 @@ class QueryConfigFlutter<T> extends QueryConfig<T> {
           refetchOnConnection == other.refetchOnConnection;
 
   @override
-  int get hashCode => super.hashCode ^ refetchOnResume.hashCode ^ refetchOnConnection.hashCode;
+  int get hashCode =>
+      super.hashCode ^ refetchOnResume.hashCode ^ refetchOnConnection.hashCode;
 }
 
 /// {@template cachedQueryConfigFlutter}
 /// Global Cached Query config including flutter options
 /// {@endtemplate}
-class CachedQueryConfigFlutter extends CachedQueryConfig {
+class GlobalQueryConfigFlutter extends GlobalQueryConfig {
   /// Whether this query should be re-fetched when the app comes into the foreground
   final bool? refetchOnResume;
 
@@ -47,25 +56,32 @@ class CachedQueryConfigFlutter extends CachedQueryConfig {
   final bool? refetchOnConnection;
 
   /// {@macro queryConfigFlutter}
-  CachedQueryConfigFlutter({
+  GlobalQueryConfigFlutter({
     this.refetchOnResume,
     this.refetchOnConnection,
-    super.ignoreCacheDuration,
-    super.storeQuery,
-    super.refetchDuration,
-    super.cacheDuration,
-    super.shouldRethrow,
-  });
+    bool? ignoreCacheDuration,
+    bool? storeQuery,
+    Duration? refetchDuration,
+    Duration? cacheDuration,
+    bool? shouldRethrow,
+  }) : super(
+          ignoreCacheDuration: ignoreCacheDuration,
+          storeQuery: storeQuery,
+          refetchDuration: refetchDuration,
+          cacheDuration: cacheDuration,
+          shouldRethrow: shouldRethrow,
+        );
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       super == other &&
-          other is CachedQueryConfigFlutter &&
+          other is GlobalQueryConfigFlutter &&
           runtimeType == other.runtimeType &&
           refetchOnResume == other.refetchOnResume &&
           refetchOnConnection == other.refetchOnConnection;
 
   @override
-  int get hashCode => super.hashCode ^ refetchOnResume.hashCode ^ refetchOnConnection.hashCode;
+  int get hashCode =>
+      super.hashCode ^ refetchOnResume.hashCode ^ refetchOnConnection.hashCode;
 }

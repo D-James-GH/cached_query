@@ -43,7 +43,7 @@ class CachedQuery {
 
   bool _configSet = false;
 
-  CachedQueryConfig _config = CachedQueryConfig.defaults();
+  GlobalQueryConfig _config = GlobalQueryConfig.defaults();
 
   Map<String, QueryBase<dynamic, dynamic>> _queryCache = {};
 
@@ -53,7 +53,7 @@ class CachedQuery {
   StorageInterface? get storage => _storage;
 
   /// The current global config that is set.
-  CachedQueryConfig get defaultConfig => _config;
+  GlobalQueryConfig get defaultConfig => _config;
 
   /// Whether global configs have been set.
   bool get isConfigSet => _configSet;
@@ -71,7 +71,7 @@ class CachedQuery {
   @visibleForTesting
   void reset() {
     _configSet = false;
-    _config = CachedQueryConfig.defaults();
+    _config = GlobalQueryConfig.defaults();
     deleteCache();
   }
 
@@ -94,7 +94,7 @@ class CachedQuery {
   /// {@endtemplate}
   void config({
     StorageInterface? storage,
-    CachedQueryConfig? config,
+    GlobalQueryConfig? config,
     QueryObserver? observer,
   }) {
     assert(_configSet == false, "Config defaults must only be set once.");

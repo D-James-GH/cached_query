@@ -18,15 +18,15 @@ void main() {
   group("Config", () {
     test("Should be able to set config", () {
       final cachedQuery = CachedQuery.asNewInstance()
-        ..config(config: CachedQueryConfig());
+        ..config(config: GlobalQueryConfig());
       expect(cachedQuery.isConfigSet, true);
     });
     test("Defaults should be set", () {
-      final config = CachedQueryConfig();
-      expect(config, CachedQueryConfig.defaults());
+      final config = GlobalQueryConfig();
+      expect(config, GlobalQueryConfig.defaults());
     });
     test("Should be able to override default values", () async {
-      final config = CachedQueryConfig(
+      final config = GlobalQueryConfig(
         storeQuery: false,
         shouldRethrow: true,
         refetchDuration: Duration.zero,

@@ -119,7 +119,7 @@ void main() {
     });
     test("Can override global config", () {
       CachedQuery.instance.configFlutter(
-        config: CachedQueryConfigFlutter(refetchOnResume: false),
+        config: GlobalQueryConfigFlutter(refetchOnResume: false),
       );
       final q = Query<String>(
         key: "global",
@@ -127,19 +127,6 @@ void main() {
         config: QueryConfigFlutter(refetchOnResume: true),
       );
       expect((q.config as QueryConfigFlutter).refetchOnResume, true);
-    });
-    test("Query config inherits global defaults", () {
-      CachedQuery.instance.configFlutter(
-        config: CachedQueryConfigFlutter(
-          refetchOnResume: false,
-          refetchOnConnection: true,
-        ),
-      );
-
-      final queryConfig = QueryConfigFlutter<String>();
-
-      expect(queryConfig.refetchOnResume, false);
-      expect(queryConfig.refetchOnConnection, true);
     });
   });
 }

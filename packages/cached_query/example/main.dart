@@ -6,7 +6,7 @@ import 'package:cached_query/cached_query.dart';
 void main() async {
   // Optionally initialise cached query with a config
   CachedQuery.instance.config(
-    config: CachedQueryConfig(
+    config: GlobalQueryConfig(
       cacheDuration: const Duration(minutes: 5),
     ),
   );

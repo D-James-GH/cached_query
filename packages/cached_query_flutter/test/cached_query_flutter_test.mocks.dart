@@ -71,9 +71,9 @@ class _FakeQueryObserver_4 extends _i1.SmartFake implements _i2.QueryObserver {
         );
 }
 
-class _FakeCachedQueryConfig_5 extends _i1.SmartFake
-    implements _i2.CachedQueryConfig {
-  _FakeCachedQueryConfig_5(
+class _FakeGlobalQueryConfig_5 extends _i1.SmartFake
+    implements _i2.GlobalQueryConfig {
+  _FakeGlobalQueryConfig_5(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -348,13 +348,13 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
         returnValueForMissingStub: null,
       );
   @override
-  _i2.CachedQueryConfig get defaultConfig => (super.noSuchMethod(
+  _i2.GlobalQueryConfig get defaultConfig => (super.noSuchMethod(
         Invocation.getter(#defaultConfig),
-        returnValue: _FakeCachedQueryConfig_5(
+        returnValue: _FakeGlobalQueryConfig_5(
           this,
           Invocation.getter(#defaultConfig),
         ),
-      ) as _i2.CachedQueryConfig);
+      ) as _i2.GlobalQueryConfig);
   @override
   bool get isConfigSet => (super.noSuchMethod(
         Invocation.getter(#isConfigSet),
@@ -371,7 +371,7 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
   @override
   void config({
     _i2.StorageInterface? storage,
-    _i2.CachedQueryConfig? config,
+    _i2.GlobalQueryConfig? config,
     _i2.QueryObserver? observer,
   }) =>
       super.noSuchMethod(

@@ -5,7 +5,7 @@ import '../cached_query.dart';
 /// Global config for all queries and infinite queries.
 ///
 /// {@endtemplate}
-class CachedQueryConfig {
+class GlobalQueryConfig {
   /// Specify how long before the query is re-fetched in the background.
   ///
   /// Defaults to 4 seconds
@@ -33,7 +33,7 @@ class CachedQueryConfig {
   final bool ignoreCacheDuration;
 
   /// Returns a query config with the default values.
-  factory CachedQueryConfig.defaults() => CachedQueryConfig(
+  factory GlobalQueryConfig.defaults() => GlobalQueryConfig(
         ignoreCacheDuration: false,
         storeQuery: true,
         refetchDuration: const Duration(seconds: 4),
@@ -42,22 +42,27 @@ class CachedQueryConfig {
       );
 
   /// {@macro baseQueryConfig}
-  CachedQueryConfig({
+  GlobalQueryConfig({
     bool? ignoreCacheDuration,
     bool? storeQuery,
     Duration? refetchDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
-  })  : ignoreCacheDuration = ignoreCacheDuration ?? CachedQuery.instance.defaultConfig.ignoreCacheDuration,
-        storeQuery = storeQuery ?? CachedQuery.instance.defaultConfig.storeQuery,
-        refetchDuration = refetchDuration ?? CachedQuery.instance.defaultConfig.refetchDuration,
-        cacheDuration = cacheDuration ?? CachedQuery.instance.defaultConfig.cacheDuration,
-        shouldRethrow = shouldRethrow ?? CachedQuery.instance.defaultConfig.shouldRethrow;
+  })  : ignoreCacheDuration = ignoreCacheDuration ??
+            CachedQuery.instance.defaultConfig.ignoreCacheDuration,
+        storeQuery =
+            storeQuery ?? CachedQuery.instance.defaultConfig.storeQuery,
+        refetchDuration = refetchDuration ??
+            CachedQuery.instance.defaultConfig.refetchDuration,
+        cacheDuration =
+            cacheDuration ?? CachedQuery.instance.defaultConfig.cacheDuration,
+        shouldRethrow =
+            shouldRethrow ?? CachedQuery.instance.defaultConfig.shouldRethrow;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is CachedQueryConfig &&
+      other is GlobalQueryConfig &&
           runtimeType == other.runtimeType &&
           refetchDuration == other.refetchDuration &&
           storeQuery == other.storeQuery &&
@@ -84,7 +89,7 @@ class CachedQueryConfig {
 /// Config for a specific query
 ///
 /// {@endtemplate}
-class QueryConfig<T> extends CachedQueryConfig {
+class QueryConfig<T> extends GlobalQueryConfig {
   /// The deserializer is called when the query is fetched from storage. Use it to
   /// change the stored value to the query value.
   final Deserializer<T>? deserializer;
@@ -97,12 +102,18 @@ class QueryConfig<T> extends CachedQueryConfig {
   QueryConfig({
     this.deserializer,
     this.serializer,
-    super.ignoreCacheDuration,
-    super.storeQuery,
-    super.refetchDuration,
-    super.cacheDuration,
-    super.shouldRethrow,
-  });
+    bool? ignoreCacheDuration,
+    bool? storeQuery,
+    Duration? refetchDuration,
+    Duration? cacheDuration,
+    bool? shouldRethrow,
+  }) : super(
+          ignoreCacheDuration: ignoreCacheDuration,
+          storeQuery: storeQuery,
+          refetchDuration: refetchDuration,
+          cacheDuration: cacheDuration,
+          shouldRethrow: shouldRethrow,
+        );
 
   @override
   bool operator ==(Object other) =>
@@ -114,7 +125,8 @@ class QueryConfig<T> extends CachedQueryConfig {
           serializer == other.serializer;
 
   @override
-  int get hashCode => super.hashCode ^ deserializer.hashCode ^ serializer.hashCode;
+  int get hashCode =>
+      super.hashCode ^ deserializer.hashCode ^ serializer.hashCode;
 
   @override
   String toString() {

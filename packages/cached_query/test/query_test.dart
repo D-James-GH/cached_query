@@ -326,7 +326,7 @@ void main() {
     test("Result should rethrow if specified ", () async {
       cachedQuery
         ..reset()
-        ..config(config: CachedQueryConfig(shouldRethrow: true));
+        ..config(config: GlobalQueryConfig(shouldRethrow: true));
       try {
         final query = Query<String>(
           key: "error2",
