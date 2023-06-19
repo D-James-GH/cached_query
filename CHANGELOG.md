@@ -15,6 +15,27 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`cached_query_flutter` - `v1.0.0-dev.1`](#cached_query_flutter---v100-dev1)
+
+---
+
+#### `cached_query_flutter` - `v1.0.0-dev.1`
+
+ - chore: update packages
+
+
+## 2023-06-19
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`cached_query` - `v1.0.0-dev.1`](#cached_query---v100-dev1)
  - [`cached_query_flutter` - `v0.6.0+3`](#cached_query_flutter---v0603)
  - [`cached_storage` - `v1.0.0-dev.2`](#cached_storage---v100-dev2)

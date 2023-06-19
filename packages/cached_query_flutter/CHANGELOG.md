@@ -1,3 +1,7 @@
+## 1.0.0-dev.1
+
+ - chore: update packages
+
 ## 0.6.0+3
 
  - Update a dependency to the latest release.
