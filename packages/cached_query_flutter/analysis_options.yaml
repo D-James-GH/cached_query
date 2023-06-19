@@ -8,10 +8,9 @@ analyzer:
     - "README.md"
     - "**/*.mocks.dart"
   language:
+    strict-casts: true
+    strict-inference: true
     strict-raw-types: true
-  strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false
 
 linter:
   rules:
