@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-06-19
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_storage` - `v1.0.0-dev.1`](#cached_storage---v100-dev1)
+
+---
+
+#### `cached_storage` - `v1.0.0-dev.1`
+
+
 ## 2023-03-04
 
 ### Changes
