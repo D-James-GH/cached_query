@@ -15,6 +15,15 @@ typedef InfiniteQueryBuilderFunc<T, A> = Widget Function(
   InfiniteQuery<T, A> query,
 );
 
+/// {@template infiniteQueryBuilderCondition}
+/// This function is being called everytime the query registered in the [InfiniteQueryBuilder] receives new updates
+/// and let's you control when the [_InfiniteQueryBuilderState.build] method should be called
+/// {@endtemplate}
+typedef InfiniteQueryBuilderCondition<T> = FutureOr<bool> Function(
+  InfiniteQueryState<T> oldState,
+  InfiniteQueryState<T> newState,
+);
+
 /// {@template infiniteQueryBuilder}
 /// Listen to changed in an [InfiniteQuery] and build the ui with the result.
 /// {@endtemplate}
@@ -28,12 +37,8 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   /// {@macro infiniteQueryBuilderFunc}
   final InfiniteQueryBuilderFunc<T, A> builder;
 
-  /// This function is being called everytime the query registered in the [InfiniteQueryBuilder] receives new updates
-  /// and let's you control when the [_InfiniteQueryBuilderState.build] method should be called
-  final FutureOr<bool> Function(
-    InfiniteQueryState<T> oldState,
-    InfiniteQueryState<T> newState,
-  )? buildWhen;
+  /// {@macro infiniteQueryBuilderCondition}
+  final InfiniteQueryBuilderCondition<T>? buildWhen;
 
   /// {@macro infiniteQueryBuilder}
   ///

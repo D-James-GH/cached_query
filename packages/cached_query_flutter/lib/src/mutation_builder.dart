@@ -16,6 +16,15 @@ typedef MutationBuilderCallback<T, A> = Widget Function(
   Future<T?> Function(A args) mutate,
 );
 
+/// {@template mutationBuilderCondition}
+/// This function is being called everytime the query registered in the [MutationBuilder] receives new updates
+/// and let's you control when the [_MutationBuilderState.build] method should be called
+/// {@endtemplate}
+typedef MutationBuilderCondition<T> = FutureOr<bool> Function(
+  MutationState<T> oldState,
+  MutationState<T> newState,
+);
+
 /// {@template mutationBuilder}
 /// Listen to changes in an [Mutation] and build the ui with the result.
 /// {@endtemplate}
@@ -26,12 +35,8 @@ class MutationBuilder<T, A> extends StatefulWidget {
   /// {@macro mutationBuilder}
   final MutationBuilderCallback<T, A> builder;
 
-  /// This function is being called everytime the query registered in the [MutationBuilder] receives new updates
-  /// and let's you control when the [_MutationBuilderState.build] method should be called
-  final FutureOr<bool> Function(
-    MutationState<T> oldState,
-    MutationState<T> newState,
-  )? buildWhen;
+  /// {@macro mutationBuilderCondition}
+  final MutationBuilderCondition<T>? buildWhen;
 
   /// {@macro mutationBuilder}
   const MutationBuilder({

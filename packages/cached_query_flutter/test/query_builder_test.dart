@@ -29,6 +29,22 @@ void main() {
       expect(buildCount, 2);
     });
 
+    testWidgets(
+      "Tries to build twice, but the second build is denied by buildWhen",
+      (tester) async {
+        int buildCount = 0;
+        await tester.pumpWidget(
+          TitleValue(
+            response: "title",
+            buildWhen: (oldState, newState) => buildCount == 0,
+            onBuild: () => buildCount++,
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(buildCount, 1);
+      },
+    );
+
     testWidgets("Query builds first with initial data", (tester) async {
       int buildCount = 0;
       const response = "My Title";

@@ -8,12 +8,15 @@ class TitleValue extends StatelessWidget {
   final String? initialTitle;
   final void Function()? onBuild;
   final Duration? queryDelay;
+  final QueryBuilderCondition<String>? buildWhen;
+
   const TitleValue({
     Key? key,
     required this.response,
     this.onBuild,
     this.initialTitle,
     this.queryDelay,
+    this.buildWhen,
   }) : super(key: key);
 
   @override
@@ -22,6 +25,7 @@ class TitleValue extends StatelessWidget {
       home: QueryBuilder<String>(
         query: TitleRepo(response: response, queryDelay: queryDelay)
             .fetchTitle(initialTitle: initialTitle),
+        buildWhen: buildWhen,
         builder: (context, state) {
           if (onBuild != null) {
             onBuild!();
