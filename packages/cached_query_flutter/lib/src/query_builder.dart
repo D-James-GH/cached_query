@@ -21,11 +21,19 @@ class QueryBuilder<T> extends StatefulWidget {
   /// cache. If no query is found it will through an error.
   final Object? queryKey;
 
+  /// This function is being called everytime the query registered in the [QueryBuilder] receives new updates
+  /// and let's you control when the [_QueryBuilderState.build] method should be called
+  final FutureOr<bool> Function(
+    QueryState<T> oldState,
+    QueryState<T> newState,
+  )? buildWhen;
+
   /// {@macro queryBuilder}
   const QueryBuilder({
     Key? key,
     this.query,
     this.queryKey,
+    this.buildWhen,
     required this.builder,
   })  : assert(
           query != null || queryKey != null,
@@ -93,10 +101,14 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
 
   void _subscribe() {
     _state = _query.state;
-    _subscription = _query.stream.listen((state) {
-      setState(() {
-        _state = state;
-      });
+    _subscription = _query.stream.listen((state) async {
+      if (widget.buildWhen != null) {
+        final shouldRebuild = await Future.value(
+          widget.buildWhen!.call(_state, state),
+        );
+        if (!shouldRebuild) return;
+      }
+      setState(() => _state = state);
     });
   }
 
