@@ -28,6 +28,13 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   /// {@macro infiniteQueryBuilderFunc}
   final InfiniteQueryBuilderFunc<T, A> builder;
 
+  /// This function is being called everytime the query registered in the [InfiniteQueryBuilder] receives new updates
+  /// and let's you control when the [_InfiniteQueryBuilderState.build] method should be called
+  final FutureOr<bool> Function(
+    InfiniteQueryState<T> oldState,
+    InfiniteQueryState<T> newState,
+  )? buildWhen;
+
   /// {@macro infiniteQueryBuilder}
   ///
   /// The value constructor takes an infinite query rather than a key.
@@ -35,6 +42,7 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
     Key? key,
     this.query,
     this.queryKey,
+    this.buildWhen,
     required this.builder,
   })  : assert(
           query != null || queryKey != null,
@@ -104,7 +112,13 @@ class _InfiniteQueryBuilderState<T, A>
 
   void _subscribe() {
     _state = _query.state;
-    _subscription = _query.stream.listen((state) {
+    _subscription = _query.stream.listen((state) async {
+      if (widget.buildWhen != null) {
+        final shouldRebuild = await Future.value(
+          widget.buildWhen!.call(_state, state),
+        );
+        if (!shouldRebuild) return;
+      }
       setState(() {
         _state = state;
       });
