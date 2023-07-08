@@ -1,3 +1,7 @@
+## 1.0.0
+
+ - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.
+
 ## 1.0.0-dev.2
 
  - **FEAT**: Added `buildWhen` to other query builders ([#15](https://github.com/D-James-GH/cached_query/issues/15)). ([a8f58359](https://github.com/D-James-GH/cached_query/commit/a8f583598b19a1fc11970f557dfdc3201f060b02))

@@ -11,6 +11,37 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 Packages with breaking changes:
 
+ - [`cached_query` - `v1.0.0`](#cached_query---v100)
+ - [`cached_query_flutter` - `v1.0.0`](#cached_query_flutter---v100)
+ - [`cached_storage` - `v1.0.0`](#cached_storage---v100)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+Packages graduated to a stable release (see pre-releases prior to the stable version for changelog entries):
+
+ - `cached_query` - `v1.0.0`
+ - `cached_query_flutter` - `v1.0.0`
+ - `cached_storage` - `v1.0.0`
+
+---
+
+#### `cached_query` - `v1.0.0`
+
+#### `cached_query_flutter` - `v1.0.0`
+
+#### `cached_storage` - `v1.0.0`
+
+
+## 2023-07-08
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
  - There are no breaking changes in this release.
 
 Packages with other changes:
