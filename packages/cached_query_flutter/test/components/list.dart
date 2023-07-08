@@ -27,13 +27,20 @@ class ListQuery extends StatelessWidget {
 class ListValue extends StatelessWidget {
   final String response;
   final void Function()? onBuild;
-  const ListValue({Key? key, required this.response, this.onBuild})
-      : super(key: key);
+  final InfiniteQueryBuilderCondition<String>? buildWhen;
+
+  const ListValue({
+    Key? key,
+    required this.response,
+    this.onBuild,
+    this.buildWhen,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: InfiniteQueryBuilder<String, int>(
+        buildWhen: buildWhen,
         query: InfiniteQueryRepo(response: response).fetchList(),
         builder: (context, state, query) {
           if (onBuild != null) {

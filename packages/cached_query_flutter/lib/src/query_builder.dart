@@ -3,6 +3,15 @@ import 'dart:async';
 import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 
+/// {@template queryBuilderCondition}
+/// This function is being called everytime the query registered in the [QueryBuilder] receives new updates
+/// and let's you control when the [_QueryBuilderState.build] method should be called
+/// {@endtemplate}
+typedef QueryBuilderCondition<T> = FutureOr<bool> Function(
+  QueryState<T> oldState,
+  QueryState<T> newState,
+);
+
 /// {@template queryBuilder}
 /// Listen to changes in an [Mutation] and build the ui with the result.
 /// {@endtemplate}
@@ -21,12 +30,8 @@ class QueryBuilder<T> extends StatefulWidget {
   /// cache. If no query is found it will through an error.
   final Object? queryKey;
 
-  /// This function is being called everytime the query registered in the [QueryBuilder] receives new updates
-  /// and let's you control when the [_QueryBuilderState.build] method should be called
-  final FutureOr<bool> Function(
-    QueryState<T> oldState,
-    QueryState<T> newState,
-  )? buildWhen;
+  /// {@macro queryBuilderCondition}
+  final QueryBuilderCondition<T>? buildWhen;
 
   /// {@macro queryBuilder}
   const QueryBuilder({
