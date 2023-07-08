@@ -1,3 +1,8 @@
+## 1.0.0-dev.2
+
+ - **FEAT**: Added `buildWhen` to other query builders ([#15](https://github.com/D-James-GH/cached_query/issues/15)). ([a8f58359](https://github.com/D-James-GH/cached_query/commit/a8f583598b19a1fc11970f557dfdc3201f060b02))
+ - **FEAT**: added `buildWhen` parameter in `QueryBuilder` for conditional rebuilding ([#14](https://github.com/D-James-GH/cached_query/issues/14)). ([4d2d3678](https://github.com/D-James-GH/cached_query/commit/4d2d36780c8050912793cc9bfe86534fb2f023da))
+
 ## 1.0.0-dev.1
 
  - chore: update packages

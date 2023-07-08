@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-07-08
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query_flutter` - `v1.0.0-dev.2`](#cached_query_flutter---v100-dev2)
+
+---
+
+#### `cached_query_flutter` - `v1.0.0-dev.2`
+
+ - **FEAT**: Added `buildWhen` to other query builders ([#15](https://github.com/D-James-GH/cached_query/issues/15)). ([a8f58359](https://github.com/D-James-GH/cached_query/commit/a8f583598b19a1fc11970f557dfdc3201f060b02))
+ - **FEAT**: added `buildWhen` parameter in `QueryBuilder` for conditional rebuilding ([#14](https://github.com/D-James-GH/cached_query/issues/14)). ([4d2d3678](https://github.com/D-James-GH/cached_query/commit/4d2d36780c8050912793cc9bfe86534fb2f023da))
+
+
 ## 2023-06-19
 
 ### Changes
