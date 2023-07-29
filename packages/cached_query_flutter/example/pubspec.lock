@@ -31,14 +31,14 @@ packages:
       path: "../../cached_query"
       relative: true
     source: path
-    version: "0.6.0"
+    version: "1.0.0-dev.1"
   cached_query_flutter:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.6.0+2"
+    version: "1.0.0-dev.1"
   characters:
     dependency: transitive
     description:

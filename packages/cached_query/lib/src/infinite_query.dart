@@ -17,7 +17,7 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A);
 ///
 /// Return null if the last page has already been fetch and therefore trigger
 /// [InfiniteQueryState.hasReachedMax] to equal `true`.
-typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
+typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryState<T>);
 
 /// {@template infiniteQuery}
 ///
@@ -42,7 +42,7 @@ typedef GetNextArg<T, A> = A? Function(InfiniteQueryState<T>);
 /// [onError].
 ///
 /// {@endtemplate}
-class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
+class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   /// On success is called when the query function is executed successfully.
   ///
   /// Passes the returned data.
@@ -53,8 +53,8 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   /// Passes the error through.
   final OnQueryErrorCallback<T>? _onError;
 
-  final GetNextArg<T, A> _getNextArg;
-  final InfiniteQueryFunc<T, A> _queryFn;
+  final GetNextArg<T, Arg> _getNextArg;
+  final InfiniteQueryFunc<T, Arg> _queryFn;
 
   /// Whether the Query should always refetch all pages, not just check the first
   /// for changes.
@@ -70,10 +70,10 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   T? get lastPage => state.lastPage;
 
   InfiniteQuery._internal({
-    required InfiniteQueryFunc<T, A> queryFn,
+    required InfiniteQueryFunc<T, Arg> queryFn,
     required String key,
     required Object unencodedKey,
-    required GetNextArg<T, A> getNextArg,
+    required GetNextArg<T, Arg> getNextArg,
     required QueryConfig? config,
     required List<T>? initialData,
     required this.forceRevalidateAll,
@@ -97,9 +97,9 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   /// {@macro infiniteQuery}
   factory InfiniteQuery({
     required Object key,
-    required Future<T> Function(A arg) queryFn,
-    required GetNextArg<T, A> getNextArg,
-    List<A>? prefetchPages,
+    required Future<T> Function(Arg arg) queryFn,
+    required GetNextArg<T, Arg> getNextArg,
+    List<Arg>? prefetchPages,
     QueryConfig? config,
     List<T>? initialData,
     bool forceRevalidateAll = false,
@@ -110,8 +110,8 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     final globalCache = CachedQuery.instance;
     final queryKey = encodeKey(key);
     var query = globalCache.getQuery(queryKey);
-    if (query == null || query is! InfiniteQuery<T, A>) {
-      query = InfiniteQuery<T, A>._internal(
+    if (query == null || query is! InfiniteQuery<T, Arg>) {
+      query = InfiniteQuery<T, Arg>._internal(
         queryFn: queryFn,
         unencodedKey: key,
         getNextArg: getNextArg,
@@ -289,7 +289,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     }
   }
 
-  Future<void> _fetchNextPage({A? arg}) async {
+  Future<void> _fetchNextPage({Arg? arg}) async {
     final isInitial = state.status == QueryStatus.initial;
     _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
@@ -346,7 +346,7 @@ class InfiniteQuery<T, A> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     }
   }
 
-  void _preFetchPages(List<A> arguments) async {
+  void _preFetchPages(List<Arg> arguments) async {
     for (final arg in arguments) {
       await _fetchNextPage(arg: arg);
     }

@@ -111,21 +111,21 @@ packages:
       path: "../../packages/cached_query"
       relative: true
     source: path
-    version: "0.6.0"
+    version: "1.0.0-dev.1"
   cached_query_flutter:
     dependency: "direct main"
     description:
       path: "../../packages/cached_query_flutter"
       relative: true
     source: path
-    version: "0.6.0+2"
+    version: "1.0.0-dev.1"
   cached_storage:
     dependency: "direct main"
     description:
       path: "../../packages/cached_storage"
       relative: true
     source: path
-    version: "0.2.0+4"
+    version: "1.0.0-dev.2"
   characters:
     dependency: transitive
     description:

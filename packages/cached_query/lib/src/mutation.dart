@@ -6,20 +6,22 @@ import '../cached_query.dart';
 import 'mutation_cache.dart';
 
 /// Called when the [queryFn] as completed with no error.
-typedef OnSuccessCallback<T, A> = FutureOr<void> Function(T res, A arg);
+typedef OnSuccessCallback<T, Arg> = FutureOr<void> Function(T res, Arg arg);
 
 /// Called when the [queryFn] as completed with an error.
-typedef OnErrorCallback<A> = FutureOr<void> Function(
-  A arg,
+typedef OnErrorCallback<Arg> = FutureOr<void> Function(
+  Arg arg,
   Object error,
   Object? fallback,
 );
 
 /// Called when [Mutation] has started.
-typedef OnStartMutateCallback<A> = FutureOr<dynamic> Function(A arg);
+typedef OnStartMutateCallback<Arg> = FutureOr<dynamic> Function(Arg arg);
 
 /// The asynchronous query function.
-typedef MutationQueryCallback<T, A> = Future<T> Function(A arg);
+typedef MutationQueryCallback<ReturnType, Arg> = Future<ReturnType> Function(
+  Arg arg,
+);
 
 /// {@template mutation}
 /// Mutation is used to create, update and delete data from an asynchronous
@@ -30,7 +32,7 @@ typedef MutationQueryCallback<T, A> = Future<T> Function(A arg);
 /// set. [key] must be a serializable value.
 ///
 /// The mutation is an asynchronous [queryFn]. It should return a [Future] of
-/// type [T] and takes any argument of type [A].
+/// type [ReturnType] and takes any argument of type [Arg].
 ///
 /// The mutation takes multiple lifecycle callbacks:
 /// - [onStartMutation] is called before the mutation [_queryFn] is run.
@@ -44,35 +46,35 @@ typedef MutationQueryCallback<T, A> = Future<T> Function(A arg);
 ///
 /// To invalidate and refetch a query use [refetchQueries]
 /// {@endtemplate mutation}
-class Mutation<T, A> {
+class Mutation<ReturnType, Arg> {
   /// A stringified key to reference the mutation.
   final String? key;
 
-  final OnStartMutateCallback<A>? _onStartMutation;
-  final OnSuccessCallback<T, A>? _onSuccess;
-  final OnErrorCallback<A>? _onError;
-  final MutationQueryCallback<T, A> _queryFn;
+  final OnStartMutateCallback<Arg>? _onStartMutation;
+  final OnSuccessCallback<ReturnType, Arg>? _onSuccess;
+  final OnErrorCallback<Arg>? _onError;
+  final MutationQueryCallback<ReturnType, Arg> _queryFn;
   final List<Object>? _invalidateQueries;
   final List<Object>? _refetchQueries;
-  MutationState<T> _state;
-  StreamController<MutationState<T>>? _streamController;
+  MutationState<ReturnType> _state;
+  StreamController<MutationState<ReturnType>>? _streamController;
   final _cache = MutationCache.instance;
 
   /// Current [MutationState] of the mutation.
-  MutationState<T> get state => _state;
+  MutationState<ReturnType> get state => _state;
 
   /// Stream the state of the query.
   ///
   /// When the state is updated either by a mutation or a new query [stream]
   /// will be notified.
-  Stream<MutationState<T>> get stream => _createStream();
+  Stream<MutationState<ReturnType>> get stream => _createStream();
 
   Mutation._internal({
     this.key,
-    OnStartMutateCallback<A>? onStartMutation,
-    OnSuccessCallback<T, A>? onSuccess,
-    OnErrorCallback<A>? onError,
-    required MutationQueryCallback<T, A> queryFn,
+    OnStartMutateCallback<Arg>? onStartMutation,
+    OnSuccessCallback<ReturnType, Arg>? onSuccess,
+    OnErrorCallback<Arg>? onError,
+    required MutationQueryCallback<ReturnType, Arg> queryFn,
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
   })  : _queryFn = queryFn,
@@ -81,7 +83,7 @@ class Mutation<T, A> {
         _onStartMutation = onStartMutation,
         _onSuccess = onSuccess,
         _refetchQueries = refetchQueries,
-        _state = MutationState<T>() {
+        _state = MutationState<ReturnType>() {
     if (key != null) {
       _cache.addMutation(this);
     }
@@ -90,10 +92,10 @@ class Mutation<T, A> {
   /// {@macro mutation}
   factory Mutation({
     Object? key,
-    OnStartMutateCallback<A>? onStartMutation,
-    OnSuccessCallback<T, A>? onSuccess,
-    OnErrorCallback<A>? onError,
-    required MutationQueryCallback<T, A> queryFn,
+    OnStartMutateCallback<Arg>? onStartMutation,
+    OnSuccessCallback<ReturnType, Arg>? onSuccess,
+    OnErrorCallback<Arg>? onError,
+    required MutationQueryCallback<ReturnType, Arg> queryFn,
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
   }) {
@@ -101,7 +103,7 @@ class Mutation<T, A> {
     if (key != null) {
       stringKey = encodeKey(key);
       final mutationFromCache =
-          MutationCache.instance.getMutation<T, A>(stringKey);
+          MutationCache.instance.getMutation<ReturnType, Arg>(stringKey);
       if (mutationFromCache != null) {
         CachedQuery.instance.observer.onMutationCreation(mutationFromCache);
         return mutationFromCache;
@@ -121,13 +123,13 @@ class Mutation<T, A> {
   }
 
   /// Starts the mutation with the given [arg].
-  Future<T?> mutate([A? arg]) async {
+  Future<ReturnType?> mutate([Arg? arg]) async {
     // type cast so that void doesn't require an argument
-    arg = arg as A;
+    arg = arg as Arg;
     return _fetch(arg);
   }
 
-  Stream<MutationState<T>> _createStream() {
+  Stream<MutationState<ReturnType>> _createStream() {
     if (_streamController != null) {
       return _streamController!.stream;
     }
@@ -145,7 +147,7 @@ class Mutation<T, A> {
     return _streamController!.stream;
   }
 
-  Future<T?> _fetch(A arg) async {
+  Future<ReturnType?> _fetch(Arg arg) async {
     _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
     dynamic startMutationResponse;
@@ -183,7 +185,7 @@ class Mutation<T, A> {
     }
   }
 
-  void _setState(MutationState<T> newState, [StackTrace? stackTrace]) {
+  void _setState(MutationState<ReturnType> newState, [StackTrace? stackTrace]) {
     CachedQuery.instance.observer.onMutationChange(this, newState);
     _state = newState;
     if (stackTrace != null) {
@@ -201,9 +203,9 @@ class Mutation<T, A> {
 ///
 /// Should not be instantiated manually. Instead should be read from [Mutation].
 /// {@endtemplate}
-class MutationState<T> {
+class MutationState<ReturnType> {
   /// Response of the [MutationQueryCallback].
-  final T? data;
+  final ReturnType? data;
 
   /// Status of the [MutationQueryCallback].
   final QueryStatus status;
@@ -220,8 +222,8 @@ class MutationState<T> {
 
   /// Creates a copy of the current [MutationState] with the given filed
   /// replaced.
-  MutationState<T> copyWith({
-    T? data,
+  MutationState<ReturnType> copyWith({
+    ReturnType? data,
     QueryStatus? status,
     dynamic error,
   }) {
