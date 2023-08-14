@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cached_query/src/util/encode_key.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../cached_query.dart';
 import 'mutation_cache.dart';
@@ -57,7 +58,7 @@ class Mutation<ReturnType, Arg> {
   final List<Object>? _invalidateQueries;
   final List<Object>? _refetchQueries;
   MutationState<ReturnType> _state;
-  StreamController<MutationState<ReturnType>>? _streamController;
+  BehaviorSubject<MutationState<ReturnType>>? _streamController;
   final _cache = MutationCache.instance;
 
   /// Current [MutationState] of the mutation.
@@ -133,8 +134,9 @@ class Mutation<ReturnType, Arg> {
     if (_streamController != null) {
       return _streamController!.stream;
     }
-    _streamController = StreamController.broadcast(
-      onListen: _emit,
+
+    _streamController = BehaviorSubject.seeded(
+      _state,
       onCancel: () {
         _streamController!.close();
         _streamController = null;
