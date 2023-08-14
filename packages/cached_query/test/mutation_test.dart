@@ -30,7 +30,7 @@ void main() {
       final mutation = Mutation<String, void>(
         queryFn: (_) => Future.value(""),
       );
-      expect(mutation.mutate(), isA<Future<String?>>());
+      expect(mutation.mutate(), isA<Future<MutationState<String?>>>());
     });
     test("Mutation returns the value of the queryFn", () async {
       const returnString = "return string";
@@ -38,7 +38,7 @@ void main() {
         queryFn: (_) => Future.value(returnString),
       );
       final res = await mutation.mutate();
-      expect(res, returnString);
+      expect(res.data, returnString);
     });
   });
   group("Listening to a mutation", () {
