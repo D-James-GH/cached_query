@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 typedef MutationBuilderCallback<T, A> = Widget Function(
   BuildContext context,
   MutationState<T> state,
-  Future<T?> Function(A args) mutate,
+  Future<MutationState<T?>> Function(A args) mutate,
 );
 
 /// {@template mutationBuilderCondition}

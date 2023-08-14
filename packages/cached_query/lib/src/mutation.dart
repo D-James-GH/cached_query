@@ -123,7 +123,7 @@ class Mutation<ReturnType, Arg> {
   }
 
   /// Starts the mutation with the given [arg].
-  Future<ReturnType?> mutate([Arg? arg]) async {
+  Future<MutationState<ReturnType?>> mutate([Arg? arg]) async {
     // type cast so that void doesn't require an argument
     arg = arg as Arg;
     return _fetch(arg);
@@ -147,7 +147,7 @@ class Mutation<ReturnType, Arg> {
     return _streamController!.stream;
   }
 
-  Future<ReturnType?> _fetch(Arg arg) async {
+  Future<MutationState<ReturnType?>> _fetch(Arg arg) async {
     _setState(_state.copyWith(status: QueryStatus.loading));
     _emit();
     dynamic startMutationResponse;
@@ -169,7 +169,7 @@ class Mutation<ReturnType, Arg> {
       if (_refetchQueries != null) {
         CachedQuery.instance.refetchQueries(keys: _refetchQueries!);
       }
-      return res;
+      return state;
     } catch (e, trace) {
       if (_onError != null) {
         await _onError!(arg, e, startMutationResponse);
@@ -179,7 +179,7 @@ class Mutation<ReturnType, Arg> {
         trace,
       );
 
-      return null;
+      return state;
     } finally {
       _emit();
     }
