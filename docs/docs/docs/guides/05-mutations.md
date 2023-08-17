@@ -73,3 +73,14 @@ There are three lifecycle call backs for a mutation.
 - `onStartMutation`  is called before the queryFn. This can be used for [optimistic updates](/docs/guides/optimistic-updates).
 - `onSuccess` is called after the queryFn if the mutation is successful.
 - `onError` is called after the queryFn if the mutation fails.
+
+### Error handling
+The `onError` callback is called if the queryFn throws an error. Sometimes you may need to handle the error where you 
+call the `mutate` function. To do this you can await the `mutate` function and use the mutation state to view the error.
+```dart
+final mutation = updateUser();
+await mutation.mutate(user);
+if(mutation.state.status == QueryStatus.error){
+  // handle error
+}
+```
