@@ -17,12 +17,12 @@ dependencies:
     git:
       url: https://github.com/CyberMindWorks/cached_query.git
       path: packages/cached_query
-      ref: b2452e8daded655f96ae03bc6c2f0d4e56d26419
+      ref: d6dbddc4e215329a2daae184b7a5cf7375cc51bb
   connectivity_plus: ^4.0.1
 
 dev_dependencies:
   flutter_lints: ^2.0.1
-  mockito: ^5.4.1
+  mockito: ^5.4.0
   connectivity_plus_platform_interface: ^1.2.4
   build_runner:
   flutter_test:
