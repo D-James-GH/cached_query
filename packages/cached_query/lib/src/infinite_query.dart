@@ -237,7 +237,8 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       }
 
       var newState = _state.copyWith(
-        data: [firstPage],
+        data: Future.wait(
+            List.generate(_state.data.length, (index) => _queryFn(index))),
         lastPage: firstPage,
       );
 
