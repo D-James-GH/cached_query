@@ -30,12 +30,12 @@ extension CachedQueryExt on CachedQuery {
     bool neverCheckConnection = false,
     StorageInterface? storage,
     QueryConfigFlutter? config,
-    QueryObserver? observer,
+    List<QueryObserver>? observers,
   }) {
     this.config(
       config: config,
       storage: storage,
-      observer: observer,
+      observers: observers,
     );
 
     _refetchOnResume();

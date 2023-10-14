@@ -10,7 +10,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
     storage: await CachedStorage.ensureInitialized(),
-    observer: Observer(),
+    observers: [Observer()],
   );
   runApp(const MyApp());
 }
