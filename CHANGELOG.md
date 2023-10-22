@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-10-22
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v1.0.1`](#cached_query---v101)
+ - [`cached_query_flutter` - `v1.0.1`](#cached_query_flutter---v101)
+ - [`cached_storage` - `v1.0.1`](#cached_storage---v101)
+
+---
+
+#### `cached_query` - `v1.0.1`
+
+ - **FIX**: analysis options, for examples. ([0f28d977](https://github.com/D-James-GH/cached_query/commit/0f28d97775c78f9c6972fbd0bd9aee9d13446e7e))
+ - **FIX**: package updates. ([0a934e2f](https://github.com/D-James-GH/cached_query/commit/0a934e2f5c99231e9d3644a40dae8d52bca5f814))
+ - **FIX**: better generic type names. ([1e7fb516](https://github.com/D-James-GH/cached_query/commit/1e7fb5165cbc1fb864b7dc61a41d38ab35cd8fc6))
+
+#### `cached_query_flutter` - `v1.0.1`
+
+ - **FIX**: analysis options, for examples. ([0f28d977](https://github.com/D-James-GH/cached_query/commit/0f28d97775c78f9c6972fbd0bd9aee9d13446e7e))
+ - **FIX**: package updates. ([0a934e2f](https://github.com/D-James-GH/cached_query/commit/0a934e2f5c99231e9d3644a40dae8d52bca5f814))
+ - **FIX**: better generic type names. ([1e7fb516](https://github.com/D-James-GH/cached_query/commit/1e7fb5165cbc1fb864b7dc61a41d38ab35cd8fc6))
+
+#### `cached_storage` - `v1.0.1`
+
+ - **FIX**: package updates. ([0a934e2f](https://github.com/D-James-GH/cached_query/commit/0a934e2f5c99231e9d3644a40dae8d52bca5f814))
+
+
 ## 2023-07-08
 
 ### Changes
