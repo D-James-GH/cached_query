@@ -12,9 +12,8 @@ analyzer:
     - "README.md"
   language:
     strict-raw-types: true
-  strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false
+    strict-casts: true
+    strict-inference: true
 
 linter:
   rules:

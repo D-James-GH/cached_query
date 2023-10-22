@@ -11,9 +11,8 @@ analyzer:
     - "**/*.freezed.dart"
   language:
     strict-raw-types: true
-  strong-mode:
-    implicit-casts: false
-    implicit-dynamic: false
+    strict-inference: true
+    strict-casts: true
 
 linter:
   rules:

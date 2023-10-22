@@ -263,7 +263,7 @@ void main() {
       storage.put(
         key,
         item: {
-          key: {"name": MockStorage.data}
+          key: {"name": MockStorage.data},
         },
       );
       final query = Query<Serializable>(
