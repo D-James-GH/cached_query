@@ -7,24 +7,24 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  http: ^0.13.5
-  meta: ^1.8.0
-  json_annotation: ^4.8.0
-  freezed_annotation: ^2.2.0
+  http: ^1.1.0
+  meta: ^1.9.1
+  json_annotation: ^4.8.1
+  freezed_annotation: ^2.4.1
   cached_query_flutter: ^1.0.0
   cached_storage: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.3.3
-  freezed: ^2.3.2
-  json_serializable: ^6.6.0
-  flutter_lints: ^2.0.1
+  build_runner: ^2.4.6
+  freezed: ^2.4.5
+  json_serializable: ^6.7.1
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
