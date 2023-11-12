@@ -77,7 +77,7 @@ class _PostListScreenState extends State<PostListScreen> {
             icon: const Icon(Icons.arrow_right_alt),
             onPressed: () =>
                 Navigator.pushReplacementNamed(context, JokeScreen.routeName),
-          )
+          ),
         ],
       ),
       body: InfiniteQueryBuilder<List<PostModel>, int>(
@@ -157,7 +157,7 @@ class _PostListScreenState extends State<PostListScreen> {
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom,
                   ),
-                )
+                ),
               ],
             );
           }

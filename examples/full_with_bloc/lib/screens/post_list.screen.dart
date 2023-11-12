@@ -68,7 +68,7 @@ class _PostListScreenState extends State<PostListScreen> {
             icon: const Icon(Icons.arrow_right_alt),
             onPressed: () =>
                 Navigator.pushReplacementNamed(context, JokeScreen.routeName),
-          )
+          ),
         ],
       ),
       body: BlocBuilder<PostBloc, PostState>(
@@ -110,7 +110,7 @@ class _PostListScreenState extends State<PostListScreen> {
                   padding: EdgeInsets.only(
                     bottom: MediaQuery.of(context).padding.bottom,
                   ),
-                )
+                ),
               ],
             );
           }

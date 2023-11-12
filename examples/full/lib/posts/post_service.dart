@@ -80,7 +80,7 @@ Mutation<PostModel, PostModel> createPost() {
       query.update(
         (old) => [
           [newPost, ...?old?.first],
-          ...?old?.sublist(1).toList()
+          ...?old?.sublist(1).toList(),
         ],
       );
 

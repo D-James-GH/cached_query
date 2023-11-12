@@ -37,7 +37,7 @@ class PostRepository {
             if (old is List<List<PostModel>>) {
               return <List<PostModel>>[
                 [postArg, ...old[0]],
-                ...old.sublist(1).toList()
+                ...old.sublist(1).toList(),
               ];
             }
           },

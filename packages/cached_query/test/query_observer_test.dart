@@ -113,7 +113,7 @@ void main() {
             queryChange = query;
             count++;
           }
-        })
+        }),
       ];
       final query = Query(
         key: "queryLoading",
@@ -133,7 +133,7 @@ void main() {
             queryChange = query;
             count++;
           }
-        })
+        }),
       ];
       final query = Query(
         key: "querySuccess",
@@ -152,7 +152,7 @@ void main() {
           count++;
           queryError = query;
           trace = stacktrace;
-        })
+        }),
       ];
       final query = Query<String>(
         key: "queryFail",
@@ -173,7 +173,7 @@ void main() {
             queryChange = query;
             count++;
           }
-        })
+        }),
       ];
       final query = InfiniteQuery(
         key: "queryLoading",
@@ -193,7 +193,7 @@ void main() {
             queryChange = query;
             count++;
           }
-        })
+        }),
       ];
       final query = InfiniteQuery(
         key: "querySuccess",
@@ -214,7 +214,7 @@ void main() {
           trace = stackTrace;
           queryChange = query;
           count++;
-        })
+        }),
       ];
       final query = InfiniteQuery<String, int>(
         key: "queryFail",
@@ -234,7 +234,7 @@ void main() {
           if (next.status == QueryStatus.loading) {
             count++;
           }
-        })
+        }),
       ];
       final mutation = Mutation<String, int>(
         queryFn: (a) => Future.value("response"),
@@ -249,7 +249,7 @@ void main() {
         MutationErrorObserver((mutation, trace) {
           count++;
           stackTrace = trace;
-        })
+        }),
       ];
       final mutation = Mutation<String, int>(
         queryFn: (a) => throw "error",
@@ -266,7 +266,7 @@ void main() {
           if (next.status == QueryStatus.success) {
             count++;
           }
-        })
+        }),
       ];
       final mutation = Mutation<String, int>(
         queryFn: (a) => Future.value("response"),

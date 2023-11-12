@@ -27,7 +27,7 @@ class SinglePostScreen extends StatelessWidget {
                     key.startsWith("posts/"),
               );
             },
-          )
+          ),
         ],
       ),
       body: Padding(
