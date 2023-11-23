@@ -46,7 +46,7 @@ typedef MutationQueryCallback<ReturnType, Arg> = Future<ReturnType> Function(
 /// [invalidateQuery] at any time.
 ///
 /// To invalidate and refetch a query use [refetchQueries]
-/// {@endtemplate mutation}
+/// {@endtemplate}
 class Mutation<ReturnType, Arg> {
   /// A stringified key to reference the mutation.
   final String? key;
