@@ -12,7 +12,7 @@ class JokeScreen extends StatelessWidget {
   final Color color = Colors.white;
   final JokeService service = JokeService();
 
-  JokeScreen({Key? key}) : super(key: key);
+  JokeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class JokeScreen extends StatelessWidget {
               context,
               PostListScreen.routeName,
             ),
-          )
+          ),
         ],
       ),
       body: QueryBuilder<JokeModel?>(

@@ -106,7 +106,9 @@ class Mutation<ReturnType, Arg> {
       final mutationFromCache =
           MutationCache.instance.getMutation<ReturnType, Arg>(stringKey);
       if (mutationFromCache != null) {
-        CachedQuery.instance.observer.onMutationCreation(mutationFromCache);
+        for (final ob in CachedQuery.instance.observers) {
+          ob.onMutationReuse(mutationFromCache);
+        }
         return mutationFromCache;
       }
     }
@@ -119,7 +121,9 @@ class Mutation<ReturnType, Arg> {
       refetchQueries: refetchQueries,
       queryFn: queryFn,
     );
-    CachedQuery.instance.observer.onMutationCreation(mutation);
+    for (final ob in CachedQuery.instance.observers) {
+      ob.onMutationCreation(mutation);
+    }
     return mutation;
   }
 
@@ -188,10 +192,14 @@ class Mutation<ReturnType, Arg> {
   }
 
   void _setState(MutationState<ReturnType> newState, [StackTrace? stackTrace]) {
-    CachedQuery.instance.observer.onMutationChange(this, newState);
+    for (final ob in CachedQuery.instance.observers) {
+      ob.onMutationChange(this, newState);
+    }
     _state = newState;
     if (stackTrace != null) {
-      CachedQuery.instance.observer.onMutationError(this, stackTrace);
+      for (final ob in CachedQuery.instance.observers) {
+        ob.onMutationError(this, stackTrace);
+      }
     }
   }
 

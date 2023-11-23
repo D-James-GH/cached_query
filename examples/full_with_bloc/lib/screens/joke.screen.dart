@@ -20,7 +20,7 @@ class JokeScreen extends StatelessWidget {
               context,
               PostListScreen.routeName,
             ),
-          )
+          ),
         ],
       ),
       body: BlocBuilder<JokeBloc, JokeState>(

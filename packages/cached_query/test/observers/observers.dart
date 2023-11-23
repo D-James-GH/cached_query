@@ -26,13 +26,20 @@ class DeletionObserver extends QueryObserver {
 }
 
 class MutationCreationObserver extends QueryObserver {
-  final void Function(Mutation<dynamic, dynamic>) onCreate;
+  final void Function(Mutation<dynamic, dynamic>)? onCreate;
+  final void Function(Mutation<dynamic, dynamic>)? onReuse;
 
-  MutationCreationObserver(this.onCreate);
+  MutationCreationObserver({this.onCreate, this.onReuse});
   @override
   void onMutationCreation(Mutation<dynamic, dynamic> mutation) {
-    onCreate(mutation);
+    onCreate?.call(mutation);
     super.onMutationCreation(mutation);
+  }
+
+  @override
+  void onMutationReuse(Mutation<dynamic, dynamic> query) {
+    onReuse?.call(query);
+    super.onMutationReuse(query);
   }
 }
 

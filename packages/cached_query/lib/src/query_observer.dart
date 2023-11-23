@@ -6,9 +6,15 @@ import '../cached_query.dart';
 ///
 /// Observe state changes in every query and mutation.
 abstract class QueryObserver {
-  /// Called when an infinite query or query are created in the cache
+  /// Called when a mutation is created in the cache
   @mustCallSuper
   void onMutationCreation(
+    Mutation<dynamic, dynamic> query,
+  ) {}
+
+  /// Called when a mutation is found in the cache and re-used
+  @mustCallSuper
+  void onMutationReuse(
     Mutation<dynamic, dynamic> query,
   ) {}
 

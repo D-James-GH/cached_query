@@ -28,7 +28,7 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
         'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
       );
       final res = await http.get(uri);
-      if (Random().nextInt(1000) % 4 == 0) {
+      if (Random().nextInt(1000) % 8 == 0) {
         throw "A random error has occurred ⚠️";
       }
       return Future.delayed(
@@ -80,7 +80,7 @@ Mutation<PostModel, PostModel> createPost() {
       query.update(
         (old) => [
           [newPost, ...?old?.first],
-          ...?old?.sublist(1).toList()
+          ...?old?.sublist(1),
         ],
       );
 
