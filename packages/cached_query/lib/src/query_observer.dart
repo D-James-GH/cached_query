@@ -12,7 +12,7 @@ abstract class QueryObserver {
     Mutation<dynamic, dynamic> query,
   ) {}
 
-  /// Called when a mutation is re-used from the cache
+  /// Called when a mutation is found in the cache and re-used
   @mustCallSuper
   void onMutationReuse(
     Mutation<dynamic, dynamic> query,

@@ -79,4 +79,16 @@ class QueryState<T> implements StateBase {
   @override
   int get hashCode =>
       runtimeType.hashCode ^ data.hashCode ^ status.hashCode ^ error.hashCode;
+
+  @override
+  String toString() {
+    return '''
+QueryState{
+  timeCreated: $timeCreated, 
+  status: $status, 
+  error: $error
+  data: $data, 
+}
+''';
+  }
 }

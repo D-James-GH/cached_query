@@ -11,7 +11,7 @@ import 'post_model/post_model.dart';
 class PostListScreen extends StatefulWidget {
   static const routeName = '/';
 
-  const PostListScreen({Key? key}) : super(key: key);
+  const PostListScreen({super.key});
 
   @override
   State<PostListScreen> createState() => _PostListScreenState();
@@ -203,8 +203,7 @@ class _Post extends StatelessWidget {
   final PostModel post;
   final int index;
 
-  const _Post({Key? key, required this.post, required this.index})
-      : super(key: key);
+  const _Post({required this.post, required this.index});
 
   @override
   Widget build(BuildContext context) {
