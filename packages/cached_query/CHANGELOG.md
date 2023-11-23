@@ -1,3 +1,11 @@
+## 2.0.0-dev.0
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: added query logging observer. ([a95896e7](https://github.com/D-James-GH/cached_query/commit/a95896e78e661ac19abf47794253d287e4d9878e))
+ - **FEAT**: switch mutation to use behaviour subject. ([3e50021a](https://github.com/D-James-GH/cached_query/commit/3e50021a19a6ed44d5757d973c5efddca34f10ce))
+ - **BREAKING** **FEAT**: return mutation state from mutate function. ([02e29ed0](https://github.com/D-James-GH/cached_query/commit/02e29ed0f5aa53ec874df5468fabe783c7ccc0f0))
+
 ## 1.0.1
 
  - **FIX**: analysis options, for examples. ([0f28d977](https://github.com/D-James-GH/cached_query/commit/0f28d97775c78f9c6972fbd0bd9aee9d13446e7e))

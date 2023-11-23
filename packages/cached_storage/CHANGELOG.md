@@ -1,3 +1,7 @@
+## 1.0.2-dev.0
+
+ - Update a dependency to the latest release.
+
 ## 1.0.1
 
  - **FIX**: package updates. ([0a934e2f](https://github.com/D-James-GH/cached_query/commit/0a934e2f5c99231e9d3644a40dae8d52bca5f814))

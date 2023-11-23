@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2023-11-23
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v2.0.0-dev.0`](#cached_query---v200-dev0)
+ - [`cached_query_flutter` - `v2.0.0-dev.0`](#cached_query_flutter---v200-dev0)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v1.0.2-dev.0`](#cached_storage---v102-dev0)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v1.0.2-dev.0`
+
+---
+
+#### `cached_query` - `v2.0.0-dev.0`
+
+ - **FEAT**: added query logging observer. ([a95896e7](https://github.com/D-James-GH/cached_query/commit/a95896e78e661ac19abf47794253d287e4d9878e))
+ - **FEAT**: switch mutation to use behaviour subject. ([3e50021a](https://github.com/D-James-GH/cached_query/commit/3e50021a19a6ed44d5757d973c5efddca34f10ce))
+ - **BREAKING** **FEAT**: return mutation state from mutate function. ([02e29ed0](https://github.com/D-James-GH/cached_query/commit/02e29ed0f5aa53ec874df5468fabe783c7ccc0f0))
+
+#### `cached_query_flutter` - `v2.0.0-dev.0`
+
+ - **FEAT**: added query logging observer. ([a95896e7](https://github.com/D-James-GH/cached_query/commit/a95896e78e661ac19abf47794253d287e4d9878e))
+ - **BREAKING** **FEAT**: return mutation state from mutate function. ([02e29ed0](https://github.com/D-James-GH/cached_query/commit/02e29ed0f5aa53ec874df5468fabe783c7ccc0f0))
+
+
 ## 2023-10-22
 
 ### Changes
