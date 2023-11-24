@@ -1,7 +1,6 @@
 library cached_query;
 
 export './src/cached_query.dart';
-export 'src/default_query_config.dart';
 export 'src/infinite_query_state.dart';
 export 'src/mutation.dart';
 export 'src/query_config.dart';

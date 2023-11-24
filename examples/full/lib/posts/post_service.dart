@@ -11,7 +11,7 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
     config: QueryConfigFlutter(
       refetchOnResume: true,
       refetchDuration: const Duration(seconds: 2),
-      serializer: (dynamic postJson) {
+      storageDeserializer: (dynamic postJson) {
         return (postJson as List<dynamic>)
             .map(
               (dynamic page) => PostModel.listFromJson(page as List<dynamic>),

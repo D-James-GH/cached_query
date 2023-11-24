@@ -14,7 +14,7 @@ class JokeService {
       config: QueryConfigFlutter(
         refetchDuration: const Duration(seconds: 4),
         cacheDuration: const Duration(seconds: 10),
-        serializer: (dynamic json) =>
+        storageDeserializer: (dynamic json) =>
             JokeModel.fromJson(json as Map<String, dynamic>),
       ),
       queryFn: () async {

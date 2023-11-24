@@ -27,11 +27,11 @@ dart objects from the `queryFn` you will need to serialized the json back into t
 `serilizer` to the QueryConfig which will be used to turn the stored data back into a dart object.
 
 ```dart
- Query<JokeModel>(
+Query<JokeModel>(
   key: 'joke',
   config: QueryConfig(
-    // Use a serializer to transform the store json to an object.
-    serializer: (dynamic json) =>
+    // Use a deserializer to transform the stored json to an object.
+    storageDeserializer: (dynamic json) =>
         JokeModel.fromJson(json as Map<String, dynamic>),
   ),
   queryFn: () async {

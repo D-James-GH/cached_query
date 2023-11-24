@@ -67,8 +67,8 @@ The only difference is if the last page returned an empty list. If the last page
 null cached query knows that there are no more pages to be fetched and no more calls to `getNextPage` will be called.
 
 In this example we are using `CachedStorage` to persist the query to disk. As our cache is a dart object (PostModel) we
-need to pass a `serializer` function to the infinite query. If the storage has been set up when configuring `CachedQuery` 
-and `serializer` field is not null then it will be used to parse the data returned from disk back into a dart object.
+need to pass a `storageDeserializer` function to the infinite query. If the storage has been set up when configuring `CachedQuery` 
+and `storageDeserializer` field is not null then it will be used to parse the data returned from disk back into a dart object.
 
 ```dart
 InfiniteQuery<List<PostModel>, int> getPosts() {
@@ -77,7 +77,7 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
     config: QueryConfig(
       refetchDuration: const Duration(seconds: 2),
       // use a serializer for cached storage
-      serializer: (dynamic postJson) {
+      storageDeserializer: (dynamic postJson) {
         return (postJson as List<dynamic>)
             .map(
               (dynamic page) => PostModel.listFromJson(page as List<dynamic>),

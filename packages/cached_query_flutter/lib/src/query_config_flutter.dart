@@ -14,7 +14,7 @@ class QueryConfigFlutter extends QueryConfig {
   QueryConfigFlutter({
     this.refetchOnResume,
     this.refetchOnConnection,
-    // ignore: deprecated_member_use
+    @Deprecated('Use QueryConfig.storageDeserializer instead')
     Serializer? serializer,
     Serializer? storageSerializer,
     Serializer? storageDeserializer,
