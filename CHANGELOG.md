@@ -11,6 +11,38 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 Packages with breaking changes:
 
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v2.0.0-dev.1`](#cached_query---v200-dev1)
+ - [`cached_query_flutter` - `v2.0.0-dev.1`](#cached_query_flutter---v200-dev1)
+ - [`cached_storage` - `v1.0.2-dev.1`](#cached_storage---v102-dev1)
+
+---
+
+#### `cached_query` - `v2.0.0-dev.1`
+
+ - **FEAT**: added storageSerializer and storageDeserializer to the QueryConfig to allow for more flexible storage ([#20](https://github.com/D-James-GH/cached_query/issues/20)). ([4aca144d](https://github.com/D-James-GH/cached_query/commit/4aca144dd49589309d49969f9f11ce42eeff87ce))
+ - **DOCS**: add change for breaking change. ([67711026](https://github.com/D-James-GH/cached_query/commit/67711026e648dfec1d0f72c90601ffeddb355070))
+
+#### `cached_query_flutter` - `v2.0.0-dev.1`
+
+ - **FEAT**: added storageSerializer and storageDeserializer to the QueryConfig to allow for more flexible storage ([#20](https://github.com/D-James-GH/cached_query/issues/20)). ([4aca144d](https://github.com/D-James-GH/cached_query/commit/4aca144dd49589309d49969f9f11ce42eeff87ce))
+
+#### `cached_storage` - `v1.0.2-dev.1`
+
+ - **FEAT**: added storageSerializer and storageDeserializer to the QueryConfig to allow for more flexible storage ([#20](https://github.com/D-James-GH/cached_query/issues/20)). ([4aca144d](https://github.com/D-James-GH/cached_query/commit/4aca144dd49589309d49969f9f11ce42eeff87ce))
+
+
+## 2023-11-23
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
  - [`cached_query` - `v2.0.0-dev.0`](#cached_query---v200-dev0)
  - [`cached_query_flutter` - `v2.0.0-dev.0`](#cached_query_flutter---v200-dev0)
 

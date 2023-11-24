@@ -1,3 +1,7 @@
+## 2.0.0-dev.1
+
+ - **FEAT**: added storageSerializer and storageDeserializer to the QueryConfig to allow for more flexible storage ([#20](https://github.com/D-James-GH/cached_query/issues/20)). ([4aca144d](https://github.com/D-James-GH/cached_query/commit/4aca144dd49589309d49969f9f11ce42eeff87ce))
+
 ## 2.0.0-dev.0
 
 > Note: This release has breaking changes.
