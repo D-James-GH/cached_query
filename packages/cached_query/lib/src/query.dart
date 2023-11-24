@@ -104,19 +104,21 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   @override
   Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
-    if (!_stale &&
+    final isStale = _stale ||
+        _state.timeCreated.add(config.refetchDuration).isBefore(DateTime.now());
+    if (!isStale &&
         !forceRefetch &&
         _state.status != QueryStatus.error &&
-        _state.data != null &&
-        (_state.timeCreated
-            .add(config.refetchDuration)
-            .isAfter(DateTime.now()))) {
+        _state.data != null) {
       _emit();
       return _state;
     }
-    _currentFuture ??= _fetch();
-    await _currentFuture;
-    _stale = false;
+    final shouldRefetch = config.shouldRefetch?.call(this, false) ?? true;
+    if (shouldRefetch || _state.status == QueryStatus.initial || forceRefetch) {
+      _currentFuture ??= _fetch();
+      await _currentFuture;
+      _stale = false;
+    }
     return _state;
   }
 
@@ -131,6 +133,10 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
           _setState(_state.copyWith(data: dataFromStorage));
           // Emit the data from storage
           _emit();
+          final shouldRefetch = config.shouldRefetch?.call(this, true) ?? true;
+          if (!shouldRefetch) {
+            return;
+          }
         }
       }
 

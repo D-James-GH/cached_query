@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
@@ -360,6 +362,29 @@ void main() {
       expect(storage.store[key], count.toString());
       expect(storage.store[key], res2.data.toString());
     });
+
+    test("Can prevent queryFn being fired after fetch from storage", () async {
+      int numCalls = 0;
+      const key = "query_no_fetch_storage";
+      const data = {"test": "storage_data"};
+      storage.store[key] = jsonEncode(data);
+      final query = Query<Map<String, dynamic>>(
+        key: key,
+        queryFn: () {
+          numCalls++;
+          return Future.value({"test": "data"});
+        },
+        config: QueryConfig(
+          shouldRefetch: (query, afterStorage) => !afterStorage,
+          refetchDuration: Duration.zero,
+        ),
+      );
+
+      final res = await query.result;
+
+      expect(numCalls, 0);
+      expect(res.data, data);
+    });
   });
   group("Errors", () {
     tearDown(() {
@@ -413,5 +438,48 @@ void main() {
     );
 
     expect(query.config.shouldRethrow, true);
+  });
+
+  group("Should refetch", () {
+    tearDownAll(cachedQuery.deleteCache);
+    test("query should never refresh if returning false", () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "should_refetch_false",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(
+          shouldRefetch: (query, _) => false,
+          refetchDuration: Duration.zero,
+        ),
+      );
+
+      await query.result;
+      await query.result;
+
+      expect(numCalls, 1);
+    });
+
+    test("can still force refetch", () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "force_refetch_should_refetch",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(
+          shouldRefetch: (query, _) => false,
+          refetchDuration: Duration.zero,
+        ),
+      );
+
+      await query.result;
+      await query.refetch();
+
+      expect(numCalls, 2);
+    });
   });
 }

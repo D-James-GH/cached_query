@@ -582,6 +582,30 @@ void main() async {
         res2.data!.first,
       );
     });
+
+    test("Can prevent queryFn being fired after fetch from storage", () async {
+      int numCalls = 0;
+      const key = "query_no_fetch_storage";
+      const data = 1000;
+      storage.store[key] = jsonEncode([data]);
+      final query = InfiniteQuery<int, int>(
+        key: key,
+        getNextArg: (state) => 2,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(
+          shouldRefetch: (query, afterStorage) => !afterStorage,
+          refetchDuration: Duration.zero,
+        ),
+      );
+
+      final res = await query.result;
+
+      expect(numCalls, 0);
+      expect(res.data, [data]);
+    });
   });
   group("Side Effects", () {
     tearDown(CachedQuery.instance.reset);
@@ -658,6 +682,51 @@ void main() async {
       final res = await query.getNextPage();
       expect(count, 1);
       expect(res?.error, error);
+    });
+  });
+
+  group("Should refetch", () {
+    tearDownAll(cachedQuery.deleteCache);
+    test("query should never refresh if returning false", () async {
+      int numCalls = 0;
+      final query = InfiniteQuery(
+        key: "infinite_query_no_refetch",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(
+          shouldRefetch: (query, _) => false,
+          refetchDuration: Duration.zero,
+        ),
+      );
+
+      await query.result;
+      await query.result;
+
+      expect(numCalls, 1);
+    });
+
+    test("can still force refetch", () async {
+      int numCalls = 0;
+      final query = InfiniteQuery(
+        key: "infinite_query_force_refetch",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(
+          shouldRefetch: (query, _) => false,
+          refetchDuration: Duration.zero,
+        ),
+      );
+
+      await query.result;
+      await query.refetch();
+
+      expect(numCalls, 2);
     });
   });
 }
