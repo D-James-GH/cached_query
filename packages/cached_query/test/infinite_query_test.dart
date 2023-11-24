@@ -410,6 +410,26 @@ void main() async {
       expect(storage.store[key], jsonEncode([0]));
     });
 
+    test("Should store using serializer if available", () async {
+      const key = "store";
+      const convertedData = [1000];
+      storage.deleteAll();
+
+      final query = InfiniteQuery<int, int>(
+        key: key,
+        queryFn: repo.getPage,
+        config: QueryConfig(
+          storageSerializer: (dynamic json) => convertedData,
+        ),
+        getNextArg: (state) {
+          if (state.length == 0) return 0;
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      expect(storage.store.length, 1);
+      expect(storage.store[key], jsonEncode(convertedData));
+    });
     test("Should not store infinite query if specified", () async {
       storage.deleteAll();
       const key = "store";
@@ -457,7 +477,7 @@ void main() async {
       );
     });
 
-    test("Should serialize data if a serialize function is provided", () async {
+    test("Should deserialize data provided", () async {
       const key = "serialize";
       // Make sure the storage has initial data
       storage.put(key, item: jsonEncode([Serializable(MockStorage.data)]));
@@ -465,6 +485,49 @@ void main() async {
         key: key,
         queryFn: (i) => Future.value(Serializable("$i")),
         config: QueryConfig(
+          storageDeserializer: (dynamic json) {
+            return Serializable.listFromJson(json as List<dynamic>);
+          },
+        ),
+        getNextArg: (state) {
+          if (state.length == 0) return 0;
+          return state.length + 1;
+        },
+      );
+
+      int count = 1;
+      final output = <dynamic>[];
+      query.stream.listen(
+        expectAsync1(
+          (event) {
+            if (event.data != null && event.data!.isNotEmpty) {
+              output.add(event.data!);
+            }
+            if (output.length == 1 || count == 2) {
+              expect(output[0], isA<List<Serializable>>());
+              expect(
+                (output[0] as List<Serializable>).first.name,
+                MockStorage.data,
+              );
+            }
+            count++;
+          },
+          max: 10,
+          count: 2,
+        ),
+      );
+    });
+    test(
+        "[DEPRECIATED] Should serialize data if a serialize function is provided",
+        () async {
+      const key = "serialize";
+      // Make sure the storage has initial data
+      storage.put(key, item: jsonEncode([Serializable(MockStorage.data)]));
+      final query = InfiniteQuery<Serializable, int>(
+        key: key,
+        queryFn: (i) => Future.value(Serializable("$i")),
+        config: QueryConfig(
+          // ignore: deprecated_member_use_from_same_package
           serializer: (dynamic json) {
             return Serializable.listFromJson(json as List<dynamic>);
           },

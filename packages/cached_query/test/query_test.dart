@@ -212,11 +212,28 @@ void main() {
       storage.deleteAll();
       final query = Query<String>(
         key: key,
-        queryFn: () async => Future.value(data),
+        queryFn: () => Future.value(data),
       );
       await query.result;
       expect(storage.store.length, 1);
       expect(storage.store[key], data);
+    });
+
+    test("Should use storageSerializer to store the query", () async {
+      const key = "store";
+      const data = "someData";
+      const convertedData = "convertedData";
+      storage.deleteAll();
+      final query = Query<String>(
+        key: key,
+        queryFn: () => Future.value(data),
+        config: QueryConfig(
+          storageSerializer: (_) => convertedData,
+        ),
+      );
+      await query.result;
+      expect(storage.store.length, 1);
+      expect(storage.store[key], convertedData);
     });
 
     test("Should not store query if specified", () async {
@@ -257,7 +274,7 @@ void main() {
       );
     });
 
-    test("Should serialize data if a serialize function is provided", () async {
+    test("Should deserialize data if provided", () async {
       const key = "serialize";
       // Make sure the storage has initial data
       storage.put(
@@ -270,6 +287,43 @@ void main() {
         key: key,
         queryFn: () async => Future.value(Serializable("Fetched")),
         config: QueryConfig(
+          storageDeserializer: (dynamic json) =>
+              Serializable.fromJson(json as Map<String, dynamic>),
+        ),
+      );
+
+      final output = <dynamic>[];
+      query.stream.listen(
+        expectAsync1(
+          (event) {
+            if (event.data != null) {
+              output.add(event.data!);
+            }
+            if (output.length == 1) {
+              expect(output[0], isA<Serializable>());
+              expect((output[0] as Serializable).name, MockStorage.data);
+            }
+          },
+          max: 3,
+        ),
+      );
+    });
+    test(
+        "[DEPRECATED] Should serialize data if a serialize function is provided",
+        () async {
+      const key = "serialize";
+      // Make sure the storage has initial data
+      storage.put(
+        key,
+        item: {
+          key: {"name": MockStorage.data},
+        },
+      );
+      final query = Query<Serializable>(
+        key: key,
+        queryFn: () async => Future.value(Serializable("Fetched")),
+        config: QueryConfig(
+          // ignore: deprecated_member_use_from_same_package
           serializer: (dynamic json) =>
               Serializable.fromJson(json as Map<String, dynamic>),
         ),
