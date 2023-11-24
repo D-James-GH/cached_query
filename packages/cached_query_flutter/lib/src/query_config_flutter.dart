@@ -14,7 +14,10 @@ class QueryConfigFlutter extends QueryConfig {
   QueryConfigFlutter({
     this.refetchOnResume,
     this.refetchOnConnection,
+    // ignore: deprecated_member_use
     Serializer? serializer,
+    Serializer? storageSerializer,
+    Serializer? storageDeserializer,
     bool? ignoreCacheDuration,
     bool? storeQuery,
     Duration? refetchDuration,
@@ -22,7 +25,10 @@ class QueryConfigFlutter extends QueryConfig {
     bool? shouldRethrow,
   }) : super(
           ignoreCacheDuration: ignoreCacheDuration,
+          // ignore: deprecated_member_use
           serializer: serializer,
+          storageSerializer: storageSerializer,
+          storageDeserializer: storageDeserializer,
           storeQuery: storeQuery,
           refetchDuration: refetchDuration,
           cacheDuration: cacheDuration,

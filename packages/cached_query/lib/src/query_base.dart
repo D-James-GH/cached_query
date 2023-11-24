@@ -140,8 +140,12 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 
   void _saveToStorage<StorageType>() {
     if (_globalCache.storage != null && _state.data != null) {
+      dynamic dataToStore = _state.data;
+      if (config.storageSerializer != null) {
+        dataToStore = config.storageSerializer!(dataToStore);
+      }
       _globalCache._storage!
-          .put<StorageType>(key, item: _state.data! as StorageType);
+          .put<StorageType>(key, item: dataToStore! as StorageType);
     }
   }
 
@@ -149,9 +153,13 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     if (_globalCache.storage != null) {
       final dynamic storedData = await _globalCache.storage?.get(key);
       if (storedData != null) {
-        return config.serializer == null
-            ? storedData
-            : config.serializer!(storedData);
+        if (config.storageDeserializer != null) {
+          return config.storageDeserializer!(storedData);
+        }
+        if (config.serializer != null) {
+          return config.serializer!(storedData);
+        }
+        return storedData;
       }
     }
   }

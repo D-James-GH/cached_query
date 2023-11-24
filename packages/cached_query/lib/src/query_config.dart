@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use_from_same_package
 import '../cached_query.dart';
 
 /// {@template queryConfig}
@@ -33,11 +34,20 @@ class QueryConfig {
   /// change the stored value to the query value.
   final Serializer? serializer;
 
+  /// Converts the query data to a storable format.
+  final Serializer? storageSerializer;
+
+  /// Called when the query is fetched from storage and should
+  /// convert the stored data to the usable data.
+  final Serializer? storageDeserializer;
+
   /// If set to true the query(ies) will never be removed from cache.
   final bool ignoreCacheDuration;
 
   const QueryConfig._({
     required this.serializer,
+    required this.storageSerializer,
+    required this.storageDeserializer,
     required this.ignoreCacheDuration,
     required this.storeQuery,
     required this.refetchDuration,
@@ -48,6 +58,8 @@ class QueryConfig {
   /// Returns a query config with the default values.
   factory QueryConfig.defaults() => const QueryConfig._(
         serializer: null,
+        storageSerializer: null,
+        storageDeserializer: null,
         ignoreCacheDuration: false,
         storeQuery: true,
         refetchDuration: Duration(seconds: 4),
@@ -57,14 +69,21 @@ class QueryConfig {
 
   /// {@macro queryConfig}
   QueryConfig({
-    Serializer? serializer,
+    @Deprecated('Use storageDeserializer instead') Serializer? serializer,
+    Serializer? storageSerializer,
+    Serializer? storageDeserializer,
     bool? ignoreCacheDuration,
     bool? storeQuery,
     Duration? refetchDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
+    // use the defaults if not set
   })  : serializer =
             serializer ?? CachedQuery.instance.defaultConfig.serializer,
+        storageSerializer = storageSerializer ??
+            CachedQuery.instance.defaultConfig.storageSerializer,
+        storageDeserializer = storageDeserializer ??
+            CachedQuery.instance.defaultConfig.storageDeserializer,
         ignoreCacheDuration = ignoreCacheDuration ??
             CachedQuery.instance.defaultConfig.ignoreCacheDuration,
         storeQuery =
@@ -86,6 +105,8 @@ class QueryConfig {
           cacheDuration == other.cacheDuration &&
           shouldRethrow == other.shouldRethrow &&
           serializer == other.serializer &&
+          storageDeserializer == other.storageDeserializer &&
+          storageSerializer == other.storageSerializer &&
           ignoreCacheDuration == other.ignoreCacheDuration;
 
   @override
@@ -95,5 +116,6 @@ class QueryConfig {
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^
       serializer.hashCode ^
+      storageDeserializer.hashCode ^
       ignoreCacheDuration.hashCode;
 }

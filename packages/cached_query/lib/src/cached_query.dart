@@ -19,8 +19,11 @@ part "query_base.dart";
 /// Similar to List.where.
 typedef WhereCallback = bool Function(QueryBase<dynamic, dynamic>);
 
-/// Used to serialize the query data when fetched from local storage.
+/// Used to serialize or deserialize the query from storage.
 typedef Serializer = dynamic Function(dynamic json);
+
+// /// Used to serialize or deserialize the query data when fetched from local storage.
+// typedef StorageConverter = dynamic Function(dynamic data);
 
 /// Used to match multiple queries.
 typedef KeyFilterFunc = bool Function(Object unencodedKey, String key);
