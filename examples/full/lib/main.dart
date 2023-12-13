@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:cached_storage/cached_storage.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +12,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
     storage: await CachedStorage.ensureInitialized(),
-    observers: [Observer(), const QueryLoggingObserver()],
+    observers: [
+      Observer(),
+      QueryLoggingObserver(colors: !Platform.isIOS),
+    ],
   );
   runApp(const MyApp());
 }

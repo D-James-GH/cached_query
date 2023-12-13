@@ -10,12 +10,12 @@ ide:
 
 command:
   version:
-    # Generate commit links in package changelogs.
     linkToCommits: true
-    # Additionally build a changelog at the root of the workspace.
     workspaceChangelog: true
 
 scripts:
+  build:devtools:
+    run: cd packages/devtools_extension && dart run devtools_extensions build_and_copy --source=. --dest=../cached_query/extension/devtools
   lint:all:
     run: melos run analyze && melos run format
     description: Run all static analysis checks.

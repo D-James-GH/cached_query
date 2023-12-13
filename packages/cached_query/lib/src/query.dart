@@ -104,9 +104,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   @override
   Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
-    final isStale = _stale ||
-        _state.timeCreated.add(config.refetchDuration).isBefore(DateTime.now());
-    if (!isStale &&
+    if (!stale &&
         !forceRefetch &&
         _state.status != QueryStatus.error &&
         _state.data != null) {
@@ -117,7 +115,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     if (shouldRefetch || _state.status == QueryStatus.initial || forceRefetch) {
       _currentFuture ??= _fetch();
       await _currentFuture;
-      _stale = false;
+      _staleOverride = false;
     }
     return _state;
   }

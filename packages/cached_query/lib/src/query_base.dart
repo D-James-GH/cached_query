@@ -48,7 +48,12 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 
   /// Whether the current query is marked as stale and therefore requires a
   /// refetch.
-  bool get stale => _stale;
+  bool get stale {
+    return _state.timeCreated
+            .add(config.refetchDuration)
+            .isBefore(DateTime.now()) ||
+        _staleOverride;
+  }
 
   /// The config for this specific query.
   final QueryConfig config;
@@ -83,8 +88,9 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   final CachedQuery _globalCache = CachedQuery.instance;
   Timer? _deleteQueryTimer;
   Future<void>? _currentFuture;
-  // Initialise the query as stale so the first fetch is guaranteed to happen
-  bool _stale = true;
+
+// Initialise the query as stale so the first fetch is guaranteed to happen
+  bool _staleOverride = true;
   State _state;
 
   QueryBase._internal({
@@ -110,7 +116,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   ///
   /// Will force a fetch next time the query is accessed.
   void invalidateQuery() {
-    _stale = true;
+    _staleOverride = true;
   }
 
   /// Delete the query and query key from cache
