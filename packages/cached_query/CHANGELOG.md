@@ -1,3 +1,9 @@
+## 2.0.0-dev.2
+
+ - **FEAT**: add devtools package ([#24](https://github.com/D-James-GH/cached_query/issues/24)). ([43ba85ea](https://github.com/D-James-GH/cached_query/commit/43ba85ea3c65debd006a457dfef6aadf9130ef3b))
+ - **FEAT**: added shouldRefetch call back to the query config. ([#21](https://github.com/D-James-GH/cached_query/issues/21)). ([3e944b64](https://github.com/D-James-GH/cached_query/commit/3e944b64c387487d7315d224759161763c28ccc3))
+ - **DOCS**: update for storageSerializer and storageDeserializer. ([0b4c4e5f](https://github.com/D-James-GH/cached_query/commit/0b4c4e5fb4a5e005d8e21e48e2ff748036065b47))
+
 ## 2.0.0-dev.1
 
  - **FEAT**: added storageSerializer and storageDeserializer to the QueryConfig to allow for more flexible storage ([#20](https://github.com/D-James-GH/cached_query/issues/20)). ([4aca144d](https://github.com/D-James-GH/cached_query/commit/4aca144dd49589309d49969f9f11ce42eeff87ce))
