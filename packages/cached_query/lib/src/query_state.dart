@@ -15,6 +15,23 @@ enum QueryStatus {
   initial,
 }
 
+/// Extension methods for [QueryStatus]
+extension QueryStatusExt on QueryStatus {
+  /// Printable string for the status.
+  String get displayString {
+    switch (this) {
+      case QueryStatus.loading:
+        return 'Loading';
+      case QueryStatus.success:
+        return 'Success';
+      case QueryStatus.error:
+        return 'Error';
+      case QueryStatus.initial:
+        return 'Initial';
+    }
+  }
+}
+
 /// {@template queryState}
 /// [QueryState] holds the current state of a [Query]
 ///

@@ -164,9 +164,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
 
   @override
   Future<InfiniteQueryState<T>> _getResult({bool forceRefetch = false}) async {
-    final isStale = _stale ||
-        _state.timeCreated.add(config.refetchDuration).isBefore(DateTime.now());
-    if (!isStale &&
+    if (!stale &&
         !forceRefetch &&
         _state.status != QueryStatus.error &&
         _state.data != null &&
@@ -179,7 +177,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     if (shouldRefetch || _state.status == QueryStatus.initial) {
       _currentFuture ??= _refetch();
       await _currentFuture;
-      _stale = false;
+      _staleOverride = false;
     }
     return _state;
   }
@@ -237,7 +235,12 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         if (_onSuccess != null) {
           _onSuccess!(firstPage);
         }
-        _setState(_state.copyWith(status: QueryStatus.success));
+        _setState(
+          _state.copyWith(
+            status: QueryStatus.success,
+            timeCreated: DateTime.now(),
+          ),
+        );
         _emit();
         return;
       }
