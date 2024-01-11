@@ -76,10 +76,11 @@ class _$JokeStateCopyWithImpl<$Res, $Val extends JokeState>
 }
 
 /// @nodoc
-abstract class _$$_JokeStateCopyWith<$Res> implements $JokeStateCopyWith<$Res> {
-  factory _$$_JokeStateCopyWith(
-          _$_JokeState value, $Res Function(_$_JokeState) then) =
-      __$$_JokeStateCopyWithImpl<$Res>;
+abstract class _$$JokeStateImplCopyWith<$Res>
+    implements $JokeStateCopyWith<$Res> {
+  factory _$$JokeStateImplCopyWith(
+          _$JokeStateImpl value, $Res Function(_$JokeStateImpl) then) =
+      __$$JokeStateImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({JokeStatus status, JokeModel? joke});
@@ -89,11 +90,11 @@ abstract class _$$_JokeStateCopyWith<$Res> implements $JokeStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class __$$_JokeStateCopyWithImpl<$Res>
-    extends _$JokeStateCopyWithImpl<$Res, _$_JokeState>
-    implements _$$_JokeStateCopyWith<$Res> {
-  __$$_JokeStateCopyWithImpl(
-      _$_JokeState _value, $Res Function(_$_JokeState) _then)
+class __$$JokeStateImplCopyWithImpl<$Res>
+    extends _$JokeStateCopyWithImpl<$Res, _$JokeStateImpl>
+    implements _$$JokeStateImplCopyWith<$Res> {
+  __$$JokeStateImplCopyWithImpl(
+      _$JokeStateImpl _value, $Res Function(_$JokeStateImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -102,7 +103,7 @@ class __$$_JokeStateCopyWithImpl<$Res>
     Object? status = null,
     Object? joke = freezed,
   }) {
-    return _then(_$_JokeState(
+    return _then(_$JokeStateImpl(
       status: null == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -117,8 +118,8 @@ class __$$_JokeStateCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_JokeState implements _JokeState {
-  const _$_JokeState({this.status = JokeStatus.initial, this.joke});
+class _$JokeStateImpl implements _JokeState {
+  const _$JokeStateImpl({this.status = JokeStatus.initial, this.joke});
 
   @override
   @JsonKey()
@@ -132,10 +133,10 @@ class _$_JokeState implements _JokeState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_JokeState &&
+            other is _$JokeStateImpl &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.joke, joke) || other.joke == joke));
   }
@@ -146,13 +147,13 @@ class _$_JokeState implements _JokeState {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_JokeStateCopyWith<_$_JokeState> get copyWith =>
-      __$$_JokeStateCopyWithImpl<_$_JokeState>(this, _$identity);
+  _$$JokeStateImplCopyWith<_$JokeStateImpl> get copyWith =>
+      __$$JokeStateImplCopyWithImpl<_$JokeStateImpl>(this, _$identity);
 }
 
 abstract class _JokeState implements JokeState {
   const factory _JokeState({final JokeStatus status, final JokeModel? joke}) =
-      _$_JokeState;
+      _$JokeStateImpl;
 
   @override
   JokeStatus get status;
@@ -160,6 +161,6 @@ abstract class _JokeState implements JokeState {
   JokeModel? get joke;
   @override
   @JsonKey(ignore: true)
-  _$$_JokeStateCopyWith<_$_JokeState> get copyWith =>
+  _$$JokeStateImplCopyWith<_$JokeStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

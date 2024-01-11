@@ -157,7 +157,7 @@ class _$QueryStateDetailsJsonImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QueryStateDetailsJsonImpl &&
@@ -329,7 +329,7 @@ class _$QueryStateDetailsStringImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QueryStateDetailsStringImpl &&
@@ -510,7 +510,7 @@ class _$InfiniteQueryDetailsJsonImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$InfiniteQueryDetailsJsonImpl &&
@@ -692,7 +692,7 @@ class _$QueryDetailsStateImpl
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QueryDetailsStateImpl &&

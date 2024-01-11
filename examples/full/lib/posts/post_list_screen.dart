@@ -39,7 +39,7 @@ class _PostListScreenState extends State<PostListScreen> {
               children: [
                 if (state.status == QueryStatus.loading)
                   const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                   ),
                 const Text('posts'),
               ],
@@ -56,7 +56,7 @@ class _PostListScreenState extends State<PostListScreen> {
                 children: [
                   if (state.status == QueryStatus.loading)
                     const CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                     ),
                   IconButton(
                     icon: const Icon(Icons.create),

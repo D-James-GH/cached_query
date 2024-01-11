@@ -21,12 +21,16 @@ class QueryConfigFlutter extends QueryConfig {
     bool? ignoreCacheDuration,
     bool? storeQuery,
     Duration? refetchDuration,
+    ShouldRefetch? shouldRefetch,
+    Duration? storageDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
   }) : super(
           ignoreCacheDuration: ignoreCacheDuration,
           // ignore: deprecated_member_use
           serializer: serializer,
+          storageDuration: storageDuration,
+          shouldRefetch: shouldRefetch,
           storageSerializer: storageSerializer,
           storageDeserializer: storageDeserializer,
           storeQuery: storeQuery,

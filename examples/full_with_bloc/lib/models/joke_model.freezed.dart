@@ -67,21 +67,22 @@ class _$JokeModelCopyWithImpl<$Res, $Val extends JokeModel>
 }
 
 /// @nodoc
-abstract class _$$_JokeModelCopyWith<$Res> implements $JokeModelCopyWith<$Res> {
-  factory _$$_JokeModelCopyWith(
-          _$_JokeModel value, $Res Function(_$_JokeModel) then) =
-      __$$_JokeModelCopyWithImpl<$Res>;
+abstract class _$$JokeModelImplCopyWith<$Res>
+    implements $JokeModelCopyWith<$Res> {
+  factory _$$JokeModelImplCopyWith(
+          _$JokeModelImpl value, $Res Function(_$JokeModelImpl) then) =
+      __$$JokeModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({String joke, String id});
 }
 
 /// @nodoc
-class __$$_JokeModelCopyWithImpl<$Res>
-    extends _$JokeModelCopyWithImpl<$Res, _$_JokeModel>
-    implements _$$_JokeModelCopyWith<$Res> {
-  __$$_JokeModelCopyWithImpl(
-      _$_JokeModel _value, $Res Function(_$_JokeModel) _then)
+class __$$JokeModelImplCopyWithImpl<$Res>
+    extends _$JokeModelCopyWithImpl<$Res, _$JokeModelImpl>
+    implements _$$JokeModelImplCopyWith<$Res> {
+  __$$JokeModelImplCopyWithImpl(
+      _$JokeModelImpl _value, $Res Function(_$JokeModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -90,7 +91,7 @@ class __$$_JokeModelCopyWithImpl<$Res>
     Object? joke = null,
     Object? id = null,
   }) {
-    return _then(_$_JokeModel(
+    return _then(_$JokeModelImpl(
       joke: null == joke
           ? _value.joke
           : joke // ignore: cast_nullable_to_non_nullable
@@ -105,11 +106,11 @@ class __$$_JokeModelCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_JokeModel implements _JokeModel {
-  const _$_JokeModel({required this.joke, required this.id});
+class _$JokeModelImpl implements _JokeModel {
+  const _$JokeModelImpl({required this.joke, required this.id});
 
-  factory _$_JokeModel.fromJson(Map<String, dynamic> json) =>
-      _$$_JokeModelFromJson(json);
+  factory _$JokeModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$JokeModelImplFromJson(json);
 
   @override
   final String joke;
@@ -122,10 +123,10 @@ class _$_JokeModel implements _JokeModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_JokeModel &&
+            other is _$JokeModelImpl &&
             (identical(other.joke, joke) || other.joke == joke) &&
             (identical(other.id, id) || other.id == id));
   }
@@ -137,12 +138,12 @@ class _$_JokeModel implements _JokeModel {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_JokeModelCopyWith<_$_JokeModel> get copyWith =>
-      __$$_JokeModelCopyWithImpl<_$_JokeModel>(this, _$identity);
+  _$$JokeModelImplCopyWith<_$JokeModelImpl> get copyWith =>
+      __$$JokeModelImplCopyWithImpl<_$JokeModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_JokeModelToJson(
+    return _$$JokeModelImplToJson(
       this,
     );
   }
@@ -150,10 +151,10 @@ class _$_JokeModel implements _JokeModel {
 
 abstract class _JokeModel implements JokeModel {
   const factory _JokeModel(
-      {required final String joke, required final String id}) = _$_JokeModel;
+      {required final String joke, required final String id}) = _$JokeModelImpl;
 
   factory _JokeModel.fromJson(Map<String, dynamic> json) =
-      _$_JokeModel.fromJson;
+      _$JokeModelImpl.fromJson;
 
   @override
   String get joke;
@@ -161,6 +162,6 @@ abstract class _JokeModel implements JokeModel {
   String get id;
   @override
   @JsonKey(ignore: true)
-  _$$_JokeModelCopyWith<_$_JokeModel> get copyWith =>
+  _$$JokeModelImplCopyWith<_$JokeModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

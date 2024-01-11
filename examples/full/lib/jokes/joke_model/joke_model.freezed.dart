@@ -123,7 +123,7 @@ class _$JokeModelImpl implements _JokeModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$JokeModelImpl &&

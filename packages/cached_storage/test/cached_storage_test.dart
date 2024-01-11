@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_query/cached_query.dart';
 import 'package:cached_storage/cached_storage.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -16,8 +17,14 @@ void main() async {
       when(
         db.insert(any, any, conflictAlgorithm: anyNamed("conflictAlgorithm")),
       ).thenAnswer((realInvocation) async => 1);
+      final storedQuery = StoredQuery(
+        key: "key",
+        data: {"something": "something else"},
+        createdAt: DateTime.now(),
+      );
 
-      CachedStorage(db).put("key", item: {"something": "something else"});
+      CachedStorage(db).put(storedQuery);
+
       final dynamic captured = verify(
         db.insert(
           any,
@@ -48,7 +55,8 @@ void main() async {
       final storage = CachedStorage(db);
       final dynamic fromStorage = await storage.get("dbKey");
 
-      expect(fromStorage, data);
+      expect(fromStorage, isA<StoredQuery>());
+      expect((fromStorage as StoredQuery).data, data);
     });
   });
 }

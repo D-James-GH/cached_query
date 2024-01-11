@@ -144,30 +144,55 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
     _streamController?.add(_state);
   }
 
-  void _saveToStorage<StorageType>() {
+  void _saveToStorage() {
     if (_globalCache.storage != null && _state.data != null) {
       dynamic dataToStore = _state.data;
       if (config.storageSerializer != null) {
         dataToStore = config.storageSerializer!(dataToStore);
       }
-      _globalCache._storage!
-          .put<StorageType>(key, item: dataToStore! as StorageType);
+      final storedQuery = StoredQuery(
+        key: key,
+        data: dataToStore,
+        createdAt: _state.timeCreated,
+        storageDuration: config.storageDuration,
+      );
+      _globalCache._storage!.put(storedQuery);
     }
   }
 
-  Future<dynamic> _fetchFromStorage() async {
-    if (_globalCache.storage != null) {
-      final dynamic storedData = await _globalCache.storage?.get(key);
-      if (storedData != null) {
-        if (config.storageDeserializer != null) {
-          return config.storageDeserializer!(storedData);
-        }
-        if (config.serializer != null) {
-          return config.serializer!(storedData);
-        }
-        return storedData;
-      }
+  /// If the data is expired this will return null.
+  Future<T?> _fetchFromStorage() async {
+    if (_globalCache.storage == null) {
+      return null;
     }
+
+    final storedData = await _globalCache.storage?.get(key);
+
+    // In-case the developer changes the storage duration in the code.
+    final expiryHasChanged =
+        storedData?.storageDuration != config.storageDuration;
+
+    if (storedData == null ||
+        storedData.isExpired ||
+        storedData.data == null ||
+        expiryHasChanged) {
+      return null;
+    }
+
+    dynamic data = storedData.data;
+
+    if (config.storageDeserializer != null) {
+      data = config.storageDeserializer!(storedData.data);
+    }
+    if (config.serializer != null) {
+      data = config.serializer!(storedData.data);
+    }
+
+    if (data is T) {
+      return data;
+    }
+
+    return null;
   }
 
   Stream<State> _getStream() {

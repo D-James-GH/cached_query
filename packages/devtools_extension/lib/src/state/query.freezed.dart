@@ -130,7 +130,7 @@ class _$QueryItemImpl implements _QueryItem {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QueryItemImpl &&
@@ -277,7 +277,7 @@ class _$QueryStateImpl implements _QueryState {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$QueryStateImpl &&

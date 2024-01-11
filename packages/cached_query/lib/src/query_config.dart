@@ -35,6 +35,12 @@ class QueryConfig {
   /// {@endtemplate}
   final bool storeQuery;
 
+  /// {@template QueryConfig.storageDuration}
+  /// Use [storageDuration] to specify how long a query is stored in the database.
+  /// Defaults to Null (forever).
+  /// {@endtemplate}
+  final Duration? storageDuration;
+
   /// {@template QueryConfig.cacheDuration}
   /// Use [cacheDuration] to specify how long a query that has zero listeners
   /// stays in memory.
@@ -83,6 +89,7 @@ class QueryConfig {
     required this.storageDeserializer,
     required this.ignoreCacheDuration,
     required this.storeQuery,
+    required this.storageDuration,
     required this.refetchDuration,
     required this.cacheDuration,
     required this.shouldRethrow,
@@ -94,6 +101,7 @@ class QueryConfig {
         storageSerializer: null,
         shouldRefetch: null,
         storageDeserializer: null,
+        storageDuration: null,
         ignoreCacheDuration: false,
         storeQuery: true,
         refetchDuration: Duration(seconds: 4),
@@ -106,6 +114,8 @@ class QueryConfig {
   /// {@macro QueryConfig.storageSerializer}
   ///
   /// {@macro QueryConfig.storageDeserializer}
+  ///
+  /// {@macro QueryConfig.storageDuration}
   ///
   /// {@macro QueryConfig.ShouldRefetch}
   ///
@@ -123,6 +133,7 @@ class QueryConfig {
     Serializer? storageSerializer,
     Serializer? storageDeserializer,
     ShouldRefetch? shouldRefetch,
+    Duration? storageDuration,
     bool? ignoreCacheDuration,
     bool? storeQuery,
     Duration? refetchDuration,
@@ -141,6 +152,8 @@ class QueryConfig {
             storeQuery ?? CachedQuery.instance.defaultConfig.storeQuery,
         refetchDuration = refetchDuration ??
             CachedQuery.instance.defaultConfig.refetchDuration,
+        storageDuration = storageDuration ??
+            CachedQuery.instance.defaultConfig.storageDuration,
         cacheDuration =
             cacheDuration ?? CachedQuery.instance.defaultConfig.cacheDuration,
         shouldRefetch =

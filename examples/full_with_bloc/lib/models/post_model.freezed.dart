@@ -79,21 +79,22 @@ class _$PostModelCopyWithImpl<$Res, $Val extends PostModel>
 }
 
 /// @nodoc
-abstract class _$$_PostModelCopyWith<$Res> implements $PostModelCopyWith<$Res> {
-  factory _$$_PostModelCopyWith(
-          _$_PostModel value, $Res Function(_$_PostModel) then) =
-      __$$_PostModelCopyWithImpl<$Res>;
+abstract class _$$PostModelImplCopyWith<$Res>
+    implements $PostModelCopyWith<$Res> {
+  factory _$$PostModelImplCopyWith(
+          _$PostModelImpl value, $Res Function(_$PostModelImpl) then) =
+      __$$PostModelImplCopyWithImpl<$Res>;
   @override
   @useResult
   $Res call({int id, String title, String body, int userId});
 }
 
 /// @nodoc
-class __$$_PostModelCopyWithImpl<$Res>
-    extends _$PostModelCopyWithImpl<$Res, _$_PostModel>
-    implements _$$_PostModelCopyWith<$Res> {
-  __$$_PostModelCopyWithImpl(
-      _$_PostModel _value, $Res Function(_$_PostModel) _then)
+class __$$PostModelImplCopyWithImpl<$Res>
+    extends _$PostModelCopyWithImpl<$Res, _$PostModelImpl>
+    implements _$$PostModelImplCopyWith<$Res> {
+  __$$PostModelImplCopyWithImpl(
+      _$PostModelImpl _value, $Res Function(_$PostModelImpl) _then)
       : super(_value, _then);
 
   @pragma('vm:prefer-inline')
@@ -104,7 +105,7 @@ class __$$_PostModelCopyWithImpl<$Res>
     Object? body = null,
     Object? userId = null,
   }) {
-    return _then(_$_PostModel(
+    return _then(_$PostModelImpl(
       id: null == id
           ? _value.id
           : id // ignore: cast_nullable_to_non_nullable
@@ -127,15 +128,15 @@ class __$$_PostModelCopyWithImpl<$Res>
 
 /// @nodoc
 @JsonSerializable()
-class _$_PostModel implements _PostModel {
-  const _$_PostModel(
+class _$PostModelImpl implements _PostModel {
+  const _$PostModelImpl(
       {required this.id,
       required this.title,
       required this.body,
       required this.userId});
 
-  factory _$_PostModel.fromJson(Map<String, dynamic> json) =>
-      _$$_PostModelFromJson(json);
+  factory _$PostModelImpl.fromJson(Map<String, dynamic> json) =>
+      _$$PostModelImplFromJson(json);
 
   @override
   final int id;
@@ -152,10 +153,10 @@ class _$_PostModel implements _PostModel {
   }
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_PostModel &&
+            other is _$PostModelImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.body, body) || other.body == body) &&
@@ -169,12 +170,12 @@ class _$_PostModel implements _PostModel {
   @JsonKey(ignore: true)
   @override
   @pragma('vm:prefer-inline')
-  _$$_PostModelCopyWith<_$_PostModel> get copyWith =>
-      __$$_PostModelCopyWithImpl<_$_PostModel>(this, _$identity);
+  _$$PostModelImplCopyWith<_$PostModelImpl> get copyWith =>
+      __$$PostModelImplCopyWithImpl<_$PostModelImpl>(this, _$identity);
 
   @override
   Map<String, dynamic> toJson() {
-    return _$$_PostModelToJson(
+    return _$$PostModelImplToJson(
       this,
     );
   }
@@ -185,10 +186,10 @@ abstract class _PostModel implements PostModel {
       {required final int id,
       required final String title,
       required final String body,
-      required final int userId}) = _$_PostModel;
+      required final int userId}) = _$PostModelImpl;
 
   factory _PostModel.fromJson(Map<String, dynamic> json) =
-      _$_PostModel.fromJson;
+      _$PostModelImpl.fromJson;
 
   @override
   int get id;
@@ -200,6 +201,6 @@ abstract class _PostModel implements PostModel {
   int get userId;
   @override
   @JsonKey(ignore: true)
-  _$$_PostModelCopyWith<_$_PostModel> get copyWith =>
+  _$$PostModelImplCopyWith<_$PostModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

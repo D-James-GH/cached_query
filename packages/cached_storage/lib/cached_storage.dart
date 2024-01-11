@@ -15,8 +15,10 @@ import 'package:sqflite/sqflite.dart';
 class CachedStorage extends StorageInterface {
   /// True if the SqfLite  instance is open
 
-  static const String _queryTable = "Query";
+  static const String _queryTable = "CachedQueryStorage";
+  static const String _oldQueryTable = "Query";
   final Database _db;
+
   CachedStorage._(this._db);
 
   /// Manual constructor for testing
@@ -32,16 +34,17 @@ class CachedStorage extends StorageInterface {
 
     final db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
-        await db.execute(
-          '''
-          CREATE TABLE IF NOT EXISTS $_queryTable(
-           queryKey TEXT PRIMARY KEY,
-           queryData TEXT
-          )
-          ''',
-        );
+        final batch = db.batch();
+        _createQueryTable(batch);
+        await batch.commit();
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        final batch = db.batch()
+          ..execute("DROP TABLE IF EXISTS $_oldQueryTable");
+        _createQueryTable(batch);
+        await batch.commit();
       },
     );
 
@@ -68,36 +71,69 @@ class CachedStorage extends StorageInterface {
   }
 
   @override
-  Future<dynamic> get(String key) async {
+  Future<StoredQuery?> get(String key) async {
     final dbQuery = await _db.query(
       _queryTable,
       where: 'queryKey = ?',
       whereArgs: [key],
-      columns: ["queryData"],
       limit: 1,
     );
-    if (dbQuery.isNotEmpty) {
-      final item = dbQuery.first["queryData"];
-      if (item is String) {
-        return jsonDecode(item);
-      }
+
+    if (dbQuery.isEmpty) {
+      return null;
     }
+
+    final data = dbQuery.first["queryData"];
+    final createdAt = dbQuery.first["createdAtMs"] ?? 0;
+    final duration = dbQuery.first["durationMs"];
+
+    if (data is String) {
+      final json = jsonDecode(data);
+      return StoredQuery(
+        key: key,
+        data: json,
+        createdAt: DateTime.fromMillisecondsSinceEpoch(createdAt as int),
+        storageDuration:
+            duration == null ? null : Duration(milliseconds: duration as int),
+      );
+    }
+
     return null;
   }
 
   @override
-  void put<T>(String key, {required T item}) async {
+  void put(StoredQuery query) async {
     try {
-      final payload = jsonEncode(item);
+      final payload = jsonEncode(query.data);
       await _db.insert(
         _queryTable,
-        {"queryKey": key, "queryData": payload},
+        {
+          "queryKey": query.key,
+          "queryData": payload,
+          "createdAtMs": query.createdAt.millisecondsSinceEpoch,
+          "durationMs": query.storageDuration?.inMilliseconds,
+        },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
     } catch (e) {
       throw Exception(
-        "Error inserting into the Database. It is likely that the data in this query is not directly serializable and it does not have a `.toJson()` method",
+        """Error inserting into the Database.
+It is likely that the data in this query is not directly serializable and it does not have a `.toJson()` method
+
+${e.toString()}
+""",
       );
     }
   }
+}
+
+void _createQueryTable(Batch batch) {
+  batch.execute(
+    '''CREATE TABLE IF NOT EXISTS ${CachedStorage._queryTable}(
+       queryKey TEXT PRIMARY KEY,
+       queryData TEXT,
+       createdAtMs INTEGER,
+       durationMs INTEGER
+      )''',
+  );
 }

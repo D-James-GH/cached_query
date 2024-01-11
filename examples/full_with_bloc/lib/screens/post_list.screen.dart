@@ -40,7 +40,7 @@ class _PostListScreenState extends State<PostListScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                              AlwaysStoppedAnimation<Color>(Colors.black),
                         ),
                       ),
                     ),

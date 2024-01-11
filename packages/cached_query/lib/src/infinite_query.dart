@@ -186,11 +186,11 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     if ((_state.data.isNullOrEmpty || _state.status == QueryStatus.initial) &&
         config.storeQuery) {
       // try to get any data from storage if the query has no data
-      final dataFromStorage = await _fetchFromStorage() as List<dynamic>?;
+      final dataFromStorage = await _fetchFromStorage();
       if (dataFromStorage != null) {
         _setState(
           _state.copyWith(
-            data: dataFromStorage.cast<T>(),
+            data: dataFromStorage,
             status: QueryStatus.success,
           ),
         );
@@ -275,7 +275,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       );
       if (config.storeQuery) {
         // save to local storage if exists
-        _saveToStorage<List<T>>();
+        _saveToStorage();
       }
     } catch (e, trace) {
       if (_onError != null) {
@@ -333,7 +333,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       );
       if (config.storeQuery) {
         // save to local storage if exists
-        _saveToStorage<List<T>>();
+        _saveToStorage();
       }
     } catch (e, trace) {
       if (_onError != null) {

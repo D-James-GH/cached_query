@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
@@ -218,7 +216,62 @@ void main() {
       );
       await query.result;
       expect(storage.store.length, 1);
-      expect(storage.store[key], data);
+      expect(storage.store.firstWhere((e) => e.key == key).data, data);
+    });
+
+    test("Should not return if expired", () async {
+      const key = "expired";
+      const expiredData = "expiredData";
+      const newData = "newData";
+      const storageDuration = Duration(minutes: 1);
+      storage
+        ..deleteAll()
+        ..put(
+          StoredQuery(
+            key: key,
+            data: expiredData,
+            storageDuration: storageDuration,
+            createdAt: DateTime.now().subtract(
+              const Duration(days: 1),
+            ),
+          ),
+        );
+
+      final query = Query<String>(
+        key: key,
+        config: QueryConfig(storageDuration: storageDuration),
+        queryFn: () => Future.value(newData),
+      );
+
+      final firstData =
+          await query.stream.firstWhere((element) => element.data != null);
+      expect(firstData.data, newData);
+    });
+
+    test("Should return if not expired", () async {
+      const key = "notExpired";
+      const data = "data";
+      const storageDuration = Duration(minutes: 1);
+      storage
+        ..deleteAll()
+        ..put(
+          StoredQuery(
+            key: key,
+            data: data,
+            storageDuration: storageDuration,
+            createdAt: DateTime.now(),
+          ),
+        );
+
+      final query = Query<String>(
+        key: key,
+        config: QueryConfig(storageDuration: storageDuration),
+        queryFn: () => Future.value("newData"),
+      );
+
+      final firstData =
+          await query.stream.firstWhere((element) => element.data != null);
+      expect(firstData.data, data);
     });
 
     test("Should use storageSerializer to store the query", () async {
@@ -235,7 +288,7 @@ void main() {
       );
       await query.result;
       expect(storage.store.length, 1);
-      expect(storage.store[key], convertedData);
+      expect(storage.store.firstWhere((e) => e.key == key).data, convertedData);
     });
 
     test("Should not store query if specified", () async {
@@ -253,8 +306,13 @@ void main() {
 
     test("Should get initial data from storage before queryFn", () async {
       const key = "getInitial";
+      final storedQuery = StoredQuery(
+        key: key,
+        data: MockStorage.data,
+        createdAt: DateTime.now(),
+      );
       // Make sure the storage has initial data
-      storage.put(key, item: MockStorage.data);
+      storage.put(storedQuery);
       final query = Query<String>(
         key: key,
         queryFn: () async => Future.value("data"),
@@ -278,13 +336,15 @@ void main() {
 
     test("Should deserialize data if provided", () async {
       const key = "serialize";
-      // Make sure the storage has initial data
-      storage.put(
-        key,
-        item: {
+      final storedQuery = StoredQuery(
+        key: key,
+        data: {
           key: {"name": MockStorage.data},
         },
+        createdAt: DateTime.now(),
       );
+      // Make sure the storage has initial data
+      storage.put(storedQuery);
       final query = Query<Serializable>(
         key: key,
         queryFn: () async => Future.value(Serializable("Fetched")),
@@ -314,13 +374,15 @@ void main() {
         "[DEPRECATED] Should serialize data if a serialize function is provided",
         () async {
       const key = "serialize";
-      // Make sure the storage has initial data
-      storage.put(
-        key,
-        item: {
+      final storedQuery = StoredQuery(
+        key: key,
+        data: {
           key: {"name": MockStorage.data},
         },
+        createdAt: DateTime.now(),
       );
+      // Make sure the storage has initial data
+      storage.put(storedQuery);
       final query = Query<Serializable>(
         key: key,
         queryFn: () async => Future.value(Serializable("Fetched")),
@@ -359,15 +421,22 @@ void main() {
       );
       await query.result;
       final res2 = await query.refetch();
-      expect(storage.store[key], count.toString());
-      expect(storage.store[key], res2.data.toString());
+      expect(
+        storage.store.firstWhere((element) => element.key == key).data,
+        count,
+      );
+      expect(
+        storage.store.firstWhere((element) => element.key == key).data,
+        res2.data,
+      );
     });
 
     test("Can prevent queryFn being fired after fetch from storage", () async {
       int numCalls = 0;
       const key = "query_no_fetch_storage";
       const data = {"test": "storage_data"};
-      storage.store[key] = jsonEncode(data);
+      storage.store[0] =
+          StoredQuery(key: key, data: data, createdAt: DateTime.now());
       final query = Query<Map<String, dynamic>>(
         key: key,
         queryFn: () {

@@ -126,9 +126,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     try {
       if (_state.data == null && config.storeQuery) {
         // try to get any data from storage if the query has no data
-        final dynamic dataFromStorage = await _fetchFromStorage();
-        if (dataFromStorage is T && dataFromStorage != null) {
-          _setState(_state.copyWith(data: dataFromStorage));
+        final storedData = await _fetchFromStorage();
+        if (storedData != null) {
+          _setState(_state.copyWith(data: storedData));
           // Emit the data from storage
           _emit();
           final shouldRefetch = config.shouldRefetch?.call(this, true) ?? true;
@@ -151,7 +151,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       );
       if (config.storeQuery) {
         // save to local storage if exists
-        _saveToStorage<T>();
+        _saveToStorage();
       }
     } catch (e, trace) {
       if (_onError != null) {
