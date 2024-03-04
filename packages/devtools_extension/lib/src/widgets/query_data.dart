@@ -34,7 +34,7 @@ class QueryData extends StatelessWidget {
     const encoder = JsonEncoder.withIndent("   ");
     return switch (json) {
       Map<String, dynamic>() => Padding(
-          padding: const EdgeInsets.only(left: denseModeDenseSpacing),
+          padding: const EdgeInsets.only(left: intermediateSpacing),
           child: Text(encoder.convert(json)),
         ),
       List<dynamic>() => Column(

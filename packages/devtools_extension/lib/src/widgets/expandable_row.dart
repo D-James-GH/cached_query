@@ -44,7 +44,7 @@ class _ExpandableRowState extends ConsumerState<ExpandableRow> {
                 color: Theme.of(context).colorScheme.onSurface,
                 size: 16,
               ),
-              const SizedBox(width: denseModeDenseSpacing),
+              const SizedBox(width: intermediateSpacing),
               if (widget.titleWidget != null)
                 Expanded(child: widget.titleWidget!),
               if (widget.title != null) Expanded(child: Text(widget.title!)),
@@ -53,8 +53,8 @@ class _ExpandableRowState extends ConsumerState<ExpandableRow> {
         ),
         if (isExpanded)
           Container(
-            margin: const EdgeInsets.only(left: intermediateSpacing),
-            padding: const EdgeInsets.only(left: denseModeDenseSpacing),
+            margin: const EdgeInsets.only(left: denseRowSpacing),
+            padding: const EdgeInsets.only(left: denseRowSpacing),
             decoration: BoxDecoration(
               border: Border(
                 left: BorderSide(

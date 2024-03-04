@@ -31,7 +31,7 @@ class _QueryListBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final queries = ref.watch(queryListProvider);
     if (queries.isLoading && queries.value == null) {
-      return const CircularProgressIndicator();
+      return const Center(child: CircularProgressIndicator());
     }
     if (queries.hasError) {
       return ListView(
@@ -139,7 +139,7 @@ class _Row extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(
             horizontal: denseSpacing,
-            vertical: denseModeDenseSpacing,
+            vertical: intermediateSpacing,
           ),
           child: children[index],
         ),
@@ -151,7 +151,7 @@ class _Row extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: denseSpacing,
-            vertical: denseModeDenseSpacing,
+            vertical: intermediateSpacing,
           ),
           child: children[index],
         ),
@@ -169,7 +169,7 @@ class _Row extends StatelessWidget {
         ),
         padding: const EdgeInsets.symmetric(
           horizontal: denseSpacing,
-          vertical: denseModeDenseSpacing,
+          vertical: intermediateSpacing,
         ),
         child: children[index],
       ),

@@ -63,6 +63,7 @@ class _QueryDetailsWidgetState extends ConsumerState<QueryDetailsWidget> {
                         forceExpanded
                             ? Icons.unfold_more_rounded
                             : Icons.unfold_less_rounded,
+                        size: 16,
                       ),
                       onPressed: () =>
                           ref.read(detailsExpandedProvider.notifier).toggle(),
@@ -71,7 +72,10 @@ class _QueryDetailsWidgetState extends ConsumerState<QueryDetailsWidget> {
                   DevToolsTooltip(
                     message: "Refresh query data",
                     child: IconButton(
-                      icon: const Icon(Icons.refresh_rounded),
+                      icon: const Icon(
+                        Icons.refresh_rounded,
+                        size: 16,
+                      ),
                       onPressed: () => ref
                           .read(queryDetailsProvider(query).notifier)
                           .refresh(),
@@ -95,15 +99,18 @@ class _QueryDetailsWidgetState extends ConsumerState<QueryDetailsWidget> {
               padding: const EdgeInsets.symmetric(horizontal: denseSpacing),
               child: ListView(
                 children: [
-                  const SizedBox(height: denseModeDenseSpacing),
-                  Text("Key: ${details.key}"),
-                  const SizedBox(height: denseModeDenseSpacing),
-                  Text("Type: ${details.type}"),
-                  const SizedBox(height: denseModeDenseSpacing),
-                  Text("Status: ${details.state.status}"),
-                  const SizedBox(height: denseModeDenseSpacing),
-                  Text("Stale: ${details.stale ?? false}"),
-                  const SizedBox(height: denseModeDenseSpacing),
+                  const SizedBox(height: intermediateSpacing),
+                  _Item(name: "Key: ", value: details.key),
+                  const SizedBox(height: intermediateSpacing),
+                  _Item(name: "Type: ", value: details.type),
+                  const SizedBox(height: intermediateSpacing),
+                  _Item(name: "Status: ", value: details.state.status),
+                  const SizedBox(height: intermediateSpacing),
+                  _Item(
+                    name: "Stale: ",
+                    value: details.stale?.toString() ?? "false",
+                  ),
+                  const SizedBox(height: intermediateSpacing),
                   ExpandableRow(
                     titleWidget: Row(
                       children: [
@@ -148,6 +155,31 @@ class _QueryDetailsWidgetState extends ConsumerState<QueryDetailsWidget> {
       case InfiniteQueryDetailsJson():
         return state.pages.toString();
     }
+  }
+}
+
+class _Item extends StatelessWidget {
+  final String name;
+  final String value;
+  const _Item({required this.name, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        text: "",
+        style: Theme.of(context).textTheme.bodyMedium,
+        children: [
+          TextSpan(
+            text: name,
+            style: const TextStyle(color: Color(0xff569cd6)),
+          ),
+          TextSpan(
+            text: value,
+          ),
+        ],
+      ),
+    );
   }
 }
 

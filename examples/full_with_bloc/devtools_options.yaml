@@ -1,0 +1,3 @@
+extensions:
+  - provider: true
+  - cached_query: true
