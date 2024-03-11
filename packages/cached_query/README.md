@@ -24,6 +24,7 @@ Accompanying packages:
   * [Updating Cached Data](#updating-the-query-cache)
 * [Persisting Data](#persistent-storage)
 * [Error Handling](#error-handling)
+* [Devtools Extension](#devtools-extension)
 * [Additional Information](#additional-information)
 
 ## Features
@@ -255,6 +256,10 @@ can be set to rethrow any error it catches.
 ```
 *:warning: Warning: This may cause some unexpected functionality in queries, so it is recommended to only use this as a development
 tool.*
+
+## Devtools Extension
+
+This package comes with a devtools extension. The data of a query must be serializable to be displayed.
 
 ## Additional information
 
