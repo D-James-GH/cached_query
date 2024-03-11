@@ -11,6 +11,39 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 Packages with breaking changes:
 
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v2.0.1`](#cached_query---v201)
+ - [`cached_query_flutter` - `v2.0.1`](#cached_query_flutter---v201)
+ - [`cached_storage` - `v1.0.3`](#cached_storage---v103)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v1.0.3`
+
+---
+
+#### `cached_query` - `v2.0.1`
+
+ - **FIX**: lints. ([d3677368](https://github.com/D-James-GH/cached_query/commit/d3677368d916e349e50e35e118b7dce4f8619c42))
+
+#### `cached_query_flutter` - `v2.0.1`
+
+ - **FIX**: lints. ([d3677368](https://github.com/D-James-GH/cached_query/commit/d3677368d916e349e50e35e118b7dce4f8619c42))
+
+
+## 2024-03-11
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
  - [`cached_query` - `v2.0.0`](#cached_query---v200)
  - [`cached_query_flutter` - `v2.0.0`](#cached_query_flutter---v200)
 
