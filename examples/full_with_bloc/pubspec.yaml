@@ -14,7 +14,7 @@ dependencies:
   equatable: ^2.0.5
   get_it: 7.2.0
   freezed_annotation:
-  cached_query_flutter: ^2.0.0-dev.3
+  cached_query_flutter: ^2.0.0
   http: ^0.13.5
   bloc_concurrency: ^0.2.0
 
