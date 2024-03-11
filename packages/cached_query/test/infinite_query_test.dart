@@ -439,7 +439,8 @@ void main() async {
       );
 
       final firstData = await query.stream.firstWhere(
-          (element) => element.data != null && element.data!.isNotEmpty);
+        (element) => element.data != null && element.data!.isNotEmpty,
+      );
       expect(firstData.data?.first, newData);
     });
 
@@ -466,7 +467,8 @@ void main() async {
       );
 
       final firstData = await query.stream.firstWhere(
-          (element) => element.data != null && element.data!.isNotEmpty);
+        (element) => element.data != null && element.data!.isNotEmpty,
+      );
       expect(firstData.data?.first, data);
     });
     test("Should store using serializer if available", () async {
