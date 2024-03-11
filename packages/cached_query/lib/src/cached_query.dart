@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import "dart:developer" as developer;
 
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query/src/devtools_observer.dart';
@@ -107,8 +108,13 @@ class CachedQuery {
     _storage = storage;
     _configSet = true;
     if (observers != null) {
-      this.observers = [...observers, DevtoolsObserver()];
+      this.observers = observers;
     }
+
+    assert(() {
+      this.observers.add(DevtoolsObserver());
+      return true;
+    }());
   }
 
   /// Get a [Query] at a given key.
