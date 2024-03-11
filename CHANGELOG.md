@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-03-11
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v2.0.0-dev.3`](#cached_query---v200-dev3)
+ - [`cached_query_flutter` - `v2.0.0-dev.3`](#cached_query_flutter---v200-dev3)
+ - [`cached_storage` - `v1.0.2-dev.3`](#cached_storage---v102-dev3)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v1.0.2-dev.3`
+
+---
+
+#### `cached_query` - `v2.0.0-dev.3`
+
+ - **FEAT**: add devtools. ([ef621f1f](https://github.com/D-James-GH/cached_query/commit/ef621f1f8a4830d75c9d0cdd2b6b40e9efa8a7cf))
+ - **DOCS**: add devtools extension. ([3464c736](https://github.com/D-James-GH/cached_query/commit/3464c736f5c7383ea9eafbaf266937ddbe163078))
+
+#### `cached_query_flutter` - `v2.0.0-dev.3`
+
+ - **FEAT**: add devtools. ([ef621f1f](https://github.com/D-James-GH/cached_query/commit/ef621f1f8a4830d75c9d0cdd2b6b40e9efa8a7cf))
+
+
 ## 2023-12-13
 
 ### Changes

@@ -1,3 +1,7 @@
+## 1.0.2-dev.3
+
+ - Update a dependency to the latest release.
+
 ## 1.0.2-dev.2
 
  - **DOCS**: update for storageSerializer and storageDeserializer. ([0b4c4e5f](https://github.com/D-James-GH/cached_query/commit/0b4c4e5fb4a5e005d8e21e48e2ff748036065b47))
