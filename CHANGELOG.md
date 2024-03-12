@@ -23,6 +23,33 @@ Packages with other changes:
 
 #### `cached_query_flutter` - `v2.0.0`
 
+#### `cached_query` - `v2.0.0`
+
+#### `cached_storage` - `v2.0.0`
+
+ - n
+
+
+## 2024-03-11
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query_flutter` - `v2.0.0`](#cached_query_flutter---v200)
+ - [`cached_query` - `v2.0.0`](#cached_query---v200)
+ - [`cached_storage` - `v2.0.0`](#cached_storage---v200)
+
+---
+
+#### `cached_query_flutter` - `v2.0.0`
+
  - Release 2.0.0
 
  - **FIX**: lints. ([d3677368](https://github.com/D-James-GH/cached_query/commit/d3677368d916e349e50e35e118b7dce4f8619c42))
