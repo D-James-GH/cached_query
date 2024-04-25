@@ -1,3 +1,7 @@
+## 2.0.1
+
+ - **FIX**: devtools not building. ([03306c4b](https://github.com/D-James-GH/cached_query/commit/03306c4bb56d7e2cea4367cabb3adb9a39e1dd64))
+
 ## 2.0.0
 
  - Release 2.0.0
