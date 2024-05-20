@@ -33,21 +33,22 @@ class MockConnectivity extends _i1.Mock implements _i2.Connectivity {
   }
 
   @override
-  _i3.Stream<_i4.ConnectivityResult> get onConnectivityChanged =>
+  _i3.Stream<List<_i4.ConnectivityResult>> get onConnectivityChanged =>
       (super.noSuchMethod(
         Invocation.getter(#onConnectivityChanged),
-        returnValue: _i3.Stream<_i4.ConnectivityResult>.empty(),
-      ) as _i3.Stream<_i4.ConnectivityResult>);
+        returnValue: _i3.Stream<List<_i4.ConnectivityResult>>.empty(),
+      ) as _i3.Stream<List<_i4.ConnectivityResult>>);
 
   @override
-  _i3.Future<_i4.ConnectivityResult> checkConnectivity() => (super.noSuchMethod(
+  _i3.Future<List<_i4.ConnectivityResult>> checkConnectivity() =>
+      (super.noSuchMethod(
         Invocation.method(
           #checkConnectivity,
           [],
         ),
-        returnValue: _i3.Future<_i4.ConnectivityResult>.value(
-            _i4.ConnectivityResult.bluetooth),
-      ) as _i3.Future<_i4.ConnectivityResult>);
+        returnValue: _i3.Future<List<_i4.ConnectivityResult>>.value(
+            <_i4.ConnectivityResult>[]),
+      ) as _i3.Future<List<_i4.ConnectivityResult>>);
 }
 
 /// A class which mocks [ConnectivityService].
