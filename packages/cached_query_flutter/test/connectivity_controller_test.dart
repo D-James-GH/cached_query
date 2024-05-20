@@ -49,7 +49,9 @@ void main() {
     test("Should refetch queries when connectivity is resumed", () async {
       when(connectivity.onConnectivityChanged).thenAnswer(
         (_) => Stream.fromIterable(
-          [ConnectivityResult.wifi],
+          [
+            [ConnectivityResult.wifi],
+          ],
         ),
       );
       int callCount = 0;

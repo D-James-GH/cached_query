@@ -138,6 +138,33 @@ class MockDatabase extends _i1.Mock implements _i2.Database {
       ) as _i3.Future<T>);
 
   @override
+  _i3.Future<T> readTransaction<T>(
+          _i3.Future<T> Function(_i2.Transaction)? action) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #readTransaction,
+          [action],
+        ),
+        returnValue: _i4.ifNotNull(
+              _i4.dummyValueOrNull<T>(
+                this,
+                Invocation.method(
+                  #readTransaction,
+                  [action],
+                ),
+              ),
+              (T v) => _i3.Future<T>.value(v),
+            ) ??
+            _FakeFuture_1<T>(
+              this,
+              Invocation.method(
+                #readTransaction,
+                [action],
+              ),
+            ),
+      ) as _i3.Future<T>);
+
+  @override
   _i3.Future<T> devInvokeMethod<T>(
     String? method, [
     Object? arguments,
