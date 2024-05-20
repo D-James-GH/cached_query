@@ -20,7 +20,7 @@ class ConnectivityController {
   final Connectivity _connectivity;
   final ConnectivityService _connectivityService;
   final void Function() _refetchCurrentQueries;
-  StreamSubscription<ConnectivityResult>? _connectivitySubscription;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   ConnectivityController._({
     Connectivity? connectivity,

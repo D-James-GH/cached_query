@@ -8,24 +8,24 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  devtools_extensions: 0.0.14
-  devtools_app_shared: 0.0.10
-  flutter_riverpod: ^2.4.10
+  devtools_extensions: ^0.1.1
+  devtools_app_shared: ^0.1.1
+  flutter_riverpod: ^2.5.1
   freezed_annotation: ^2.4.1
-  json_annotation: ^4.8.1
-  riverpod_annotation: ^2.3.4
-  vm_service: ^14.1.0
-  logger: ^2.1.0
+  json_annotation: ^4.9.0
+  riverpod_annotation: ^2.3.5
+  vm_service: ^14.2.2
+  logger: ^2.3.0
   cached_query: ^2.0.1
   collection: ^1.18.0
 
 dev_dependencies:
   flutter_lints: ^3.0.1
   riverpod_generator: ^2.3.11
-  build_runner: ^2.4.8
+  build_runner: ^2.4.10
   freezed: ^2.4.7
-  json_serializable: ^6.7.1
-  custom_lint: ^0.6.2
+  json_serializable: ^6.8.0
+  custom_lint: ^0.6.4
   riverpod_lint: ^2.3.9
 flutter:
   uses-material-design: true
