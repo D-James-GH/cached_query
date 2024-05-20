@@ -1,3 +1,7 @@
+## 2.0.2
+
+ - **FIX**: deps update for flutter 3.22 ([#31](https://github.com/D-James-GH/cached_query/issues/31)). ([1fbc044b](https://github.com/D-James-GH/cached_query/commit/1fbc044b7b925066cd4101dc2eefd14c10e801aa))
+
 ## 2.0.1
 
  - **FIX**: devtools not building. ([03306c4b](https://github.com/D-James-GH/cached_query/commit/03306c4bb56d7e2cea4367cabb3adb9a39e1dd64))

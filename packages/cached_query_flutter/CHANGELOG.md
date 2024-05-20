@@ -1,3 +1,7 @@
+## 2.0.2
+
+ - **FIX**: deps update for flutter 3.22 ([#31](https://github.com/D-James-GH/cached_query/issues/31)). ([1fbc044b](https://github.com/D-James-GH/cached_query/commit/1fbc044b7b925066cd4101dc2eefd14c10e801aa))
+
 ## 2.0.1
 
  - Update a dependency to the latest release.
