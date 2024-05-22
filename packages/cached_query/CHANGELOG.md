@@ -1,3 +1,7 @@
+## 2.0.3
+
+ - **FIX**: add reset of _currentFuture with whenComplete handler ([#35](https://github.com/D-James-GH/cached_query/issues/35)). ([bf75ef0b](https://github.com/D-James-GH/cached_query/commit/bf75ef0b459107211ddef0991fd93321fdff0e75))
+
 ## 2.0.2
 
  - **FIX**: deps update for flutter 3.22 ([#31](https://github.com/D-James-GH/cached_query/issues/31)). ([1fbc044b](https://github.com/D-James-GH/cached_query/commit/1fbc044b7b925066cd4101dc2eefd14c10e801aa))

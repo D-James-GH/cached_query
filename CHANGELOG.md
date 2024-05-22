@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-05-22
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v2.0.3`](#cached_query---v203)
+ - [`cached_query_flutter` - `v2.0.3`](#cached_query_flutter---v203)
+ - [`cached_storage` - `v2.0.3`](#cached_storage---v203)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v2.0.3`
+ - `cached_storage` - `v2.0.3`
+
+---
+
+#### `cached_query` - `v2.0.3`
+
+ - **FIX**: add reset of _currentFuture with whenComplete handler ([#35](https://github.com/D-James-GH/cached_query/issues/35)). ([bf75ef0b](https://github.com/D-James-GH/cached_query/commit/bf75ef0b459107211ddef0991fd93321fdff0e75))
+
+
 ## 2024-05-20
 
 ### Changes
