@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query/src/util/encode_key.dart';
+import 'package:cached_query/src/util/future_extension.dart';
 import 'package:cached_query/src/util/list_extension.dart';
 import 'package:cached_query/src/util/page_equality.dart';
 import 'package:meta/meta.dart';
