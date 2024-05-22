@@ -87,7 +87,14 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 
   final CachedQuery _globalCache = CachedQuery.instance;
   Timer? _deleteQueryTimer;
-  Future<void>? _currentFuture;
+  Future<void>? _f;
+  Future<void>? get _currentFuture => _f;
+
+  set _currentFuture(Future<void>? future) {
+    _f = future?.whenComplete(() {
+      _currentFuture = null;
+    });
+  }
 
 // Initialise the query as stale so the first fetch is guaranteed to happen
   bool _staleOverride = true;
