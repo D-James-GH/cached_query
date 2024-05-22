@@ -186,7 +186,16 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     if ((_state.data.isNullOrEmpty || _state.status == QueryStatus.initial) &&
         config.storeQuery) {
       // try to get any data from storage if the query has no data
-      final dataFromStorage = await _fetchFromStorage();
+      List<T>? dataFromStorage;
+      try
+      {
+        dataFromStorage = await _fetchFromStorage();
+      }
+      catch (e)
+      {
+        _currentFuture = null;
+        rethrow;
+      }
       if (dataFromStorage != null) {
         _setState(
           _state.copyWith(
@@ -197,6 +206,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _emit();
         final shouldRefetch = config.shouldRefetch?.call(this, true) ?? true;
         if (!shouldRefetch) {
+          _currentFuture = null;
           return;
         }
       }
