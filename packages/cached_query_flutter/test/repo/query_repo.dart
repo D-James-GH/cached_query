@@ -15,4 +15,11 @@ class TitleRepo {
       config: QueryConfig(ignoreCacheDuration: true),
     );
   }
+
+  Mutation<String, String> updateTitle() {
+    return Mutation(
+      queryFn: (title) =>
+          Future.delayed(queryDelay ?? Duration.zero, () => title),
+    );
+  }
 }
