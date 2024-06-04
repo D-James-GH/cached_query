@@ -3,51 +3,52 @@ import 'dart:async';
 import 'package:cached_query/cached_query.dart';
 import 'package:flutter/material.dart';
 
-/// {@template queryBuilderCallback}
-/// Called on each widget build.
+/// {@template queryListenerCallback}
+/// Called on each state change.
 ///
-/// Passes [BuildContext], [QueryState].
+/// Passes [QueryState].
 /// {@endtemplate}
-typedef QueryBuilderCallback<T> = Widget Function(
-  BuildContext context,
-  QueryState<T> state,
-);
+typedef QueryListenerCallback<T> = void Function(QueryState<T> state);
 
-/// {@template queryBuilderCondition}
-/// This function is being called everytime the query registered in the [QueryBuilder] receives new updates
-/// and let's you control when the [_QueryBuilderState.build] method should be called
+/// {@template queryListenerCondition}
+/// This function is being called every time the query registered in the [QueryListener] receives new updates
+/// and let's you control when the [QueryListenerCallback] should be called
 /// {@endtemplate}
-typedef QueryBuilderCondition<T> = FutureOr<bool> Function(
+typedef QueryListenerCondition<T> = FutureOr<bool> Function(
   QueryState<T> oldState,
   QueryState<T> newState,
 );
 
-/// {@template queryBuilder}
-/// Listen to changes in an [Mutation] and build the ui with the result.
+/// {@template queryListener}
+/// Listen to changes in an [Query] and call the listener with the result.
 /// {@endtemplate}
-class QueryBuilder<T> extends StatefulWidget {
-  /// The [Query] to used to update the ui.
+class QueryListener<T> extends StatefulWidget {
+  /// The [Query] to used to update the listener.
   final Query<T>? query;
 
-  /// {@macro queryBuilderCallback}
-  final QueryBuilderCallback<T> builder;
+  /// {@macro queryListenerCallback}
+  final QueryListenerCallback<T> listener;
 
   /// The key of the query to build.
   ///
-  /// If a key is past the builder will look for the corresponding query in the
+  /// If a key is past the listener will look for the corresponding query in the
   /// cache. If no query is found it will through an error.
   final Object? queryKey;
 
-  /// {@macro queryBuilderCondition}
-  final QueryBuilderCondition<T>? buildWhen;
+  /// {@macro queryListenerCondition}
+  final QueryListenerCondition<T>? listenWhen;
 
-  /// {@macro queryBuilder}
-  const QueryBuilder({
+  /// The child widget to render
+  final Widget child;
+
+  /// {@macro queryListener}
+  const QueryListener({
     Key? key,
     this.query,
     this.queryKey,
-    this.buildWhen,
-    required this.builder,
+    this.listenWhen,
+    required this.listener,
+    required this.child,
   })  : assert(
           query != null || queryKey != null,
           "Query key or a query must be provided.",
@@ -55,12 +56,12 @@ class QueryBuilder<T> extends StatefulWidget {
         super(key: key);
 
   @override
-  State<QueryBuilder<T>> createState() => _QueryBuilderState<T>();
+  State<QueryListener<T>> createState() => _QueryListenerState<T>();
 }
 
-class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
+class _QueryListenerState<T> extends State<QueryListener<T>> {
   late Query<T> _query;
-  late QueryState<T> _state;
+  late QueryState<T> _previousState;
 
   StreamSubscription<QueryState<T>>? _subscription;
 
@@ -80,11 +81,11 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
       _query = widget.query!;
     }
     _subscribe();
-    _state = _query.state;
+    _previousState = _query.state;
   }
 
   @override
-  void didUpdateWidget(covariant QueryBuilder<T> oldWidget) {
+  void didUpdateWidget(covariant QueryListener<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
     final oldQuery =
         oldWidget.query ?? CachedQuery.instance.getQuery(oldWidget.queryKey!);
@@ -95,7 +96,7 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
       if (_subscription != null) {
         _unsubscribe();
         _query = currentQuery as Query<T>;
-        _state = _query.state;
+        _previousState = _query.state;
       }
       _subscribe();
     }
@@ -103,7 +104,7 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.builder(context, _state);
+    return widget.child;
   }
 
   @override
@@ -113,15 +114,16 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
   }
 
   void _subscribe() {
-    _state = _query.state;
+    _previousState = _query.state;
     _subscription = _query.stream.listen((state) async {
-      if (widget.buildWhen != null) {
-        final shouldRebuild = await Future.value(
-          widget.buildWhen!.call(_state, state),
-        );
-        if (!shouldRebuild) return;
+      final listenWhen = widget.listenWhen;
+      if (listenWhen != null) {
+        final shouldListen =
+            await Future.value(listenWhen(_previousState, state));
+        if (!shouldListen) return;
       }
-      setState(() => _state = state);
+      widget.listener(state);
+      _previousState = state;
     });
   }
 
