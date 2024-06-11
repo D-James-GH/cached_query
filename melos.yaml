@@ -8,6 +8,7 @@ packages:
 ide:
   intellij: false
 
+
 command:
   version:
     linkToCommits: true
