@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-06-11
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query_flutter` - `v2.1.0`](#cached_query_flutter---v210)
+
+---
+
+#### `cached_query_flutter` - `v2.1.0`
+
+ - **FEAT**: listener and consumer widgets ([#36](https://github.com/D-James-GH/cached_query/issues/36)). ([01595f4a](https://github.com/D-James-GH/cached_query/commit/01595f4a225e708587f78b14b05d33e6d6fdc336))
+
+
 ## 2024-05-22
 
 ### Changes

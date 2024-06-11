@@ -1,3 +1,7 @@
+## 2.1.0
+
+ - **FEAT**: listener and consumer widgets ([#36](https://github.com/D-James-GH/cached_query/issues/36)). ([01595f4a](https://github.com/D-James-GH/cached_query/commit/01595f4a225e708587f78b14b05d33e6d6fdc336))
+
 ## 2.0.3
 
  - Update a dependency to the latest release.
