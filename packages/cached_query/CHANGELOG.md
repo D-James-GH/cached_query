@@ -1,3 +1,7 @@
+## 2.0.4
+
+ - **FIX**: infinite query getting stuck if it has max and the first page is different. ([ce49d295](https://github.com/D-James-GH/cached_query/commit/ce49d295e197e9d6f540d68fd9931b7f532764ee))
+
 ## 2.0.3
 
  - **FIX**: add reset of _currentFuture with whenComplete handler ([#35](https://github.com/D-James-GH/cached_query/issues/35)). ([bf75ef0b](https://github.com/D-James-GH/cached_query/commit/bf75ef0b459107211ddef0991fd93321fdff0e75))

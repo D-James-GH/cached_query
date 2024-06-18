@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-06-18
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v2.0.4`](#cached_query---v204)
+ - [`cached_query_flutter` - `v2.1.1`](#cached_query_flutter---v211)
+ - [`cached_storage` - `v2.0.4`](#cached_storage---v204)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v2.1.1`
+ - `cached_storage` - `v2.0.4`
+
+---
+
+#### `cached_query` - `v2.0.4`
+
+ - **FIX**: infinite query getting stuck if it has max and the first page is different. ([ce49d295](https://github.com/D-James-GH/cached_query/commit/ce49d295e197e9d6f540d68fd9931b7f532764ee))
+
+
 ## 2024-06-11
 
 ### Changes
