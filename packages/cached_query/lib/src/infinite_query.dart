@@ -135,8 +135,9 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
 
   /// Get the next page in an [InfiniteQuery] and cache the result.
   Future<InfiniteQueryState<T>?> getNextPage() async {
-    if (state.hasReachedMax) return null;
-    _currentFuture ??= _fetchNextPage();
+    final arg = _getNextArg(state);
+    if (arg == null) return null;
+    _currentFuture ??= _fetchNextPage(arg: arg);
     await _currentFuture;
     return state;
   }
