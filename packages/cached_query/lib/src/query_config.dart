@@ -79,7 +79,7 @@ class QueryConfig {
   /// {@endtemplate}
   final bool ignoreCacheDuration;
 
-  /// {@macro QueryConfig.ShouldRefetch}
+  ///{@macro QueryConfig.ShouldRefetch}
   final ShouldRefetch? shouldRefetch;
 
   const QueryConfig._({

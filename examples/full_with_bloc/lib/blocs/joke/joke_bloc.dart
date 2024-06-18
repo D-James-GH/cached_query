@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
@@ -15,7 +16,7 @@ part 'joke_state.dart';
 class JokeBloc extends Bloc<JokeEvent, JokeState> {
   final _repo = JokeRepository();
   JokeBloc() : super(const JokeState()) {
-    on<JokeFetched>(_onJokeFetched);
+    on<JokeFetched>(_onJokeFetched, transformer: restartable());
   }
 
   FutureOr<void> _onJokeFetched(

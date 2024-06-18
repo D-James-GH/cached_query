@@ -10,12 +10,16 @@ class PostRepository {
     return InfiniteQuery<List<PostModel>, int>(
       key: 'posts',
       getNextArg: (state) {
+        final len = state.data?.length ?? 0;
+        if (len > 5) return null;
         if (state.lastPage?.isEmpty ?? false) return null;
         return state.length + 1;
       },
-      queryFn: (page) async => PostModel.listFromJson(
-        await _service.getPosts(page: page, limit: 10),
-      ),
+      queryFn: (page) async {
+        return PostModel.listFromJson(
+          await _service.getPosts(page: page, limit: 10),
+        );
+      },
     );
   }
 

@@ -33,7 +33,11 @@ void main() {
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return InfiniteQueryState(timeCreated: DateTime.now(), data: [""]);
+        return InfiniteQueryState(
+          timeCreated: DateTime.now(),
+          data: [""],
+          getNextArg: (_) => 1,
+        );
       });
       cachedQuery.refetchCurrentQueries();
 
@@ -47,7 +51,11 @@ void main() {
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return InfiniteQueryState(timeCreated: DateTime.now(), data: [""]);
+        return InfiniteQueryState(
+          timeCreated: DateTime.now(),
+          data: [""],
+          getNextArg: (_) => 1,
+        );
       });
       cachedQuery.refetchCurrentQueries();
 

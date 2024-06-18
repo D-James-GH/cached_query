@@ -251,7 +251,10 @@ void main() {
       );
 
       when(query2.refetch()).thenAnswer(
-        (_) async => InfiniteQueryState(timeCreated: DateTime.now()),
+        (_) async => InfiniteQueryState(
+          getNextArg: (_) => 1,
+          timeCreated: DateTime.now(),
+        ),
       );
 
       when(query3.refetch()).thenAnswer(

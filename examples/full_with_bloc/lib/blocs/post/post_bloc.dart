@@ -22,6 +22,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       transformer: restartable(),
     );
     on<PostsNextPage>(_onPostsNextPage);
+    on<PostsRefreshed>(_onPostsRefreshed);
     on<PostCreated>(_onPostCreated);
   }
 
@@ -63,5 +64,9 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         );
       },
     );
+  }
+
+  FutureOr<void> _onPostsRefreshed(PostsRefreshed event, Emitter<PostState> emit) async {
+    await _repo.getPosts().refetch();
   }
 }

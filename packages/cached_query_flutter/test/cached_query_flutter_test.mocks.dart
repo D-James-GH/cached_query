@@ -309,6 +309,15 @@ class MockInfiniteQuery<T, Arg> extends _i1.Mock
       );
 
   @override
+  bool hasReachedMax() => (super.noSuchMethod(
+        Invocation.method(
+          #hasReachedMax,
+          [],
+        ),
+        returnValue: false,
+      ) as bool);
+
+  @override
   void invalidateQuery() => super.noSuchMethod(
         Invocation.method(
           #invalidateQuery,

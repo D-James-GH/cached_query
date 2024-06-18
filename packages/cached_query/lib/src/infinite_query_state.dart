@@ -4,10 +4,12 @@ import 'package:cached_query/cached_query.dart';
 /// [InfiniteQueryState] holds the current state of an [InfiniteQuery]
 /// {@endtemplate}
 class InfiniteQueryState<T> extends QueryState<List<T>> {
+  final dynamic Function(InfiniteQueryState<T>) _getNextArg;
+
   /// True if there are no more pages available to fetch.
   ///
-  /// Set to true if [GetNextArg] has returned null.
-  final bool hasReachedMax;
+  /// Calculated using [GetNextArg], if it has returned null then this is true.
+  bool get hasReachedMax => _getNextArg(this) == null;
 
   /// The last response from the queryFn
   final T? lastPage;
@@ -19,13 +21,14 @@ class InfiniteQueryState<T> extends QueryState<List<T>> {
 
   /// {@macro infiniteQueryState}
   InfiniteQueryState({
-    this.hasReachedMax = false,
+    required dynamic Function(InfiniteQueryState<T>) getNextArg,
     this.lastPage,
     List<T>? data,
     QueryStatus status = QueryStatus.initial,
     dynamic error,
     required DateTime timeCreated,
-  }) : super(
+  })  : _getNextArg = getNextArg,
+        super(
           status: status,
           error: error,
           timeCreated: timeCreated,
@@ -39,14 +42,13 @@ class InfiniteQueryState<T> extends QueryState<List<T>> {
     List<T>? data,
     int? currentIndex,
     QueryStatus? status,
-    bool? hasReachedMax,
     DateTime? timeCreated,
     T? lastPage,
     dynamic error,
   }) {
     return InfiniteQueryState(
       lastPage: lastPage ?? this.lastPage,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      getNextArg: _getNextArg,
       error: error ?? this.error,
       data: data ?? this.data,
       status: status ?? this.status,

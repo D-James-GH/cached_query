@@ -5,18 +5,17 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=3.1.0 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.1
+  flutter_bloc: ^8.1.6
   equatable: ^2.0.5
-  get_it: 7.2.0
   freezed_annotation:
   cached_query_flutter: ^2.1.1
   http: ^0.13.5
-  bloc_concurrency: ^0.2.0
+  bloc_concurrency: ^0.2.5
 
 dev_dependencies:
   flutter_test:

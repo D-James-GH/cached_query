@@ -74,44 +74,49 @@ class _PostListScreenState extends State<PostListScreen> {
       body: BlocBuilder<PostBloc, PostState>(
         builder: (context, state) {
           if (state.posts != null) {
-            return CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                if (state.isMutationLoading)
-                  SliverToBoxAdapter(
-                    child: Container(
-                      color: Colors.teal,
-                      child: const Text(
-                        "This will show when the mutation is loading.",
-                        style: TextStyle(color: Colors.white),
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<PostBloc>().add(PostsRefreshed());
+              },
+              child: CustomScrollView(
+                controller: _scrollController,
+                slivers: [
+                  if (state.isMutationLoading)
+                    SliverToBoxAdapter(
+                      child: Container(
+                        color: Colors.teal,
+                        child: const Text(
+                          "This will show when the mutation is loading.",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
-                  ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, i) => _Post(
-                      post: state.posts![i],
-                      index: i,
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, i) => _Post(
+                        post: state.posts![i],
+                        index: i,
+                      ),
+                      childCount: state.posts!.length,
                     ),
-                    childCount: state.posts!.length,
                   ),
-                ),
-                if (state.status == PostStatus.loading)
-                  const SliverToBoxAdapter(
-                    child: Center(
-                      child: SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: CircularProgressIndicator(),
+                  if (state.status == PostStatus.loading)
+                    const SliverToBoxAdapter(
+                      child: Center(
+                        child: SizedBox(
+                          height: 40,
+                          width: 40,
+                          child: CircularProgressIndicator(),
+                        ),
                       ),
                     ),
+                  SliverPadding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom,
+                    ),
                   ),
-                SliverPadding(
-                  padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).padding.bottom,
-                  ),
-                ),
-              ],
+                ],
+              ),
             );
           }
           if (state.status == PostStatus.loading) {
