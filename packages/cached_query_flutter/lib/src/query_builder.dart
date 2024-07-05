@@ -46,17 +46,16 @@ class QueryBuilder<T> extends StatefulWidget {
 
   /// {@macro queryBuilder}
   const QueryBuilder({
-    Key? key,
+    super.key,
     this.query,
     this.enabled = true,
     this.queryKey,
     this.buildWhen,
     required this.builder,
-  })  : assert(
+  }) : assert(
           query != null || queryKey != null,
           "Query key or a query must be provided.",
-        ),
-        super(key: key);
+        );
 
   @override
   State<QueryBuilder<T>> createState() => _QueryBuilderState<T>();
