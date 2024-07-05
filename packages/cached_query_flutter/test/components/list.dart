@@ -57,11 +57,11 @@ class ListValue extends StatelessWidget {
   final InfiniteQueryBuilderCondition<String>? buildWhen;
 
   const ListValue({
-    Key? key,
+    super.key,
     required this.response,
     this.onBuild,
     this.buildWhen,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

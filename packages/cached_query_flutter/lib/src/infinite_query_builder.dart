@@ -47,17 +47,16 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   ///
   /// The value constructor takes an infinite query rather than a key.
   const InfiniteQueryBuilder({
-    Key? key,
+    super.key,
     this.query,
     this.enabled = true,
     this.queryKey,
     this.buildWhen,
     required this.builder,
-  })  : assert(
+  }) : assert(
           query != null || queryKey != null,
           "Query key or a infinite query must be provided.",
-        ),
-        super(key: key);
+        );
 
   @override
   State<InfiniteQueryBuilder<T, A>> createState() =>

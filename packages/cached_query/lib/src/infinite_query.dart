@@ -71,10 +71,10 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
 
   InfiniteQuery._internal({
     required InfiniteQueryFunc<T, Arg> queryFn,
-    required String key,
-    required Object unencodedKey,
+    required super.key,
+    required super.unencodedKey,
     required GetNextArg<T, Arg> getNextArg,
-    required QueryConfig? config,
+    required super.config,
     required List<T>? initialData,
     required this.forceRevalidateAll,
     required this.revalidateAll,
@@ -86,10 +86,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _onSuccess = onSuccess,
         _onError = onError,
         super._internal(
-          key: key,
           cache: cache,
-          unencodedKey: unencodedKey,
-          config: config,
           state: InfiniteQueryState<T>(
             getNextArg: getNextArg,
             data: initialData ?? [],

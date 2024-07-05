@@ -26,13 +26,13 @@ class MutationConsumer<T, A> extends StatelessWidget {
 
   /// {@macro MutationConsumer}
   const MutationConsumer({
-    Key? key,
+    super.key,
     required this.mutation,
     required this.listener,
     this.listenWhen,
     required this.builder,
     this.buildWhen,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
