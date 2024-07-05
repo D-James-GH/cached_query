@@ -24,17 +24,11 @@ class InfiniteQueryState<T> extends QueryState<List<T>> {
   InfiniteQueryState({
     required dynamic Function(InfiniteQueryState<T>) getNextArg,
     this.lastPage,
-    List<T>? data,
-    QueryStatus status = QueryStatus.initial,
-    dynamic error,
-    required DateTime timeCreated,
-  })  : _getNextArg = getNextArg,
-        super(
-          status: status,
-          error: error,
-          timeCreated: timeCreated,
-          data: data,
-        );
+    super.data,
+    super.status,
+    super.error,
+    required super.timeCreated,
+  }) : _getNextArg = getNextArg;
 
   /// Creates a copy of the current [InfiniteQueryState] with the given filed
   /// replaced.

@@ -40,11 +40,11 @@ class MutationBuilder<T, A> extends StatefulWidget {
 
   /// {@macro mutationBuilder}
   const MutationBuilder({
-    Key? key,
+    super.key,
     required this.mutation,
     required this.builder,
     this.buildWhen,
-  }) : super(key: key);
+  });
 
   @override
   State<MutationBuilder<T, A>> createState() => _MutationBuilderState<T, A>();
