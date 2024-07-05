@@ -6,11 +6,11 @@ class Title extends StatelessWidget {
   final void Function()? onBuild;
   final Object queryKey;
   const Title({
-    Key? key,
+    super.key,
     this.onBuild,
     this.initialTitle,
     required this.queryKey,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -12,14 +12,14 @@ class TitleValue extends StatefulWidget {
   final QueryBuilderCondition<String>? buildWhen;
 
   const TitleValue({
-    Key? key,
+    super.key,
     required this.response,
     this.enabled = true,
     this.onBuild,
     this.initialTitle,
     this.queryDelay,
     this.buildWhen,
-  }) : super(key: key);
+  });
 
   @override
   State<TitleValue> createState() => TitleValueState();

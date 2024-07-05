@@ -37,12 +37,12 @@ class MutationListener<T, A> extends StatefulWidget {
 
   /// {@macro mutationListener}
   const MutationListener({
-    Key? key,
+    super.key,
     required this.mutation,
     required this.listener,
     this.listenWhen,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<MutationListener<T, A>> createState() => _MutationListenerState<T, A>();
