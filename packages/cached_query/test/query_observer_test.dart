@@ -169,7 +169,6 @@ void main() {
       QueryBase<dynamic, dynamic>? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, next) {
-          print(next.status);
           if (next.status == QueryStatus.loading) {
             queryChange = query;
             count++;
