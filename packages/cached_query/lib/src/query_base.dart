@@ -194,9 +194,6 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     if (config.storageDeserializer != null) {
       data = config.storageDeserializer!(storedData.data);
     }
-    if (config.serializer != null) {
-      data = config.serializer!(storedData.data);
-    }
 
     if (data is T) {
       return data;
