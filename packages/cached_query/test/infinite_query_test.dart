@@ -355,6 +355,47 @@ void main() async {
       expect(page2Count, 2);
     });
   });
+  group("Has Reached Max", () {
+    tearDown(cachedQuery.deleteCache);
+    test("hasReachedMax should be true if no more args", () async {
+      final query = InfiniteQuery<String, int>(
+        key: "hasReachedMax",
+        queryFn: repo.getPosts,
+        getNextArg: (state) {
+          if ((state.data?.length ?? 0) > 2) return null;
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      await query.getNextPage();
+      final res = await query.getNextPage();
+      expect(res!.hasReachedMax, true);
+    });
+
+    test("hasReachedMax resets if refetch changes the data", () async {
+      final query = InfiniteQuery<String, int>(
+        key: "hasReachedMax",
+        queryFn: (page) {
+          if (page == 1) return repo.getPosts(Random().nextInt(1000));
+          return repo.getPosts(page);
+        },
+        getNextArg: (state) {
+          if ((state.data?.length ?? 0) > 2) return null;
+          if (state.lastPage == null && state.length != 0) return null;
+          return state.length + 1;
+        },
+      );
+      await query.result;
+      await query.getNextPage();
+      final res1 = await query.getNextPage();
+      expect(res1!.length, 3);
+      expect(res1.hasReachedMax, true);
+      final res2 = await query.refetch();
+      expect(res2.length, 1);
+      expect(res2.hasReachedMax, false);
+    });
+  });
   group("Infinite query args", () {
     tearDown(cachedQuery.deleteCache);
     test("Initial index", () async {
