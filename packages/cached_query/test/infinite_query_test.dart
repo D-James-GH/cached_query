@@ -592,55 +592,6 @@ void main() async {
         ),
       );
     });
-    test(
-        "[DEPRECIATED] Should serialize data if a serialize function is provided",
-        () async {
-      const key = "serialize";
-      final storedQuery = StoredQuery(
-        key: key,
-        data: jsonEncode([Serializable(MockStorage.data)]),
-        createdAt: DateTime.now(),
-      );
-      // Make sure the storage has initial data
-      storage.put(storedQuery);
-      final query = InfiniteQuery<Serializable, int>(
-        key: key,
-        queryFn: (i) => Future.value(Serializable("$i")),
-        config: QueryConfig(
-          // ignore: deprecated_member_use_from_same_package
-          serializer: (dynamic json) {
-            json = jsonDecode(json as String);
-            return Serializable.listFromJson(json as List<dynamic>);
-          },
-        ),
-        getNextArg: (state) {
-          if (state.length == 0) return 0;
-          return state.length + 1;
-        },
-      );
-
-      int count = 1;
-      final output = <dynamic>[];
-      query.stream.listen(
-        expectAsync1(
-          (event) {
-            if (event.data != null && event.data!.isNotEmpty) {
-              output.add(event.data!);
-            }
-            if (output.length == 1 || count == 2) {
-              expect(output[0], isA<List<Serializable>>());
-              expect(
-                (output[0] as List<Serializable>).first.name,
-                MockStorage.data,
-              );
-            }
-            count++;
-          },
-          max: 10,
-          count: 2,
-        ),
-      );
-    });
     test("Storage should update on each fetch", () async {
       int count = 0;
       const key = "updateStore";

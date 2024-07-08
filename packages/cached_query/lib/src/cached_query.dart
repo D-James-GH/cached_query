@@ -147,40 +147,6 @@ class CachedQuery {
     }
   }
 
-  /// Update the data of an [InfiniteQuery] at a given key.
-  @Deprecated("Use updateQuery instead.")
-  void updateInfiniteQuery<Data>({
-    Object? key,
-    KeyFilterFunc? filterFn,
-    required UpdateFunc<List<Data>> updateFn,
-  }) {
-    assert(
-      key != null || filterFn != null,
-      "key or filterFn must not be null",
-    );
-    List<QueryBase<dynamic, dynamic>> queries = [];
-
-    if (filterFn != null) {
-      queries = _filterQueryKey(filter: filterFn);
-    } else if (key != null) {
-      final query = getQuery(key);
-      if (query != null) {
-        queries.add(query);
-      }
-    }
-
-    for (final query in queries) {
-      assert(
-        query is! Query,
-        "InfiniteQuery at key $key is an Query. To update a Query use updateQuery",
-      );
-
-      if (query is InfiniteQuery) {
-        (query as InfiniteQuery<Data, dynamic>).update(updateFn);
-      }
-    }
-  }
-
   /// Find and return a list of [Query]'s matching a given condition.
   List<QueryBase<dynamic, dynamic>>? whereQuery(WhereCallback findCallback) {
     final List<QueryBase<dynamic, dynamic>> result = [];

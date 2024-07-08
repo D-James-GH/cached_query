@@ -1,4 +1,3 @@
-// ignore_for_file: deprecated_member_use_from_same_package
 import '../cached_query.dart';
 
 /// {@template QueryConfig.ShouldRefetch}
@@ -59,10 +58,6 @@ class QueryConfig {
   /// {@endtemplate}
   final bool shouldRethrow;
 
-  /// The serializer is called when the query is fetched from storage. Use it to
-  /// change the stored value to the query value.
-  final Serializer? serializer;
-
   /// {@template QueryConfig.storageSerializer}
   /// Converts the query data to a storable format.
   /// {@endtemplate}
@@ -84,7 +79,6 @@ class QueryConfig {
 
   const QueryConfig._({
     required this.shouldRefetch,
-    required this.serializer,
     required this.storageSerializer,
     required this.storageDeserializer,
     required this.ignoreCacheDuration,
@@ -97,7 +91,6 @@ class QueryConfig {
 
   /// Returns a query config with the default values.
   factory QueryConfig.defaults() => const QueryConfig._(
-        serializer: null,
         storageSerializer: null,
         shouldRefetch: null,
         storageDeserializer: null,
@@ -129,7 +122,6 @@ class QueryConfig {
   ///
   /// {@macro QueryConfig.shouldRethrow}
   QueryConfig({
-    @Deprecated('Use storageDeserializer instead') Serializer? serializer,
     Serializer? storageSerializer,
     Serializer? storageDeserializer,
     ShouldRefetch? shouldRefetch,
@@ -140,9 +132,7 @@ class QueryConfig {
     Duration? cacheDuration,
     bool? shouldRethrow,
     // use the defaults if not set
-  })  : serializer =
-            serializer ?? CachedQuery.instance.defaultConfig.serializer,
-        storageSerializer = storageSerializer ??
+  })  : storageSerializer = storageSerializer ??
             CachedQuery.instance.defaultConfig.storageSerializer,
         storageDeserializer = storageDeserializer ??
             CachedQuery.instance.defaultConfig.storageDeserializer,
@@ -170,7 +160,6 @@ class QueryConfig {
           storeQuery == other.storeQuery &&
           cacheDuration == other.cacheDuration &&
           shouldRethrow == other.shouldRethrow &&
-          serializer == other.serializer &&
           storageDeserializer == other.storageDeserializer &&
           storageSerializer == other.storageSerializer &&
           ignoreCacheDuration == other.ignoreCacheDuration;
@@ -181,7 +170,6 @@ class QueryConfig {
       storeQuery.hashCode ^
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^
-      serializer.hashCode ^
       storageDeserializer.hashCode ^
       ignoreCacheDuration.hashCode;
 }

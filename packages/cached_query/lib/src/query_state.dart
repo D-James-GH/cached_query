@@ -12,11 +12,8 @@ enum QueryStatus {
   error,
 
   /// The Query has not started.
-  initial,
-}
+  initial;
 
-/// Extension methods for [QueryStatus]
-extension QueryStatusExt on QueryStatus {
   /// Printable string for the status.
   String get displayString {
     switch (this) {
