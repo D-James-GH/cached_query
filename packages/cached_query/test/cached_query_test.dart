@@ -209,19 +209,6 @@ void main() {
       verifyNever(query3.update(any));
     });
 
-    test("<Deprecated> update infinite query ", () {
-      final query = MockInfiniteQuery<String, int>();
-      when(query.key).thenReturn("update");
-      CachedQuery.asNewInstance()
-        ..addQuery(query)
-        // ignore: deprecated_member_use_from_same_package
-        ..updateInfiniteQuery<String>(
-          key: "update",
-          updateFn: (value) => [],
-        );
-      verify(query.update(any));
-    });
-
     test("update infinite query", () {
       final query = MockInfiniteQuery<String, int>();
       when(query.key).thenReturn("update");
