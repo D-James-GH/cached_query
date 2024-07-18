@@ -1,3 +1,8 @@
+## 2.0.5
+
+ - **REFACTOR**: infinite_query. ([f7d1708b](https://github.com/D-James-GH/cached_query/commit/f7d1708bbb4dcdd2822a118970fd6c3a38ce4f80))
+ - **FIX**: upgrade rx dart to 0.28.*. ([2fbcf5c3](https://github.com/D-James-GH/cached_query/commit/2fbcf5c321928d8b49c6e6985e2bfeec98c3f846))
+
 ## 2.0.4
 
  - **FIX**: infinite query getting stuck if it has max and the first page is different. ([ce49d295](https://github.com/D-James-GH/cached_query/commit/ce49d295e197e9d6f540d68fd9931b7f532764ee))
