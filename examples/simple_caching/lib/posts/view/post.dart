@@ -7,7 +7,7 @@ import '../service/post_service.dart' as service;
 class Post extends StatelessWidget {
   final int id;
 
-  const Post({required this.id, super.key});
+  const Post({Key? key, required this.id}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
