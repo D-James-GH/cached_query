@@ -551,4 +551,58 @@ void main() {
       expect(numCalls, 2);
     });
   });
+
+  group("Enable", () {
+    test("should never fetch if enabled is false", () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "enabled_false",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      await query.result;
+      expect(numCalls, 0);
+    });
+
+    test("should fetch if enabled is true", () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "enabled_true",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: true),
+      );
+      await query.result;
+      expect(numCalls, 1);
+    });
+
+    test("should fetch query after change enabled to true", () async {
+      int numCalls = 0;
+      var query = Query(
+        key: "toggle_enabled",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      await query.result;
+      expect(numCalls, 0);
+      query = Query(
+        key: "toggle_enabled",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: true),
+      );
+      await query.result;
+      expect(numCalls, 1);
+    });
+  });
 }

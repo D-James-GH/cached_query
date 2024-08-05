@@ -82,6 +82,13 @@ class QueryConfig {
   ///{@macro QueryConfig.ShouldRefetch}
   final ShouldRefetch? shouldRefetch;
 
+  /// {@template QueryConfig.enabled}
+  /// If set to true the queryFn will not run.
+  ///
+  /// Defaults to true;
+  /// {@endtemplate}
+  final bool enabled;
+
   const QueryConfig._({
     required this.shouldRefetch,
     required this.serializer,
@@ -93,6 +100,7 @@ class QueryConfig {
     required this.refetchDuration,
     required this.cacheDuration,
     required this.shouldRethrow,
+    required this.enabled,
   });
 
   /// Returns a query config with the default values.
@@ -107,6 +115,7 @@ class QueryConfig {
         refetchDuration: Duration(seconds: 4),
         cacheDuration: Duration(minutes: 5),
         shouldRethrow: false,
+        enabled: true,
       );
 
   /// {@macro queryConfig}
@@ -139,6 +148,7 @@ class QueryConfig {
     Duration? refetchDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
+    bool? enabled,
     // use the defaults if not set
   })  : serializer =
             serializer ?? CachedQuery.instance.defaultConfig.serializer,
@@ -159,7 +169,8 @@ class QueryConfig {
         shouldRefetch =
             shouldRefetch ?? CachedQuery.instance.defaultConfig.shouldRefetch,
         shouldRethrow =
-            shouldRethrow ?? CachedQuery.instance.defaultConfig.shouldRethrow;
+            shouldRethrow ?? CachedQuery.instance.defaultConfig.shouldRethrow,
+        enabled = enabled ?? CachedQuery.instance.defaultConfig.enabled;
 
   @override
   bool operator ==(Object other) =>
@@ -173,7 +184,8 @@ class QueryConfig {
           serializer == other.serializer &&
           storageDeserializer == other.storageDeserializer &&
           storageSerializer == other.storageSerializer &&
-          ignoreCacheDuration == other.ignoreCacheDuration;
+          ignoreCacheDuration == other.ignoreCacheDuration &&
+          enabled == other.enabled;
 
   @override
   int get hashCode =>
@@ -183,5 +195,37 @@ class QueryConfig {
       shouldRethrow.hashCode ^
       serializer.hashCode ^
       storageDeserializer.hashCode ^
-      ignoreCacheDuration.hashCode;
+      ignoreCacheDuration.hashCode ^
+      enabled.hashCode;
+
+  /// Returns a copy of the current [QueryConfig] with the provided values.
+  ///
+  /// If a value is not provided the current value is used.
+  QueryConfig copyWith({
+    bool? enabled,
+    Duration? cacheDuration,
+    bool? ignoreCacheDuration,
+    Duration? refetchDuration,
+    bool? shouldRethrow,
+    Serializer? serializer,
+    Serializer? storageDeserializer,
+    Serializer? storageSerializer,
+    bool? storeQuery,
+    ShouldRefetch? shouldRefetch,
+    Duration? storageDuration,
+  }) {
+    return QueryConfig(
+      enabled: enabled ?? this.enabled,
+      cacheDuration: cacheDuration ?? this.cacheDuration,
+      ignoreCacheDuration: ignoreCacheDuration ?? this.ignoreCacheDuration,
+      refetchDuration: refetchDuration ?? this.refetchDuration,
+      shouldRethrow: shouldRethrow ?? this.shouldRethrow,
+      serializer: serializer ?? this.serializer,
+      storageDeserializer: storageDeserializer ?? this.storageDeserializer,
+      storageSerializer: storageSerializer ?? this.storageSerializer,
+      storeQuery: storeQuery ?? this.storeQuery,
+      shouldRefetch: shouldRefetch ?? this.shouldRefetch,
+      storageDuration: storageDuration ?? this.storageDuration,
+    );
+  }
 }

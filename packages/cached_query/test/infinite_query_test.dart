@@ -821,4 +821,62 @@ void main() async {
       expect(numCalls, 2);
     });
   });
+
+  group("Enable", () {
+    test("should never fetch if enabled is false", () async {
+      int numCalls = 0;
+      final query = InfiniteQuery(
+        key: "enabled_false",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(enabled: false),
+      );
+      await query.result;
+      expect(numCalls, 0);
+    });
+
+    test("should fetch if enabled is true", () async {
+      int numCalls = 0;
+      final query = InfiniteQuery(
+        key: "enabled_true",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(enabled: true),
+      );
+      await query.result;
+      expect(numCalls, 1);
+    });
+
+    test("should fetch query after change enabled to true", () async {
+      int numCalls = 0;
+      var query = InfiniteQuery(
+        key: "toggle_enabled",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(enabled: false),
+      );
+      await query.result;
+      expect(numCalls, 0);
+      query = InfiniteQuery(
+        key: "toggle_enabled",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(enabled: true),
+      );
+      await query.result;
+      expect(numCalls, 1);
+    });
+  });
 }

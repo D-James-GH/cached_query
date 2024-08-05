@@ -56,7 +56,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   }
 
   /// The config for this specific query.
-  final QueryConfig config;
+  QueryConfig config;
 
   /// Weather the query stream has any listeners.
   bool get hasListener => _streamController?.hasListener ?? false;

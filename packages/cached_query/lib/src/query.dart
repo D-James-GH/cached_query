@@ -80,6 +80,10 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         config: config,
       );
       globalCache.addQuery(query);
+    } else {
+      query.config = query.config.copyWith(
+        enabled: config?.enabled,
+      );
     }
 
     return query;
@@ -104,6 +108,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   @override
   Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
+    if (!config.enabled) {
+      return _state;
+    }
     if (!stale &&
         !forceRefetch &&
         _state.status != QueryStatus.error &&
