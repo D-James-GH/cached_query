@@ -551,4 +551,92 @@ void main() {
       expect(numCalls, 2);
     });
   });
+
+  group("Enable", () {
+    test("should never fetch if enabled is false", () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "enabled_false",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      await query.result;
+      expect(numCalls, 0);
+    });
+
+    test("should fetch if enabled is true", () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "enabled_true",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: true),
+      );
+      await query.result;
+      expect(numCalls, 1);
+    });
+
+    test("should fetch query after change enabled to true", () async {
+      int numCalls = 0;
+      var query = Query(
+        key: "toggle_enabled",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      await query.result;
+      expect(numCalls, 0);
+      query = Query(
+        key: "toggle_enabled",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: true),
+      );
+      await query.result;
+      expect(numCalls, 1);
+    });
+
+    test("should refetch using query.refetch even if the enabled flag is false",
+        () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "refetch_enabled_false",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      expect(numCalls, 0);
+      await query.refetch();
+      expect(numCalls, 1);
+    });
+
+    test(
+        "should not refetch using CachedQuery.refetchQueries if the enabled flag is false ",
+        () async {
+      int numCalls = 0;
+      Query(
+        key: "cached_query_refetch_enabled_false",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      expect(numCalls, 0);
+      CachedQuery.instance
+          .refetchQueries(keys: ["cached_query_refetch_enabled_false"]);
+      expect(numCalls, 0);
+    });
+  });
 }

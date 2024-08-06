@@ -125,6 +125,10 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         config: config,
       );
       globalCache.addQuery(query);
+    } else {
+      query.config = query.config.copyWith(
+        enabled: config?.enabled,
+      );
     }
 
     if (prefetchPages != null) {
@@ -174,10 +178,11 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   @override
   Future<InfiniteQueryState<T>> _getResult({bool forceRefetch = false}) async {
     final hasData = _state.data != null && _state.data!.isNotEmpty;
-    if (!stale &&
-        !forceRefetch &&
-        _state.status != QueryStatus.error &&
-        hasData) {
+    if ((!config.enabled && !forceRefetch) ||
+        (!stale &&
+            !forceRefetch &&
+            _state.status != QueryStatus.error &&
+            hasData)) {
       _emit();
       return _state;
     }

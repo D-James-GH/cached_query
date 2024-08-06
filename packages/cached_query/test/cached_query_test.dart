@@ -239,12 +239,16 @@ void main() {
       final query = MockQuery<String>();
       final query2 = MockInfiniteQuery<int, String>();
       final query3 = MockQuery<String>();
+
       when(query.key).thenReturn("query");
       when(query.unencodedKey).thenReturn("query");
+      when(query.config).thenReturn(QueryConfig.defaults());
       when(query2.key).thenReturn("query2");
       when(query2.unencodedKey).thenReturn("query2");
+      when(query2.config).thenReturn(QueryConfig.defaults());
       when(query3.key).thenReturn("other_key");
       when(query3.unencodedKey).thenReturn("other_key");
+      when(query3.config).thenReturn(QueryConfig.defaults());
 
       when(query.refetch()).thenAnswer(
         (_) async => QueryState(timeCreated: DateTime.now()),
@@ -280,11 +284,13 @@ void main() {
     test("Refetch queries", () {
       final query = MockQuery<String>();
       when(query.key).thenReturn("query");
+      when(query.config).thenReturn(QueryConfig.defaults());
       when(query.refetch()).thenAnswer(
         (_) async => QueryState(timeCreated: DateTime.now()),
       );
       final query2 = MockQuery<String>();
       when(query2.key).thenReturn("query2");
+      when(query2.config).thenReturn(QueryConfig.defaults());
 
       when(query2.refetch()).thenAnswer(
         (_) async => QueryState(timeCreated: DateTime.now()),

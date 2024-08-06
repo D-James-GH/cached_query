@@ -271,6 +271,7 @@ class CachedQuery {
     if (filterFn != null) {
       final queries = _filterQueryKey(filter: filterFn);
       for (final query in queries) {
+        if (!query.config.enabled) continue;
         query.refetch();
       }
     }
@@ -278,6 +279,7 @@ class CachedQuery {
       for (final key in keys) {
         final k = encodeKey(key);
         if (_queryCache.containsKey(k)) {
+          if (!_queryCache[k]!.config.enabled) continue;
           _queryCache[k]!.refetch();
         }
       }
