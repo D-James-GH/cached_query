@@ -878,5 +878,40 @@ void main() async {
       await query.result;
       expect(numCalls, 1);
     });
+
+    test("should refetch even if the enabled flag is false", () async {
+      int numCalls = 0;
+      final query = InfiniteQuery(
+        key: "query_refetch_enabled_false",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(enabled: false),
+      );
+      expect(numCalls, 0);
+      await query.refetch();
+      expect(numCalls, 1);
+    });
+
+    test(
+        "should not refetch using CachedQuery.refetchQueries if the enabled flag is false ",
+        () async {
+      int numCalls = 0;
+      InfiniteQuery(
+        key: "cached_query_refetch_enabled_false",
+        getNextArg: (state) => 1,
+        queryFn: (_) {
+          numCalls++;
+          return Future.value(1);
+        },
+        config: QueryConfig(enabled: false),
+      );
+      expect(numCalls, 0);
+      CachedQuery.instance
+          .refetchQueries(keys: ["cached_query_refetch_enabled_false"]);
+      expect(numCalls, 0);
+    });
   });
 }

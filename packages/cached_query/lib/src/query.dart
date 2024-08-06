@@ -108,13 +108,11 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   @override
   Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
-    if (!config.enabled) {
-      return _state;
-    }
-    if (!stale &&
-        !forceRefetch &&
-        _state.status != QueryStatus.error &&
-        _state.data != null) {
+    if ((!config.enabled && !forceRefetch) ||
+        (!stale &&
+            !forceRefetch &&
+            _state.status != QueryStatus.error &&
+            _state.data != null)) {
       _emit();
       return _state;
     }

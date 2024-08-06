@@ -604,5 +604,39 @@ void main() {
       await query.result;
       expect(numCalls, 1);
     });
+
+    test("should refetch using query.refetch even if the enabled flag is false",
+        () async {
+      int numCalls = 0;
+      final query = Query(
+        key: "refetch_enabled_false",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      expect(numCalls, 0);
+      await query.refetch();
+      expect(numCalls, 1);
+    });
+
+    test(
+        "should not refetch using CachedQuery.refetchQueries if the enabled flag is false ",
+        () async {
+      int numCalls = 0;
+      Query(
+        key: "cached_query_refetch_enabled_false",
+        queryFn: () {
+          numCalls++;
+          return Future.value("");
+        },
+        config: QueryConfig(enabled: false),
+      );
+      expect(numCalls, 0);
+      CachedQuery.instance
+          .refetchQueries(keys: ["cached_query_refetch_enabled_false"]);
+      expect(numCalls, 0);
+    });
   });
 }

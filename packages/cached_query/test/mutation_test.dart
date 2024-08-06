@@ -184,6 +184,7 @@ void main() {
       const key = "refetch";
       final query = MockQuery<String>();
       when(query.key).thenReturn(key);
+      when(query.config).thenReturn(QueryConfig.defaults());
       CachedQuery.instance.addQuery(query);
       final mutation = Mutation<String, void>(
         refetchQueries: [key],
