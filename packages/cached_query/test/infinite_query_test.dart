@@ -879,7 +879,8 @@ void main() async {
       expect(numCalls, 1);
     });
 
-    test("should refetch even if the enabled flag is false", () async {
+    test("should refetch using query.refetch even if the enabled flag is false",
+        () async {
       int numCalls = 0;
       final query = InfiniteQuery(
         key: "query_refetch_enabled_false",
