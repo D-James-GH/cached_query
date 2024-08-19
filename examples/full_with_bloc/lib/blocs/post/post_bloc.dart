@@ -66,7 +66,10 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     );
   }
 
-  FutureOr<void> _onPostsRefreshed(PostsRefreshed event, Emitter<PostState> emit) async {
+  FutureOr<void> _onPostsRefreshed(
+    PostsRefreshed event,
+    Emitter<PostState> emit,
+  ) async {
     await _repo.getPosts().refetch();
   }
 }

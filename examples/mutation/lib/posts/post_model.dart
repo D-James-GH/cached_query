@@ -10,7 +10,7 @@ class PostModel extends Equatable {
     this.id,
     required this.title,
     required this.body,
-     this.userId,
+    this.userId,
   });
 
   factory PostModel.fromJson(Map<String, dynamic> json) => PostModel(

@@ -160,7 +160,15 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   @override
   void update(UpdateFunc<List<T>> updateFn) {
     final newData = updateFn(_state.data);
-    _setState(_state.copyWith(data: newData));
+    final newState = InfiniteQueryState(
+      data: newData,
+      timeCreated: DateTime.now(),
+      getNextArg: _getNextArg,
+      error: _state.error,
+      status: _state.status,
+      lastPage: _state.lastPage,
+    );
+    _setState(newState);
     _emit();
   }
 

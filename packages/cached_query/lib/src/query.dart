@@ -98,7 +98,14 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   @override
   void update(UpdateFunc<T> updateFn) {
     final newData = updateFn(_state.data);
-    _setState(_state.copyWith(data: newData));
+    final newState = QueryState(
+      timeCreated: DateTime.now(),
+      data: newData,
+      status: _state.status,
+      error: _state.error,
+    );
+
+    _setState(newState);
     _emit();
   }
 

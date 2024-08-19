@@ -7,6 +7,7 @@ class PostsFetched extends PostEvent {
   @override
   List<Object?> get props => [];
 }
+
 class PostsRefreshed extends PostEvent {
   @override
   List<Object?> get props => [];
