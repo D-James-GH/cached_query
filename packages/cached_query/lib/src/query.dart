@@ -99,7 +99,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   void update(UpdateFunc<T> updateFn) {
     final newData = updateFn(_state.data);
     final newState = QueryState(
-      timeCreated: DateTime.now(),
+      timeCreated: _state.timeCreated,
       data: newData,
       status: _state.status,
       error: _state.error,

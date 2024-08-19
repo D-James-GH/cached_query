@@ -162,7 +162,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     final newData = updateFn(_state.data);
     final newState = InfiniteQueryState(
       data: newData,
-      timeCreated: DateTime.now(),
+      timeCreated: _state.timeCreated,
       getNextArg: _getNextArg,
       error: _state.error,
       status: _state.status,
