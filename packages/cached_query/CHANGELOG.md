@@ -1,3 +1,7 @@
+## 2.0.7
+
+ - **FIX**: keep time stamp if updating manually. ([1655444e](https://github.com/D-James-GH/cached_query/commit/1655444e74dd77ba2eabdc6a800688ec118d2868))
+
 ## 2.0.6
 
  - **FIX**: allow updating state to null. ([c0753854](https://github.com/D-James-GH/cached_query/commit/c0753854244e22f3ea2a32b90f2627a9c8ebef40))

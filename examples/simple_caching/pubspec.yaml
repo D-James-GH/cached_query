@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cached_query_flutter: 2.1.3
+  cached_query_flutter: 2.1.4
   http: ^0.13.5
 
 dev_dependencies:

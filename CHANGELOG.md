@@ -15,6 +15,36 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`cached_query` - `v2.0.7`](#cached_query---v207)
+ - [`cached_storage` - `v2.0.7`](#cached_storage---v207)
+ - [`cached_query_flutter` - `v2.1.4`](#cached_query_flutter---v214)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v2.0.7`
+ - `cached_query_flutter` - `v2.1.4`
+
+---
+
+#### `cached_query` - `v2.0.7`
+
+ - **FIX**: keep time stamp if updating manually. ([1655444e](https://github.com/D-James-GH/cached_query/commit/1655444e74dd77ba2eabdc6a800688ec118d2868))
+
+
+## 2024-08-19
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`cached_query` - `v2.0.6`](#cached_query---v206)
  - [`cached_query_flutter` - `v2.1.3`](#cached_query_flutter---v213)
  - [`cached_storage` - `v2.0.6`](#cached_storage---v206)
