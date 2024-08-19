@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-08-19
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v2.0.6`](#cached_query---v206)
+ - [`cached_query_flutter` - `v2.1.3`](#cached_query_flutter---v213)
+ - [`cached_storage` - `v2.0.6`](#cached_storage---v206)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v2.1.3`
+ - `cached_storage` - `v2.0.6`
+
+---
+
+#### `cached_query` - `v2.0.6`
+
+ - **FIX**: allow updating state to null. ([c0753854](https://github.com/D-James-GH/cached_query/commit/c0753854244e22f3ea2a32b90f2627a9c8ebef40))
+
+
 ## 2024-07-18
 
 ### Changes

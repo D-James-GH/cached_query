@@ -1,3 +1,7 @@
+## 2.0.6
+
+ - **FIX**: allow updating state to null. ([c0753854](https://github.com/D-James-GH/cached_query/commit/c0753854244e22f3ea2a32b90f2627a9c8ebef40))
+
 ## 2.0.5
 
  - **REFACTOR**: infinite_query. ([f7d1708b](https://github.com/D-James-GH/cached_query/commit/f7d1708bbb4dcdd2822a118970fd6c3a38ce4f80))

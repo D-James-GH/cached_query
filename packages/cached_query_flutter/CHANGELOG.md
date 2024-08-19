@@ -1,3 +1,7 @@
+## 2.1.3
+
+ - Update a dependency to the latest release.
+
 ## 2.1.2
 
  - **REFACTOR**: infinite_query. ([f7d1708b](https://github.com/D-James-GH/cached_query/commit/f7d1708bbb4dcdd2822a118970fd6c3a38ce4f80))
