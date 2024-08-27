@@ -13,6 +13,7 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   int currentId = 50;
+  bool enabled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -20,6 +21,7 @@ class _PostPageState extends State<PostPage> {
       appBar: AppBar(
         centerTitle: true,
         title: QueryBuilder(
+          enabled: enabled,
           query: service.getPostById(currentId),
           builder: (context, state) {
             return Text(
@@ -51,7 +53,11 @@ class _PostPageState extends State<PostPage> {
                 ),
               ],
             ),
-            Post(id: currentId),
+            Post(id: currentId, enabled: enabled),
+            ElevatedButton(
+              onPressed: () => setState(() => enabled = true),
+              child: const Text("Enable Query"),
+            )
           ],
         ),
       ),

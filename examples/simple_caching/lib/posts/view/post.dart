@@ -6,12 +6,15 @@ import '../service/post_service.dart' as service;
 
 class Post extends StatelessWidget {
   final int id;
+  final bool enabled;
 
-  const Post({Key? key, required this.id}) : super(key: key);
+  const Post({Key? key, required this.id, required this.enabled})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return QueryBuilder<PostModel>(
+      enabled: enabled,
       // Can use key if the query already exists.
       queryKey: service.postKey(id),
       builder: (context, state) {
