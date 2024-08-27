@@ -137,15 +137,12 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   Future<void> _fetch() async {
     _setState(_state.copyWith(status: QueryStatus.loading));
-    _emit();
     try {
       if (_state.data == null && config.storeQuery) {
         // try to get any data from storage if the query has no data
         final storedData = await _fetchFromStorage();
         if (storedData != null) {
           _setState(_state.copyWith(data: storedData));
-          // Emit the data from storage
-          _emit();
           final shouldRefetch = config.shouldRefetch?.call(this, true) ?? true;
           if (!shouldRefetch) {
             return;
@@ -182,9 +179,6 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       if (config.shouldRethrow) {
         rethrow;
       }
-    } finally {
-      _currentFuture = null;
-      _emit();
     }
   }
 }
