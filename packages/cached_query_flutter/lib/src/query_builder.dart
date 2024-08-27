@@ -29,6 +29,9 @@ class QueryBuilder<T> extends StatefulWidget {
   /// The [Query] to used to update the ui.
   final Query<T>? query;
 
+  /// Whether the query should be called immediately.
+  final bool enabled;
+
   /// {@macro queryBuilderCallback}
   final QueryBuilderCallback<T> builder;
 
@@ -45,6 +48,7 @@ class QueryBuilder<T> extends StatefulWidget {
   const QueryBuilder({
     Key? key,
     this.query,
+    this.enabled = true,
     this.queryKey,
     this.buildWhen,
     required this.builder,
@@ -99,6 +103,13 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
       }
       _subscribe();
     }
+    if (oldWidget.enabled != widget.enabled) {
+      if (widget.enabled) {
+        _subscribe();
+      } else {
+        _unsubscribe();
+      }
+    }
   }
 
   @override
@@ -114,6 +125,12 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
 
   void _subscribe() {
     _state = _query.state;
+    if (!widget.enabled) {
+      if (_subscription != null) {
+        _unsubscribe();
+      }
+      return;
+    }
     _subscription = _query.stream.listen((state) async {
       if (widget.buildWhen != null) {
         final shouldRebuild = await Future.value(
