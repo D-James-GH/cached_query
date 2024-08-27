@@ -147,6 +147,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
         observer.onError(this, stackTrace);
       }
     }
+    _emit();
   }
 
   /// Emits the current state down the stream.

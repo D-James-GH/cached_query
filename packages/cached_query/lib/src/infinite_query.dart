@@ -230,7 +230,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
             timeCreated: DateTime.now(),
           ),
         );
-        _emit();
         return;
       }
 
@@ -275,9 +274,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       if (CachedQuery.instance._config.shouldRethrow) {
         rethrow;
       }
-    } finally {
-      _currentFuture = null;
-      _emit();
     }
   }
 
@@ -298,7 +294,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
             status: QueryStatus.success,
           ),
         );
-        _emit();
         return;
       }
 
@@ -332,9 +327,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       if (CachedQuery.instance._config.shouldRethrow) {
         rethrow;
       }
-    } finally {
-      _currentFuture = null;
-      _emit();
     }
   }
 
@@ -346,7 +338,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
 
   void _setLoading() {
     _setState(_state.copyWith(status: QueryStatus.loading));
-    _emit();
   }
 
   Future<bool> _fetchAfterStorage() async {
@@ -361,7 +352,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _setState(
           _state.copyWith(data: dataFromStorage, status: QueryStatus.success),
         );
-        _emit();
         return config.shouldRefetch?.call(this, true) ?? true;
       }
       return true;
@@ -370,7 +360,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _state.copyWith(status: QueryStatus.error, error: e),
         trace,
       );
-      _emit();
       return true;
     }
   }
@@ -385,10 +374,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     );
 
     if (initialArg == null) {
-      _setState(
-        state.copyWith(status: QueryStatus.success),
-      );
-      _emit();
+      _setState(state.copyWith(status: QueryStatus.success));
       return null;
     }
 
