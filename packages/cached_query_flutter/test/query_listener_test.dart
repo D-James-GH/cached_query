@@ -83,5 +83,31 @@ void main() {
         expect(childFinder, findsOneWidget);
       },
     );
+
+    testWidgets(
+      "Don't call query if enabled is false",
+      (tester) async {
+        const response = "My Title";
+        const child = Text('Hello world');
+        var queryCalled = false;
+        const TitleRepo(response: response).fetchTitle(
+          onQueryCalled: () {
+            queryCalled = true;
+          },
+        );
+        await tester.pumpWidget(
+          MaterialApp(
+            home: QueryListener(
+              queryKey: TitleRepo.key,
+              enabled: false,
+              listener: (_) {},
+              child: child,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
+        expect(queryCalled, isFalse);
+      },
+    );
   });
 }

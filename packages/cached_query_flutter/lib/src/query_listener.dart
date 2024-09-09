@@ -26,6 +26,9 @@ class QueryListener<T> extends StatefulWidget {
   /// The [Query] to used to update the listener.
   final Query<T>? query;
 
+  /// Whether the query should be called immediately.
+  final bool enabled;
+
   /// {@macro queryListenerCallback}
   final QueryListenerCallback<T> listener;
 
@@ -44,6 +47,7 @@ class QueryListener<T> extends StatefulWidget {
   /// {@macro queryListener}
   const QueryListener({
     Key? key,
+    this.enabled = true,
     this.query,
     this.queryKey,
     this.listenWhen,
@@ -98,7 +102,18 @@ class _QueryListenerState<T> extends State<QueryListener<T>> {
         _query = currentQuery as Query<T>;
         _previousState = _query.state;
       }
-      _subscribe();
+      if (widget.enabled) {
+        _subscribe();
+        return;
+      }
+    }
+
+    if (oldWidget.enabled != widget.enabled) {
+      if (widget.enabled) {
+        _subscribe();
+      } else {
+        _unsubscribe();
+      }
     }
   }
 
@@ -115,6 +130,12 @@ class _QueryListenerState<T> extends State<QueryListener<T>> {
 
   void _subscribe() {
     _previousState = _query.state;
+    if (!widget.enabled) {
+      if (_subscription != null) {
+        _unsubscribe();
+      }
+      return;
+    }
     _subscription = _query.stream.listen((state) async {
       final listenWhen = widget.listenWhen;
       if (listenWhen != null) {

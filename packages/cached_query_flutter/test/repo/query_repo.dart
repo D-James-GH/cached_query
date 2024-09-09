@@ -4,13 +4,19 @@ class TitleRepo {
   static const key = 'title';
   final String response;
   final Duration? queryDelay;
+
   const TitleRepo({this.queryDelay, required this.response});
 
-  Query<String> fetchTitle({String? initialTitle}) {
+  Query<String> fetchTitle({
+    String? initialTitle,
+    void Function()? onQueryCalled,
+  }) {
     return Query<String>(
       key: key,
-      queryFn: () =>
-          Future.delayed(queryDelay ?? Duration.zero, () => response),
+      queryFn: () {
+        onQueryCalled?.call();
+        return Future.delayed(queryDelay ?? Duration.zero, () => response);
+      },
       initialData: initialTitle,
       config: QueryConfig(ignoreCacheDuration: true),
     );

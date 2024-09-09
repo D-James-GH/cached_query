@@ -12,6 +12,9 @@ class QueryConsumer<T> extends StatelessWidget {
   /// The [Query] to used to update the listener.
   final Query<T> query;
 
+  /// Whether the query should be called immediately.
+  final bool enabled;
+
   /// {@macro queryListenerCallback}
   final QueryListenerCallback<T> listener;
 
@@ -27,6 +30,7 @@ class QueryConsumer<T> extends StatelessWidget {
   /// {@macro QueryConsumer}
   const QueryConsumer({
     Key? key,
+    this.enabled = true,
     required this.query,
     required this.listener,
     this.listenWhen,
@@ -39,9 +43,11 @@ class QueryConsumer<T> extends StatelessWidget {
     return QueryListener(
       query: query,
       listener: listener,
+      enabled: enabled,
       listenWhen: listenWhen,
       child: QueryBuilder(
         query: query,
+        enabled: enabled,
         buildWhen: buildWhen,
         builder: builder,
       ),
