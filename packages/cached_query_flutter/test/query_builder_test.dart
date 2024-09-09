@@ -1,4 +1,5 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'components/title.dart';
@@ -73,6 +74,26 @@ void main() {
       );
       await tester.pumpAndSettle();
       final titleFinder = find.text(title);
+      expect(titleFinder, findsOneWidget);
+    });
+    testWidgets("Enabled blocks request", (tester) async {
+      const title = "title here";
+      await tester.pumpWidget(
+        const TitleValue(
+          response: title,
+          enabled: false,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final emptyBoxFinder = find.byKey(const Key("empty-box"));
+      expect(emptyBoxFinder, findsOneWidget);
+      final titleFinder = find.byKey(const Key("title-text"));
+      expect(titleFinder, findsNothing);
+      final enableButton = find.byKey(const Key("enable-button"));
+      await tester.tap(enableButton);
+      await tester.pumpAndSettle();
+
+      expect(emptyBoxFinder, findsNothing);
       expect(titleFinder, findsOneWidget);
     });
     testWidgets("Can update query key to update query", (tester) async {});

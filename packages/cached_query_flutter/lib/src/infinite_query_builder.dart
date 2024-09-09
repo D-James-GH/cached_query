@@ -31,6 +31,9 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   /// The [InfiniteQuery] to watch.
   final InfiniteQuery<T, A>? query;
 
+  /// Whether the query should be called immediately.
+  final bool enabled;
+
   /// Get a query by the queryKey.
   final Object? queryKey;
 
@@ -46,6 +49,7 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   const InfiniteQueryBuilder({
     Key? key,
     this.query,
+    this.enabled = true,
     this.queryKey,
     this.buildWhen,
     required this.builder,
@@ -100,7 +104,18 @@ class _InfiniteQueryBuilderState<T, A>
         _query = currentQuery as InfiniteQuery<T, A>;
         _state = _query.state;
       }
-      _subscribe();
+      if (widget.enabled) {
+        _subscribe();
+        return;
+      }
+    }
+
+    if (oldWidget.enabled != widget.enabled) {
+      if (widget.enabled) {
+        _subscribe();
+      } else {
+        _unsubscribe();
+      }
     }
   }
 
@@ -117,6 +132,12 @@ class _InfiniteQueryBuilderState<T, A>
 
   void _subscribe() {
     _state = _query.state;
+    if (!widget.enabled) {
+      if (_subscription != null) {
+        _unsubscribe();
+      }
+      return;
+    }
     _subscription = _query.stream.listen((state) async {
       if (widget.buildWhen != null) {
         final shouldRebuild = await Future.value(

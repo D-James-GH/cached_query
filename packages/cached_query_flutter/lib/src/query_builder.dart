@@ -101,8 +101,12 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
         _query = currentQuery as Query<T>;
         _state = _query.state;
       }
-      _subscribe();
+      if (widget.enabled) {
+        _subscribe();
+        return;
+      }
     }
+
     if (oldWidget.enabled != widget.enabled) {
       if (widget.enabled) {
         _subscribe();
