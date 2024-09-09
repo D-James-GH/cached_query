@@ -1,3 +1,9 @@
+## 2.2.0
+
+ - **FEAT**: add enabled flag to consumer and listener. ([4c340484](https://github.com/D-James-GH/cached_query/commit/4c34048411565495dd891b0928edd9e2a7de9315))
+ - **FEAT**: add enable flag to infinite query builder. ([a415d847](https://github.com/D-James-GH/cached_query/commit/a415d847d367af38be653e2754aba6bb491f67dc))
+ - **FEAT**: add enabled flag to query_builder.dart. ([d8de7b6f](https://github.com/D-James-GH/cached_query/commit/d8de7b6fc1837153c73f0c0a74ffdc0d128aae4b))
+
 ## 2.1.4
 
  - Update a dependency to the latest release.
