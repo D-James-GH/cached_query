@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 
 import '../repo/query_repo.dart';
 
-class TitleValue extends StatelessWidget {
+class TitleValue extends StatefulWidget {
   final String response;
   final String? initialTitle;
+  final bool enabled;
   final void Function()? onBuild;
   final Duration? queryDelay;
   final QueryBuilderCondition<String>? buildWhen;
@@ -13,6 +14,7 @@ class TitleValue extends StatelessWidget {
   const TitleValue({
     Key? key,
     required this.response,
+    this.enabled = true,
     this.onBuild,
     this.initialTitle,
     this.queryDelay,
@@ -20,19 +22,46 @@ class TitleValue extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<TitleValue> createState() => TitleValueState();
+}
+
+class TitleValueState extends State<TitleValue> {
+  bool enabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    enabled = widget.enabled;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: QueryBuilder<String>(
-        query: TitleRepo(response: response, queryDelay: queryDelay)
-            .fetchTitle(initialTitle: initialTitle),
-        buildWhen: buildWhen,
-        builder: (context, state) {
-          if (onBuild != null) {
-            onBuild!();
-          }
-          if (state.data == null) return const SizedBox();
-          return Text(state.data!, key: const Key("title-text"));
-        },
+      home: Column(
+        children: [
+          ElevatedButton(
+            key: const Key("enable-button"),
+            onPressed: () => setState(() => enabled = !enabled),
+            child: const Text("enable"),
+          ),
+          QueryBuilder<String>(
+            enabled: enabled,
+            query: TitleRepo(
+              response: widget.response,
+              queryDelay: widget.queryDelay,
+            ).fetchTitle(initialTitle: widget.initialTitle),
+            buildWhen: widget.buildWhen,
+            builder: (context, state) {
+              if (widget.onBuild != null) {
+                widget.onBuild!();
+              }
+              if (state.data == null) {
+                return const SizedBox(key: Key("empty-box"));
+              }
+              return Text(state.data!, key: const Key("title-text"));
+            },
+          ),
+        ],
       ),
     );
   }

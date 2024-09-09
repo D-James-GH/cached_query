@@ -1,9 +1,12 @@
+import 'package:cached_query/cached_query.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'components/list.dart';
 import 'repo/infinite_query_repo.dart';
 
 void main() {
+  tearDown(CachedQuery.instance.deleteCache);
   group("Query builder", () {
     testWidgets("Builds widget based on query state", (tester) async {
       await tester.pumpWidget(const ListValue(response: "response"));
@@ -39,7 +42,27 @@ void main() {
         expect(buildCount, 1);
       },
     );
+    testWidgets("Enabled blocks request", (tester) async {
+      InfiniteQueryRepo(response: "hello").fetchList();
+      await tester.pumpWidget(
+        const ListQuery(
+          enabled: false,
+          queryKey: InfiniteQueryRepo.queryKey,
+        ),
+      );
+      await tester.pumpAndSettle();
 
+      final emptyBoxFinder = find.byKey(const Key("empty-box"));
+      expect(emptyBoxFinder, findsOneWidget);
+      final titleFinder = find.text("title");
+      expect(titleFinder, findsNothing);
+      final enableButton = find.byKey(const Key("enable-button"));
+      await tester.tap(enableButton);
+      await tester.pumpAndSettle();
+
+      expect(emptyBoxFinder, findsNothing);
+      expect(titleFinder, findsOneWidget);
+    });
     testWidgets("Infinite query builder from key", (tester) async {
       InfiniteQueryRepo(response: "response").fetchList();
       await tester.pumpWidget(

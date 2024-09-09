@@ -3,21 +3,48 @@ import 'package:flutter/material.dart';
 
 import '../repo/infinite_query_repo.dart';
 
-class ListQuery extends StatelessWidget {
+class ListQuery extends StatefulWidget {
+  final bool enabled;
   final Object queryKey;
-  const ListQuery({Key? key, required this.queryKey}) : super(key: key);
+
+  const ListQuery({Key? key, required this.queryKey, this.enabled = true})
+      : super(key: key);
+
+  @override
+  State<ListQuery> createState() => _ListQueryState();
+}
+
+class _ListQueryState extends State<ListQuery> {
+  bool enabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    enabled = widget.enabled;
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: InfiniteQueryBuilder<String, int>(
-        queryKey: queryKey,
-        builder: (context, state, query) => ListView.builder(
-          itemBuilder: (context, index) {
-            if (state.data == null) return const SizedBox();
-            return Text(state.data![index]);
-          },
-          itemCount: state.length,
+        queryKey: widget.queryKey,
+        enabled: enabled,
+        builder: (context, state, query) => ListView(
+          children: [
+            ElevatedButton(
+              key: const Key("enable-button"),
+              onPressed: () => setState(() {
+                enabled = !enabled;
+              }),
+              child: const Text("enable"),
+            ),
+            if (state.data == null || state.data!.isEmpty) ...[
+              const SizedBox(key: Key("empty-box")),
+            ] else ...[
+              const Text("title"),
+              for (final item in state.data!) Text(item),
+            ],
+          ],
         ),
       ),
     );
