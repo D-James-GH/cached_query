@@ -821,4 +821,76 @@ void main() async {
       expect(numCalls, 2);
     });
   });
+
+  group("Caching Query", () {
+    tearDownAll(cachedQuery.deleteCache);
+    test("Two keys retrieve the same instance", () {
+      Future<String> queryFunction(int page) => Future.value("data");
+      final query1 = InfiniteQuery(
+        key: "same",
+        queryFn: queryFunction,
+        getNextArg: (_) => 1,
+      );
+      final query2 = InfiniteQuery(
+        key: "same",
+        queryFn: queryFunction,
+        getNextArg: (_) => 1,
+      );
+      expect(query1, same(query2));
+    });
+    test("Pass a cache to add query to", () {
+      final cache = CachedQuery.asNewInstance();
+      Future<String> queryFunction(int page) => Future.value("data");
+      final query = InfiniteQuery(
+        key: "cacheInstance1",
+        queryFn: queryFunction,
+        getNextArg: (_) => 1,
+        cache: cache,
+      );
+      expect(cache.getQuery("cacheInstance1"), query);
+    });
+
+    test("Two queries in same cache are the same", () {
+      Future<String> queryFunction(int page) => Future.value("data");
+      final cache = CachedQuery.asNewInstance();
+      const key = "differentCaches";
+
+      final query1 = InfiniteQuery(
+        key: key,
+        queryFn: queryFunction,
+        getNextArg: (_) => 1,
+        cache: cache,
+      );
+
+      final query2 = InfiniteQuery(
+        key: key,
+        queryFn: queryFunction,
+        getNextArg: (_) => 1,
+        cache: cache,
+      );
+
+      expect(query1, same(query2));
+    });
+
+    test("Can pass CachedQuery for separation", () async {
+      Future<String> queryFunction(int page) => Future.value("data");
+      final cache = CachedQuery.asNewInstance();
+      const key = "differentCaches";
+
+      final query1 = InfiniteQuery(
+        key: key,
+        queryFn: queryFunction,
+        getNextArg: (_) => 1,
+        cache: cache,
+      );
+
+      final query2 = InfiniteQuery(
+        key: key,
+        queryFn: queryFunction,
+        getNextArg: (_) => 1,
+      );
+
+      expect(query1, isNot(same(query2)));
+    });
+  });
 }

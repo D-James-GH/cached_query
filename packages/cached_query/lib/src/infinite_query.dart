@@ -78,6 +78,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     required List<T>? initialData,
     required this.forceRevalidateAll,
     required this.revalidateAll,
+    required CachedQuery cache,
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
   })  : _getNextArg = getNextArg,
@@ -86,6 +87,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _onError = onError,
         super._internal(
           key: key,
+          cache: cache,
           unencodedKey: unencodedKey,
           config: config,
           state: InfiniteQueryState<T>(
@@ -107,10 +109,11 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     bool revalidateAll = false,
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
+    CachedQuery? cache,
   }) {
-    final globalCache = CachedQuery.instance;
+    cache = cache ?? CachedQuery.instance;
     final queryKey = encodeKey(key);
-    var query = globalCache.getQuery(queryKey);
+    var query = cache.getQuery(queryKey);
     if (query == null || query is! InfiniteQuery<T, Arg>) {
       query = InfiniteQuery<T, Arg>._internal(
         queryFn: queryFn,
@@ -123,8 +126,9 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         key: queryKey,
         initialData: initialData,
         config: config,
+        cache: cache,
       );
-      globalCache.addQuery(query);
+      cache.addQuery(query);
     }
 
     if (prefetchPages != null) {

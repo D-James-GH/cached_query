@@ -9,9 +9,7 @@ import 'package:meta/meta.dart';
 import 'package:rxdart/rxdart.dart';
 
 part 'infinite_query.dart';
-
 part 'query.dart';
-
 part "query_base.dart";
 
 /// Should return true if a condition is met.
@@ -61,8 +59,7 @@ class CachedQuery {
   // This class should not be instantiated manually.
   CachedQuery._();
 
-  /// Allow the creation of new instances for testing purposes
-  @visibleForTesting
+  /// Allow the creation of new instances
   factory CachedQuery.asNewInstance() {
     return CachedQuery._();
   }

@@ -38,6 +38,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   Query._internal({
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
+    required CachedQuery cache,
     required String key,
     required Object unencodedKey,
     required QueryConfig? config,
@@ -47,6 +48,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         _onError = onError,
         _onSuccess = onSuccess,
         super._internal(
+          cache: cache,
           config: config,
           unencodedKey: unencodedKey,
           key: key,
@@ -64,13 +66,15 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     OnQuerySuccessCallback<T>? onSuccess,
     T? initialData,
     QueryConfig? config,
+    CachedQuery? cache,
   }) {
-    final globalCache = CachedQuery.instance;
-    var query = globalCache.getQuery(key) as Query<T>?;
+    cache = cache ?? CachedQuery.instance;
+    var query = cache.getQuery(key) as Query<T>?;
 
     // if query is null check the storage
     if (query == null) {
       query = Query<T>._internal(
+        cache: cache,
         key: encodeKey(key),
         unencodedKey: key,
         queryFn: queryFn,
@@ -79,7 +83,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         initialData: initialData,
         config: config,
       );
-      globalCache.addQuery(query);
+      cache.addQuery(query);
     }
 
     return query;
