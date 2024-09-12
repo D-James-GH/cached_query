@@ -60,11 +60,25 @@ Query(
 ## Builders
 Three builders are added for ease of use. They act very similar to a `StreamBuilder`. 
 
+### Enabling and Disabling
+
+By default, the builders will subscribe to the query's listener on `initState` and unsubscribe on `dispose`.
+This means that the query will be fetched when the widget is first rendered. You can prevent this using the `enabled` flag
+on the `InfiniteQueryBuilder` and `QueryBuilder`.
+
+:::warning
+
+This will only prevent the widget from adding a listener to the query. If you have other listeners elsewhere then the 
+query will still be fetched.
+
+:::
+
 ### QueryBuilder
 QueryBuilder takes a query and will call the builder method whenever the query state changes.
 
 ```dart
  QueryBuilder<DataModel?>(
+  enabled: false,
   query: Query(
     key: "a query key",
     queryFn: () async => _api.getData(),
