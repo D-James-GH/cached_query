@@ -35,6 +35,16 @@ abstract class StateBase {
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
 abstract class QueryBase<T, State extends QueryState<dynamic>> {
+  QueryBase._internal({
+    required this.key,
+    required this.unencodedKey,
+    required State state,
+    required QueryConfig? config,
+    required CachedQuery cache,
+  })  : config = config ?? cache.defaultConfig,
+        _cache = cache,
+        _state = state;
+
   /// The key used to store and access the query. Encoded using jsonEncode.
   ///
   /// This is created by calling jsonEncode on the passed dynamic key.
@@ -85,9 +95,10 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   /// Broadcast stream controller that reacts to changes to the query state
   BehaviorSubject<State>? _streamController;
 
-  final CachedQuery _globalCache = CachedQuery.instance;
+  final CachedQuery _cache;
   Timer? _deleteQueryTimer;
   Future<void>? _f;
+
   Future<void>? get _currentFuture => _f;
 
   set _currentFuture(Future<void>? future) {
@@ -99,14 +110,6 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 // Initialise the query as stale so the first fetch is guaranteed to happen
   bool _staleOverride = true;
   State _state;
-
-  QueryBase._internal({
-    required this.key,
-    required this.unencodedKey,
-    required State state,
-    required QueryConfig? config,
-  })  : config = config ?? CachedQuery.instance.defaultConfig,
-        _state = state;
 
   /// Refetch the query immediately.
   ///
@@ -128,19 +131,19 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
 
   /// Delete the query and query key from cache
   void deleteQuery({bool deleteStorage = false}) {
-    _globalCache.deleteCache(key: key, deleteStorage: deleteStorage);
+    _cache.deleteCache(key: key, deleteStorage: deleteStorage);
   }
 
   Future<State> _getResult();
 
   /// Sets the new state.
   void _setState(State newState, [StackTrace? stackTrace]) {
-    for (final observer in CachedQuery.instance.observers) {
+    for (final observer in _cache.observers) {
       observer.onChange(this, newState);
     }
     _state = newState;
     if (stackTrace != null) {
-      for (final observer in CachedQuery.instance.observers) {
+      for (final observer in _cache.observers) {
         observer.onError(this, stackTrace);
       }
     }
@@ -152,7 +155,7 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
   }
 
   void _saveToStorage() {
-    if (_globalCache.storage != null && _state.data != null) {
+    if (_cache.storage != null && _state.data != null) {
       dynamic dataToStore = _state.data;
       if (config.storageSerializer != null) {
         dataToStore = config.storageSerializer!(dataToStore);
@@ -163,17 +166,17 @@ abstract class QueryBase<T, State extends QueryState<dynamic>> {
         createdAt: _state.timeCreated,
         storageDuration: config.storageDuration,
       );
-      _globalCache._storage!.put(storedQuery);
+      _cache._storage!.put(storedQuery);
     }
   }
 
   /// If the data is expired this will return null.
   Future<T?> _fetchFromStorage() async {
-    if (_globalCache.storage == null) {
+    if (_cache.storage == null) {
       return null;
     }
 
-    final storedData = await _globalCache.storage?.get(key);
+    final storedData = await _cache.storage?.get(key);
 
     // In-case the developer changes the storage duration in the code.
     final expiryHasChanged =

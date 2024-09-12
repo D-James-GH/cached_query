@@ -25,6 +25,11 @@ void main() {
       final config = QueryConfig();
       expect(config, QueryConfig.defaults());
     });
+    test("Different caches have different config", () {
+      final cache1 = CachedQuery.asNewInstance()..config(config: QueryConfig());
+      final cache2 = CachedQuery.asNewInstance()..config(config: QueryConfig());
+      expect(cache1.defaultConfig, isNot(same(cache2.defaultConfig)));
+    });
     test("Should be able to override default values", () async {
       final config = QueryConfig(
         storeQuery: false,

@@ -551,4 +551,51 @@ void main() {
       expect(numCalls, 2);
     });
   });
+  group("Caching Query", () {
+    tearDownAll(cachedQuery.deleteCache);
+    test("Two keys retrieve the same instance", () {
+      final query1 = Query(key: "same", queryFn: fetchFunction);
+      final query2 = Query(key: "same", queryFn: fetchFunction);
+      expect(query1, same(query2));
+    });
+    test("Pass a cache to add query to", () {
+      final cache = CachedQuery.asNewInstance();
+      final query = Query(
+        key: "cacheInstance1",
+        queryFn: fetchFunction,
+        cache: cache,
+      );
+      expect(cache.getQuery("cacheInstance1"), query);
+    });
+
+    test("Two queries same cache", () async {
+      final cache = CachedQuery.asNewInstance();
+      const key = "sameCache";
+      final query1 = Query(
+        key: key,
+        queryFn: fetchFunction,
+        cache: cache,
+      );
+      final query2 = Query(
+        key: key,
+        queryFn: fetchFunction,
+        cache: cache,
+      );
+      expect(query1, same(query2));
+    });
+    test("Can pass CachedQuery for separation", () async {
+      final cache = CachedQuery.asNewInstance();
+      const key = "differentCaches";
+      final query1 = Query(
+        key: key,
+        queryFn: fetchFunction,
+        cache: cache,
+      );
+      final query2 = Query(
+        key: key,
+        queryFn: fetchFunction,
+      );
+      expect(query1, isNot(same(query2)));
+    });
+  });
 }
