@@ -20,7 +20,9 @@ mixin _$QueryStateDetailsJson {
   String get status => throw _privateConstructorUsedError;
   Map<String, dynamic>? get data => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryStateDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $QueryStateDetailsJsonCopyWith<QueryStateDetailsJson> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -46,6 +48,8 @@ class _$QueryStateDetailsJsonCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of QueryStateDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -92,6 +96,8 @@ class __$$QueryStateDetailsJsonImplCopyWithImpl<$Res>
       $Res Function(_$QueryStateDetailsJsonImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of QueryStateDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -171,7 +177,9 @@ class _$QueryStateDetailsJsonImpl
   int get hashCode => Object.hash(runtimeType, dataRuntimeType, status,
       const DeepCollectionEquality().hash(_data));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryStateDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$QueryStateDetailsJsonImplCopyWith<_$QueryStateDetailsJsonImpl>
@@ -191,8 +199,11 @@ abstract class _QueryStateDetailsJson implements QueryStateDetailsJson {
   String get status;
   @override
   Map<String, dynamic>? get data;
+
+  /// Create a copy of QueryStateDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$QueryStateDetailsJsonImplCopyWith<_$QueryStateDetailsJsonImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -203,7 +214,9 @@ mixin _$QueryStateDetailsString {
   String get status => throw _privateConstructorUsedError;
   String? get data => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryStateDetailsString
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $QueryStateDetailsStringCopyWith<QueryStateDetailsString> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -228,6 +241,8 @@ class _$QueryStateDetailsStringCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of QueryStateDetailsString
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -274,6 +289,8 @@ class __$$QueryStateDetailsStringImplCopyWithImpl<$Res>
       $Res Function(_$QueryStateDetailsStringImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of QueryStateDetailsString
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -342,7 +359,9 @@ class _$QueryStateDetailsStringImpl
   @override
   int get hashCode => Object.hash(runtimeType, dataRuntimeType, status, data);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryStateDetailsString
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$QueryStateDetailsStringImplCopyWith<_$QueryStateDetailsStringImpl>
@@ -362,8 +381,11 @@ abstract class _QueryStateDetailsString implements QueryStateDetailsString {
   String get status;
   @override
   String? get data;
+
+  /// Create a copy of QueryStateDetailsString
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$QueryStateDetailsStringImplCopyWith<_$QueryStateDetailsStringImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -374,7 +396,9 @@ mixin _$InfiniteQueryDetailsJson {
   String get dataRuntimeType => throw _privateConstructorUsedError;
   List<dynamic>? get pages => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of InfiniteQueryDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $InfiniteQueryDetailsJsonCopyWith<InfiniteQueryDetailsJson> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -399,6 +423,8 @@ class _$InfiniteQueryDetailsJsonCopyWithImpl<$Res,
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of InfiniteQueryDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -445,6 +471,8 @@ class __$$InfiniteQueryDetailsJsonImplCopyWithImpl<$Res>
       $Res Function(_$InfiniteQueryDetailsJsonImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of InfiniteQueryDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -524,7 +552,9 @@ class _$InfiniteQueryDetailsJsonImpl
   int get hashCode => Object.hash(runtimeType, status, dataRuntimeType,
       const DeepCollectionEquality().hash(_pages));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of InfiniteQueryDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$InfiniteQueryDetailsJsonImplCopyWith<_$InfiniteQueryDetailsJsonImpl>
@@ -544,8 +574,11 @@ abstract class _InfiniteQueryDetailsJson implements InfiniteQueryDetailsJson {
   String get dataRuntimeType;
   @override
   List<dynamic>? get pages;
+
+  /// Create a copy of InfiniteQueryDetailsJson
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$InfiniteQueryDetailsJsonImplCopyWith<_$InfiniteQueryDetailsJsonImpl>
       get copyWith => throw _privateConstructorUsedError;
 }
@@ -557,7 +590,9 @@ mixin _$QueryDetailsState {
   bool? get stale => throw _privateConstructorUsedError;
   QueryStateDetails get state => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryDetailsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $QueryDetailsStateCopyWith<QueryDetailsState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -581,6 +616,8 @@ class _$QueryDetailsStateCopyWithImpl<$Res, $Val extends QueryDetailsState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of QueryDetailsState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -629,6 +666,8 @@ class __$$QueryDetailsStateImplCopyWithImpl<$Res>
       $Res Function(_$QueryDetailsStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of QueryDetailsState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -705,7 +744,9 @@ class _$QueryDetailsStateImpl
   @override
   int get hashCode => Object.hash(runtimeType, key, type, stale, state);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryDetailsState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$QueryDetailsStateImplCopyWith<_$QueryDetailsStateImpl> get copyWith =>
@@ -728,8 +769,11 @@ abstract class _QueryDetailsState implements QueryDetailsState {
   bool? get stale;
   @override
   QueryStateDetails get state;
+
+  /// Create a copy of QueryDetailsState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$QueryDetailsStateImplCopyWith<_$QueryDetailsStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

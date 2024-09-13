@@ -19,7 +19,9 @@ mixin _$JokeState {
   JokeStatus get status => throw _privateConstructorUsedError;
   JokeModel? get joke => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of JokeState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $JokeStateCopyWith<JokeState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -44,6 +46,8 @@ class _$JokeStateCopyWithImpl<$Res, $Val extends JokeState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of JokeState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -62,6 +66,8 @@ class _$JokeStateCopyWithImpl<$Res, $Val extends JokeState>
     ) as $Val);
   }
 
+  /// Create a copy of JokeState
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
   $JokeModelCopyWith<$Res>? get joke {
@@ -97,6 +103,8 @@ class __$$JokeStateImplCopyWithImpl<$Res>
       _$JokeStateImpl _value, $Res Function(_$JokeStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of JokeState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -144,7 +152,9 @@ class _$JokeStateImpl implements _JokeState {
   @override
   int get hashCode => Object.hash(runtimeType, status, joke);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of JokeState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$JokeStateImplCopyWith<_$JokeStateImpl> get copyWith =>
@@ -159,8 +169,11 @@ abstract class _JokeState implements JokeState {
   JokeStatus get status;
   @override
   JokeModel? get joke;
+
+  /// Create a copy of JokeState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$JokeStateImplCopyWith<_$JokeStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

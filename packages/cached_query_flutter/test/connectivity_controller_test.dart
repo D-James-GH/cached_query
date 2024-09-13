@@ -17,6 +17,13 @@ void main() {
 
     test("If has a connection should return true", () async {
       when(connectivityService.lookup()).thenAnswer((_) async => true);
+      when(connectivity.onConnectivityChanged).thenAnswer(
+        (_) => Stream.fromIterable(
+          [
+            [ConnectivityResult.wifi],
+          ],
+        ),
+      );
       final connectivityController = ConnectivityController.asNewInstance(
         connectivity: connectivity,
         service: connectivityService,
@@ -62,13 +69,12 @@ void main() {
 
       when(connectivityService.lookup()).thenAnswer((_) async => true);
 
-      final controller = ConnectivityController.asNewInstance(
+      final instance = ConnectivityController.asNewInstance(
         connectivity: connectivity,
         service: connectivityService,
         initialConnection: false,
-        refetchCurrentQueries: refetch,
-      );
-      await controller.initialize();
+      )..addListener(refetch);
+      await instance.checkConnection();
       expect(callCount, 1);
     });
   });
