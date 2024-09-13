@@ -20,7 +20,9 @@ mixin _$AppEvent {
   Map<String, dynamic> get data => throw _privateConstructorUsedError;
   EventType get type => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of AppEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $AppEventCopyWith<AppEvent> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -43,6 +45,8 @@ class _$AppEventCopyWithImpl<$Res, $Val extends AppEvent>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of AppEvent
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -86,6 +90,8 @@ class __$$AppEventImplCopyWithImpl<$Res>
       _$AppEventImpl _value, $Res Function(_$AppEventImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of AppEvent
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -151,7 +157,9 @@ class _$AppEventImpl implements _AppEvent {
   int get hashCode => Object.hash(
       runtimeType, name, const DeepCollectionEquality().hash(_data), type);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of AppEvent
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$AppEventImplCopyWith<_$AppEventImpl> get copyWith =>
@@ -170,8 +178,11 @@ abstract class _AppEvent implements AppEvent {
   Map<String, dynamic> get data;
   @override
   EventType get type;
+
+  /// Create a copy of AppEvent
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$AppEventImplCopyWith<_$AppEventImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

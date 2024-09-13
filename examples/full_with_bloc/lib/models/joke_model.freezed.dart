@@ -23,8 +23,12 @@ mixin _$JokeModel {
   String get joke => throw _privateConstructorUsedError;
   String get id => throw _privateConstructorUsedError;
 
+  /// Serializes this JokeModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
-  @JsonKey(ignore: true)
+
+  /// Create a copy of JokeModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $JokeModelCopyWith<JokeModel> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -47,6 +51,8 @@ class _$JokeModelCopyWithImpl<$Res, $Val extends JokeModel>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of JokeModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -85,6 +91,8 @@ class __$$JokeModelImplCopyWithImpl<$Res>
       _$JokeModelImpl _value, $Res Function(_$JokeModelImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of JokeModel
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -131,11 +139,13 @@ class _$JokeModelImpl implements _JokeModel {
             (identical(other.id, id) || other.id == id));
   }
 
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, joke, id);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of JokeModel
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$JokeModelImplCopyWith<_$JokeModelImpl> get copyWith =>
@@ -160,8 +170,11 @@ abstract class _JokeModel implements JokeModel {
   String get joke;
   @override
   String get id;
+
+  /// Create a copy of JokeModel
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$JokeModelImplCopyWith<_$JokeModelImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }

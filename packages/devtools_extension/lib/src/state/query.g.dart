@@ -299,7 +299,7 @@ class _QueryStatusProviderElement
   String get queryKey => (origin as QueryStatusProvider).queryKey;
 }
 
-String _$queryListHash() => r'179ea7a33723dded26b6efba2b074e357ec20bab';
+String _$queryListHash() => r'5e7a37b2ac4c91774aee882ce4ac2c4eb2b0da2c';
 
 /// See also [QueryList].
 @ProviderFor(QueryList)

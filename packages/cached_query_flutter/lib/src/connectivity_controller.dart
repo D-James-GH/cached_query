@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:cached_query_flutter/src/connectivity_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
@@ -17,55 +16,72 @@ class ConnectivityController {
   /// Whether the device is connected.
   bool hasConnection;
 
+  /// Whether the instance has been initialized.
+  bool hasInitialized = false;
+
+  final _listeners = <void Function()>[];
   final Connectivity _connectivity;
   final ConnectivityService _connectivityService;
-  final void Function() _refetchCurrentQueries;
   StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
 
   ConnectivityController._({
     Connectivity? connectivity,
-    void Function()? refetchCurrentQueries,
     ConnectivityService? service,
     bool? initialConnection,
   })  : _connectivity = connectivity ?? Connectivity(),
         hasConnection = initialConnection ?? true,
-        _refetchCurrentQueries = refetchCurrentQueries ??
-            (() => CachedQuery.instance
-                .refetchCurrentQueries(RefetchReason.connectivity)),
-        _connectivityService = service ?? ConnectivityService();
+        _connectivityService = service ?? ConnectivityService() {
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen((event) {
+      checkConnection();
+    });
+    checkConnection();
+  }
 
   /// Allow the creation of new instances for testing purposes
   @visibleForTesting
   factory ConnectivityController.asNewInstance({
     Connectivity? connectivity,
-    void Function()? refetchCurrentQueries,
     ConnectivityService? service,
     bool? initialConnection,
   }) {
     return ConnectivityController._(
       initialConnection: initialConnection,
       connectivity: connectivity,
-      refetchCurrentQueries: refetchCurrentQueries,
       service: service,
     );
   }
 
+  Future<bool>? _connectionFuture;
+
   /// Stream the current connectivity state
   Stream<bool> get stream => connectionChangeController.stream;
 
-  /// Initialise the connectivity stream and check connection.
-  Future<void> initialize() async {
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen((event) {
-      checkConnection();
-    });
-    await checkConnection();
+  /// Listeners are called when connection is gained from an inactive state.
+  void addListener(void Function() listener) {
+    _listeners.add(listener);
+  }
+
+  /// Remove a listener.
+  void removeListener(void Function() listener) {
+    _listeners.remove(listener);
   }
 
   // stream current connection state
 
   /// The test to actually see if there is a connection
   Future<bool> checkConnection() async {
+    try {
+      _connectionFuture ??= _testConnection();
+      return await _connectionFuture!;
+    } catch (_) {
+      return false;
+    } finally {
+      _connectionFuture = null;
+    }
+  }
+
+  Future<bool> _testConnection() async {
     final bool previousConnection = hasConnection;
 
     try {
@@ -80,7 +96,9 @@ class ConnectivityController {
       connectionChangeController.add(hasConnection);
       // The connection has come online, refetch all current queries
       if (hasConnection) {
-        _refetchCurrentQueries();
+        for (final listener in _listeners) {
+          listener();
+        }
       }
     }
 

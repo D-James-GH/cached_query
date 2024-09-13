@@ -41,7 +41,9 @@ extension CachedQueryExt on CachedQuery {
     _refetchOnResume();
 
     if (!neverCheckConnection) {
-      ConnectivityController.instance.initialize();
+      ConnectivityController.instance.addListener(() {
+        refetchCurrentQueries(RefetchReason.connectivity);
+      });
     }
   }
 
@@ -82,7 +84,7 @@ extension CachedQueryExt on CachedQuery {
   }
 
   bool _getDefaultOnResume() {
-    final config = CachedQuery.instance.defaultConfig;
+    final config = defaultConfig;
     if (config is QueryConfigFlutter) {
       return config.refetchOnResume ?? true;
     }
@@ -90,7 +92,7 @@ extension CachedQueryExt on CachedQuery {
   }
 
   bool _getDefaultOnConnection() {
-    final config = CachedQuery.instance.defaultConfig;
+    final config = defaultConfig;
     if (config is QueryConfigFlutter) {
       return config.refetchOnConnection ?? true;
     }
@@ -99,15 +101,19 @@ extension CachedQueryExt on CachedQuery {
 
   /// If the app comes back into the foreground refetch any queries that have listeners.
   void _refetchOnResume() {
-    WidgetsBinding.instance.addObserver(_LifecycleObserver());
+    WidgetsBinding.instance.addObserver(_LifecycleObserver(this));
   }
 }
 
 class _LifecycleObserver extends WidgetsBindingObserver {
+  final CachedQuery cache;
+
+  _LifecycleObserver(this.cache);
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      CachedQuery.instance.refetchCurrentQueries(RefetchReason.resume);
+      cache.refetchCurrentQueries(RefetchReason.resume);
     }
   }
 }

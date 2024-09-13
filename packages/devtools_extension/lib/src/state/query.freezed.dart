@@ -20,7 +20,9 @@ mixin _$QueryInstance {
   String get type => throw _privateConstructorUsedError;
   InstanceRef get valueRef => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryInstance
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $QueryInstanceCopyWith<QueryInstance> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -44,6 +46,8 @@ class _$QueryInstanceCopyWithImpl<$Res, $Val extends QueryInstance>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of QueryInstance
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -87,6 +91,8 @@ class __$$QueryItemImplCopyWithImpl<$Res>
       _$QueryItemImpl _value, $Res Function(_$QueryItemImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of QueryInstance
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -143,7 +149,9 @@ class _$QueryItemImpl implements _QueryItem {
   @override
   int get hashCode => Object.hash(runtimeType, key, type, valueRef);
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryInstance
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$QueryItemImplCopyWith<_$QueryItemImpl> get copyWith =>
@@ -162,8 +170,11 @@ abstract class _QueryItem implements QueryInstance {
   String get type;
   @override
   InstanceRef get valueRef;
+
+  /// Create a copy of QueryInstance
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$QueryItemImplCopyWith<_$QueryItemImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -173,7 +184,9 @@ mixin _$QueryListState {
   String? get selectedKey => throw _privateConstructorUsedError;
   List<QueryInstance> get queries => throw _privateConstructorUsedError;
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryListState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   $QueryListStateCopyWith<QueryListState> get copyWith =>
       throw _privateConstructorUsedError;
 }
@@ -197,6 +210,8 @@ class _$QueryListStateCopyWithImpl<$Res, $Val extends QueryListState>
   // ignore: unused_field
   final $Res Function($Val) _then;
 
+  /// Create a copy of QueryListState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -235,6 +250,8 @@ class __$$QueryStateImplCopyWithImpl<$Res>
       _$QueryStateImpl _value, $Res Function(_$QueryStateImpl) _then)
       : super(_value, _then);
 
+  /// Create a copy of QueryListState
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -290,7 +307,9 @@ class _$QueryStateImpl implements _QueryState {
   int get hashCode => Object.hash(
       runtimeType, selectedKey, const DeepCollectionEquality().hash(_queries));
 
-  @JsonKey(ignore: true)
+  /// Create a copy of QueryListState
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
   _$$QueryStateImplCopyWith<_$QueryStateImpl> get copyWith =>
@@ -306,8 +325,11 @@ abstract class _QueryState implements QueryListState {
   String? get selectedKey;
   @override
   List<QueryInstance> get queries;
+
+  /// Create a copy of QueryListState
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  @JsonKey(ignore: true)
+  @JsonKey(includeFromJson: false, includeToJson: false)
   _$$QueryStateImplCopyWith<_$QueryStateImpl> get copyWith =>
       throw _privateConstructorUsedError;
 }
