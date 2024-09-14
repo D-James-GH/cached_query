@@ -107,3 +107,31 @@ final query = Query<String>(
   },
 );
 ```
+## Local Cache
+By default, all queries will be saved inside the `CachedQuery.instance` singleton. Most of the time this is enough. 
+However, it may be useful to have full control of the cache for different areas of an app to prevent leaking sensitive 
+information by not deleting the queries. Each query has a `cache` prop which allows you to pass in specific instance of `CachedQuery`.
+
+```dart
+final cache = CachedQuery.asNewInstance()
+  ..configFlutter();
+
+final query = Query(
+  cache: cache,
+  key: queryKey(id),
+  queryFn: () async {
+    final uri = Uri.parse(
+      'https://jsonplaceholder.typicode.com/posts/$id',
+    );
+    final res = await http.get(uri);
+    return PostModel.fromJson(
+      jsonDecode(res.body) as Map<String, dynamic>,
+    );
+  },
+);
+```
+A new instance of  `CachedQuery` can have a different config to the global one. 
+
+If no cache is passed the query will be cached in the default `CachedQuery.instance` singleton.
+
+A full example can be found here: https://github.com/D-James-GH/cached_query/tree/main/examples/multiple_caches

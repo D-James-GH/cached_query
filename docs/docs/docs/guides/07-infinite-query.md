@@ -129,5 +129,9 @@ final query = InfiniteQuery<String>(
 );
 ```
 
+## Local Cache
+Each infinite query can take a local cache as a prop.
+
+For more information, see [local cache](/docs/guides/query#local-cache).
 
 
