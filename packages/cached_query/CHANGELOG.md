@@ -1,3 +1,8 @@
+## 2.1.0
+
+ - **FEAT**: allow multiple caches in flutter. ([4429f6fe](https://github.com/D-James-GH/cached_query/commit/4429f6fef7077eed926f6ed1c2c0112846b2fe96))
+ - **FEAT**: allow passing a different cache to queries. ([aeb23396](https://github.com/D-James-GH/cached_query/commit/aeb23396b13346df45d47a7cd7b76ef4d7f51a89))
+
 ## 2.0.7
 
  - **FIX**: keep time stamp if updating manually. ([1655444e](https://github.com/D-James-GH/cached_query/commit/1655444e74dd77ba2eabdc6a800688ec118d2868))

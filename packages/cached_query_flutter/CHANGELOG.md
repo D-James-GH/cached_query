@@ -1,3 +1,8 @@
+## 2.3.0
+
+ - **FEAT**: allow multiple caches in flutter. ([4429f6fe](https://github.com/D-James-GH/cached_query/commit/4429f6fef7077eed926f6ed1c2c0112846b2fe96))
+ - **FEAT**: allow passing a different cache to queries. ([aeb23396](https://github.com/D-James-GH/cached_query/commit/aeb23396b13346df45d47a7cd7b76ef4d7f51a89))
+
 ## 2.2.0
 
  - **FEAT**: add enabled flag to consumer and listener. ([4c340484](https://github.com/D-James-GH/cached_query/commit/4c34048411565495dd891b0928edd9e2a7de9315))
