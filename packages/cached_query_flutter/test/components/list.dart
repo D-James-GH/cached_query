@@ -26,6 +26,14 @@ class _ListQueryState extends State<ListQuery> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      home: QueryBuilder<InfiniteQueryState<String>>(
+        queryKey: queryKey,
+        builder: (context, state) => ListView.builder(
+          itemBuilder: (context, index) {
+            if (state.data == null) return const SizedBox();
+            return Text(state.data![index]);
+          },
+          itemCount: state.length,
       home: InfiniteQueryBuilder<String, int>(
         queryKey: widget.queryKey,
         enabled: enabled,
@@ -65,11 +73,12 @@ class ListValue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final repo = InfiniteQueryRepo(response: response);
     return MaterialApp(
-      home: InfiniteQueryBuilder<String, int>(
+      home: QueryBuilder<InfiniteQueryState<String>>(
         buildWhen: buildWhen,
-        query: InfiniteQueryRepo(response: response).fetchList(),
-        builder: (context, state, query) {
+        query: repo.fetchList(),
+        builder: (context, state) {
           if (onBuild != null) {
             onBuild!();
           }
@@ -80,7 +89,7 @@ class ListValue extends StatelessWidget {
             children: [
               TextButton(
                 key: const Key("button"),
-                onPressed: () => query.getNextPage(),
+                onPressed: () => repo.fetchList().getNextPage(),
                 child: const Text("Get next page"),
               ),
               Expanded(

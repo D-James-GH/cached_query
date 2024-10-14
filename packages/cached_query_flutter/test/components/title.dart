@@ -15,7 +15,7 @@ class Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: QueryBuilder<String>(
+      home: QueryBuilder<QueryState<String>>(
         queryKey: queryKey,
         builder: (context, state) {
           if (onBuild != null) {

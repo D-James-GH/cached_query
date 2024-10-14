@@ -29,9 +29,9 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: InfiniteQueryBuilder(
+        title: QueryBuilder<InfiniteQueryState<dynamic>>(
           queryKey: 'posts',
-          builder: (context, state, _) {
+          builder: (context, state) {
             return Row(
               children: [
                 if (state.status == QueryStatus.loading)
@@ -45,9 +45,9 @@ class _PostListScreenState extends State<PostListScreen> {
         ),
         centerTitle: true,
       ),
-      body: InfiniteQueryBuilder<List<PostModel>, int>(
+      body: QueryBuilder<InfiniteQueryState<List<PostModel>>>(
           query: getPosts(),
-          builder: (context, state, query) {
+          builder: (context, state) {
             final allPosts = state.data?.expand((e) => e).toList();
             return CustomScrollView(
               controller: _scrollController,

@@ -8,26 +8,27 @@ import 'package:flutter/material.dart';
 ///
 /// Passes [BuildContext], [QueryState].
 /// {@endtemplate}
-typedef QueryBuilderCallback<T> = Widget Function(
+typedef QueryBuilderCallback<T extends QueryState<dynamic>> = Widget Function(
   BuildContext context,
-  QueryState<T> state,
+  T state,
 );
 
 /// {@template queryBuilderCondition}
 /// This function is being called everytime the query registered in the [QueryBuilder] receives new updates
 /// and let's you control when the [_QueryBuilderState.build] method should be called
 /// {@endtemplate}
-typedef QueryBuilderCondition<T> = FutureOr<bool> Function(
-  QueryState<T> oldState,
-  QueryState<T> newState,
+typedef QueryBuilderCondition<T extends QueryState<dynamic>> = FutureOr<bool>
+    Function(
+  T oldState,
+  T newState,
 );
 
 /// {@template queryBuilder}
 /// Listen to changes in an [Mutation] and build the ui with the result.
 /// {@endtemplate}
-class QueryBuilder<T> extends StatefulWidget {
+class QueryBuilder<T extends QueryState<dynamic>> extends StatefulWidget {
   /// The [Query] to used to update the ui.
-  final Query<T>? query;
+  final QueryBase<dynamic, T>? query;
 
   /// Whether the query should be called immediately.
   final bool enabled;
@@ -61,11 +62,12 @@ class QueryBuilder<T> extends StatefulWidget {
   State<QueryBuilder<T>> createState() => _QueryBuilderState<T>();
 }
 
-class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
-  late Query<T> _query;
-  late QueryState<T> _state;
+class _QueryBuilderState<T extends QueryState<dynamic>>
+    extends State<QueryBuilder<T>> {
+  late QueryBase<dynamic, T> _query;
+  late T _state;
 
-  StreamSubscription<QueryState<T>>? _subscription;
+  StreamSubscription<QueryState<dynamic>>? _subscription;
 
   @override
   void initState() {
@@ -76,8 +78,11 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
         q != null,
         "No query found with the key ${widget.queryKey}, have you created it yet?",
       );
-      assert(q is Query<T>, "Query found is not of type $T");
-      _query = q! as Query<T>;
+      assert(
+        q is QueryBase<dynamic, T>,
+        "Query found is not of type QueryBase<dynamic, $T>",
+      );
+      _query = q! as QueryBase<dynamic, T>;
     }
     if (widget.query != null) {
       _query = widget.query!;
@@ -93,11 +98,14 @@ class _QueryBuilderState<T> extends State<QueryBuilder<T>> {
         oldWidget.query ?? CachedQuery.instance.getQuery(oldWidget.queryKey!);
     final currentQuery =
         widget.query ?? CachedQuery.instance.getQuery(widget.queryKey!);
-    assert(currentQuery is Query<T>, "Query found is not of type $T");
+    assert(
+      currentQuery is QueryBase<dynamic, T>,
+      "Query found is not of type $T",
+    );
     if (oldQuery != currentQuery) {
       if (_subscription != null) {
         _unsubscribe();
-        _query = currentQuery as Query<T>;
+        _query = currentQuery as QueryBase<dynamic, T>;
         _state = _query.state;
       }
       if (widget.enabled) {
