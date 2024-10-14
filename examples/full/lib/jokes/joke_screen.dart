@@ -21,7 +21,7 @@ class JokeScreen extends StatelessWidget {
         title: Row(
           children: [
             const Text('jokes'),
-            QueryBuilder<JokeModel?>(
+            QueryBuilder<QueryState<JokeModel?>>(
               query: service.getJoke(),
               builder: (_, state) {
                 if (state.status == QueryStatus.loading) {
@@ -44,7 +44,7 @@ class JokeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: QueryBuilder<JokeModel?>(
+      body: QueryBuilder<QueryState<JokeModel?>>(
         query: service.getJoke(),
         builder: (_, state) {
           return Column(

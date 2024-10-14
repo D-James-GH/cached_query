@@ -1,7 +1,8 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:full/posts/post_model/post_model.dart';
-import 'post_service.dart' as service;
 import 'package:flutter/material.dart';
+import 'package:full/posts/post_model/post_model.dart';
+
+import 'post_service.dart' as service;
 
 class SinglePostScreen extends StatelessWidget {
   final int id;
@@ -40,7 +41,7 @@ class SinglePostScreen extends StatelessWidget {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: 50),
-            QueryBuilder<PostModel>(
+            QueryBuilder<QueryState<PostModel>>(
               query: service.getPostById(id),
               builder: (context, state) {
                 return Column(
@@ -55,7 +56,7 @@ class SinglePostScreen extends StatelessWidget {
               },
             ),
             const SizedBox(height: 50),
-            QueryBuilder<PostModel>(
+            QueryBuilder<QueryState<PostModel>>(
               query: service.getPostById(id + 1),
               builder: (context, state) {
                 return Column(

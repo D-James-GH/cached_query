@@ -32,9 +32,9 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: InfiniteQueryBuilder(
+        title: QueryBuilder<InfiniteQueryState<List<PostModel>>>(
           queryKey: 'posts',
-          builder: (context, state, _) {
+          builder: (context, state) {
             return Row(
               children: [
                 if (state.status == QueryStatus.loading)
@@ -80,9 +80,9 @@ class _PostListScreenState extends State<PostListScreen> {
           ),
         ],
       ),
-      body: InfiniteQueryBuilder<List<PostModel>, int>(
+      body: QueryBuilder<InfiniteQueryState<List<PostModel>>>(
         query: query,
-        builder: (context, state, query) {
+        builder: (context, state) {
           if (state.data != null && state.data!.isNotEmpty) {
             final allPosts = state.data!.expand((e) => e).toList();
 

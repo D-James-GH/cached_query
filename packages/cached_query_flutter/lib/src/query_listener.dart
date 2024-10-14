@@ -8,23 +8,26 @@ import 'package:flutter/material.dart';
 ///
 /// Passes [QueryState].
 /// {@endtemplate}
-typedef QueryListenerCallback<T> = void Function(QueryState<T> state);
+typedef QueryListenerCallback<T extends QueryState<dynamic>> = void Function(
+  T state,
+);
 
 /// {@template queryListenerCondition}
 /// This function is being called every time the query registered in the [QueryListener] receives new updates
 /// and let's you control when the [QueryListenerCallback] should be called
 /// {@endtemplate}
-typedef QueryListenerCondition<T> = FutureOr<bool> Function(
-  QueryState<T> oldState,
-  QueryState<T> newState,
+typedef QueryListenerCondition<T extends QueryState<dynamic>> = FutureOr<bool>
+    Function(
+  T oldState,
+  T newState,
 );
 
 /// {@template queryListener}
 /// Listen to changes in an [Query] and call the listener with the result.
 /// {@endtemplate}
-class QueryListener<T> extends StatefulWidget {
+class QueryListener<T extends QueryState<dynamic>> extends StatefulWidget {
   /// The [Query] to used to update the listener.
-  final Query<T>? query;
+  final QueryBase<dynamic, T>? query;
 
   /// Whether the query should be called immediately.
   final bool enabled;
@@ -63,11 +66,12 @@ class QueryListener<T> extends StatefulWidget {
   State<QueryListener<T>> createState() => _QueryListenerState<T>();
 }
 
-class _QueryListenerState<T> extends State<QueryListener<T>> {
-  late Query<T> _query;
-  late QueryState<T> _previousState;
+class _QueryListenerState<T extends QueryState<dynamic>>
+    extends State<QueryListener<T>> {
+  late QueryBase<dynamic, T> _query;
+  late T _previousState;
 
-  StreamSubscription<QueryState<T>>? _subscription;
+  StreamSubscription<T>? _subscription;
 
   @override
   void initState() {
@@ -78,8 +82,11 @@ class _QueryListenerState<T> extends State<QueryListener<T>> {
         q != null,
         "No query found with the key ${widget.queryKey}, have you created it yet?",
       );
-      assert(q is Query<T>, "Query found is not of type $T");
-      _query = q! as Query<T>;
+      assert(
+        q is QueryBase<dynamic, T>,
+        "Query found is not of type QueryBase<dynamic, $T>",
+      );
+      _query = q! as QueryBase<dynamic, T>;
     }
     if (widget.query != null) {
       _query = widget.query!;
@@ -99,7 +106,7 @@ class _QueryListenerState<T> extends State<QueryListener<T>> {
     if (oldQuery != currentQuery) {
       if (_subscription != null) {
         _unsubscribe();
-        _query = currentQuery as Query<T>;
+        _query = currentQuery as QueryBase<dynamic, T>;
         _previousState = _query.state;
       }
       if (widget.enabled) {

@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use_from_same_package
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -27,6 +28,7 @@ typedef InfiniteQueryBuilderCondition<T> = FutureOr<bool> Function(
 /// {@template infiniteQueryBuilder}
 /// Listen to changed in an [InfiniteQuery] and build the ui with the result.
 /// {@endtemplate}
+@Deprecated("Use QueryBuilder instead.")
 class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   /// The [InfiniteQuery] to watch.
   final InfiniteQuery<T, A>? query;
@@ -46,6 +48,7 @@ class InfiniteQueryBuilder<T, A> extends StatefulWidget {
   /// {@macro infiniteQueryBuilder}
   ///
   /// The value constructor takes an infinite query rather than a key.
+  @Deprecated("Use QueryBuilder instead.")
   const InfiniteQueryBuilder({
     super.key,
     this.query,

@@ -13,7 +13,7 @@ class Post extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return QueryBuilder<PostModel>(
+    return QueryBuilder<QueryState<PostModel>>(
       enabled: enabled,
       // Can use key if the query already exists.
       queryKey: service.postKey(id),
