@@ -29,14 +29,14 @@ class QueryConsumer<T extends QueryState<dynamic>> extends StatelessWidget {
 
   /// {@macro QueryConsumer}
   const QueryConsumer({
-    Key? key,
+    super.key,
     this.enabled = true,
     required this.query,
     required this.listener,
     this.listenWhen,
     required this.builder,
     this.buildWhen,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
