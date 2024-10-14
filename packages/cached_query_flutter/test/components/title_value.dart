@@ -9,7 +9,7 @@ class TitleValue extends StatefulWidget {
   final bool enabled;
   final void Function()? onBuild;
   final Duration? queryDelay;
-  final QueryBuilderCondition<String>? buildWhen;
+  final QueryBuilderCondition<QueryState<String>>? buildWhen;
 
   const TitleValue({
     super.key,

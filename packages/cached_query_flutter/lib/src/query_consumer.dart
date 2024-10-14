@@ -8,9 +8,9 @@ import 'query_listener.dart';
 /// Combination of [QueryBuilder] and [QueryListener] which allows listening to specific query changes
 /// and also rebuilds on query changes.
 /// {@endtemplate}
-class QueryConsumer<T> extends StatelessWidget {
+class QueryConsumer<T extends QueryState<dynamic>> extends StatelessWidget {
   /// The [Query] to used to update the listener.
-  final Query<T> query;
+  final QueryBase<dynamic, T> query;
 
   /// Whether the query should be called immediately.
   final bool enabled;
@@ -45,7 +45,7 @@ class QueryConsumer<T> extends StatelessWidget {
       listener: listener,
       enabled: enabled,
       listenWhen: listenWhen,
-      child: QueryBuilder(
+      child: QueryBuilder<T>(
         query: query,
         enabled: enabled,
         buildWhen: buildWhen,
