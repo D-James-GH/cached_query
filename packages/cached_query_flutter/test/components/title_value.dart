@@ -44,7 +44,7 @@ class TitleValueState extends State<TitleValue> {
             onPressed: () => setState(() => enabled = !enabled),
             child: const Text("enable"),
           ),
-          QueryBuilder<String>(
+          QueryBuilder<QueryState<String>>(
             enabled: enabled,
             query: TitleRepo(
               response: widget.response,

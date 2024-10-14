@@ -68,7 +68,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     required List<T>? initialData,
     required this.forceRevalidateAll,
     required this.revalidateAll,
-    required CachedQuery cache,
+    required super.cache,
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
   })  : _getNextArg = getNextArg,
@@ -76,7 +76,6 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _onSuccess = onSuccess,
         _onError = onError,
         super._internal(
-          cache: cache,
           state: InfiniteQueryState<T>(
             getNextArg: getNextArg,
             data: initialData ?? [],
