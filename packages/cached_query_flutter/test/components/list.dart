@@ -7,8 +7,7 @@ class ListQuery extends StatefulWidget {
   final bool enabled;
   final Object queryKey;
 
-  const ListQuery({Key? key, required this.queryKey, this.enabled = true})
-      : super(key: key);
+  const ListQuery({super.key, required this.queryKey, this.enabled = true});
 
   @override
   State<ListQuery> createState() => _ListQueryState();
@@ -27,17 +26,9 @@ class _ListQueryState extends State<ListQuery> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: QueryBuilder<InfiniteQueryState<String>>(
-        queryKey: queryKey,
-        builder: (context, state) => ListView.builder(
-          itemBuilder: (context, index) {
-            if (state.data == null) return const SizedBox();
-            return Text(state.data![index]);
-          },
-          itemCount: state.length,
-      home: InfiniteQueryBuilder<String, int>(
         queryKey: widget.queryKey,
         enabled: enabled,
-        builder: (context, state, query) => ListView(
+        builder: (context, state) => ListView(
           children: [
             ElevatedButton(
               key: const Key("enable-button"),

@@ -49,18 +49,17 @@ class QueryListener<T extends QueryState<dynamic>> extends StatefulWidget {
 
   /// {@macro queryListener}
   const QueryListener({
-    Key? key,
+    super.key,
     this.enabled = true,
     this.query,
     this.queryKey,
     this.listenWhen,
     required this.listener,
     required this.child,
-  })  : assert(
+  }) : assert(
           query != null || queryKey != null,
           "Query key or a query must be provided.",
-        ),
-        super(key: key);
+        );
 
   @override
   State<QueryListener<T>> createState() => _QueryListenerState<T>();
