@@ -57,9 +57,9 @@ class _ListState extends State<_List> {
     return BlocBuilder<PostWithBuilderBloc, PostWithBuilderState>(
       builder: (context, state) {
         if (state is PostWithBuilderSuccess) {
-          return InfiniteQueryBuilder<List<PostModel>, int>(
+          return QueryBuilder<InfiniteQueryState<List<PostModel>>>(
             query: state.postQuery,
-            builder: (context, state, query) {
+            builder: (context, state) {
               if (state.data != null && state.data!.isNotEmpty) {
                 final allPosts = state.data!.expand((e) => e).toList();
                 return CustomScrollView(
