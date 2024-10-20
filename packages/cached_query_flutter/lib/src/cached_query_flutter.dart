@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:cached_query_flutter/src/connectivity_controller.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +40,9 @@ extension CachedQueryExt on CachedQuery {
       observers: observers,
     );
 
-    _refetchOnResume();
+    final minBackgroundDuration = config?.refetchOnResumeMinBackgroundDuration ?? QueryConfigFlutter.defaults.refetchOnResumeMinBackgroundDuration;
+
+    _setupRefetchOnResume(minBackgroundDuration);
 
     if (!neverCheckConnection) {
       ConnectivityController.instance.addListener(() {
@@ -64,16 +68,16 @@ extension CachedQueryExt on CachedQuery {
         shouldRefetch = true;
       } else if (reason == RefetchReason.resume) {
         if (config is QueryConfigFlutter) {
-          shouldRefetch = config.refetchOnResume ?? _getDefaultOnResume();
+          shouldRefetch = config.refetchOnResume;
         } else {
-          shouldRefetch = _getDefaultOnResume();
+          shouldRefetch = QueryConfigFlutter.defaults.refetchOnResume;
         }
       } else if (reason == RefetchReason.connectivity) {
         if (config is QueryConfigFlutter) {
           shouldRefetch =
-              config.refetchOnConnection ?? _getDefaultOnConnection();
+              config.refetchOnConnection;
         } else {
-          shouldRefetch = _getDefaultOnConnection();
+          shouldRefetch = QueryConfigFlutter.defaults.refetchOnConnection;
         }
       }
 
@@ -83,37 +87,48 @@ extension CachedQueryExt on CachedQuery {
     }
   }
 
-  bool _getDefaultOnResume() {
-    final config = defaultConfig;
-    if (config is QueryConfigFlutter) {
-      return config.refetchOnResume ?? true;
-    }
-    return true;
-  }
-
-  bool _getDefaultOnConnection() {
-    final config = defaultConfig;
-    if (config is QueryConfigFlutter) {
-      return config.refetchOnConnection ?? true;
-    }
-    return true;
-  }
-
   /// If the app comes back into the foreground refetch any queries that have listeners.
-  void _refetchOnResume() {
-    WidgetsBinding.instance.addObserver(_LifecycleObserver(this));
+  void _setupRefetchOnResume(Duration minBackgroundDuration) {
+    WidgetsBinding.instance.addObserver(_LifecycleObserver(this, minBackgroundDuration));
   }
 }
 
 class _LifecycleObserver extends WidgetsBindingObserver {
   final CachedQuery cache;
+  final Duration minBackgroundDuration;
 
-  _LifecycleObserver(this.cache);
+  _LifecycleObserver(this.cache, this.minBackgroundDuration);
+
+  DateTime? _lastPaused;
+
+  bool shouldNotify() {
+    if (_lastPaused == null) {
+      if (Platform.isIOS || Platform.isAndroid) {
+        return false;
+      }
+      // Note: Other platforms might never enter full background mode so we
+      // return true to be safe (only if we have no last paused time).
+      return true;
+    }
+
+    final diff = DateTime.now().difference(_lastPaused!);
+    return diff > minBackgroundDuration;
+  }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      cache.refetchCurrentQueries(RefetchReason.resume);
+      final shouldNotify = this.shouldNotify();
+      _lastPaused = null;
+
+      if (shouldNotify) {
+        cache.refetchCurrentQueries(RefetchReason.resume);
+      }
+      return;
+    }
+
+    if (state == AppLifecycleState.paused) {
+      _lastPaused = DateTime.now();
     }
   }
 }
