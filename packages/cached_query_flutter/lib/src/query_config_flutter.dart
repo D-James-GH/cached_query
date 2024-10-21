@@ -5,25 +5,25 @@ import 'package:cached_query/cached_query.dart';
 /// {@endtemplate}
 class QueryConfigFlutter extends QueryConfig {
   /// Whether this query should be re-fetched when the app comes into the foreground
-  /// 
+  ///
   /// Defaults to true.
   final bool refetchOnResume;
 
   /// How long the app needs to stay in the background before refetching the
   /// query if [refetchOnResume] is true.
-  /// 
+  ///
   /// Defaults to 5 seconds.
-  /// 
-  /// Note: 
+  ///
+  /// Note:
   /// Some Android devices with missconfigured settings appear to trigger
   /// forground and background events in quick succession while beeing
-  /// constantly in the foreground. 
+  /// constantly in the foreground.
   /// Having a value greater than 500ms will prevent those devices from
   /// refetching the query on these kinds of sketchy events.
   final Duration refetchOnResumeMinBackgroundDuration;
 
   /// Whether this query should be re-fetched when the device gains connection
-  /// 
+  ///
   /// Defaults to true.
   final bool refetchOnConnection;
 
@@ -57,7 +57,6 @@ class QueryConfigFlutter extends QueryConfig {
           shouldRethrow: shouldRethrow,
         );
 
-  
   /// Returns a flutter query config with the default values.
   static final QueryConfigFlutter defaults = QueryConfigFlutter(
     // Note: leaving out non optional parameters, as they get their defaults

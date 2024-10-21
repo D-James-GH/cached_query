@@ -40,7 +40,9 @@ extension CachedQueryExt on CachedQuery {
       observers: observers,
     );
 
-    final minBackgroundDuration = config?.refetchOnResumeMinBackgroundDuration ?? QueryConfigFlutter.defaults.refetchOnResumeMinBackgroundDuration;
+    final minBackgroundDuration =
+        config?.refetchOnResumeMinBackgroundDuration ??
+            QueryConfigFlutter.defaults.refetchOnResumeMinBackgroundDuration;
 
     _setupRefetchOnResume(minBackgroundDuration);
 
@@ -74,8 +76,7 @@ extension CachedQueryExt on CachedQuery {
         }
       } else if (reason == RefetchReason.connectivity) {
         if (config is QueryConfigFlutter) {
-          shouldRefetch =
-              config.refetchOnConnection;
+          shouldRefetch = config.refetchOnConnection;
         } else {
           shouldRefetch = QueryConfigFlutter.defaults.refetchOnConnection;
         }
@@ -89,7 +90,8 @@ extension CachedQueryExt on CachedQuery {
 
   /// If the app comes back into the foreground refetch any queries that have listeners.
   void _setupRefetchOnResume(Duration minBackgroundDuration) {
-    WidgetsBinding.instance.addObserver(_LifecycleObserver(this, minBackgroundDuration));
+    WidgetsBinding.instance
+        .addObserver(_LifecycleObserver(this, minBackgroundDuration));
   }
 }
 
