@@ -1,14 +1,13 @@
 import 'dart:convert';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:http/http.dart' as http;
 import 'package:full/posts/post_model/post_model.dart';
+import 'package:http/http.dart' as http;
 
 InfiniteQuery<List<PostModel>, int> getPosts() {
   return InfiniteQuery<List<PostModel>, int>(
     key: 'posts',
     config: QueryConfigFlutter(
-      refetchOnResume: true,
       storageDuration: const Duration(seconds: 10),
       storeQuery: true,
       refetchDuration: const Duration(seconds: 2),

@@ -87,10 +87,7 @@ void main() {
     test("Can set refetch config per query", () async {
       final query = MockQuery<String>();
       when(query.config).thenReturn(
-        QueryConfigFlutter(
-          refetchOnResume: true,
-          refetchOnConnection: true,
-        ),
+        QueryConfigFlutter(),
       );
       when(query.hasListener).thenReturn(true);
       when(query.key).thenReturn("hasListeners");
@@ -132,7 +129,7 @@ void main() {
       final q = Query<String>(
         key: "global",
         queryFn: () async => "",
-        config: QueryConfigFlutter(refetchOnResume: true),
+        config: QueryConfigFlutter(),
       );
       expect((q.config as QueryConfigFlutter).refetchOnResume, true);
     });
