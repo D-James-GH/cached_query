@@ -1,3 +1,7 @@
+## 2.4.0
+
+ - **FEAT**: added background duration to fetchOnResume ([#52](https://github.com/D-James-GH/cached_query/issues/52)). ([1e71c9b2](https://github.com/D-James-GH/cached_query/commit/1e71c9b28fa9517525389193321002db73db9395))
+
 ## 2.3.0
 
  - **FEAT**: allow multiple caches in flutter. ([4429f6fe](https://github.com/D-James-GH/cached_query/commit/4429f6fef7077eed926f6ed1c2c0112846b2fe96))

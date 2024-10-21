@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-10-21
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query_flutter` - `v2.4.0`](#cached_query_flutter---v240)
+
+---
+
+#### `cached_query_flutter` - `v2.4.0`
+
+ - **FEAT**: added background duration to fetchOnResume ([#52](https://github.com/D-James-GH/cached_query/issues/52)). ([1e71c9b2](https://github.com/D-James-GH/cached_query/commit/1e71c9b28fa9517525389193321002db73db9395))
+
+
 ## 2024-09-14
 
 ### Changes
