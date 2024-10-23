@@ -1,3 +1,7 @@
+## 2.1.1
+
+ - **FIX**: typing improvements. ([c45c8f52](https://github.com/D-James-GH/cached_query/commit/c45c8f52741097b3c3ad7f6092df178f946e7154))
+
 ## 2.1.0
 
  - **FEAT**: allow multiple caches in flutter. ([4429f6fe](https://github.com/D-James-GH/cached_query/commit/4429f6fef7077eed926f6ed1c2c0112846b2fe96))

@@ -1,3 +1,7 @@
+## 2.4.1
+
+ - Update a dependency to the latest release.
+
 ## 2.4.0
 
  - **FEAT**: added background duration to fetchOnResume ([#52](https://github.com/D-James-GH/cached_query/issues/52)). ([1e71c9b2](https://github.com/D-James-GH/cached_query/commit/1e71c9b28fa9517525389193321002db73db9395))
