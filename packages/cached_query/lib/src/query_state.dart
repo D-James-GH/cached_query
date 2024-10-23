@@ -38,7 +38,7 @@ extension QueryStatusExt on QueryStatus {
 /// Is returned as the result of a query and emitted down the query stream.
 /// Should not be instantiated manually.
 /// {@endtemplate}
-class QueryState<T> implements StateBase {
+class QueryState<T> implements StateBase<T> {
   /// Current data of the query.
   @override
   final T? data;

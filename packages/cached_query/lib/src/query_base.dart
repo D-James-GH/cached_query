@@ -3,19 +3,19 @@ part of "cached_query.dart";
 /// On success is called when the query function is executed successfully.
 ///
 /// Passes the returned data.
-typedef OnQuerySuccessCallback<T> = void Function(T);
+typedef OnQuerySuccessCallback<T> = void Function(T data);
 
 /// On success is called when the query function is executed successfully.
 ///
 /// Passes the error through.
-typedef OnQueryErrorCallback<T> = void Function(dynamic);
+typedef OnQueryErrorCallback<T> = void Function(dynamic error);
 
 /// {@template stateBase}
 /// An Interface for both [QueryState] and [InfiniteQueryState].
 /// {@endtemplate}
-abstract class StateBase {
+abstract class StateBase<T> {
   /// Current data of the query.
-  dynamic get data;
+  T? get data;
 
   /// Timestamp of the query.
   ///
@@ -34,7 +34,7 @@ abstract class StateBase {
 /// {@template queryBase}
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
-abstract class QueryBase<T, State extends QueryState<dynamic>> {
+abstract class QueryBase<T, State extends QueryState<T>> {
   QueryBase._internal({
     required this.key,
     required this.unencodedKey,

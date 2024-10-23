@@ -23,7 +23,7 @@ typedef QueryFunc<T> = Future<T> Function();
 ///
 /// {@endtemplate}
 class Query<T> extends QueryBase<T, QueryState<T>> {
-  final Function _queryFn;
+  final Future<T> Function() _queryFn;
 
   /// On success is called when the query function is executed successfully.
   ///
@@ -42,7 +42,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     required String key,
     required Object unencodedKey,
     required QueryConfig? config,
-    required Function queryFn,
+    required Future<T> Function() queryFn,
     required T? initialData,
   })  : _queryFn = queryFn,
         _onError = onError,
@@ -149,7 +149,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         }
       }
 
-      final res = await (_queryFn() as Future<T>);
+      final res = await _queryFn();
       if (_onSuccess != null) {
         _onSuccess!(res);
       }

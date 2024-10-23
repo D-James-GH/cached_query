@@ -1,23 +1,13 @@
 part of 'cached_query.dart';
 
-/// On success is called when the query function is executed successfully.
-///
-/// Passes the returned data.
-typedef OnInfiniteQuerySuccessCallback<T> = void Function(T);
-
-/// On success is called when the query function is executed successfully.
-///
-/// Passes the error through.
-typedef OnInfiniteQueryErrorCallback<T> = void Function(dynamic);
-
 /// The result of the [InfiniteQueryFunc] will be cached.
-typedef InfiniteQueryFunc<T, A> = Future<T> Function(A);
+typedef InfiniteQueryFunc<T, A> = Future<T> Function(A pageArgs);
 
 /// Determines the parameters of the next page in an infinite query.
 ///
 /// Return null if the last page has already been fetch and therefore trigger
 /// [InfiniteQueryState.hasReachedMax] to equal `true`.
-typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryState<T>);
+typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryState<T> state);
 
 /// {@template infiniteQuery}
 ///

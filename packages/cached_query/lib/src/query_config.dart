@@ -10,7 +10,7 @@ import '../cached_query.dart';
 /// If no [ShouldRefetch] is passed; all normal caching rules apply.
 /// {@endtemplate}
 typedef ShouldRefetch = bool Function(
-  QueryBase<dynamic, dynamic>,
+  QueryBase<dynamic, dynamic> query,
   // ignore: avoid_positional_boolean_parameters
   bool afterStorage,
 );

@@ -15,7 +15,7 @@ part "query_base.dart";
 /// Should return true if a condition is met.
 ///
 /// Similar to List.where.
-typedef WhereCallback = bool Function(QueryBase<dynamic, dynamic>);
+typedef WhereCallback = bool Function(QueryBase<dynamic, dynamic> query);
 
 /// Used to serialize or deserialize the query from storage.
 typedef Serializer = dynamic Function(dynamic json);

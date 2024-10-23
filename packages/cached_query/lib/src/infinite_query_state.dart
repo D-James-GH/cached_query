@@ -4,7 +4,7 @@ import 'package:cached_query/cached_query.dart';
 /// [InfiniteQueryState] holds the current state of an [InfiniteQuery]
 /// {@endtemplate}
 class InfiniteQueryState<T> extends QueryState<List<T>> {
-  final dynamic Function(InfiniteQueryState<T>) _getNextArg;
+  final Object? Function(InfiniteQueryState<T>) _getNextArg;
 
   /// True if there are no more pages available to fetch.
   ///
