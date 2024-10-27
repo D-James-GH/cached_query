@@ -13,12 +13,12 @@ dependencies:
   flutter:
     sdk: flutter
   cached_query: ^2.1.2
-  connectivity_plus: ^6.0.3
+  connectivity_plus: ^6.1.0
 
 dev_dependencies:
   flutter_lints: ^3.0.0
   mockito: ^5.4.4
-  connectivity_plus_platform_interface: ^2.0.0
+  connectivity_plus_platform_interface: ^2.0.1
   build_runner:
   flutter_test:
     sdk: flutter

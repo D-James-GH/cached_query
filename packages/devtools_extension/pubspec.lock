@@ -124,7 +124,7 @@ packages:
       path: "../cached_query"
       relative: true
     source: path
-    version: "2.1.0"
+    version: "2.1.2"
   characters:
     dependency: transitive
     description:
