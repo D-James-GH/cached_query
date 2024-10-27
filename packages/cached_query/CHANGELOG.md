@@ -1,3 +1,7 @@
+## 2.1.2
+
+ - **REFACTOR**: depriciate hasreachedmax on infinite query state. ([3231390e](https://github.com/D-James-GH/cached_query/commit/3231390e5bf2f9d5f53da0ec6914728851754d70))
+
 ## 2.1.1
 
  - **FIX**: typing improvements. ([c45c8f52](https://github.com/D-James-GH/cached_query/commit/c45c8f52741097b3c3ad7f6092df178f946e7154))
