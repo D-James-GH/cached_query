@@ -65,6 +65,7 @@ class InfiniteQueryState<T> extends QueryState<List<T>> {
           data == other.data &&
           timeCreated == other.timeCreated &&
           error == other.error &&
+          // ignore: deprecated_member_use_from_same_package
           hasReachedMax == other.hasReachedMax &&
           status == other.status;
 
@@ -74,5 +75,6 @@ class InfiniteQueryState<T> extends QueryState<List<T>> {
       data.hashCode ^
       status.hashCode ^
       error.hashCode ^
+      // ignore: deprecated_member_use_from_same_package
       hasReachedMax.hashCode;
 }

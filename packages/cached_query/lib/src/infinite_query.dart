@@ -6,7 +6,7 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A pageArgs);
 /// Determines the parameters of the next page in an infinite query.
 ///
 /// Return null if the last page has already been fetch and therefore trigger
-/// [InfiniteQueryState.hasReachedMax] to equal `true`.
+/// [InfiniteQuery.hasReachedMax] to equal `true`.
 typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryState<T> state);
 
 /// {@template infiniteQuery}
