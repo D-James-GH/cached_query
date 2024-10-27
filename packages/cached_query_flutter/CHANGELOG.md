@@ -1,3 +1,7 @@
+## 2.4.3
+
+ - **REFACTOR**: package update. ([22944de7](https://github.com/D-James-GH/cached_query/commit/22944de756865c7e77138a372fd20489ebae5519))
+
 ## 2.4.2
 
  - Update a dependency to the latest release.

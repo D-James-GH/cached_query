@@ -1,3 +1,7 @@
+## 2.1.3
+
+ - **FIX**: ignore deprecated warning for hasReachedMax. ([efbaa5c4](https://github.com/D-James-GH/cached_query/commit/efbaa5c4d9e8830d393933344520496ac12c67e5))
+
 ## 2.1.2
 
  - **REFACTOR**: depriciate hasreachedmax on infinite query state. ([3231390e](https://github.com/D-James-GH/cached_query/commit/3231390e5bf2f9d5f53da0ec6914728851754d70))

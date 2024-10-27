@@ -15,6 +15,39 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`cached_query` - `v2.1.3`](#cached_query---v213)
+ - [`cached_query_flutter` - `v2.4.3`](#cached_query_flutter---v243)
+ - [`cached_storage` - `v2.0.11`](#cached_storage---v2011)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v2.0.11`
+
+---
+
+#### `cached_query` - `v2.1.3`
+
+ - **FIX**: ignore deprecated warning for hasReachedMax. ([efbaa5c4](https://github.com/D-James-GH/cached_query/commit/efbaa5c4d9e8830d393933344520496ac12c67e5))
+
+#### `cached_query_flutter` - `v2.4.3`
+
+ - **REFACTOR**: package update. ([22944de7](https://github.com/D-James-GH/cached_query/commit/22944de756865c7e77138a372fd20489ebae5519))
+
+
+## 2024-10-27
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`cached_query` - `v2.1.2`](#cached_query---v212)
  - [`cached_storage` - `v2.0.10`](#cached_storage---v2010)
  - [`cached_query_flutter` - `v2.4.2`](#cached_query_flutter---v242)
