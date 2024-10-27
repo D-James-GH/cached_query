@@ -9,6 +9,7 @@ class InfiniteQueryState<T> extends QueryState<List<T>> {
   /// True if there are no more pages available to fetch.
   ///
   /// Calculated using [GetNextArg], if it has returned null then this is true.
+  @Deprecated("Use the function on the query (InfiniteQuery.hasReachedMax())")
   bool get hasReachedMax => _getNextArg(this) == null;
 
   /// The last response from the queryFn
