@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:cached_query_flutter/src/connectivity_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// The reason the cache is being refetched.
@@ -105,7 +106,7 @@ class _LifecycleObserver extends WidgetsBindingObserver {
 
   bool shouldNotify() {
     if (_lastPaused == null) {
-      if (Platform.isIOS || Platform.isAndroid) {
+      if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
         return false;
       }
       // Note: Other platforms might never enter full background mode so we

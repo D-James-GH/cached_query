@@ -163,6 +163,10 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       lastPage: _state.lastPage,
     );
     _setState(newState);
+    if (config.storeQuery) {
+      // save to local storage if exists
+      _saveToStorage();
+    }
     _emit();
   }
 
