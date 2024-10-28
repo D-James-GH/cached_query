@@ -110,6 +110,10 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     );
 
     _setState(newState);
+    if (config.storeQuery) {
+      // save to local storage if exists
+      _saveToStorage();
+    }
     _emit();
   }
 
