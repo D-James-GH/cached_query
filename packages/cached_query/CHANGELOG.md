@@ -1,3 +1,7 @@
+## 2.1.4
+
+ - **FIX**: manual query update > local storage & web platform check ([#55](https://github.com/D-James-GH/cached_query/issues/55)). ([1a1ac507](https://github.com/D-James-GH/cached_query/commit/1a1ac507c116f101f498a89b58c52f8ebde98134))
+
 ## 2.1.3
 
  - **FIX**: ignore deprecated warning for hasReachedMax. ([efbaa5c4](https://github.com/D-James-GH/cached_query/commit/efbaa5c4d9e8830d393933344520496ac12c67e5))

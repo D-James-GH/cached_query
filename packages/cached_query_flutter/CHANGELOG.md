@@ -1,3 +1,8 @@
+## 2.4.4
+
+ - **REFACTOR**: package update. ([22944de7](https://github.com/D-James-GH/cached_query/commit/22944de756865c7e77138a372fd20489ebae5519))
+ - **FIX**: manual query update > local storage & web platform check ([#55](https://github.com/D-James-GH/cached_query/issues/55)). ([1a1ac507](https://github.com/D-James-GH/cached_query/commit/1a1ac507c116f101f498a89b58c52f8ebde98134))
+
 ## 2.4.3
 
  - **REFACTOR**: package update. ([22944de7](https://github.com/D-James-GH/cached_query/commit/22944de756865c7e77138a372fd20489ebae5519))

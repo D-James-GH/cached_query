@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-10-28
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v2.1.4`](#cached_query---v214)
+ - [`cached_query_flutter` - `v2.4.4`](#cached_query_flutter---v244)
+ - [`cached_storage` - `v2.0.12`](#cached_storage---v2012)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v2.0.12`
+
+---
+
+#### `cached_query` - `v2.1.4`
+
+ - **FIX**: manual query update > local storage & web platform check ([#55](https://github.com/D-James-GH/cached_query/issues/55)). ([1a1ac507](https://github.com/D-James-GH/cached_query/commit/1a1ac507c116f101f498a89b58c52f8ebde98134))
+
+#### `cached_query_flutter` - `v2.4.4`
+
+ - **REFACTOR**: package update. ([22944de7](https://github.com/D-James-GH/cached_query/commit/22944de756865c7e77138a372fd20489ebae5519))
+ - **FIX**: manual query update > local storage & web platform check ([#55](https://github.com/D-James-GH/cached_query/issues/55)). ([1a1ac507](https://github.com/D-James-GH/cached_query/commit/1a1ac507c116f101f498a89b58c52f8ebde98134))
+
+
 ## 2024-10-27
 
 ### Changes
