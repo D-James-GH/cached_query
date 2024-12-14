@@ -16,7 +16,7 @@ dependencies:
   riverpod_annotation: ^2.3.5
   vm_service: ^14.2.2
   logger: ^2.3.0
-  cached_query: ^2.1.4
+  cached_query: ^2.2.0
   collection: ^1.18.0
 
 dev_dependencies:
