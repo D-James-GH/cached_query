@@ -260,25 +260,29 @@ class CachedQuery {
   ///
   /// Pass a List of keys to refetch specific queries.
   /// Pass a [filterFn] to "fuzzy" match queries to refetch.
-  void refetchQueries({KeyFilterFunc? filterFn, List<Object>? keys}) {
+  Future<void> refetchQueries({
+    KeyFilterFunc? filterFn,
+    List<Object>? keys,
+  }) async {
     assert(
       filterFn != null || keys != null,
       "Either filterFn or keys must not be null",
     );
+
+    final List<QueryBase<dynamic, dynamic>> queries = [];
+
     if (filterFn != null) {
-      final queries = _filterQueryKey(filter: filterFn);
-      for (final query in queries) {
-        query.refetch();
-      }
+      queries.addAll(_filterQueryKey(filter: filterFn));
     }
     if (keys != null) {
       for (final key in keys) {
         final k = encodeKey(key);
         if (_queryCache.containsKey(k)) {
-          _queryCache[k]!.refetch();
+          queries.add(_queryCache[k]!);
         }
       }
     }
+    await Future.wait(queries.map((q) => q.refetch()));
   }
 
   /// Add a query to the cache.

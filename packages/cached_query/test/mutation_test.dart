@@ -181,17 +181,24 @@ void main() {
   });
   group("Optional side effects", () {
     test("Queries should be re-fetched", () async {
-      const key = "refetch";
-      final query = MockQuery<String>();
-      when(query.key).thenReturn(key);
+      const key = "QueriesRefetch";
+      int count = 0;
+      final query = Query(
+        key: key,
+        queryFn: () async {
+          count++;
+          return "";
+        },
+      );
       CachedQuery.instance.addQuery(query);
+      await query.result;
       final mutation = Mutation<String, void>(
         refetchQueries: [key],
         queryFn: (_) async => "",
       );
       await mutation.mutate();
-      verify(query.refetch());
-      // expect(errorCount, 1);
+      await Future.delayed(Duration.zero, () {});
+      expect(count, 2);
     });
     test("Queries should be invalidated", () async {
       const key = "invalidate";

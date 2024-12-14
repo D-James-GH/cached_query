@@ -21,6 +21,8 @@ final cachedQueryEvalProvider =
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef CachedQueryEvalRef = AutoDisposeFutureProviderRef<CachedQueryEval>;
 String _$eventStreamHash() => r'1bac564e092dc4ce206cf7206514acf73f19efd7';
 
@@ -35,6 +37,8 @@ final eventStreamProvider = AutoDisposeStreamProvider<AppEvent>.internal(
   allTransitiveDependencies: null,
 );
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 typedef EventStreamRef = AutoDisposeStreamProviderRef<AppEvent>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -282,6 +282,42 @@ void main() {
       verify(query2.refetch());
       verifyNever(query3.refetch());
     });
+
+    test("Refetch awaits the result of all queries", () async {
+      final cachedQuery = CachedQuery.asNewInstance();
+      int query1Fetched = 0;
+      final query1 = Query(
+        key: "query1",
+        cache: cachedQuery,
+        queryFn: () async {
+          query1Fetched++;
+          return Future.delayed(
+            const Duration(milliseconds: 300),
+            () => "query1",
+          );
+        },
+      );
+      int query2Fetched = 0;
+      final query2 = Query(
+        key: "query2",
+        cache: cachedQuery,
+        queryFn: () async {
+          query2Fetched++;
+          return Future.delayed(
+            const Duration(milliseconds: 300),
+            () => "query2",
+          );
+        },
+      );
+      await Future.wait([query1.result, query2.result]);
+      final timer = Stopwatch()..start();
+      await cachedQuery.refetchQueries(keys: ["query1", "query2"]);
+      timer.stop();
+      expect(query1Fetched, 2);
+      expect(query2Fetched, 2);
+      expect(timer.elapsedMilliseconds, greaterThan(300));
+    });
+
     test("Refetch queries", () {
       final query = MockQuery<String>();
       when(query.key).thenReturn("query");

@@ -35,7 +35,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           status: queryState.status == QueryStatus.loading
               ? PostStatus.loading
               : PostStatus.success,
-          hasReachedMax: queryState.hasReachedMax,
+          hasReachedMax: query.hasReachedMax(),
         );
       },
     );

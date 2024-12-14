@@ -503,11 +503,11 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
       );
 
   @override
-  void refetchQueries({
+  _i4.Future<void> refetchQueries({
     _i2.KeyFilterFunc? filterFn,
     List<Object>? keys,
   }) =>
-      super.noSuchMethod(
+      (super.noSuchMethod(
         Invocation.method(
           #refetchQueries,
           [],
@@ -516,8 +516,9 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
             #keys: keys,
           },
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
   void addQuery(_i2.QueryBase<dynamic, dynamic>? query) => super.noSuchMethod(
