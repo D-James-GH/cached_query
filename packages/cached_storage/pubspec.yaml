@@ -5,6 +5,9 @@ repository: https://github.com/D-James-GH/cached_query/tree/main/packages/cached
 documentation: https://cachedquery.dev/
 homepage: https://cachedquery.dev/
 
+funding:
+ - https://github.com/sponsors/D-James-GH
+
 environment:
   sdk: ">=2.12.0 <4.0.0"
   flutter: ">=1.17.0"
