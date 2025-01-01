@@ -42,28 +42,6 @@ class _FakeQueryConfig_1 extends _i1.SmartFake implements _i2.QueryConfig {
         );
 }
 
-class _FakeQueryState_2<T1> extends _i1.SmartFake
-    implements _i2.QueryState<T1> {
-  _FakeQueryState_2(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
-class _FakeInfiniteQueryState_3<T1> extends _i1.SmartFake
-    implements _i2.InfiniteQueryState<T1> {
-  _FakeInfiniteQueryState_3(
-    Object parent,
-    Invocation parentInvocation,
-  ) : super(
-          parent,
-          parentInvocation,
-        );
-}
-
 /// A class which mocks [Query].
 ///
 /// See the documentation for Mockito's code generation for more information.
@@ -100,13 +78,13 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
       ) as _i2.QueryConfig);
 
   @override
-  _i2.QueryState<T> get state => (super.noSuchMethod(
+  _i2.QueryStatus<T> get state => (super.noSuchMethod(
         Invocation.getter(#state),
-        returnValue: _FakeQueryState_2<T>(
+        returnValue: _i3.dummyValue<_i2.QueryStatus<T>>(
           this,
           Invocation.getter(#state),
         ),
-      ) as _i2.QueryState<T>);
+      ) as _i2.QueryStatus<T>);
 
   @override
   bool get stale => (super.noSuchMethod(
@@ -121,34 +99,36 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
       ) as bool);
 
   @override
-  _i4.Stream<_i2.QueryState<T>> get stream => (super.noSuchMethod(
+  _i4.Stream<_i2.QueryStatus<T>> get stream => (super.noSuchMethod(
         Invocation.getter(#stream),
-        returnValue: _i4.Stream<_i2.QueryState<T>>.empty(),
-      ) as _i4.Stream<_i2.QueryState<T>>);
+        returnValue: _i4.Stream<_i2.QueryStatus<T>>.empty(),
+      ) as _i4.Stream<_i2.QueryStatus<T>>);
 
   @override
-  _i4.Future<_i2.QueryState<T>> get result => (super.noSuchMethod(
+  _i4.Future<_i2.QueryStatus<T>> get result => (super.noSuchMethod(
         Invocation.getter(#result),
-        returnValue: _i4.Future<_i2.QueryState<T>>.value(_FakeQueryState_2<T>(
+        returnValue: _i4.Future<_i2.QueryStatus<T>>.value(
+            _i3.dummyValue<_i2.QueryStatus<T>>(
           this,
           Invocation.getter(#result),
         )),
-      ) as _i4.Future<_i2.QueryState<T>>);
+      ) as _i4.Future<_i2.QueryStatus<T>>);
 
   @override
-  _i4.Future<_i2.QueryState<T>> refetch() => (super.noSuchMethod(
+  _i4.Future<_i2.QueryStatus<T>> refetch() => (super.noSuchMethod(
         Invocation.method(
           #refetch,
           [],
         ),
-        returnValue: _i4.Future<_i2.QueryState<T>>.value(_FakeQueryState_2<T>(
+        returnValue: _i4.Future<_i2.QueryStatus<T>>.value(
+            _i3.dummyValue<_i2.QueryStatus<T>>(
           this,
           Invocation.method(
             #refetch,
             [],
           ),
         )),
-      ) as _i4.Future<_i2.QueryState<T>>);
+      ) as _i4.Future<_i2.QueryStatus<T>>);
 
   @override
   void update(_i2.UpdateFunc<T>? updateFn) => super.noSuchMethod(
@@ -211,14 +191,14 @@ class MockInfiniteQuery<T, Arg> extends _i1.Mock
       ) as bool);
 
   @override
-  _i4.Future<_i2.InfiniteQueryState<T>> get result => (super.noSuchMethod(
+  _i4.Future<_i2.InfiniteQueryStatus<T, Arg>> get result => (super.noSuchMethod(
         Invocation.getter(#result),
-        returnValue: _i4.Future<_i2.InfiniteQueryState<T>>.value(
-            _FakeInfiniteQueryState_3<T>(
+        returnValue: _i4.Future<_i2.InfiniteQueryStatus<T, Arg>>.value(
+            _i3.dummyValue<_i2.InfiniteQueryStatus<T, Arg>>(
           this,
           Invocation.getter(#result),
         )),
-      ) as _i4.Future<_i2.InfiniteQueryState<T>>);
+      ) as _i4.Future<_i2.InfiniteQueryStatus<T, Arg>>);
 
   @override
   String get key => (super.noSuchMethod(
@@ -248,13 +228,13 @@ class MockInfiniteQuery<T, Arg> extends _i1.Mock
       ) as _i2.QueryConfig);
 
   @override
-  _i2.InfiniteQueryState<T> get state => (super.noSuchMethod(
+  _i2.InfiniteQueryStatus<T, Arg> get state => (super.noSuchMethod(
         Invocation.getter(#state),
-        returnValue: _FakeInfiniteQueryState_3<T>(
+        returnValue: _i3.dummyValue<_i2.InfiniteQueryStatus<T, Arg>>(
           this,
           Invocation.getter(#state),
         ),
-      ) as _i2.InfiniteQueryState<T>);
+      ) as _i2.InfiniteQueryStatus<T, Arg>);
 
   @override
   bool get stale => (super.noSuchMethod(
@@ -269,35 +249,36 @@ class MockInfiniteQuery<T, Arg> extends _i1.Mock
       ) as bool);
 
   @override
-  _i4.Stream<_i2.InfiniteQueryState<T>> get stream => (super.noSuchMethod(
+  _i4.Stream<_i2.InfiniteQueryStatus<T, Arg>> get stream => (super.noSuchMethod(
         Invocation.getter(#stream),
-        returnValue: _i4.Stream<_i2.InfiniteQueryState<T>>.empty(),
-      ) as _i4.Stream<_i2.InfiniteQueryState<T>>);
+        returnValue: _i4.Stream<_i2.InfiniteQueryStatus<T, Arg>>.empty(),
+      ) as _i4.Stream<_i2.InfiniteQueryStatus<T, Arg>>);
 
   @override
-  _i4.Future<_i2.InfiniteQueryState<T>?> getNextPage() => (super.noSuchMethod(
+  _i4.Future<_i2.InfiniteQueryStatus<T, Arg>?> getNextPage() =>
+      (super.noSuchMethod(
         Invocation.method(
           #getNextPage,
           [],
         ),
-        returnValue: _i4.Future<_i2.InfiniteQueryState<T>?>.value(),
-      ) as _i4.Future<_i2.InfiniteQueryState<T>?>);
+        returnValue: _i4.Future<_i2.InfiniteQueryStatus<T, Arg>?>.value(),
+      ) as _i4.Future<_i2.InfiniteQueryStatus<T, Arg>?>);
 
   @override
-  _i4.Future<_i2.InfiniteQueryState<T>> refetch() => (super.noSuchMethod(
+  _i4.Future<_i2.InfiniteQueryStatus<T, Arg>> refetch() => (super.noSuchMethod(
         Invocation.method(
           #refetch,
           [],
         ),
-        returnValue: _i4.Future<_i2.InfiniteQueryState<T>>.value(
-            _FakeInfiniteQueryState_3<T>(
+        returnValue: _i4.Future<_i2.InfiniteQueryStatus<T, Arg>>.value(
+            _i3.dummyValue<_i2.InfiniteQueryStatus<T, Arg>>(
           this,
           Invocation.method(
             #refetch,
             [],
           ),
         )),
-      ) as _i4.Future<_i2.InfiniteQueryState<T>>);
+      ) as _i4.Future<_i2.InfiniteQueryStatus<T, Arg>>);
 
   @override
   void update(_i2.UpdateFunc<List<T>>? updateFn) => super.noSuchMethod(
@@ -429,25 +410,6 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
       super.noSuchMethod(
         Invocation.method(
           #updateQuery,
-          [],
-          {
-            #key: key,
-            #filterFn: filterFn,
-            #updateFn: updateFn,
-          },
-        ),
-        returnValueForMissingStub: null,
-      );
-
-  @override
-  void updateInfiniteQuery<Data>({
-    Object? key,
-    _i2.KeyFilterFunc? filterFn,
-    required _i2.UpdateFunc<List<Data>>? updateFn,
-  }) =>
-      super.noSuchMethod(
-        Invocation.method(
-          #updateInfiniteQuery,
           [],
           {
             #key: key,

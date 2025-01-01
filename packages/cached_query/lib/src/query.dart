@@ -22,7 +22,7 @@ typedef QueryFunc<T> = Future<T> Function();
 /// [onError].
 ///
 /// {@endtemplate}
-class Query<T> extends QueryBase<T, QueryState<T>> {
+class Query<T> extends QueryBase<T, QueryStatus<T>> {
   final Function _queryFn;
 
   /// On success is called when the query function is executed successfully.
@@ -48,7 +48,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         _onError = onError,
         _onSuccess = onSuccess,
         super._internal(
-          state: QueryState<T>(
+          state: QueryInitial(
             timeCreated: DateTime.now(),
             data: initialData,
           ),
@@ -87,9 +87,9 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
 
   /// Refetch the query immediately.
   ///
-  /// Returns the updated [QueryState] and will notify the [stream].
+  /// Returns the updated [QueryStatus] and will notify the [stream].
   @override
-  Future<QueryState<T>> refetch() => _getResult(forceRefetch: true);
+  Future<QueryStatus<T>> refetch() => _getResult(forceRefetch: true);
 
   /// Update the current [Query] data.
   ///
@@ -98,28 +98,23 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   @override
   void update(UpdateFunc<T> updateFn) {
     final newData = updateFn(_state.data);
-    final newState = QueryState(
-      timeCreated: _state.timeCreated,
-      data: newData,
-      status: _state.status,
-      error: _state.error,
-    );
+    final newState = _state.copyWithData(newData);
 
     _setState(newState);
     _emit();
   }
 
   @override
-  Future<QueryState<T>> _getResult({bool forceRefetch = false}) async {
+  Future<QueryStatus<T>> _getResult({bool forceRefetch = false}) async {
     if (!stale &&
         !forceRefetch &&
-        _state.status != QueryStatus.error &&
+        _state is! QueryError &&
         _state.data != null) {
       _emit();
       return _state;
     }
     final shouldRefetch = config.shouldRefetch?.call(this, false) ?? true;
-    if (shouldRefetch || _state.status == QueryStatus.initial || forceRefetch) {
+    if (shouldRefetch || _state is QueryInitial || forceRefetch) {
       _currentFuture ??= _fetch();
       await _currentFuture;
       _staleOverride = false;
@@ -128,13 +123,20 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
   }
 
   Future<void> _fetch() async {
-    _setState(_state.copyWith(status: QueryStatus.loading));
+    // _setState(_state.copyWith(status: QueryStatus.loading));
+    _setState(
+      QueryLoading(
+        timeCreated: _state.timeCreated,
+        isRefetching: _state is QuerySuccess || _state is QueryError,
+        data: _state.data,
+      ),
+    );
     try {
       if (_state.data == null && config.storeQuery) {
         // try to get any data from storage if the query has no data
         final storedData = await _fetchFromStorage();
         if (storedData != null) {
-          _setState(_state.copyWith(data: storedData));
+          _setState(_state.copyWithData(storedData));
           final shouldRefetch = config.shouldRefetch?.call(this, true) ?? true;
           if (!shouldRefetch) {
             return;
@@ -146,15 +148,8 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
       if (_onSuccess != null) {
         _onSuccess!(res);
       }
-      _setState(
-        _state.copyWith(
-          data: res,
-          timeCreated: DateTime.now(),
-          status: QueryStatus.success,
-        ),
-      );
+      _setState(QuerySuccess(timeCreated: DateTime.now(), data: res));
       if (config.storeQuery) {
-        // save to local storage if exists
         _saveToStorage();
       }
     } catch (e, trace) {
@@ -162,9 +157,11 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         _onError!(e);
       }
       _setState(
-        _state.copyWith(
-          status: QueryStatus.error,
+        QueryError(
           error: e,
+          data: _state.data,
+          stackTrace: trace,
+          timeCreated: _state.timeCreated,
         ),
         trace,
       );

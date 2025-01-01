@@ -16,8 +16,8 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A);
 /// Determines the parameters of the next page in an infinite query.
 ///
 /// Return null if the last page has already been fetch and therefore trigger
-/// [InfiniteQueryState.hasReachedMax] to equal `true`.
-typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryState<T>);
+/// [InfiniteQueryStatus.hasReachedMax] to equal `true`.
+typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryStatus<T, Arg> state);
 
 /// {@template infiniteQuery}
 ///
@@ -42,7 +42,8 @@ typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryState<T>);
 /// [onError].
 ///
 /// {@endtemplate}
-class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
+class InfiniteQuery<T, Arg>
+    extends QueryBase<List<T>, InfiniteQueryStatus<T, Arg>> {
   /// On success is called when the query function is executed successfully.
   ///
   /// Passes the returned data.
@@ -63,10 +64,12 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   /// If the fist page has changed then revalidate all pages. Defaults to false.
   final bool revalidateAll;
 
-  @override
-  Future<InfiniteQueryState<T>> get result => _getResult();
+  final List<T>? _initialData;
 
-  /// Get the last page in the [InfiniteQueryState.data]
+  @override
+  Future<InfiniteQueryStatus<T, Arg>> get result => _getResult();
+
+  /// Get the last page in the [InfiniteQueryStatus.data]
   T? get lastPage => state.lastPage;
 
   InfiniteQuery._internal({
@@ -84,11 +87,11 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   })  : _getNextArg = getNextArg,
         _queryFn = queryFn,
         _onSuccess = onSuccess,
+        _initialData = initialData,
         _onError = onError,
         super._internal(
-          state: InfiniteQueryState<T>(
-            getNextArg: getNextArg,
-            data: initialData ?? [],
+          state: InfiniteQueryInitial<T, Arg>(
+            data: initialData,
             timeCreated: DateTime.now(),
           ),
         );
@@ -135,7 +138,7 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   }
 
   /// Get the next page in an [InfiniteQuery] and cache the result.
-  Future<InfiniteQueryState<T>?> getNextPage() async {
+  Future<InfiniteQueryStatus<T, Arg>?> getNextPage() async {
     final arg = _getNextArg(state);
     if (arg == null) return null;
     _currentFuture ??= _fetchNextPage(arg: arg);
@@ -145,9 +148,9 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
 
   /// Refetch the query immediately.
   ///
-  /// Returns the updated [State] and will notify the [stream].
+  /// Returns the updated [StateBase] and will notify the [stream].
   @override
-  Future<InfiniteQueryState<T>> refetch() async {
+  Future<InfiniteQueryStatus<T, Arg>> refetch() async {
     _currentFuture ??= _fetchAll();
     await _currentFuture;
     return state;
@@ -160,14 +163,8 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   @override
   void update(UpdateFunc<List<T>> updateFn) {
     final newData = updateFn(_state.data);
-    final newState = InfiniteQueryState(
-      data: newData,
-      timeCreated: _state.timeCreated,
-      getNextArg: _getNextArg,
-      error: _state.error,
-      status: _state.status,
-      lastPage: _state.lastPage,
-    );
+    final newState = _state.copyWithData(newData);
+
     _setState(newState);
     _emit();
   }
@@ -180,18 +177,17 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   }
 
   @override
-  Future<InfiniteQueryState<T>> _getResult({bool forceRefetch = false}) async {
+  Future<InfiniteQueryStatus<T, Arg>> _getResult({
+    bool forceRefetch = false,
+  }) async {
     final hasData = _state.data != null && _state.data!.isNotEmpty;
-    if (!stale &&
-        !forceRefetch &&
-        _state.status != QueryStatus.error &&
-        hasData) {
+    if (!stale && !forceRefetch && _state is! InfiniteQueryError && hasData) {
       _emit();
       return _state;
     }
 
     final shouldRefetch = config.shouldRefetch?.call(this, false) ?? true;
-    if (shouldRefetch || _state.status == QueryStatus.initial) {
+    if (shouldRefetch || _state is InfiniteQueryInitial) {
       _currentFuture ??= _fetchAll();
       await _currentFuture;
       _staleOverride = false;
@@ -200,22 +196,37 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   }
 
   Future<void> _fetchAll() async {
-    _setLoading();
+    _setState(
+      InfiniteQueryLoading(
+        isFetchingNextPage: false,
+        isRefetching: true,
+        data: _state.data,
+        pageParams: _state.pageParams,
+        timeCreated: _state.timeCreated,
+      ),
+    );
+
     final shouldContinue = await _fetchAfterStorage();
     if (!shouldContinue) {
       return;
     }
 
     final isInitial =
-        state.data.isNullOrEmpty || _state.status == QueryStatus.initial;
+        state.data.isNullOrEmpty || _state is InfiniteQueryInitial;
 
     if (isInitial) {
-      return _fetchNextPage();
+      final initialArg = _getNextArg(
+        InfiniteQueryInitial(
+          timeCreated: DateTime.now(),
+          data: this._initialData,
+        ),
+      );
+      return _fetchNextPage(arg: initialArg);
     }
 
     try {
-      final firstPage = await _fetchFirstPage();
-      if (firstPage == null) return;
+      final (arg, firstPage) = await _fetchFirstPage();
+      if (firstPage == null || arg == null) return;
 
       // Check first page for changes.
       if (!forceRevalidateAll &&
@@ -224,50 +235,57 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         // As the first pages are equal assume data hasn't changed
         _onSuccess?.call(firstPage);
         _setState(
-          _state.copyWith(
-            status: QueryStatus.success,
+          InfiniteQuerySuccess(
             timeCreated: DateTime.now(),
+            data: _state.data,
+            pageParams: _state.pageParams ?? [],
           ),
         );
         return;
       }
 
-      var newState = _state.copyWith(
+      InfiniteQuerySuccess<T, Arg> newState = InfiniteQuerySuccess(
+        pageParams: [arg],
+        timeCreated: _state.timeCreated,
         data: [firstPage],
-        lastPage: firstPage,
       );
 
       // Note: Removed re-fetching all pages if the first page has changed unless force revalidate is on.
       // this was taking too long and didn't seam worth it.
       if (forceRevalidateAll || revalidateAll) {
-        for (int i = 1; i < _state.length; i++) {
+        for (int i = 1; i < (_state.data ?? []).length; i++) {
           final arg = _getNextArg(newState);
           if (arg == null) {
             break;
           }
           final res = await _queryFn(arg);
-          newState = newState.copyWith(
-            data: res != null ? [...?newState.data, res] : newState.data,
-            lastPage: res,
+          newState = newState.copyWithData(
+            res != null ? [...?newState.data, res] : newState.data,
           );
         }
       }
 
       _setState(
-        newState.copyWith(
-          status: QueryStatus.success,
+        InfiniteQuerySuccess(
           timeCreated: DateTime.now(),
+          data: newState.data,
+          pageParams: newState.pageParams,
         ),
       );
+
       if (config.storeQuery) {
-        // save to local storage if exists
         _saveToStorage();
       }
     } catch (e, trace) {
       _onError?.call(e);
-      // if failed return the previous state
       _setState(
-        _state.copyWith(status: QueryStatus.error, error: e),
+        InfiniteQueryError(
+          error: e,
+          stackTrace: trace,
+          timeCreated: _state.timeCreated,
+          data: _state.data,
+          pageParams: _state.pageParams,
+        ),
         trace,
       );
       if (CachedQuery.instance._config.shouldRethrow) {
@@ -277,20 +295,26 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
   }
 
   Future<void> _fetchNextPage({Arg? arg}) async {
-    final isInitial = state.status == QueryStatus.initial;
-    if (state.status != QueryStatus.loading) {
-      _setLoading();
-    }
-    try {
-      final newSate = isInitial ? state.copyWith(data: []) : state.copyWith();
-      // Set the initial arg before getting from storage. Otherwise the storage
-      // data will effect the next arg.
-      arg ??= _getNextArg(newSate);
+    arg ??= _getNextArg(state);
 
+    _setState(
+      InfiniteQueryLoading(
+        isFetchingNextPage: true,
+        isRefetching:
+            _state.isLoading && (_state as InfiniteQueryLoading).isRefetching,
+        data: _state.data,
+        pageParams: _state.pageParams,
+        timeCreated: _state.timeCreated,
+      ),
+    );
+
+    try {
       if (arg == null) {
         _setState(
-          newSate.copyWith(
-            status: QueryStatus.success,
+          InfiniteQuerySuccess(
+            data: _state.data,
+            pageParams: [null],
+            timeCreated: _state.timeCreated,
           ),
         );
         return;
@@ -301,11 +325,10 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _onSuccess!(res);
       }
       _setState(
-        _state.copyWith(
-          data: [...?newSate.data, res],
-          lastPage: res,
+        InfiniteQuerySuccess(
+          data: [..._state.data ?? [], res],
+          pageParams: [..._state.pageParams ?? [], arg],
           timeCreated: DateTime.now(),
-          status: QueryStatus.success,
         ),
       );
       if (config.storeQuery) {
@@ -317,9 +340,12 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
         _onError!(e);
       }
       _setState(
-        _state.copyWith(
-          status: QueryStatus.error,
+        InfiniteQueryError(
           error: e,
+          stackTrace: trace,
+          pageParams: _state.pageParams,
+          timeCreated: _state.timeCreated,
+          data: _state.data,
         ),
         trace,
       );
@@ -335,13 +361,8 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
     }
   }
 
-  void _setLoading() {
-    _setState(_state.copyWith(status: QueryStatus.loading));
-  }
-
   Future<bool> _fetchAfterStorage() async {
-    final shouldGetFromStorage =
-        _state.data.isNullOrEmpty || _state.status == QueryStatus.initial;
+    final shouldGetFromStorage = _state.data.isNullOrEmpty || _state.isInitial;
     if (!shouldGetFromStorage) {
       return true;
     }
@@ -349,34 +370,45 @@ class InfiniteQuery<T, Arg> extends QueryBase<List<T>, InfiniteQueryState<T>> {
       final dataFromStorage = await _fetchFromStorage();
       if (dataFromStorage != null) {
         _setState(
-          _state.copyWith(data: dataFromStorage, status: QueryStatus.success),
+          _state.copyWithData(dataFromStorage),
         );
         return config.shouldRefetch?.call(this, true) ?? true;
       }
       return true;
     } catch (e, trace) {
       _setState(
-        _state.copyWith(status: QueryStatus.error, error: e),
+        InfiniteQueryError(
+          error: e,
+          stackTrace: trace,
+          timeCreated: _state.timeCreated,
+          data: _state.data,
+          pageParams: _state.pageParams,
+        ),
         trace,
       );
       return true;
     }
   }
 
-  Future<T?> _fetchFirstPage() async {
+  Future<(Arg?, T?)> _fetchFirstPage() async {
     final initialArg = _getNextArg(
-      InfiniteQueryState(
+      InfiniteQueryInitial(
         timeCreated: DateTime.now(),
-        data: [],
-        getNextArg: _getNextArg,
+        data: this._initialData,
       ),
     );
 
     if (initialArg == null) {
-      _setState(state.copyWith(status: QueryStatus.success));
-      return null;
+      _setState(
+        InfiniteQuerySuccess(
+          data: _state.data,
+          pageParams: [],
+          timeCreated: _state.timeCreated,
+        ),
+      );
+      return (null, null);
     }
 
-    return _queryFn(initialArg);
+    return (initialArg, await _queryFn(initialArg));
   }
 }
