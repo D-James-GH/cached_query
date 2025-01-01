@@ -1,7 +1,6 @@
 //ignore_for_file: avoid_print
 
 import 'package:cached_query/cached_query.dart';
-
 import 'package:cached_query/src/util/encode_key.dart';
 
 /// {@template query_logging_observer}
@@ -113,8 +112,8 @@ class QueryLoggingObserver implements QueryObserver {
       ];
     } else {
       message = [
-        "Prev State: ${query.state.status}",
-        "Next State: ${nextState.status}",
+        "Prev State: ${query.state}",
+        "Next State: $nextState",
       ];
     }
     _log(

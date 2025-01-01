@@ -10,27 +10,6 @@ typedef OnQuerySuccessCallback<T> = void Function(T data);
 /// Passes the error through.
 typedef OnQueryErrorCallback<T> = void Function(dynamic error);
 
-/// {@template stateBase}
-/// An Interface for both [QueryState] and [InfiniteQueryState].
-/// {@endtemplate}
-abstract class StateBase<T> {
-  /// Current data of the query.
-  T? get data;
-
-  /// Timestamp of the query.
-  ///
-  /// Time is reset if new data is fetched.
-  DateTime get timeCreated;
-
-  /// Status of the previous fetch.
-  QueryStatus get status;
-
-  /// Current error for the query.
-  ///
-  /// Equal to null if there is no error.
-  dynamic get error;
-}
-
 /// {@template queryBase}
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}

@@ -13,7 +13,7 @@ class DevtoolsObserver implements QueryObserver {
   @override
   void onChange(
     QueryBase<dynamic, dynamic> query,
-    QueryState<dynamic> nextState,
+    QueryState nextState,
   ) {
     _emit("query_changed", {"key": query.key});
   }

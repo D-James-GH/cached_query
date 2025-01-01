@@ -71,7 +71,7 @@ void main() {
         expectAsync1(
           (event) {
             if (count == 1) {
-              expect(event.status, QueryStatus.loading);
+              expect(event.status, MutationStatus.loading);
             }
             count++;
           },
@@ -181,24 +181,23 @@ void main() {
   });
   group("Optional side effects", () {
     test("Queries should be re-fetched", () async {
-      const key = "QueriesRefetch";
-      int count = 0;
-      final query = Query(
+      const key = "refetch";
+      int queryCount = 0;
+      final query = Query<String>(
         key: key,
-        queryFn: () async {
-          count++;
-          return "";
+        queryFn: () {
+          queryCount++;
+          return Future.value("res");
         },
       );
       CachedQuery.instance.addQuery(query);
-      await query.result;
       final mutation = Mutation<String, void>(
         refetchQueries: [key],
         queryFn: (_) async => "",
       );
       await mutation.mutate();
-      await Future.delayed(Duration.zero, () {});
-      expect(count, 2);
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(queryCount, 1);
     });
     test("Queries should be invalidated", () async {
       const key = "invalidate";

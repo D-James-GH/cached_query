@@ -16,8 +16,18 @@ void main() {
         const response = "My Title";
         const child = Text('Hello world');
         final sink = expectQueryStates<String>([
-          isQueryState(status: QueryStatus.loading),
-          isQueryState(status: QueryStatus.success, data: response),
+          isQueryState(
+            QueryStatus.loading(
+              timeCreated: DateTime.now(),
+              isRefetching: false,
+            ),
+          ),
+          isQueryState(
+            QueryStatus.success(
+              timeCreated: DateTime.now(),
+              data: response,
+            ),
+          ),
         ]);
         await tester.pumpWidget(
           MaterialApp(
@@ -40,14 +50,15 @@ void main() {
         const response = "My Title";
         const child = Text('Hello world');
         final sink = expectQueryStates<String>([
-          isQueryState(status: QueryStatus.success, data: response),
+          isQueryState(
+            QueryStatus.success(data: response, timeCreated: DateTime.now()),
+          ),
         ]);
         await tester.pumpWidget(
           MaterialApp(
             home: QueryListener(
               query: const TitleRepo(response: response).fetchTitle(),
-              listenWhen: (oldState, newState) =>
-                  newState.status == QueryStatus.success,
+              listenWhen: (oldState, newState) => newState.isSuccess,
               listener: sink.add,
               child: child,
             ),
@@ -65,8 +76,18 @@ void main() {
         const response = "My Title";
         const child = Text('Hello world');
         final sink = expectQueryStates<String>([
-          isQueryState(status: QueryStatus.loading),
-          isQueryState(status: QueryStatus.success, data: response),
+          isQueryState(
+            QueryStatus.loading(
+              timeCreated: DateTime.now(),
+              isRefetching: false,
+            ),
+          ),
+          isQueryState(
+            QueryStatus.success(
+              data: response,
+              timeCreated: DateTime.now(),
+            ),
+          ),
         ]);
         const TitleRepo(response: response).fetchTitle();
         await tester.pumpWidget(

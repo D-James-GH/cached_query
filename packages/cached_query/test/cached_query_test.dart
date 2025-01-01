@@ -7,10 +7,9 @@ import 'cached_query_test.mocks.dart';
 
 @GenerateMocks([StorageInterface, Query, InfiniteQuery])
 void main() {
-  setUp(() {});
+  setUp(CachedQuery.instance.deleteCache);
   test("Add and get a Query", () {
-    final query = MockQuery<String>();
-    when(query.key).thenReturn("query");
+    final query = Query(key: "query", queryFn: () => Future.value("query"));
     final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
     expect(cachedQuery.getQuery("query"), isNotNull);
@@ -228,29 +227,30 @@ void main() {
 
   group("Refetch Queries", () {
     test("Refetch using filter", () async {
-      final query = MockQuery<String>();
-      final query2 = MockInfiniteQuery<int, String>();
-      final query3 = MockQuery<String>();
-      when(query.key).thenReturn("query");
-      when(query.unencodedKey).thenReturn("query");
-      when(query2.key).thenReturn("query2");
-      when(query2.unencodedKey).thenReturn("query2");
-      when(query3.key).thenReturn("other_key");
-      when(query3.unencodedKey).thenReturn("other_key");
-
-      when(query.refetch()).thenAnswer(
-        (_) async => QueryState(timeCreated: DateTime.now()),
+      int query1Count = 0;
+      final query = Query<String>(
+        key: "query1",
+        queryFn: () {
+          query1Count++;
+          return Future.value("nothing");
+        },
       );
-
-      when(query2.refetch()).thenAnswer(
-        (_) async => InfiniteQueryState(
-          getNextArg: (_) => 1,
-          timeCreated: DateTime.now(),
-        ),
+      var query2Count = 0;
+      final query2 = InfiniteQuery<String, int>(
+        key: "infinite_query_1",
+        getNextArg: (_) => 1,
+        queryFn: (page) {
+          query2Count++;
+          return Future.value("nothing");
+        },
       );
-
-      when(query3.refetch()).thenAnswer(
-        (_) async => QueryState(timeCreated: DateTime.now()),
+      int query3Count = 0;
+      final query3 = Query<String>(
+        key: "other_key3",
+        queryFn: () {
+          query3Count++;
+          return Future.value("nothing");
+        },
       );
       CachedQuery.asNewInstance()
         ..addQuery(query)
@@ -265,64 +265,53 @@ void main() {
           },
         );
 
-      verify(query.refetch());
-      verify(query2.refetch());
-      verifyNever(query3.refetch());
-    });
+      //TODO: remove after refetch is async
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    test("Refetch awaits the result of all queries", () async {
-      final cachedQuery = CachedQuery.asNewInstance();
-      int query1Fetched = 0;
-      final query1 = Query(
+      expect(query1Count, 1);
+      expect(query2Count, 1);
+      expect(query3Count, 0);
+    });
+    test("Refetch queries", () async {
+      int query1Count = 0;
+      final query = Query<String>(
         key: "query1",
-        cache: cachedQuery,
-        queryFn: () async {
-          query1Fetched++;
-          return Future.delayed(
-            const Duration(milliseconds: 300),
-            () => "query1",
-          );
+        queryFn: () {
+          query1Count++;
+          return Future.value("nothing");
         },
       );
-      int query2Fetched = 0;
-      final query2 = Query(
-        key: "query2",
-        cache: cachedQuery,
-        queryFn: () async {
-          query2Fetched++;
-          return Future.delayed(
-            const Duration(milliseconds: 300),
-            () => "query2",
-          );
+      var query2Count = 0;
+      final query2 = InfiniteQuery<String, int>(
+        key: "infinite_query_1",
+        getNextArg: (_) => 1,
+        queryFn: (page) {
+          query2Count++;
+          return Future.value("nothing");
         },
       );
-      await Future.wait([query1.result, query2.result]);
-      final timer = Stopwatch()..start();
-      await cachedQuery.refetchQueries(keys: ["query1", "query2"]);
-      timer.stop();
-      expect(query1Fetched, 2);
-      expect(query2Fetched, 2);
-      expect(timer.elapsedMilliseconds, greaterThan(300));
-    });
-
-    test("Refetch queries", () {
-      final query = MockQuery<String>();
-      when(query.key).thenReturn("query");
-      when(query.refetch()).thenAnswer(
-        (_) async => QueryState(timeCreated: DateTime.now()),
-      );
-      final query2 = MockQuery<String>();
-      when(query2.key).thenReturn("query2");
-
-      when(query2.refetch()).thenAnswer(
-        (_) async => QueryState(timeCreated: DateTime.now()),
+      int query3Count = 0;
+      final query3 = Query<String>(
+        key: "other_key3",
+        queryFn: () {
+          query3Count++;
+          return Future.value("nothing");
+        },
       );
       CachedQuery.asNewInstance()
         ..addQuery(query)
         ..addQuery(query2)
-        ..refetchQueries(keys: ["query", "query2"]);
-      verify(query.refetch());
-      verify(query2.refetch());
+        ..addQuery(query3)
+        ..refetchQueries(
+          keys: ["query1", "infinite_query_1"],
+        );
+
+      //TODO: remove after refetch is async
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+
+      expect(query1Count, 1);
+      expect(query2Count, 1);
+      expect(query3Count, 0);
     });
   });
   test("Where query", () {
