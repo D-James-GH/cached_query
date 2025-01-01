@@ -25,7 +25,7 @@ class _ListQueryState extends State<ListQuery> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: QueryBuilder<InfiniteQueryState<String>>(
+      home: QueryBuilder<InfiniteQueryStatus<String, int>>(
         queryKey: widget.queryKey,
         enabled: enabled,
         builder: (context, state) => ListView(
@@ -53,7 +53,7 @@ class _ListQueryState extends State<ListQuery> {
 class ListValue extends StatelessWidget {
   final String response;
   final void Function()? onBuild;
-  final InfiniteQueryBuilderCondition<String>? buildWhen;
+  final QueryBuilderCondition<InfiniteQueryStatus<String, int>>? buildWhen;
 
   const ListValue({
     super.key,
@@ -66,7 +66,7 @@ class ListValue extends StatelessWidget {
   Widget build(BuildContext context) {
     final repo = InfiniteQueryRepo(response: response);
     return MaterialApp(
-      home: QueryBuilder<InfiniteQueryState<String>>(
+      home: QueryBuilder(
         buildWhen: buildWhen,
         query: repo.fetchList(),
         builder: (context, state) {

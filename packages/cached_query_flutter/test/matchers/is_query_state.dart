@@ -1,26 +1,13 @@
 import 'package:cached_query/cached_query.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-QueryStateMatcher<T> isQueryState<T>({
-  QueryStatus? status,
-  T? data,
-  Object? error,
-}) =>
-    QueryStateMatcher<T>(
-      status: status,
-      data: data,
-      error: error,
-    );
+QueryStateMatcher<T> isQueryState<T>(QueryState<T> state) =>
+    QueryStateMatcher<T>(state);
 
 class QueryStateMatcher<T> extends TypeMatcher<QueryState<T>> {
-  final QueryStatus? _status;
-  final T? _data;
-  final Object? _error;
+  final QueryState<dynamic> state;
 
-  QueryStateMatcher({QueryStatus? status, T? data, Object? error})
-      : _status = status,
-        _data = data,
-        _error = error;
+  QueryStateMatcher(this.state);
 
   @override
   bool matches(dynamic item, Map<dynamic, dynamic> matchState) =>
@@ -28,31 +15,20 @@ class QueryStateMatcher<T> extends TypeMatcher<QueryState<T>> {
       typedMatches(item as QueryState<T>, matchState);
 
   bool typedMatches(QueryState<T> item, Map<dynamic, dynamic> matchState) {
-    var matches = true;
-    if (_status != null && _status != item.status) {
-      matches = false;
+    if (item.runtimeType != state.runtimeType) {
+      return false;
     }
-    if (_data != null && _data != item.data) {
-      matches = false;
-    }
-    if (_error != null && _error != item.error) {
-      matches = false;
-    }
-    return matches;
+    return switch (item) {
+      QueryError<T>(:final error, :final data) =>
+        error == (state as QueryError).error && data == state.data,
+      InfiniteQueryError(:final error, :final data) =>
+        error == (state as InfiniteQueryError).error && data == state.data,
+      _ => item.data == state.data,
+    };
   }
 
   @override
   Description describe(Description description) {
-    final parts = <String>[];
-    if (_status != null) {
-      parts.add('status: $_status');
-    }
-    if (_data != null) {
-      parts.add('data: $_data');
-    }
-    if (_error != null) {
-      parts.add('error: $_error');
-    }
-    return description.add('matches QueryState<$T>(${parts.join(', ')})');
+    return description.add('matches ${state.toString()}');
   }
 }

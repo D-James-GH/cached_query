@@ -19,7 +19,7 @@ void main() {
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return QueryState(timeCreated: DateTime.now(), data: "");
+        return QueryStatus.initial(timeCreated: DateTime.now());
       });
       cachedQuery.refetchCurrentQueries();
 
@@ -33,10 +33,9 @@ void main() {
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return InfiniteQueryState(
+        return InfiniteQueryStatus<String, int>.initial(
           timeCreated: DateTime.now(),
           data: [""],
-          getNextArg: (_) => 1,
         );
       });
       cachedQuery.refetchCurrentQueries();
@@ -51,10 +50,9 @@ void main() {
       final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return InfiniteQueryState(
+        return InfiniteQueryStatus<String, int>.initial(
           timeCreated: DateTime.now(),
           data: [""],
-          getNextArg: (_) => 1,
         );
       });
       cachedQuery.refetchCurrentQueries();
@@ -71,10 +69,13 @@ void main() {
       when(query.key).thenReturn("hasListeners");
       when(query2.key).thenReturn("hasListeners2");
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return QueryState(timeCreated: DateTime.now(), data: "");
+        return QueryStatus<String>.initial(
+          timeCreated: DateTime.now(),
+          data: "",
+        );
       });
       when(query2.refetch()).thenAnswer((realInvocation) async {
-        return QueryState(timeCreated: DateTime.now(), data: "");
+        return QueryStatus.initial(timeCreated: DateTime.now(), data: "");
       });
       CachedQuery.asNewInstance()
         ..addQuery(query)
@@ -92,7 +93,7 @@ void main() {
       when(query.hasListener).thenReturn(true);
       when(query.key).thenReturn("hasListeners");
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return QueryState(timeCreated: DateTime.now(), data: "");
+        return QueryStatus.initial(timeCreated: DateTime.now(), data: "");
       });
       CachedQuery.asNewInstance()
         ..addQuery(query)
@@ -113,7 +114,7 @@ void main() {
       when(query.hasListener).thenReturn(true);
       when(query.key).thenReturn("hasListeners");
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return QueryState(timeCreated: DateTime.now(), data: "");
+        return QueryStatus.initial(timeCreated: DateTime.now(), data: "");
       });
       CachedQuery.asNewInstance()
         ..addQuery(query)

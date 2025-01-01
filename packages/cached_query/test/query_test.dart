@@ -127,10 +127,10 @@ void main() {
               (event) {
                 if (i == 0) {
                   expect(event.data, isNull);
-                  expect(event.status, QueryStatus.loading);
+                  expect(event, isA<QueryLoading<String>>());
                 } else if (i == 1) {
                   expect(event.data, returnString);
-                  expect(event.status, QueryStatus.success);
+                  expect(event, isA<QuerySuccess<String>>());
                 }
                 i++;
               },
@@ -144,10 +144,10 @@ void main() {
       int i = 0;
       QueryState<String>? firstQuery;
       final expectedValues = [
-        QueryStatus.loading,
-        QueryStatus.success,
-        QueryStatus.loading,
-        QueryStatus.success,
+        QueryLoading,
+        QuerySuccess,
+        QueryLoading,
+        QuerySuccess,
       ];
       final query = Query(
         key: "refetch loading",
@@ -160,7 +160,7 @@ void main() {
               expect(firstQuery, isNotNull);
               expect(firstQuery?.timeCreated, isNot(event.timeCreated));
             }
-            expect(event.status, expectedValues[i]);
+            expect(expectedValues[i].runtimeType, event.runtimeType);
             firstQuery = event;
             i++;
           },
@@ -429,7 +429,7 @@ void main() {
         queryFn: () async => throw "This is an error",
       );
       final res = await query.result;
-      expect(res.status, QueryStatus.error);
+      expect(res.isError, true);
     });
     test("Result should rethrow if specified ", () async {
       cachedQuery
