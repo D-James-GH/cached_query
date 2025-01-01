@@ -154,7 +154,7 @@ class Mutation<ReturnType, Arg> {
   }
 
   Future<MutationState<ReturnType?>> _fetch(Arg arg) async {
-    _setState(_state.copyWith(status: QueryStatus.loading));
+    _setState(_state.copyWith(status: MutationStatus.loading));
     _emit();
     dynamic startMutationResponse;
     if (_onStartMutation != null) {
@@ -166,7 +166,7 @@ class Mutation<ReturnType, Arg> {
       if (_onSuccess != null) {
         await _onSuccess!(res, arg);
       }
-      _setState(_state.copyWith(status: QueryStatus.success, data: res));
+      _setState(_state.copyWith(status: MutationStatus.success, data: res));
       if (_invalidateQueries != null) {
         for (final k in _invalidateQueries!) {
           CachedQuery.instance.invalidateCache(key: k);
@@ -181,7 +181,7 @@ class Mutation<ReturnType, Arg> {
         await _onError!(arg, e, startMutationResponse);
       }
       _setState(
-        _state.copyWith(status: QueryStatus.error, error: e),
+        _state.copyWith(status: MutationStatus.error, error: e),
         trace,
       );
 
@@ -208,6 +208,21 @@ class Mutation<ReturnType, Arg> {
   }
 }
 
+/// The status of the mutation.
+enum MutationStatus {
+  /// The mutation has not been called.
+  initial,
+
+  /// The mutation is currently running.
+  loading,
+
+  /// The mutation has completed successfully.
+  success,
+
+  /// The mutation has completed with an error.
+  error,
+}
+
 /// {@template mutationState}
 /// [MutationState] holds the current state of an [InfiniteQuery].
 ///
@@ -218,7 +233,7 @@ class MutationState<ReturnType> {
   final ReturnType? data;
 
   /// Status of the [MutationQueryCallback].
-  final QueryStatus status;
+  final MutationStatus status;
 
   /// Current error of the [MutationQueryCallback].
   final dynamic error;
@@ -226,7 +241,7 @@ class MutationState<ReturnType> {
   /// {@macro mutationState}
   const MutationState({
     this.data,
-    this.status = QueryStatus.initial,
+    this.status = MutationStatus.initial,
     this.error,
   });
 
@@ -234,7 +249,7 @@ class MutationState<ReturnType> {
   /// replaced.
   MutationState<ReturnType> copyWith({
     ReturnType? data,
-    QueryStatus? status,
+    MutationStatus? status,
     dynamic error,
   }) {
     return MutationState(

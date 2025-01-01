@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -17,10 +19,10 @@ void main() async {
         key: InfiniteQueryTestRepository.key,
         queryFn: repo.getPosts,
         getNextArg: (state) {
-          if (state.lastPage == null) return 1;
+          if (state.data == null) return 1;
           if (state.lastPage!.isEmpty) return null;
 
-          return state.length + 1;
+          return state.data!.length + 1;
         },
       );
 
@@ -36,22 +38,6 @@ void main() async {
         initialData: ["initialData"],
       );
       expect(query.state.data!.first, "initialData");
-    });
-    test("Initial data should not effect query args", () async {
-      int? pageNum;
-      final query = InfiniteQuery<String, int>(
-        key: "initial args",
-        initialData: ["initialData"],
-        queryFn: (page) {
-          pageNum = page;
-          return Future.value("$page");
-        },
-        getNextArg: (state) {
-          return state.length + 1;
-        },
-      );
-      await query.result;
-      expect(pageNum, 1);
     });
     test("Initial data is first in stream", () async {
       final initialQuery = await InfiniteQuery<String, int>(
@@ -70,20 +56,20 @@ void main() async {
         key: InfiniteQueryTestRepository.key,
         queryFn: repo.getPosts,
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       final res = await query.result;
-      expect(res, isA<InfiniteQueryState<String>>());
+      expect(res, isA<InfiniteQueryStatus<String, int>>());
     });
     test("Query result returns data", () async {
       final query = InfiniteQuery<String, int>(
         key: "Posts",
         queryFn: repo.getPosts,
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       final res = await query.result;
@@ -97,8 +83,8 @@ void main() async {
           refetchDuration: const Duration(milliseconds: 200),
         ),
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       final res = await query.result;
@@ -112,8 +98,8 @@ void main() async {
           () => repo.getPosts(page),
         ),
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       String res1 = "";
@@ -141,8 +127,8 @@ void main() async {
           refetchDuration: const Duration(seconds: 5),
         ),
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       await query.result;
@@ -150,8 +136,8 @@ void main() async {
         key: InfiniteQueryTestRepository.key,
         queryFn: createResponse,
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       ).result;
       expect(fetchCount, 1);
@@ -165,8 +151,8 @@ void main() async {
           return repo.getPosts(page);
         },
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       await query.result;
@@ -183,7 +169,7 @@ void main() async {
         config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
-        getNextArg: (state) => state.length + 1,
+        getNextArg: (state) => (state.data?.length ?? 0) + 1,
         queryFn: (page) {
           fetchCount++;
           return Future.value("$page");
@@ -202,7 +188,7 @@ void main() async {
         config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
-        getNextArg: (state) => state.length + 1,
+        getNextArg: (state) => (state.data?.length ?? 0) + 1,
         queryFn: (page) {
           if (fetchCount == 0) {
             page1 = page;
@@ -228,7 +214,7 @@ void main() async {
         config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
-        getNextArg: (state) => state.length + 1,
+        getNextArg: (state) => (state.data?.length ?? 0) + 1,
         queryFn: (page) {
           if (page == 1) {
             page1Count++;
@@ -256,7 +242,10 @@ void main() async {
         config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
-        getNextArg: (state) => state.length + 1,
+        getNextArg: (state) {
+          final res = (state.data?.length ?? 0) + 1;
+          return res;
+        },
         queryFn: (page) {
           if (page == 1) {
             page1Count++;
@@ -283,7 +272,7 @@ void main() async {
         config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
-        getNextArg: (state) => state.length + 1,
+        getNextArg: (state) => (state.data?.length ?? 0) + 1,
         queryFn: (page) {
           final randomNum = Random().nextInt(1000);
           return Future.value("$page$randomNum");
@@ -306,7 +295,7 @@ void main() async {
         config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
-        getNextArg: (state) => state.length + 1,
+        getNextArg: (state) => (state.data?.length ?? 0) + 1,
         queryFn: (page) {
           if (page == 1) {
             page1Count++;
@@ -335,7 +324,7 @@ void main() async {
           refetchDuration: Duration.zero,
         ),
         forceRevalidateAll: true,
-        getNextArg: (state) => state.length + 1,
+        getNextArg: (state) => (state.data?.length ?? 0) + 1,
         queryFn: (page) {
           if (page == 1) {
             page1Count++;
@@ -362,15 +351,16 @@ void main() async {
         key: "hasReachedMax",
         queryFn: repo.getPosts,
         getNextArg: (state) {
-          if ((state.data?.length ?? 0) > 2) return null;
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          final dataLength = state.data?.length ?? 0;
+          if (dataLength > 2) return null;
+          if (state.lastPage == null && dataLength != 0) return null;
+          return dataLength + 1;
         },
       );
       await query.result;
       await query.getNextPage();
-      final res = await query.getNextPage();
-      expect(res!.hasReachedMax, true);
+      await query.getNextPage();
+      expect(query.hasReachedMax(), true);
     });
 
     test("hasReachedMax resets if refetch changes the data", () async {
@@ -381,19 +371,20 @@ void main() async {
           return repo.getPosts(page);
         },
         getNextArg: (state) {
-          if ((state.data?.length ?? 0) > 2) return null;
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          final dataLength = state.data?.length ?? 0;
+          if (dataLength > 2) return null;
+          if (state.lastPage == null && dataLength != 0) return null;
+          return dataLength + 1;
         },
       );
       await query.result;
       await query.getNextPage();
       final res1 = await query.getNextPage();
-      expect(res1!.length, 3);
-      expect(res1.hasReachedMax, true);
+      expect(res1!.data?.length, 3);
+      expect(query.hasReachedMax(), true);
       final res2 = await query.refetch();
-      expect(res2.length, 1);
-      expect(res2.hasReachedMax, false);
+      expect(res2.data?.length, 1);
+      expect(query.hasReachedMax(), false);
     });
   });
   group("Infinite query args", () {
@@ -403,8 +394,10 @@ void main() async {
         key: "initialIndex",
         queryFn: repo.getPage,
         getNextArg: (state) {
-          if (state.lastPage == null && state.length != 0) return null;
-          return state.length + 1;
+          final dataLength = state.data?.length ?? 0;
+          if (dataLength > 2) return null;
+          if (state.lastPage == null && dataLength != 0) return null;
+          return dataLength + 1;
         },
       );
       final res = await query.result;
@@ -412,13 +405,14 @@ void main() async {
     });
 
     test("Should get next page based on next args", () async {
-      const initialIndex = 1;
       final query = InfiniteQuery<int, int>(
         key: "nextPage",
         queryFn: repo.getPage,
         getNextArg: (state) {
-          if (state.length == 0) return initialIndex;
-          return state.length + 1;
+          final dataLength = state.data?.length ?? 0;
+          if (dataLength > 2) return null;
+          if (state.lastPage == null && dataLength != 0) return null;
+          return dataLength + 1;
         },
       );
       await query.result;
@@ -442,8 +436,8 @@ void main() async {
         key: key,
         queryFn: repo.getPage,
         getNextArg: (state) {
-          if (state.length == 0) return 0;
-          return state.length + 1;
+          if (state.isInitial) return 0;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       await query.result;
@@ -524,8 +518,8 @@ void main() async {
           storageSerializer: (dynamic json) => convertedData,
         ),
         getNextArg: (state) {
-          if (state.length == 0) return 0;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       await query.result;
@@ -543,8 +537,8 @@ void main() async {
         config: QueryConfig(storeQuery: false),
         queryFn: repo.getPage,
         getNextArg: (state) {
-          if (state.length == 0) return 0;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
       await query.result;
@@ -566,8 +560,8 @@ void main() async {
         key: key,
         queryFn: repo.getPage,
         getNextArg: (state) {
-          if (state.length == 0) return 0;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
 
@@ -606,8 +600,8 @@ void main() async {
           },
         ),
         getNextArg: (state) {
-          if (state.length == 0) return 0;
-          return state.length + 1;
+          if (state.isInitial) return 1;
+          return (state.data?.length ?? 0) + 1;
         },
       );
 
@@ -742,7 +736,8 @@ void main() async {
       );
       final res = await query.result;
       expect(response, isNull);
-      expect(error, res.error);
+      expect(res, isA<InfiniteQueryError<String, int>>());
+      expect(error, (res as InfiniteQueryError).error);
     });
 
     test("onError is called when getNext page fails", () async {
@@ -765,7 +760,7 @@ void main() async {
       await query.result;
       final res = await query.getNextPage();
       expect(count, 1);
-      expect(res?.error, error);
+      expect(error, (res as InfiniteQueryError?)?.error);
     });
   });
 

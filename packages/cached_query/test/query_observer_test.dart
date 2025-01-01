@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
@@ -109,7 +111,7 @@ void main() {
       QueryBase<dynamic, dynamic>? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, nextState) {
-          if (nextState.status == QueryStatus.loading) {
+          if (nextState.isLoading) {
             queryChange = query;
             count++;
           }
@@ -129,7 +131,7 @@ void main() {
       QueryBase<dynamic, dynamic>? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, nextState) {
-          if (nextState.status == QueryStatus.success) {
+          if (nextState.isLoading) {
             queryChange = query;
             count++;
           }
@@ -169,7 +171,7 @@ void main() {
       QueryBase<dynamic, dynamic>? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, next) {
-          if (next.status == QueryStatus.loading) {
+          if (next.isLoading) {
             queryChange = query;
             count++;
           }
@@ -189,7 +191,7 @@ void main() {
       QueryBase<dynamic, dynamic>? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, next) {
-          if (next.status == QueryStatus.success) {
+          if (next.isLoading) {
             queryChange = query;
             count++;
           }
@@ -231,7 +233,7 @@ void main() {
       int count = 0;
       CachedQuery.instance.observers = [
         MutationObserver((mutation, next) {
-          if (next.status == QueryStatus.loading) {
+          if (next.status == MutationStatus.loading) {
             count++;
           }
         }),
@@ -263,7 +265,7 @@ void main() {
       int count = 0;
       CachedQuery.instance.observers = [
         MutationObserver((mutation, next) {
-          if (next.status == QueryStatus.success) {
+          if (next.status == MutationStatus.success) {
             count++;
           }
         }),

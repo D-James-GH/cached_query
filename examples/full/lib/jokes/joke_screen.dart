@@ -21,10 +21,10 @@ class JokeScreen extends StatelessWidget {
         title: Row(
           children: [
             const Text('jokes'),
-            QueryBuilder<QueryState<JokeModel?>>(
+            QueryBuilder(
               query: service.getJoke(),
               builder: (_, state) {
-                if (state.status == QueryStatus.loading) {
+                if (state.isLoading) {
                   return const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   );
@@ -49,8 +49,8 @@ class JokeScreen extends StatelessWidget {
         builder: (_, state) {
           return Column(
             children: [
-              if (state.status == QueryStatus.error &&
-                  state.error is SocketException)
+              if (state.isError &&
+                  (state as QueryError).error is SocketException)
                 Container(
                   width: double.infinity,
                   decoration:
@@ -67,8 +67,7 @@ class JokeScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(child: Text(state.data?.joke ?? "")),
-                      if (state.status == QueryStatus.loading)
-                        const CircularProgressIndicator(),
+                      if (state.isLoading) const CircularProgressIndicator(),
                     ],
                   ),
                 ),
