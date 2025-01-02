@@ -1,7 +1,4 @@
-import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/util/list_extension.dart';
-
-part "./infinite_query_state.dart";
+part "infinite_query_state.dart";
 
 /// {@template QueryState}
 /// An Interface for query state and infinite query state.
@@ -26,6 +23,9 @@ sealed class QueryState<T> {
 
   /// True if the query has errored.
   bool get isError;
+
+  /// Copy the current state with new data
+  QueryState<T> copyWithData(T? data);
 }
 
 /// {@template QueryState}
