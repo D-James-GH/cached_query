@@ -1,3 +1,9 @@
+## 3.0.0-dev.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
 ## 2.0.13
 
  - Update a dependency to the latest release.

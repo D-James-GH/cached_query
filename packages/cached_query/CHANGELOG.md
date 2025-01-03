@@ -1,3 +1,14 @@
+## 3.0.0-dev.0
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: infinite query ready for direction. ([4b456a0c](https://github.com/D-James-GH/cached_query/commit/4b456a0c9a34e5ca530b90c57907588abd327420))
+ - **FIX**: add missed part. ([a137276d](https://github.com/D-James-GH/cached_query/commit/a137276daf213cf1de9c29e98b78a57f930177b8))
+ - **FEAT**: add emit to setstate. ([990aff6e](https://github.com/D-James-GH/cached_query/commit/990aff6e3a054ef0d0f33527559191bbceb0f4cc))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([dcabfd41](https://github.com/D-James-GH/cached_query/commit/dcabfd416f23af4768d028b310c36e61ed51d792))
+ - **BREAKING** **FEAT**: remove deprecated things. ([3e68942b](https://github.com/D-James-GH/cached_query/commit/3e68942bf10cd095b9fb7dc3fda4d7fdff08eb58))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
 ## 2.2.0
 
  - **FEAT**: change CachedQuery.instance.refetchQueries() to a future. ([047edffe](https://github.com/D-James-GH/cached_query/commit/047edffe3ce9ea6e84e101f347d5677ddc34aa39))

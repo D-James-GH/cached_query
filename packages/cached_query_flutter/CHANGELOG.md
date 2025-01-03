@@ -1,3 +1,11 @@
+## 3.0.0-dev.0
+
+> Note: This release has breaking changes.
+
+- **BREAKING** **FEAT**: change state to sealed classes. ([dcabfd41](https://github.com/D-James-GH/cached_query/commit/dcabfd416f23af4768d028b310c36e61ed51d792))
+- **BREAKING** **FEAT**: Merge infinite query builder and query builder so that they function the same. Deprecated InfiniteQueryBuilder. ([5c687e76](https://github.com/D-James-GH/cached_query/commit/5c687e7630bb1edfc5abf9fcdf14d0d97d49fad3))
+- **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
 ## 2.6.0
 
  - **FEAT**: Applies shouldRefetch config to refetchCurrentQueries ([#64](https://github.com/D-James-GH/cached_query/issues/64)). ([7787bcde](https://github.com/D-James-GH/cached_query/commit/7787bcde9f0b2412b847d084f638246783395291))
