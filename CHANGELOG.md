@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-02
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v3.0.0-dev.0`](#cached_query---v300-dev0)
+ - [`cached_query_flutter` - `v3.0.0-dev.0`](#cached_query_flutter---v300-dev0)
+ - [`cached_storage` - `v3.0.0-dev.0`](#cached_storage---v300-dev0)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `cached_query` - `v3.0.0-dev.0`
+
+ - **REFACTOR**: infinite query ready for direction. ([4b456a0c](https://github.com/D-James-GH/cached_query/commit/4b456a0c9a34e5ca530b90c57907588abd327420))
+ - **FIX**: add missed part. ([a137276d](https://github.com/D-James-GH/cached_query/commit/a137276daf213cf1de9c29e98b78a57f930177b8))
+ - **FEAT**: add emit to setstate. ([990aff6e](https://github.com/D-James-GH/cached_query/commit/990aff6e3a054ef0d0f33527559191bbceb0f4cc))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([dcabfd41](https://github.com/D-James-GH/cached_query/commit/dcabfd416f23af4768d028b310c36e61ed51d792))
+ - **BREAKING** **FEAT**: remove deprecated things. ([3e68942b](https://github.com/D-James-GH/cached_query/commit/3e68942bf10cd095b9fb7dc3fda4d7fdff08eb58))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
+#### `cached_query_flutter` - `v3.0.0-dev.0`
+
+ - **BREAKING** **FEAT**: change state to sealed classes. ([dcabfd41](https://github.com/D-James-GH/cached_query/commit/dcabfd416f23af4768d028b310c36e61ed51d792))
+ - **BREAKING** **FEAT**: Merge infinite query builder and query builder so that they function the same. Deprecated InfiniteQueryBuilder. ([5c687e76](https://github.com/D-James-GH/cached_query/commit/5c687e7630bb1edfc5abf9fcdf14d0d97d49fad3))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
+#### `cached_storage` - `v3.0.0-dev.0`
+
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
+
 ## 2024-12-14
 
 ### Changes
