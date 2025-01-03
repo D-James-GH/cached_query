@@ -1,3 +1,7 @@
+## 3.0.0-dev.1
+
+ - **FEAT**: update devtools for 3. ([352c43b4](https://github.com/D-James-GH/cached_query/commit/352c43b47e46bd6119ba4979508ed6715099a298))
+
 ## 3.0.0-dev.0
 
 > Note: This release has breaking changes.
