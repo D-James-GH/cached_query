@@ -25,7 +25,7 @@ class _PostPageState extends State<PostPage> {
           query: service.getPostById(currentId),
           builder: (context, state) {
             return Text(
-              state.status == QueryStatus.loading ? "loading..." : "",
+              state.isLoading ? "loading..." : "",
             );
           },
         ),

@@ -56,7 +56,7 @@ class Post extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ],
-          if (queryState.status == QueryStatus.loading)
+          if (queryState.isLoading)
             const SizedBox(
               height: 40,
               width: 40,

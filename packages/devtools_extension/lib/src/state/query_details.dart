@@ -7,9 +7,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vm_service/vm_service.dart';
 
-part 'query_details.g.dart';
-
 part 'query_details.freezed.dart';
+part 'query_details.g.dart';
 
 sealed class QueryStateDetails {
   String get status;
@@ -21,7 +20,7 @@ class QueryStateDetailsJson extends QueryStateDetails
   const factory QueryStateDetailsJson({
     required String dataRuntimeType,
     required String status,
-    Map<String, dynamic>? data,
+    dynamic data,
   }) = _QueryStateDetailsJson;
 }
 
@@ -100,7 +99,7 @@ class QueryDetails extends _$QueryDetails {
       },
     );
 
-    if (type == "InfiniteQuery" && isJson) {
+    if (type.startsWith("InfiniteQuery") && isJson) {
       return QueryDetailsState(
         key: key,
         type: type,

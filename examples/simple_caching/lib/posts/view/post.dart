@@ -19,7 +19,7 @@ class Post extends StatelessWidget {
       queryKey: service.postKey(id),
       builder: (context, state) {
         final data = state.data;
-        if (state.error != null) return Text(state.error.toString());
+        if (state.isError) return Text((state as QueryError).error.toString());
         if (data == null) return const SizedBox();
         return Container(
           margin: const EdgeInsets.all(10),

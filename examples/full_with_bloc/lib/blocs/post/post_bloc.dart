@@ -31,14 +31,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     Emitter<PostState> emit,
   ) {
     // Subscribe to the stream from the infinite query.
-    return emit.forEach<InfiniteQueryState<List<PostModel>>>(
+    return emit.forEach<InfiniteQueryStatus<List<PostModel>, int>>(
       _repo.getPosts().stream,
       onData: (queryState) {
         return state.copyWith(
           posts: queryState.data?.expand((page) => page).toList() ?? [],
-          status: queryState.status == QueryStatus.loading
-              ? PostStatus.loading
-              : PostStatus.success,
+          status:
+              queryState.isLoading ? PostStatus.loading : PostStatus.success,
           //ignore
           hasReachedMax: _repo.getPosts().hasReachedMax(),
         );
@@ -61,7 +60,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       mutation.stream,
       onData: (mutationState) {
         return state.copyWith(
-          isMutationLoading: mutationState.status == QueryStatus.loading,
+          isMutationLoading: mutationState.status == MutationStatus.loading,
         );
       },
     );

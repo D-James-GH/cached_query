@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:simple_caching_with_bloc/posts/service/post_service.dart';
@@ -29,7 +28,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         return PostState(
           currentId: event.id,
           post: queryState.data,
-          isLoading: queryState.status == QueryStatus.loading,
+          isLoading: queryState.isLoading,
         );
       },
     );
