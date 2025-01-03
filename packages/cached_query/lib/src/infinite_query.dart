@@ -9,6 +9,14 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A pageArgs);
 /// [InfiniteQueryStatus.hasReachedMax] to equal `true`.
 typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryStatus<T, Arg> state);
 
+enum InfiniteQueryDirection {
+  forward,
+  backward;
+
+  bool get isForward => this == InfiniteQueryDirection.forward;
+  bool get isBackward => this == InfiniteQueryDirection.backward;
+}
+
 /// {@template infiniteQuery}
 ///
 /// [InfiniteQuery] caches a series of [Query]'s for use in an infinite list.
@@ -51,7 +59,7 @@ class InfiniteQuery<T, Arg>
   /// for changes.
   final bool forceRevalidateAll;
 
-  /// If the fist page has changed then revalidate all pages. Defaults to false.
+  /// If the fist page has changed then revalidate all pages. Defaults to false. Otherwise replace current data with first page only.
   final bool revalidateAll;
 
   final List<T>? _initialData;
@@ -131,7 +139,7 @@ class InfiniteQuery<T, Arg>
   Future<InfiniteQueryStatus<T, Arg>?> getNextPage() async {
     final arg = _getNextArg(state);
     if (arg == null) return null;
-    _currentFuture ??= _fetchNextPage(arg: arg);
+    _currentFuture ??= _fetch(direction: InfiniteQueryDirection.forward);
     await _currentFuture;
     return state;
   }
@@ -141,7 +149,7 @@ class InfiniteQuery<T, Arg>
   /// Returns the updated [StateBase] and will notify the [stream].
   @override
   Future<InfiniteQueryStatus<T, Arg>> refetch() async {
-    _currentFuture ??= _fetchAll();
+    _currentFuture ??= _fetch();
     await _currentFuture;
     return state;
   }
@@ -182,90 +190,140 @@ class InfiniteQuery<T, Arg>
 
     final shouldRefetch = config.shouldRefetch?.call(this, false) ?? true;
     if (shouldRefetch || _state is InfiniteQueryInitial) {
-      _currentFuture ??= _fetchAll();
+      _currentFuture ??= _fetch(
+        initialArg: _state.isInitial ? _getInitialArg() : null,
+        fetchFromStorage: true,
+      );
       await _currentFuture;
       _staleOverride = false;
     }
     return _state;
   }
 
-  Future<void> _fetchAll() async {
+  Future<void> _fetch({
+    InfiniteQueryDirection? direction,
+    bool fetchFromStorage = false,
+    Arg? initialArg,
+  }) async {
     _setState(
       InfiniteQueryLoading(
-        isFetchingNextPage: false,
-        isRefetching: true,
+        isFetchingNextPage: direction?.isForward ?? false,
+        isRefetching: direction == null,
         data: _state.data,
         pageParams: _state.pageParams,
         timeCreated: _state.timeCreated,
       ),
     );
 
-    final shouldContinue = await _fetchAfterStorage();
-    if (!shouldContinue) {
-      return;
+    if (fetchFromStorage) {
+      try {
+        final dataFromStorage = await _fetchFromStorage();
+        if (dataFromStorage != null) {
+          _setState(
+            _state.copyWithData(dataFromStorage),
+          );
+          final shouldRefetch = config.shouldRefetch?.call(this, true) ?? true;
+          if (!shouldRefetch) {
+            _setState(
+              InfiniteQuerySuccess(
+                timeCreated: _state.timeCreated,
+                data: _state.data,
+                pageParams: _state.pageParams ?? [],
+              ),
+            );
+            return;
+          }
+        }
+      } catch (e, trace) {
+        _setState(
+          InfiniteQueryError(
+            error: e,
+            stackTrace: trace,
+            timeCreated: _state.timeCreated,
+            data: _state.data,
+            pageParams: _state.pageParams,
+          ),
+        );
+      }
     }
-
-    final isInitial =
-        state.data.isNullOrEmpty || _state is InfiniteQueryInitial;
-
-    if (isInitial) {
-      final initialArg = _getNextArg(
-        InfiniteQueryInitial(
-          timeCreated: DateTime.now(),
-          data: this._initialData,
-        ),
-      );
-      return _fetchNextPage(arg: initialArg);
-    }
-
     try {
-      final (arg, firstPage) = await _fetchFirstPage();
-      if (firstPage == null || arg == null) return;
+      if (direction == null) {
+        final arg = _getInitialArg();
+        if (arg == null) {
+          return;
+        }
+        final firstPage = await _fetchPage(arg);
 
-      // Check first page for changes.
-      if (!forceRevalidateAll &&
-          _state.data.isNotNullOrEmpty &&
-          pageEquality(firstPage, _state.data![0])) {
-        // As the first pages are equal assume data hasn't changed
-        _onSuccess?.call(firstPage);
+        // Check first page for changes.
+        if (!forceRevalidateAll &&
+            _state.data.isNotNullOrEmpty &&
+            pageEquality(firstPage, _state.data![0])) {
+          // As the first pages are equal assume data hasn't changed
+          _onSuccess?.call(firstPage);
+          _setState(
+            InfiniteQuerySuccess(
+              timeCreated: DateTime.now(),
+              data: _state.data,
+              pageParams: _state.pageParams ?? [],
+            ),
+          );
+          return;
+        }
+
+        InfiniteQuerySuccess<T, Arg> newState = InfiniteQuerySuccess(
+          pageParams: [arg],
+          timeCreated: _state.timeCreated,
+          data: [firstPage],
+        );
+
+        // Note: Removed re-fetching all pages if the first page has changed unless force revalidate is on.
+        // this was taking too long and didn't seam worth it.
+        if (forceRevalidateAll || revalidateAll) {
+          for (int i = 1; i < (_state.data ?? []).length; i++) {
+            final arg = _getNextArg(newState);
+            if (arg == null) {
+              break;
+            }
+            final res = await _queryFn(arg);
+            newState = newState.copyWithData([...?newState.data, res]);
+          }
+        }
+
         _setState(
           InfiniteQuerySuccess(
             timeCreated: DateTime.now(),
-            data: _state.data,
-            pageParams: _state.pageParams ?? [],
+            data: newState.data,
+            pageParams: newState.pageParams,
           ),
         );
-        return;
-      }
-
-      InfiniteQuerySuccess<T, Arg> newState = InfiniteQuerySuccess(
-        pageParams: [arg],
-        timeCreated: _state.timeCreated,
-        data: [firstPage],
-      );
-
-      // Note: Removed re-fetching all pages if the first page has changed unless force revalidate is on.
-      // this was taking too long and didn't seam worth it.
-      if (forceRevalidateAll || revalidateAll) {
-        for (int i = 1; i < (_state.data ?? []).length; i++) {
-          final arg = _getNextArg(newState);
-          if (arg == null) {
-            break;
-          }
-          final res = await _queryFn(arg);
-          newState = newState.copyWithData(
-            res != null ? [...?newState.data, res] : newState.data,
-          );
+      } else {
+        final arg =
+            initialArg ?? (direction.isForward ? _getNextArg(_state) : null);
+        if (arg == null) {
+          return;
         }
-      }
 
-      _setState(
-        InfiniteQuerySuccess(
-          timeCreated: DateTime.now(),
-          data: newState.data,
-          pageParams: newState.pageParams,
-        ),
-      );
+        final res = await _fetchPage(arg);
+
+        final (data, pageParams) = switch (direction) {
+          InfiniteQueryDirection.forward => (
+              [...?_state.data, res],
+              [...?_state.pageParams, arg]
+            ),
+          InfiniteQueryDirection.backward => (
+              [res, ...?_state.data],
+              [arg, ...?_state.pageParams]
+            ),
+        };
+
+        _setState(
+          InfiniteQuerySuccess(
+            timeCreated: DateTime.now(),
+            data: data,
+            pageParams: pageParams,
+          ),
+        );
+      }
 
       if (config.storeQuery) {
         _saveToStorage();
@@ -280,7 +338,6 @@ class InfiniteQuery<T, Arg>
           data: _state.data,
           pageParams: _state.pageParams,
         ),
-        trace,
       );
       if (CachedQuery.instance._config.shouldRethrow) {
         rethrow;
@@ -288,121 +345,29 @@ class InfiniteQuery<T, Arg>
     }
   }
 
-  Future<void> _fetchNextPage({Arg? arg}) async {
-    arg ??= _getNextArg(state);
-
-    _setState(
-      InfiniteQueryLoading(
-        isFetchingNextPage: true,
-        isRefetching:
-            _state.isLoading && (_state as InfiniteQueryLoading).isRefetching,
-        data: _state.data,
-        pageParams: _state.pageParams,
-        timeCreated: _state.timeCreated,
-      ),
-    );
-
-    try {
-      if (arg == null) {
-        _setState(
-          InfiniteQuerySuccess(
-            data: _state.data,
-            pageParams: [null],
-            timeCreated: _state.timeCreated,
-          ),
-        );
-        return;
-      }
-
-      final res = await _queryFn(arg);
-      if (_onSuccess != null) {
-        _onSuccess!(res);
-      }
-      _setState(
-        InfiniteQuerySuccess(
-          data: [..._state.data ?? [], res],
-          pageParams: [..._state.pageParams ?? [], arg],
-          timeCreated: DateTime.now(),
-        ),
-      );
-      if (config.storeQuery) {
-        // save to local storage if exists
-        _saveToStorage();
-      }
-    } catch (e, trace) {
-      if (_onError != null) {
-        _onError!(e);
-      }
-      _setState(
-        InfiniteQueryError(
-          error: e,
-          stackTrace: trace,
-          pageParams: _state.pageParams,
-          timeCreated: _state.timeCreated,
-          data: _state.data,
-        ),
-        trace,
-      );
-      if (CachedQuery.instance._config.shouldRethrow) {
-        rethrow;
-      }
+  Future<T> _fetchPage(Arg arg) async {
+    final res = await _queryFn(arg);
+    if (_onSuccess != null) {
+      _onSuccess!(res);
     }
+    return res;
   }
 
-  void _preFetchPages(List<Arg> arguments) async {
-    for (final arg in arguments) {
-      await _fetchNextPage(arg: arg);
-    }
-  }
-
-  Future<bool> _fetchAfterStorage() async {
-    final shouldGetFromStorage = _state.data.isNullOrEmpty || _state.isInitial;
-    if (!shouldGetFromStorage) {
-      return true;
-    }
-    try {
-      final dataFromStorage = await _fetchFromStorage();
-      if (dataFromStorage != null) {
-        _setState(
-          _state.copyWithData(dataFromStorage),
-        );
-        return config.shouldRefetch?.call(this, true) ?? true;
-      }
-      return true;
-    } catch (e, trace) {
-      _setState(
-        InfiniteQueryError(
-          error: e,
-          stackTrace: trace,
-          timeCreated: _state.timeCreated,
-          data: _state.data,
-          pageParams: _state.pageParams,
-        ),
-        trace,
-      );
-      return true;
-    }
-  }
-
-  Future<(Arg?, T?)> _fetchFirstPage() async {
-    final initialArg = _getNextArg(
+  Arg? _getInitialArg() {
+    return _getNextArg(
       InfiniteQueryInitial(
         timeCreated: DateTime.now(),
         data: this._initialData,
       ),
     );
+  }
 
-    if (initialArg == null) {
-      _setState(
-        InfiniteQuerySuccess(
-          data: _state.data,
-          pageParams: [],
-          timeCreated: _state.timeCreated,
-        ),
+  void _preFetchPages(List<Arg> arguments) async {
+    for (final arg in arguments) {
+      await _fetch(
+        initialArg: arg,
+        direction: InfiniteQueryDirection.forward,
       );
-      return (null, null);
     }
-
-    return (initialArg, await _queryFn(initialArg));
   }
 }
