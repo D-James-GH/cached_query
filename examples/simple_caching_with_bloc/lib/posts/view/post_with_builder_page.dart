@@ -27,7 +27,7 @@ class PostWithBuilderPage extends StatelessWidget {
                   query: query,
                   builder: (context, state) {
                     return Text(
-                      state.status == QueryStatus.loading ? "loading..." : "",
+                      state.isLoading ? "loading..." : "",
                     );
                   },
                 );

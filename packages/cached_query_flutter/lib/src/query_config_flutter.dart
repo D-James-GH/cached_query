@@ -34,28 +34,16 @@ class QueryConfigFlutter extends QueryConfig {
     this.refetchOnConnection = true,
     @Deprecated('Use QueryConfig.storageDeserializer instead')
     Serializer? serializer,
-    Serializer? storageSerializer,
-    Serializer? storageDeserializer,
-    bool? ignoreCacheDuration,
-    bool? storeQuery,
-    Duration? refetchDuration,
-    ShouldRefetch? shouldRefetch,
-    Duration? storageDuration,
-    Duration? cacheDuration,
-    bool? shouldRethrow,
-  }) : super(
-          ignoreCacheDuration: ignoreCacheDuration,
-          // ignore: deprecated_member_use
-          serializer: serializer,
-          storageDuration: storageDuration,
-          shouldRefetch: shouldRefetch,
-          storageSerializer: storageSerializer,
-          storageDeserializer: storageDeserializer,
-          storeQuery: storeQuery,
-          refetchDuration: refetchDuration,
-          cacheDuration: cacheDuration,
-          shouldRethrow: shouldRethrow,
-        );
+    super.storageSerializer,
+    super.storageDeserializer,
+    super.ignoreCacheDuration,
+    super.storeQuery,
+    super.refetchDuration,
+    super.shouldRefetch,
+    super.storageDuration,
+    super.cacheDuration,
+    super.shouldRethrow,
+  });
 
   /// Returns a flutter query config with the default values.
   static final QueryConfigFlutter defaults = QueryConfigFlutter(

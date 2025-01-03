@@ -56,6 +56,7 @@ sealed class InfiniteQueryStatus<T, Arg>
   }) = InfiniteQueryError<T, Arg>;
 
   /// Copy the current state with new data
+  @override
   InfiniteQueryStatus<T, Arg> copyWithData(List<T>? data);
 
   @override

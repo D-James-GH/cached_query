@@ -252,21 +252,18 @@ void main() {
           return Future.value("nothing");
         },
       );
-      CachedQuery.asNewInstance()
+      final cache = CachedQuery.asNewInstance()
         ..addQuery(query)
         ..addQuery(query2)
-        ..addQuery(query3)
-        ..refetchQueries(
-          filterFn: (unencodedKey, key) {
-            if (key.contains("query")) {
-              return true;
-            }
-            return false;
-          },
-        );
-
-      //TODO: remove after refetch is async
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+        ..addQuery(query3);
+      await cache.refetchQueries(
+        filterFn: (unencodedKey, key) {
+          if (key.contains("query")) {
+            return true;
+          }
+          return false;
+        },
+      );
 
       expect(query1Count, 1);
       expect(query2Count, 1);
@@ -298,16 +295,13 @@ void main() {
           return Future.value("nothing");
         },
       );
-      CachedQuery.asNewInstance()
+      final cache = CachedQuery.asNewInstance()
         ..addQuery(query)
         ..addQuery(query2)
-        ..addQuery(query3)
-        ..refetchQueries(
-          keys: ["query1", "infinite_query_1"],
-        );
-
-      //TODO: remove after refetch is async
-      await Future<void>.delayed(const Duration(milliseconds: 100));
+        ..addQuery(query3);
+      await cache.refetchQueries(
+        keys: ["query1", "infinite_query_1"],
+      );
 
       expect(query1Count, 1);
       expect(query2Count, 1);

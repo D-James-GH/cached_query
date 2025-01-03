@@ -27,9 +27,7 @@ class JokeBloc extends Bloc<JokeEvent, JokeState> {
       _repo.getJoke().stream,
       onData: (query) => state.copyWith(
         joke: query.data,
-        status: query.status == QueryStatus.loading
-            ? JokeStatus.loading
-            : JokeStatus.success,
+        status: query.isLoading ? JokeStatus.loading : JokeStatus.success,
       ),
     );
   }

@@ -11,7 +11,7 @@ class PostRepository {
       key: 'posts',
       getNextArg: (state) {
         if (state.lastPage?.isEmpty ?? false) return null;
-        return state.length + 1;
+        return (state.data?.length ?? 0) + 1;
       },
       queryFn: (page) async => PostModel.listFromJson(
         await _service.getPosts(page: page, limit: 10),

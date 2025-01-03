@@ -27,7 +27,7 @@ abstract class QueryObserver {
   /// Called before the state changes
   void onChange(
     QueryBase<dynamic, dynamic> query,
-    QueryState nextState,
+    QueryState<dynamic> nextState,
   ) {}
 
   /// Called if a query fails.

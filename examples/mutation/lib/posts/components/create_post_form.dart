@@ -31,7 +31,7 @@ class _CreatePostFormState extends State<CreatePostForm> {
           MutationBuilder(
             mutation: createPostMutation(),
             builder: (context, state, mutate) {
-              final isLoading = state.status == QueryStatus.loading;
+              final isLoading = state.status == MutationStatus.loading;
 
               return ElevatedButton(
                 // disable the button while loading

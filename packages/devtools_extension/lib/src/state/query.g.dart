@@ -6,7 +6,7 @@ part of 'query.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$staleHash() => r'0dbd506094375a1cc9e22d21408a26602d49f1ac';
+String _$staleHash() => r'6b89d1f71c9d892febf5c3cf9735dc5a8a4c99e5';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -72,7 +72,7 @@ class StaleFamily extends Family<AsyncValue<bool?>> {
 }
 
 /// See also [stale].
-class StaleProvider extends AutoDisposeFutureProvider<bool?> {
+class StaleProvider extends FutureProvider<bool?> {
   /// See also [stale].
   StaleProvider(
     InstanceRef instanceRef,
@@ -123,7 +123,7 @@ class StaleProvider extends AutoDisposeFutureProvider<bool?> {
   }
 
   @override
-  AutoDisposeFutureProviderElement<bool?> createElement() {
+  FutureProviderElement<bool?> createElement() {
     return _StaleProviderElement(this);
   }
 
@@ -143,20 +143,19 @@ class StaleProvider extends AutoDisposeFutureProvider<bool?> {
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin StaleRef on AutoDisposeFutureProviderRef<bool?> {
+mixin StaleRef on FutureProviderRef<bool?> {
   /// The parameter `instanceRef` of this provider.
   InstanceRef get instanceRef;
 }
 
-class _StaleProviderElement extends AutoDisposeFutureProviderElement<bool?>
-    with StaleRef {
+class _StaleProviderElement extends FutureProviderElement<bool?> with StaleRef {
   _StaleProviderElement(super.provider);
 
   @override
   InstanceRef get instanceRef => (origin as StaleProvider).instanceRef;
 }
 
-String _$queryStatusHash() => r'ec6f0e549f296dd78b58940b82f6f826572c939f';
+String _$queryStatusHash() => r'13ceaaf641458ba1d886e031b56b05f93170dc6a';
 
 /// See also [queryStatus].
 @ProviderFor(queryStatus)
@@ -303,7 +302,7 @@ class _QueryStatusProviderElement
   String get queryKey => (origin as QueryStatusProvider).queryKey;
 }
 
-String _$queryListHash() => r'5e7a37b2ac4c91774aee882ce4ac2c4eb2b0da2c';
+String _$queryListHash() => r'ea408e262bdff1c21a42a737bb448649b3602020';
 
 /// See also [QueryList].
 @ProviderFor(QueryList)
