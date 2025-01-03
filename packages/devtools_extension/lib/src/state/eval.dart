@@ -1,12 +1,13 @@
 import 'package:devtools_app_shared/service.dart';
 import 'package:devtools_extension/src/state/service.dart';
 import 'package:devtools_extensions/devtools_extensions.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vm_service/vm_service.dart';
 
-part 'eval.g.dart';
 part 'eval.freezed.dart';
+part 'eval.g.dart';
 
 class CachedQueryEval {
   final EvalOnDartLibrary libraryEval;
@@ -14,8 +15,8 @@ class CachedQueryEval {
   CachedQueryEval(this.libraryEval, this.disposable);
 }
 
-@riverpod
-Future<CachedQueryEval> cachedQueryEval(CachedQueryEvalRef ref) async {
+@Riverpod(keepAlive: true)
+Future<CachedQueryEval> cachedQueryEval(Ref ref) async {
   final service = await ref.watch(serviceProvider.future);
   final eval = EvalOnDartLibrary(
     'package:cached_query/src/cached_query.dart',
@@ -58,8 +59,8 @@ class AppEvent with _$AppEvent {
   }) = _AppEvent;
 }
 
-@riverpod
-Stream<AppEvent> eventStream(EventStreamRef ref) async* {
+@Riverpod(keepAlive: true)
+Stream<AppEvent> eventStream(Ref ref) async* {
   final service = await ref.watch(serviceProvider.future);
 
   final stream = service.onExtensionEvent;

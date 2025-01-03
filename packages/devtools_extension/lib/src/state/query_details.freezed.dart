@@ -18,7 +18,7 @@ final _privateConstructorUsedError = UnsupportedError(
 mixin _$QueryStateDetailsJson {
   String get dataRuntimeType => throw _privateConstructorUsedError;
   String get status => throw _privateConstructorUsedError;
-  Map<String, dynamic>? get data => throw _privateConstructorUsedError;
+  dynamic get data => throw _privateConstructorUsedError;
 
   /// Create a copy of QueryStateDetailsJson
   /// with the given fields replaced by the non-null parameter values.
@@ -33,8 +33,7 @@ abstract class $QueryStateDetailsJsonCopyWith<$Res> {
           $Res Function(QueryStateDetailsJson) then) =
       _$QueryStateDetailsJsonCopyWithImpl<$Res, QueryStateDetailsJson>;
   @useResult
-  $Res call(
-      {String dataRuntimeType, String status, Map<String, dynamic>? data});
+  $Res call({String dataRuntimeType, String status, dynamic data});
 }
 
 /// @nodoc
@@ -69,7 +68,7 @@ class _$QueryStateDetailsJsonCopyWithImpl<$Res,
       data: freezed == data
           ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
+              as dynamic,
     ) as $Val);
   }
 }
@@ -83,8 +82,7 @@ abstract class _$$QueryStateDetailsJsonImplCopyWith<$Res>
       __$$QueryStateDetailsJsonImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call(
-      {String dataRuntimeType, String status, Map<String, dynamic>? data});
+  $Res call({String dataRuntimeType, String status, dynamic data});
 }
 
 /// @nodoc
@@ -115,9 +113,9 @@ class __$$QueryStateDetailsJsonImplCopyWithImpl<$Res>
           : status // ignore: cast_nullable_to_non_nullable
               as String,
       data: freezed == data
-          ? _value._data
+          ? _value.data
           : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>?,
+              as dynamic,
     ));
   }
 }
@@ -128,24 +126,14 @@ class _$QueryStateDetailsJsonImpl
     with DiagnosticableTreeMixin
     implements _QueryStateDetailsJson {
   const _$QueryStateDetailsJsonImpl(
-      {required this.dataRuntimeType,
-      required this.status,
-      final Map<String, dynamic>? data})
-      : _data = data;
+      {required this.dataRuntimeType, required this.status, this.data});
 
   @override
   final String dataRuntimeType;
   @override
   final String status;
-  final Map<String, dynamic>? _data;
   @override
-  Map<String, dynamic>? get data {
-    final value = _data;
-    if (value == null) return null;
-    if (_data is EqualUnmodifiableMapView) return _data;
-    // ignore: implicit_dynamic_type
-    return EqualUnmodifiableMapView(value);
-  }
+  final dynamic data;
 
   @override
   String toString({DiagnosticLevel minLevel = DiagnosticLevel.info}) {
@@ -170,12 +158,12 @@ class _$QueryStateDetailsJsonImpl
             (identical(other.dataRuntimeType, dataRuntimeType) ||
                 other.dataRuntimeType == dataRuntimeType) &&
             (identical(other.status, status) || other.status == status) &&
-            const DeepCollectionEquality().equals(other._data, _data));
+            const DeepCollectionEquality().equals(other.data, data));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, dataRuntimeType, status,
-      const DeepCollectionEquality().hash(_data));
+      const DeepCollectionEquality().hash(data));
 
   /// Create a copy of QueryStateDetailsJson
   /// with the given fields replaced by the non-null parameter values.
@@ -191,14 +179,14 @@ abstract class _QueryStateDetailsJson implements QueryStateDetailsJson {
   const factory _QueryStateDetailsJson(
       {required final String dataRuntimeType,
       required final String status,
-      final Map<String, dynamic>? data}) = _$QueryStateDetailsJsonImpl;
+      final dynamic data}) = _$QueryStateDetailsJsonImpl;
 
   @override
   String get dataRuntimeType;
   @override
   String get status;
   @override
-  Map<String, dynamic>? get data;
+  dynamic get data;
 
   /// Create a copy of QueryStateDetailsJson
   /// with the given fields replaced by the non-null parameter values.

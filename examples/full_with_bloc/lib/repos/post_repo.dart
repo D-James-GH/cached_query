@@ -13,7 +13,7 @@ class PostRepository {
         final len = state.data?.length ?? 0;
         if (len > 5) return null;
         if (state.lastPage?.isEmpty ?? false) return null;
-        return state.length + 1;
+        return (state.data?.length ?? 0) + 1;
       },
       queryFn: (page) async {
         return PostModel.listFromJson(

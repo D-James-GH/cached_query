@@ -57,7 +57,7 @@ class _ListState extends State<_List> {
     return BlocBuilder<PostWithBuilderBloc, PostWithBuilderState>(
       builder: (context, state) {
         if (state is PostWithBuilderSuccess) {
-          return QueryBuilder<InfiniteQueryState<List<PostModel>>>(
+          return QueryBuilder<InfiniteQueryStatus<List<PostModel>, int>>(
             query: state.postQuery,
             builder: (context, state) {
               if (state.data != null && state.data!.isNotEmpty) {
@@ -65,8 +65,8 @@ class _ListState extends State<_List> {
                 return CustomScrollView(
                   controller: _scrollController,
                   slivers: [
-                    if (state.status == QueryStatus.error &&
-                        state.error is SocketException)
+                    if (state.isError &&
+                        (state as InfiniteQueryError).error is SocketException)
                       SliverToBoxAdapter(
                         child: DecoratedBox(
                           decoration: BoxDecoration(
@@ -84,7 +84,7 @@ class _ListState extends State<_List> {
                         childCount: allPosts.length,
                       ),
                     ),
-                    if (state.status == QueryStatus.loading)
+                    if (state.isLoading)
                       const SliverToBoxAdapter(
                         child: Center(
                           child: SizedBox(
@@ -102,7 +102,7 @@ class _ListState extends State<_List> {
                   ],
                 );
               }
-              if (state.status == QueryStatus.loading) {
+              if (state.isLoading) {
                 return const Center(
                   child: SizedBox(
                     height: 40,

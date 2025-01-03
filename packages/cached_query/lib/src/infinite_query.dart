@@ -9,11 +9,18 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A pageArgs);
 /// [InfiniteQueryStatus.hasReachedMax] to equal `true`.
 typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryStatus<T, Arg> state);
 
+/// The fetch direction of an infinite query.
 enum InfiniteQueryDirection {
+  ///
   forward,
+
+  ///
   backward;
 
+  /// Fetch forward
   bool get isForward => this == InfiniteQueryDirection.forward;
+
+  /// Fetch backward
   bool get isBackward => this == InfiniteQueryDirection.backward;
 }
 

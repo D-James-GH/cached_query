@@ -27,14 +27,13 @@ class PostBloc extends Bloc<PostEvent, PostState> {
   ) {
     final query = _repo.getPosts();
     // Subscribe to the stream from the infinite query.
-    return emit.forEach<InfiniteQueryState<List<PostModel>>>(
+    return emit.forEach<InfiniteQueryStatus<List<PostModel>, int>>(
       query.stream,
       onData: (queryState) {
         return state.copyWith(
           posts: queryState.data?.expand((page) => page).toList() ?? [],
-          status: queryState.status == QueryStatus.loading
-              ? PostStatus.loading
-              : PostStatus.success,
+          status:
+              queryState.isLoading ? PostStatus.loading : PostStatus.success,
           hasReachedMax: query.hasReachedMax(),
         );
       },

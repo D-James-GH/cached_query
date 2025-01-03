@@ -19,7 +19,7 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
     ),
     getNextArg: (state) {
       if (state.lastPage?.isEmpty ?? false) return null;
-      return state.length + 1;
+      return (state.data?.length ?? 0) + 1;
     },
     queryFn: (arg) async {
       final uri = Uri.parse(

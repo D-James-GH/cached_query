@@ -29,12 +29,12 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: QueryBuilder<InfiniteQueryState<dynamic>>(
+        title: QueryBuilder<InfiniteQueryStatus<dynamic, dynamic>>(
           queryKey: 'posts',
           builder: (context, state) {
             return Row(
               children: [
-                if (state.status == QueryStatus.loading)
+                if (state.isLoading)
                   const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                   ),
@@ -45,22 +45,26 @@ class _PostListScreenState extends State<PostListScreen> {
         ),
         centerTitle: true,
       ),
-      body: QueryBuilder<InfiniteQueryState<List<PostModel>>>(
+      body: QueryBuilder<InfiniteQueryStatus<List<PostModel>, int>>(
           query: getPosts(),
           builder: (context, state) {
             final allPosts = state.data?.expand((e) => e).toList();
+            final error = switch (state) {
+              InfiniteQueryError(:final error) => error,
+              _ => null,
+            };
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
-                if (state.status == QueryStatus.error)
+                if (state is InfiniteQueryError)
                   SliverToBoxAdapter(
                     child: DecoratedBox(
                       decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.error),
                       child: Text(
-                        state.error is SocketException
+                        error is SocketException
                             ? "No internet connection"
-                            : state.error.toString(),
+                            : error.toString(),
                         style: const TextStyle(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
@@ -76,7 +80,7 @@ class _PostListScreenState extends State<PostListScreen> {
                       childCount: allPosts.length,
                     ),
                   ),
-                if (state.status == QueryStatus.loading)
+                if (state.isLoading)
                   const SliverToBoxAdapter(
                     child: Center(
                       child: SizedBox(
@@ -99,7 +103,7 @@ class _PostListScreenState extends State<PostListScreen> {
 
   void _onScroll() {
     final query = getPosts();
-    if (_isBottom && query.state.status != QueryStatus.loading) {
+    if (_isBottom && !query.state.isLoading) {
       query.getNextPage();
     }
   }

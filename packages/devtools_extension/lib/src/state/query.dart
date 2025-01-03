@@ -1,11 +1,11 @@
 import 'package:devtools_extension/src/state/eval.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vm_service/vm_service.dart';
 
-part "query.g.dart";
-
 part "query.freezed.dart";
+part "query.g.dart";
 
 @freezed
 class QueryInstance with _$QueryInstance {
@@ -79,18 +79,20 @@ class QueryList extends _$QueryList {
     for (var MapAssociation(key: keyRef as InstanceRef?, value: valueRef)
         in fields) {
       final key = keyRef?.valueAsString;
-      final value = (await libraryEval.getInstance(
+      final instanceRef = (await libraryEval.getInstance(
         valueRef,
         disposable,
-      ))
-          ?.classRef
-          ?.name;
+      ));
 
-      if (value != null && key != null) {
+      if (instanceRef != null && key != null) {
+        final value = await libraryEval
+            .eval('value.runtimeType', isAlive: disposable, scope: {
+          "value": instanceRef.id!,
+        });
         queries.add(
           QueryInstance(
             key: key,
-            type: value,
+            type: value?.name ?? "",
             valueRef: valueRef,
           ),
         );
@@ -100,9 +102,9 @@ class QueryList extends _$QueryList {
   }
 }
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<bool?> stale(
-  StaleRef ref,
+  Ref ref,
   InstanceRef instanceRef,
 ) async {
   final CachedQueryEval(:libraryEval, :disposable) =
@@ -124,7 +126,7 @@ Future<bool?> stale(
 
 @riverpod
 Future<String?> queryStatus(
-  QueryStatusRef ref,
+  Ref ref,
   InstanceRef instanceRef,
   String queryKey,
 ) async {
@@ -139,8 +141,8 @@ Future<String?> queryStatus(
       await ref.watch(cachedQueryEvalProvider.future);
 
   final status = await libraryEval
-      .eval('value.state.status.displayString', isAlive: disposable, scope: {
+      .eval('value.state.runtimeType', isAlive: disposable, scope: {
     "value": instanceRef.id!,
   });
-  return status?.valueAsString;
+  return status?.typeClass?.name;
 }
