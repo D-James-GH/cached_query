@@ -116,15 +116,18 @@ abstract class QueryBase<T, State extends QueryState<T>> {
   Future<State> _getResult();
 
   /// Sets the new state.
-  void _setState(State newState, [StackTrace? stackTrace]) {
+  void _setState(State newState) {
     for (final observer in _cache.observers) {
       observer.onChange(this, newState);
     }
     _state = newState;
-    if (stackTrace != null) {
-      for (final observer in _cache.observers) {
-        observer.onError(this, stackTrace);
-      }
+    switch (_state) {
+      case InfiniteQueryError(:final stackTrace) ||
+            QueryError(:final stackTrace):
+        for (final observer in _cache.observers) {
+          observer.onError(this, stackTrace);
+        }
+      default:
     }
     _emit();
   }

@@ -50,7 +50,7 @@ sealed class InfiniteQueryStatus<T, Arg>
   const factory InfiniteQueryStatus.error({
     required DateTime timeCreated,
     required dynamic error,
-    required StackTrace? stackTrace,
+    required StackTrace stackTrace,
     required List<T>? data,
     required List<Arg>? pageParams,
   }) = InfiniteQueryError<T, Arg>;
@@ -240,7 +240,7 @@ class InfiniteQueryError<T, Arg> extends InfiniteQueryStatus<T, Arg>
   final dynamic error;
 
   /// The stack trace of the error.
-  final StackTrace? stackTrace;
+  final StackTrace stackTrace;
 
   @override
   final List<Arg?>? pageParams;
