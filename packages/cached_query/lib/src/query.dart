@@ -167,7 +167,6 @@ class Query<T> extends QueryBase<T, QueryStatus<T>> {
           stackTrace: trace,
           timeCreated: _state.timeCreated,
         ),
-        trace,
       );
       if (config.shouldRethrow) {
         rethrow;

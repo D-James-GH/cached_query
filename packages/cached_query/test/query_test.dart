@@ -144,10 +144,10 @@ void main() {
       int i = 0;
       QueryState<String>? firstQuery;
       final expectedValues = [
-        QueryLoading,
-        QuerySuccess,
-        QueryLoading,
-        QuerySuccess,
+        isA<QueryLoading<String>>(),
+        isA<QuerySuccess<String>>(),
+        isA<QueryLoading<String>>(),
+        isA<QuerySuccess<String>>(),
       ];
       final query = Query(
         key: "refetch loading",
@@ -160,7 +160,7 @@ void main() {
               expect(firstQuery, isNotNull);
               expect(firstQuery?.timeCreated, isNot(event.timeCreated));
             }
-            expect(expectedValues[i].runtimeType, event.runtimeType);
+            expect(event, expectedValues[i]);
             firstQuery = event;
             i++;
           },

@@ -55,7 +55,7 @@ sealed class QueryStatus<T> implements QueryState<T> {
   const factory QueryStatus.error({
     required DateTime timeCreated,
     T? data,
-    required StackTrace? stackTrace,
+    required StackTrace stackTrace,
     required dynamic error,
   }) = QueryError<T>;
 
@@ -170,7 +170,7 @@ class QueryError<T> extends QueryStatus<T> {
   final dynamic error;
 
   /// The stack trace of the error.
-  final StackTrace? stackTrace;
+  final StackTrace stackTrace;
 
   ///{@macro QueryError}
   const QueryError({
