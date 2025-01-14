@@ -122,7 +122,9 @@ void main() {
 
       verifyNever(query.refetch());
     });
-    test("Can prevent refetchOnResume and refetchOnConnection using shouldRefetch", () async {
+    test(
+        "Can prevent refetchOnResume and refetchOnConnection using shouldRefetch",
+        () async {
       final query = MockQuery<String>();
       when(query.config).thenReturn(
         QueryConfigFlutter(
