@@ -122,6 +122,27 @@ void main() {
 
       verifyNever(query.refetch());
     });
+    test(
+        "Can prevent refetchOnResume and refetchOnConnection using shouldRefetch",
+        () async {
+      final query = MockQuery<String>();
+      when(query.config).thenReturn(
+        QueryConfigFlutter(
+          shouldRefetch: (query, fromStorage) => false,
+        ),
+      );
+      when(query.hasListener).thenReturn(true);
+      when(query.key).thenReturn("hasListeners");
+      when(query.refetch()).thenAnswer((realInvocation) async {
+        return QueryState(timeCreated: DateTime.now(), data: "");
+      });
+      CachedQuery.asNewInstance()
+        ..addQuery(query)
+        ..refetchCurrentQueries(RefetchReason.resume)
+        ..refetchCurrentQueries(RefetchReason.connectivity);
+
+      verifyNever(query.refetch());
+    });
     test("Can override global config", () {
       CachedQuery.instance.configFlutter(
         config: QueryConfigFlutter(refetchOnResume: false),
