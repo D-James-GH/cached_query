@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query_flutter` - `v2.6.0`](#cached_query_flutter---v260)
+
+---
+
+#### `cached_query_flutter` - `v2.6.0`
+
+ - **FEAT**: Applies shouldRefetch config to refetchCurrentQueries ([#64](https://github.com/D-James-GH/cached_query/issues/64)). ([7787bcde](https://github.com/D-James-GH/cached_query/commit/7787bcde9f0b2412b847d084f638246783395291))
+
+
 ## 2024-12-14
 
 ### Changes

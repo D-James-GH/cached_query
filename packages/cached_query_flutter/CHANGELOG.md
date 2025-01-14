@@ -1,3 +1,7 @@
+## 2.6.0
+
+ - **FEAT**: Applies shouldRefetch config to refetchCurrentQueries ([#64](https://github.com/D-James-GH/cached_query/issues/64)). ([7787bcde](https://github.com/D-James-GH/cached_query/commit/7787bcde9f0b2412b847d084f638246783395291))
+
 ## 2.5.0
 
  - **FEAT**: change CachedQuery.instance.refetchQueries() to a future. ([047edffe](https://github.com/D-James-GH/cached_query/commit/047edffe3ce9ea6e84e101f347d5677ddc34aa39))
