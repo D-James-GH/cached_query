@@ -67,19 +67,26 @@ extension CachedQueryExt on CachedQuery {
     for (final query in queries) {
       bool shouldRefetch = false;
       final config = query.config;
+
+      // Allow normal refetch rules if user has not configured shouldRefetch
+      final bool configShouldRefetch =
+          query.config.shouldRefetch?.call(query, false) ?? true;
+
       if (reason == null) {
-        shouldRefetch = true;
+        shouldRefetch = configShouldRefetch;
       } else if (reason == RefetchReason.resume) {
         if (config is QueryConfigFlutter) {
-          shouldRefetch = config.refetchOnResume;
+          shouldRefetch = config.refetchOnResume && configShouldRefetch;
         } else {
-          shouldRefetch = QueryConfigFlutter.defaults.refetchOnResume;
+          shouldRefetch = QueryConfigFlutter.defaults.refetchOnResume &&
+              configShouldRefetch;
         }
       } else if (reason == RefetchReason.connectivity) {
         if (config is QueryConfigFlutter) {
-          shouldRefetch = config.refetchOnConnection;
+          shouldRefetch = config.refetchOnConnection && configShouldRefetch;
         } else {
-          shouldRefetch = QueryConfigFlutter.defaults.refetchOnConnection;
+          shouldRefetch = QueryConfigFlutter.defaults.refetchOnConnection &&
+              configShouldRefetch;
         }
       }
 
