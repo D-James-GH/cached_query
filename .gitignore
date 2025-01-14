@@ -9,6 +9,7 @@
 .history
 .svn/
 **/pubspec_overrides.yaml
+**/pubspec.lock
 
 # IntelliJ related
 *.iml
