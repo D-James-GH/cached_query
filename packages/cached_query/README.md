@@ -27,6 +27,16 @@ Accompanying packages:
 * [Devtools Extension](#devtools-extension)
 * [Additional Information](#additional-information)
 
+## Installation
+```yaml
+dependencies:
+  # Use either cached_query or cached_query_flutter depending on your project
+  # both is unnecessary as cached_query_flutter exports cached_query 
+  cached_query: [version]
+  cached_query_flutter: [version]
+  cached_storage: [version]
+```
+
 ## Features
 
 * Cached responses
