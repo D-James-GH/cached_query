@@ -190,16 +190,15 @@ class InfiniteQuery<T, Arg>
     bool forceRefetch = false,
   }) async {
     final hasData = _state.data != null && _state.data!.isNotEmpty;
-    if (!stale && !forceRefetch && _state is! InfiniteQueryError && hasData) {
+    if (!stale && !forceRefetch && !_state.isError && hasData) {
       _emit();
       return _state;
     }
 
     final shouldRefetch = config.shouldRefetch?.call(this, false) ?? true;
-    if (shouldRefetch || _state is InfiniteQueryInitial) {
+    if (shouldRefetch || _state.isInitial) {
       _currentFuture ??= _fetch(
         initialArg: _state.isInitial ? _getInitialArg() : null,
-        fetchFromStorage: true,
       );
       await _currentFuture;
       _staleOverride = false;
@@ -209,7 +208,6 @@ class InfiniteQuery<T, Arg>
 
   Future<void> _fetch({
     InfiniteQueryDirection? direction,
-    bool fetchFromStorage = false,
     Arg? initialArg,
   }) async {
     _setState(
@@ -222,7 +220,7 @@ class InfiniteQuery<T, Arg>
       ),
     );
 
-    if (fetchFromStorage) {
+    if (state.isInitial) {
       try {
         final dataFromStorage = await _fetchFromStorage();
         if (dataFromStorage != null) {
