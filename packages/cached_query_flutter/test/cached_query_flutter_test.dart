@@ -6,9 +6,22 @@ import 'package:mockito/mockito.dart';
 
 import 'cached_query_flutter_test.mocks.dart';
 
-@GenerateMocks([Query, InfiniteQuery, CachedQuery])
+@GenerateMocks([
+  Query,
+  InfiniteQuery,
+  CachedQuery,
+])
 void main() {
-  setUpAll(WidgetsFlutterBinding.ensureInitialized);
+  setUpAll(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    provideDummy(QueryStatus<String>.initial(timeCreated: DateTime.now()));
+    provideDummy(
+      InfiniteQueryStatus<String, int>.initial(
+        timeCreated: DateTime.now(),
+        data: [],
+      ),
+    );
+  });
   tearDown(CachedQuery.instance.reset);
   group("Refetch current queries", () {
     test("Should refetch query if hasListeners", () async {
@@ -135,7 +148,7 @@ void main() {
       when(query.hasListener).thenReturn(true);
       when(query.key).thenReturn("hasListeners");
       when(query.refetch()).thenAnswer((realInvocation) async {
-        return QueryState(timeCreated: DateTime.now(), data: "");
+        return QueryInitial(timeCreated: DateTime.now(), data: "");
       });
       CachedQuery.asNewInstance()
         ..addQuery(query)

@@ -115,7 +115,7 @@ class InfiniteQueryInitial<T, Arg> extends InfiniteQueryStatus<T, Arg> {
   /// {@macro InfiniteQueryInitial}
   const InfiniteQueryInitial({
     required super.timeCreated,
-    required super.data,
+    super.data,
   });
 
   @override
