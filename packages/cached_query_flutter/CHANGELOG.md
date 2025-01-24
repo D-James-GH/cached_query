@@ -1,3 +1,18 @@
+## 3.0.0-dev.2
+
+> Note: This release has breaking changes.
+
+ - **FIX**: after rebasing 2.6. ([378858f9](https://github.com/D-James-GH/cached_query/commit/378858f9b0c62c9fd271d250b155b0f8f138156d))
+ - **FEAT**: update devtools for 3. ([f462df2b](https://github.com/D-James-GH/cached_query/commit/f462df2b5df460dfa47d41a576aa32af7feee5d9))
+ - **FEAT**: Applies shouldRefetch config to refetchCurrentQueries ([#64](https://github.com/D-James-GH/cached_query/issues/64)). ([7787bcde](https://github.com/D-James-GH/cached_query/commit/7787bcde9f0b2412b847d084f638246783395291))
+ - **FEAT**: update devtools for 3. ([352c43b4](https://github.com/D-James-GH/cached_query/commit/352c43b47e46bd6119ba4979508ed6715099a298))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([3f4030d4](https://github.com/D-James-GH/cached_query/commit/3f4030d4d3234cd4da1ee33a3305181c6f2ae6c1))
+ - **BREAKING** **FEAT**: Merge infinite query builder and query builder so that they function the same. Deprecated InfiniteQueryBuilder. ([f4b14485](https://github.com/D-James-GH/cached_query/commit/f4b144858a7ddcc95249fcae433e0157a1a614c4))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([e35c614b](https://github.com/D-James-GH/cached_query/commit/e35c614b0f38fa213aee1bc6e01995bcd147ebf3))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([dcabfd41](https://github.com/D-James-GH/cached_query/commit/dcabfd416f23af4768d028b310c36e61ed51d792))
+ - **BREAKING** **FEAT**: Merge infinite query builder and query builder so that they function the same. Deprecated InfiniteQueryBuilder. ([5c687e76](https://github.com/D-James-GH/cached_query/commit/5c687e7630bb1edfc5abf9fcdf14d0d97d49fad3))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
 ## 3.0.0-dev.1
 
  - **FEAT**: update devtools for 3. ([352c43b4](https://github.com/D-James-GH/cached_query/commit/352c43b47e46bd6119ba4979508ed6715099a298))

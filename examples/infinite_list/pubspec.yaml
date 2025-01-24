@@ -31,8 +31,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cached_query_flutter: ^3.0.0-dev.1
-  cached_storage: ^3.0.0-dev.1
+  cached_query_flutter: ^3.0.0-dev.2
+  cached_storage: ^3.0.0-dev.2
   http: ^0.13.5
   freezed_annotation:
 
