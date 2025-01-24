@@ -1,3 +1,25 @@
+## 3.0.0-dev.2
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: remove unnecessary infinite query fetch params. ([0304a6c3](https://github.com/D-James-GH/cached_query/commit/0304a6c3dd801af02a842ca832cba54abe19fdb3))
+ - **REFACTOR**: infinite query ready for direction. ([fabc2476](https://github.com/D-James-GH/cached_query/commit/fabc2476271b7d007d0811f276bbba04d640a2ad))
+ - **REFACTOR**: infinite query ready for direction. ([4b456a0c](https://github.com/D-James-GH/cached_query/commit/4b456a0c9a34e5ca530b90c57907588abd327420))
+ - **FIX**: infinite query not fetching from storage. ([2369dc3e](https://github.com/D-James-GH/cached_query/commit/2369dc3e886375d40878cfea0cec46213c9be877))
+ - **FIX**: after rebasing 2.6. ([378858f9](https://github.com/D-James-GH/cached_query/commit/378858f9b0c62c9fd271d250b155b0f8f138156d))
+ - **FIX**: add missed part. ([8b996510](https://github.com/D-James-GH/cached_query/commit/8b99651041571cbbb2a59609010dbc08ff1de8fa))
+ - **FIX**: add missed part. ([a137276d](https://github.com/D-James-GH/cached_query/commit/a137276daf213cf1de9c29e98b78a57f930177b8))
+ - **FEAT**: update devtools for 3. ([f462df2b](https://github.com/D-James-GH/cached_query/commit/f462df2b5df460dfa47d41a576aa32af7feee5d9))
+ - **FEAT**: add emit to setstate. ([5a7e2340](https://github.com/D-James-GH/cached_query/commit/5a7e2340bed4facc8178a0cd5b57b962a4d70477))
+ - **FEAT**: update devtools for 3. ([352c43b4](https://github.com/D-James-GH/cached_query/commit/352c43b47e46bd6119ba4979508ed6715099a298))
+ - **FEAT**: add emit to setstate. ([990aff6e](https://github.com/D-James-GH/cached_query/commit/990aff6e3a054ef0d0f33527559191bbceb0f4cc))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([3f4030d4](https://github.com/D-James-GH/cached_query/commit/3f4030d4d3234cd4da1ee33a3305181c6f2ae6c1))
+ - **BREAKING** **FEAT**: remove deprecated things. ([f238b9fc](https://github.com/D-James-GH/cached_query/commit/f238b9fc3b75d30142dac77aa43515f5c72afae0))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([e35c614b](https://github.com/D-James-GH/cached_query/commit/e35c614b0f38fa213aee1bc6e01995bcd147ebf3))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([dcabfd41](https://github.com/D-James-GH/cached_query/commit/dcabfd416f23af4768d028b310c36e61ed51d792))
+ - **BREAKING** **FEAT**: remove deprecated things. ([3e68942b](https://github.com/D-James-GH/cached_query/commit/3e68942bf10cd095b9fb7dc3fda4d7fdff08eb58))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([ff284686](https://github.com/D-James-GH/cached_query/commit/ff2846860c379fa7927066bb3c30ef29dd1ff052))
+
 ## 3.0.0-dev.1
 
  - **FEAT**: update devtools for 3. ([352c43b4](https://github.com/D-James-GH/cached_query/commit/352c43b47e46bd6119ba4979508ed6715099a298))
