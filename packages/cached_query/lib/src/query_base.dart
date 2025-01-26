@@ -103,9 +103,20 @@ abstract class QueryBase<T, State extends QueryState<T>> {
 
   /// Mark query as stale.
   ///
+  /// Pass [refetchActive] as true (default) to refetch the query if it has listeners.
+  ///
+  /// Pass [refetchInactive] as true (default = false) to refetch the query even if it has no listeners.
+  ///
   /// Will force a fetch next time the query is accessed.
-  void invalidateQuery() {
+  Future<void> invalidateQuery({
+    bool refetchActive = true,
+    bool refetchInactive = false,
+  }) {
     _staleOverride = true;
+    if ((hasListener && refetchActive) || refetchInactive) {
+      return refetch();
+    }
+    return Future.value();
   }
 
   /// Delete the query and query key from cache

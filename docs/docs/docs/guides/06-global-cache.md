@@ -29,7 +29,10 @@ CachedQuery.instance.refetchQueries(
 );
 ```
 
-Invalidating will mark the specified key as stale. To invalidate the whole cache don't pass a key.
+Invalidating will mark the specified key as stale. By default `invalidate` will refetch any query that has listeners. 
+The behavior can be changed by passing the `refetchActive` (defaults to true) and `refetchInactive` (defaults to false) parameters.
+
+To invalidate the whole cache don't pass a key.
 ```dart
 CachedQuery.instance.invalidateCache(key: "posts");
 

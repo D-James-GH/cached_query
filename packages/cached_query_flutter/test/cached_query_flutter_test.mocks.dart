@@ -141,13 +141,22 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
       );
 
   @override
-  void invalidateQuery() => super.noSuchMethod(
+  _i4.Future<void> invalidateQuery({
+    bool? refetchActive = true,
+    bool? refetchInactive = false,
+  }) =>
+      (super.noSuchMethod(
         Invocation.method(
           #invalidateQuery,
           [],
+          {
+            #refetchActive: refetchActive,
+            #refetchInactive: refetchInactive,
+          },
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
   void deleteQuery({bool? deleteStorage = false}) => super.noSuchMethod(
@@ -300,13 +309,22 @@ class MockInfiniteQuery<T, Arg> extends _i1.Mock
       ) as bool);
 
   @override
-  void invalidateQuery() => super.noSuchMethod(
+  _i4.Future<void> invalidateQuery({
+    bool? refetchActive = true,
+    bool? refetchInactive = false,
+  }) =>
+      (super.noSuchMethod(
         Invocation.method(
           #invalidateQuery,
           [],
+          {
+            #refetchActive: refetchActive,
+            #refetchInactive: refetchInactive,
+          },
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
   void deleteQuery({bool? deleteStorage = false}) => super.noSuchMethod(
@@ -430,21 +448,26 @@ class MockCachedQuery extends _i1.Mock implements _i2.CachedQuery {
       )) as List<_i2.QueryBase<dynamic, dynamic>>?);
 
   @override
-  void invalidateCache({
+  _i4.Future<void> invalidateCache({
     Object? key,
     _i2.KeyFilterFunc? filterFn,
+    bool? refetchActive = true,
+    bool? refetchInactive = false,
   }) =>
-      super.noSuchMethod(
+      (super.noSuchMethod(
         Invocation.method(
           #invalidateCache,
           [],
           {
             #key: key,
             #filterFn: filterFn,
+            #refetchActive: refetchActive,
+            #refetchInactive: refetchInactive,
           },
         ),
-        returnValueForMissingStub: null,
-      );
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
 
   @override
   void deleteCache({

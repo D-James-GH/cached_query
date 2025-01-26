@@ -7,7 +7,10 @@ import 'cached_query_test.mocks.dart';
 
 @GenerateMocks([StorageInterface, Query, InfiniteQuery])
 void main() {
-  setUp(CachedQuery.instance.deleteCache);
+  setUp(() {
+    CachedQuery.instance.deleteCache();
+    provideDummy(QueryStatus<String>.initial(timeCreated: DateTime.now()));
+  });
   test("Add and get a Query", () {
     final query = Query(key: "query", queryFn: () => Future.value("query"));
     final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
@@ -77,6 +80,7 @@ void main() {
       verify(query2.invalidateQuery());
       verifyNever(query3.invalidateQuery());
     });
+
     test("Invalidate the query", () async {
       final query = MockQuery<String>();
       when(query.key).thenReturn("query");
@@ -89,6 +93,50 @@ void main() {
         ..invalidateCache(key: "query");
       verify(query.invalidateQuery());
       verifyNever(query2.invalidateQuery());
+    });
+
+    test("Invalidate fetches active query", () async {
+      final cache = CachedQuery.asNewInstance();
+      int query1Count = 0;
+      int query2Count = 0;
+      final query1 = Query(
+        key: "query1",
+        queryFn: () {
+          query1Count++;
+          return Future.value("res");
+        },
+        cache: cache,
+      );
+      final query2 = Query(
+        key: "query2",
+        queryFn: () {
+          query2Count++;
+          return Future.value("res2");
+        },
+        cache: cache,
+      );
+      final sub = query1.stream.listen((state) {});
+      await query2.result;
+      cache.invalidateCache(key: "query1");
+      expect(query1Count, 2);
+      expect(query2Count, 1);
+      await sub.cancel();
+    });
+
+    test("Invalidate can fetch inactive query", () async {
+      final cache = CachedQuery.asNewInstance();
+      int query1Count = 0;
+      final query = Query(
+        key: "query1",
+        queryFn: () {
+          query1Count++;
+          return Future.value("res");
+        },
+        cache: cache,
+      );
+      await query.result;
+      cache.invalidateCache(key: "query1", refetchInactive: true);
+      expect(query1Count, 2);
     });
   });
   group("Delete cache", () {
