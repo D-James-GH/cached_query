@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-01-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.0-dev.3`](#cached_query---v300-dev3)
+ - [`cached_query_flutter` - `v3.0.0-dev.3`](#cached_query_flutter---v300-dev3)
+ - [`cached_storage` - `v3.0.0-dev.3`](#cached_storage---v300-dev3)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.3`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.3`
+
+ - **FEAT**: invalidating a query will, by default, refetch active queries. ([d63579f5](https://github.com/D-James-GH/cached_query/commit/d63579f57b73442ccafcb9b3f94188a85e95198d))
+
+#### `cached_query_flutter` - `v3.0.0-dev.3`
+
+ - **FEAT**: invalidating a query will, by default, refetch active queries. ([d63579f5](https://github.com/D-James-GH/cached_query/commit/d63579f57b73442ccafcb9b3f94188a85e95198d))
+
+
 ## 2025-01-24
 
 ### Changes
