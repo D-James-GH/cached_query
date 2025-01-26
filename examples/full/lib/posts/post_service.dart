@@ -8,7 +8,7 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
   return InfiniteQuery<List<PostModel>, int>(
     key: 'posts',
     config: QueryConfigFlutter(
-      storageDuration: const Duration(seconds: 10),
+      // storageDuration: const Duration(seconds: 10),
       storeQuery: true,
       refetchDuration: const Duration(seconds: 2),
       shouldRefetch: (state, fromStorage) => true,
