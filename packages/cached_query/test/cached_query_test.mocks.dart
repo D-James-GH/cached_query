@@ -165,10 +165,19 @@ class MockQuery<T> extends _i1.Mock implements _i2.Query<T> {
   );
 
   @override
-  void invalidateQuery() => super.noSuchMethod(
-    Invocation.method(#invalidateQuery, []),
-    returnValueForMissingStub: null,
-  );
+  _i3.Future<void> invalidateQuery({
+    bool? refetchActive = true,
+    bool? refetchInactive = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#invalidateQuery, [], {
+              #refetchActive: refetchActive,
+              #refetchInactive: refetchInactive,
+            }),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
 
   @override
   void deleteQuery({bool? deleteStorage = false}) => super.noSuchMethod(
@@ -310,10 +319,19 @@ class MockInfiniteQuery<T, Arg> extends _i1.Mock
           as bool);
 
   @override
-  void invalidateQuery() => super.noSuchMethod(
-    Invocation.method(#invalidateQuery, []),
-    returnValueForMissingStub: null,
-  );
+  _i3.Future<void> invalidateQuery({
+    bool? refetchActive = true,
+    bool? refetchInactive = false,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#invalidateQuery, [], {
+              #refetchActive: refetchActive,
+              #refetchInactive: refetchInactive,
+            }),
+            returnValue: _i3.Future<void>.value(),
+            returnValueForMissingStub: _i3.Future<void>.value(),
+          )
+          as _i3.Future<void>);
 
   @override
   void deleteQuery({bool? deleteStorage = false}) => super.noSuchMethod(

@@ -162,27 +162,46 @@ class CachedQuery {
   ///
   /// Pass a key to invalidate a query at the given key. Will invalidate both
   /// infinite queries and queries.
-  void invalidateCache({
+  ///
+  /// Pass [refetchActive] (defaults to true) to refetch active queries.
+  ///
+  /// Pass [refetchInactive] (defaults to false) to refetch inactive queries.
+  ///
+  /// Pass a [filterFn] to find queries to invalidate.
+  ///
+  /// Cannot pass both a key and a filterFn.
+  Future<void> invalidateCache({
     Object? key,
     KeyFilterFunc? filterFn,
+    bool refetchActive = true,
+    bool refetchInactive = false,
   }) {
+    assert(
+      key == null || filterFn == null,
+      "Cannot pass both key and filterFn",
+    );
+    List<QueryBase<dynamic, dynamic>> queries = [];
+
     if (filterFn != null) {
-      final queries = _filterQueryKey(filter: filterFn);
-      // other wise invalidate the whole cache
-      for (final query in queries) {
-        query.invalidateQuery();
-      }
+      queries = _filterQueryKey(filter: filterFn);
     } else if (key != null) {
       final k = encodeKey(key);
-      if (_queryCache.containsKey(k)) {
-        _queryCache[k]?.invalidateQuery();
+      if (_queryCache.containsKey(k) && _queryCache[k] != null) {
+        queries = [_queryCache[k]!];
       }
     } else {
-      // other wise invalidate the whole cache
-      for (final query in _queryCache.values) {
-        query.invalidateQuery();
-      }
+      // invalidate the whole cache
+      queries = _queryCache.values.toList();
     }
+
+    return Future.wait(
+      queries.map(
+        (q) => q.invalidateQuery(
+          refetchActive: refetchActive,
+          refetchInactive: refetchInactive,
+        ),
+      ),
+    );
   }
 
   /// Delete cache currently stored.

@@ -199,6 +199,42 @@ void main() {
       )..invalidateQuery();
       expect(query.stale, true);
     });
+
+    test("Invalidate fetches active query", () async {
+      final cache = CachedQuery.asNewInstance();
+      int query1Count = 0;
+      final query1 = Query(
+        key: "query1",
+        queryFn: () {
+          query1Count++;
+          return Future.value("res");
+        },
+        cache: cache,
+      );
+      final sub = query1.stream.listen((state) {});
+      await Future<void>.delayed(Duration.zero);
+      await query1.invalidateQuery();
+      expect(query1Count, 2);
+      await sub.cancel();
+    });
+
+    test("Invalidate can fetch inactive query", () async {
+      final cache = CachedQuery.asNewInstance();
+      int query1Count = 0;
+      final query = Query(
+        key: "query1",
+        queryFn: () {
+          query1Count++;
+          return Future.value("res");
+        },
+        cache: cache,
+      );
+      await query.result;
+      await query.invalidateQuery();
+      expect(query1Count, 1);
+      query.invalidateQuery(refetchInactive: true);
+      expect(query1Count, 2);
+    });
   });
 
   group("Fetch from storage", () {
