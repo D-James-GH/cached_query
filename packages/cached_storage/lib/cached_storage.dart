@@ -15,8 +15,9 @@ import 'package:sqflite/sqflite.dart';
 class CachedStorage extends StorageInterface {
   /// True if the SqfLite  instance is open
 
-  static const String _queryTable = "CachedQueryStorage";
-  static const String _oldQueryTable = "Query";
+  static const String _queryTable = 'CachedQueryStorageV3';
+  static const String _queryTableV1 = 'Query';
+  static const String _queryTableV2 = 'CachedQueryStorage';
   final Database _db;
 
   CachedStorage._(this._db);
@@ -34,7 +35,7 @@ class CachedStorage extends StorageInterface {
 
     final db = await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: (db, version) async {
         final batch = db.batch();
         _createQueryTable(batch);
@@ -42,13 +43,30 @@ class CachedStorage extends StorageInterface {
       },
       onUpgrade: (db, oldVersion, newVersion) async {
         final batch = db.batch()
-          ..execute("DROP TABLE IF EXISTS $_oldQueryTable");
+          ..execute('DROP TABLE IF EXISTS $_queryTableV1')
+          ..execute('DROP TABLE IF EXISTS $_queryTableV2');
         _createQueryTable(batch);
         await batch.commit();
       },
     );
 
-    return CachedStorage._(db);
+    final CachedStorage storage = CachedStorage._(db);
+
+    await storage.performCleanup();
+
+    return storage;
+  }
+
+  /// Delete expired queries from the database
+  Future<void> performCleanup() async {
+    final currentMilliseconds = DateTime.now().millisecondsSinceEpoch;
+
+    // delete all queries where expiresAt is not null and is less than the current time
+    await _db.delete(
+      _queryTable,
+      where: 'expiresAtMs IS NOT NULL AND expiresAtMs < ?',
+      whereArgs: [currentMilliseconds],
+    );
   }
 
   @override
@@ -105,13 +123,17 @@ class CachedStorage extends StorageInterface {
   void put(StoredQuery query) async {
     try {
       final payload = jsonEncode(query.data);
+      final createdAt = query.createdAt.millisecondsSinceEpoch;
+      final duration = query.storageDuration?.inMilliseconds;
+      final expiresAt = duration == null ? null : createdAt + duration;
       await _db.insert(
         _queryTable,
         {
-          "queryKey": query.key,
-          "queryData": payload,
-          "createdAtMs": query.createdAt.millisecondsSinceEpoch,
-          "durationMs": query.storageDuration?.inMilliseconds,
+          'queryKey': query.key,
+          'queryData': payload,
+          'createdAtMs': createdAt,
+          'durationMs': duration,
+          'expiresAtMs': expiresAt,
         },
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
@@ -133,7 +155,8 @@ void _createQueryTable(Batch batch) {
        queryKey TEXT PRIMARY KEY,
        queryData TEXT,
        createdAtMs INTEGER,
-       durationMs INTEGER
+       durationMs INTEGER,
+       expiresAtMs INTEGER
       )''',
   );
 }
