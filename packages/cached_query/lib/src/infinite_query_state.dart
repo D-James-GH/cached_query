@@ -8,7 +8,7 @@ abstract interface class InfiniteQueryData<T, Arg> {
   List<T>? get data;
 
   /// The pageParams used to fetch the page of the same index
-  List<Arg?>? get pageParams;
+  List<Arg>? get pageParams;
 }
 
 /// {@template infiniteQueryState}
@@ -73,7 +73,7 @@ sealed class InfiniteQueryStatus<T, Arg>
 
   /// The pages of data returned from the queryFn
   @override
-  List<Arg?>? get pageParams => switch (this) {
+  List<Arg>? get pageParams => switch (this) {
         InfiniteQueryInitial<T, Arg>() => null,
         InfiniteQuerySuccess<T, Arg>(:final pageParams) => pageParams,
         InfiniteQueryLoading<T, Arg>(:final pageParams) ||
@@ -150,7 +150,7 @@ class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
   final bool isFetchingNextPage;
 
   @override
-  final List<Arg?>? pageParams;
+  final List<Arg>? pageParams;
 
   /// {@macro InfiniteQueryLoading}
   const InfiniteQueryLoading({
@@ -198,7 +198,7 @@ class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
 class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg>
     implements InfiniteQueryData<T, Arg> {
   @override
-  final List<Arg?> pageParams;
+  final List<Arg> pageParams;
 
   ///{@macro InfiniteQuerySuccess}
   const InfiniteQuerySuccess({
@@ -244,7 +244,7 @@ class InfiniteQueryError<T, Arg> extends InfiniteQueryStatus<T, Arg>
   final StackTrace stackTrace;
 
   @override
-  final List<Arg?>? pageParams;
+  final List<Arg>? pageParams;
 
   /// {@macro InfiniteQueryError}
   const InfiniteQueryError({
