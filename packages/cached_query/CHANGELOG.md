@@ -1,3 +1,7 @@
+## 3.0.0-dev.4
+
+ - **FIX**: change page params in infinite query to not nullable. ([c95b6cd1](https://github.com/D-James-GH/cached_query/commit/c95b6cd1a9739614994aa2ca5b5470a5d3409c8d))
+
 ## 3.0.0-dev.3
 
  - **FEAT**: invalidating a query will, by default, refetch active queries. ([d63579f5](https://github.com/D-James-GH/cached_query/commit/d63579f57b73442ccafcb9b3f94188a85e95198d))

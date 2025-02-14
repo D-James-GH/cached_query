@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-02-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.0-dev.4`](#cached_query---v300-dev4)
+ - [`cached_storage` - `v3.0.0-dev.4`](#cached_storage---v300-dev4)
+ - [`cached_query_flutter` - `v3.0.0-dev.4`](#cached_query_flutter---v300-dev4)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.0.0-dev.4`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.4`
+
+ - **FIX**: change page params in infinite query to not nullable. ([c95b6cd1](https://github.com/D-James-GH/cached_query/commit/c95b6cd1a9739614994aa2ca5b5470a5d3409c8d))
+
+#### `cached_storage` - `v3.0.0-dev.4`
+
+ - **FEAT**(storage): remove stored queries after expiry. ([885f874b](https://github.com/D-James-GH/cached_query/commit/885f874b165566a13cae115c26bfd478334270fe))
+
+
 ## 2025-01-25
 
 ### Changes
