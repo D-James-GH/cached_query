@@ -139,6 +139,7 @@ abstract class QueryBase<T, State extends QueryState<T>> {
           observer.onError(this, stackTrace);
         }
       default:
+        break;
     }
     _emit();
   }
