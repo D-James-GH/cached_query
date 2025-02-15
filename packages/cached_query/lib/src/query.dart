@@ -127,11 +127,11 @@ class Query<T> extends QueryBase<T, QueryStatus<T>> {
   }
 
   Future<void> _fetch() async {
-    // _setState(_state.copyWith(status: QueryStatus.loading));
     _setState(
       QueryLoading(
+        isInitialFetch: state.isInitial,
         timeCreated: _state.timeCreated,
-        isRefetching: _state is QuerySuccess || _state is QueryError,
+        isRefetching: !state.isInitial,
         data: _state.data,
       ),
     );
