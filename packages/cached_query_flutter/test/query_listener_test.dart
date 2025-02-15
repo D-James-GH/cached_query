@@ -18,6 +18,7 @@ void main() {
         final sink = expectQueryStates<String>([
           isQueryState(
             QueryStatus.loading(
+              isInitialFetch: true,
               timeCreated: DateTime.now(),
               isRefetching: false,
             ),
@@ -78,6 +79,7 @@ void main() {
         final sink = expectQueryStates<String>([
           isQueryState(
             QueryStatus.loading(
+              isInitialFetch: true,
               timeCreated: DateTime.now(),
               isRefetching: false,
             ),
