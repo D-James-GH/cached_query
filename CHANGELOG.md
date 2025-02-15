@@ -15,6 +15,36 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`cached_query` - `v3.0.0-dev.5`](#cached_query---v300-dev5)
+ - [`cached_query_flutter` - `v3.0.0-dev.5`](#cached_query_flutter---v300-dev5)
+ - [`cached_storage` - `v3.0.0-dev.5`](#cached_storage---v300-dev5)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.0.0-dev.5`
+ - `cached_storage` - `v3.0.0-dev.5`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.5`
+
+ - **FEAT**: add isInitialFetch to loading state. ([c3799a95](https://github.com/D-James-GH/cached_query/commit/c3799a95287804a84e2c89f309964c26bc0addfa))
+
+
+## 2025-02-14
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`cached_query` - `v3.0.0-dev.4`](#cached_query---v300-dev4)
  - [`cached_storage` - `v3.0.0-dev.4`](#cached_storage---v300-dev4)
  - [`cached_query_flutter` - `v3.0.0-dev.4`](#cached_query_flutter---v300-dev4)

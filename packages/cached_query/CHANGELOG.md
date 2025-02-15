@@ -1,3 +1,7 @@
+## 3.0.0-dev.5
+
+ - **FEAT**: add isInitialFetch to loading state. ([c3799a95](https://github.com/D-James-GH/cached_query/commit/c3799a95287804a84e2c89f309964c26bc0addfa))
+
 ## 3.0.0-dev.4
 
  - **FIX**: change page params in infinite query to not nullable. ([c95b6cd1](https://github.com/D-James-GH/cached_query/commit/c95b6cd1a9739614994aa2ca5b5470a5d3409c8d))

@@ -1,3 +1,7 @@
+## 3.0.0-dev.5
+
+ - Update a dependency to the latest release.
+
 ## 3.0.0-dev.4
 
  - **FEAT**(storage): remove stored queries after expiry. ([885f874b](https://github.com/D-James-GH/cached_query/commit/885f874b165566a13cae115c26bfd478334270fe))
