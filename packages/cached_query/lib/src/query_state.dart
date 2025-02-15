@@ -49,6 +49,7 @@ sealed class QueryStatus<T> implements QueryState<T> {
   const factory QueryStatus.loading({
     required DateTime timeCreated,
     required bool isRefetching,
+    required bool isInitialFetch,
     T? data,
   }) = QueryLoading<T>;
 
@@ -69,7 +70,9 @@ sealed class QueryStatus<T> implements QueryState<T> {
     return switch (this) {
       QueryInitial<T>() => QueryInitial(timeCreated: timeCreated, data: data),
       QuerySuccess<T>() => QuerySuccess(timeCreated: timeCreated, data: data),
-      QueryLoading<T>(:final isRefetching) => QueryLoading(
+      QueryLoading<T>(:final isRefetching, :final isInitialFetch) =>
+        QueryLoading(
+          isInitialFetch: isInitialFetch,
           timeCreated: timeCreated,
           isRefetching: isRefetching,
           data: data,
@@ -138,6 +141,9 @@ class QuerySuccess<T> extends QueryStatus<T> {
 /// The state of the query when the `queryFn` is currently being called.
 /// {@endtemplate}
 class QueryLoading<T> extends QueryStatus<T> {
+  /// True if the query has never been fetched before.
+  final bool isInitialFetch;
+
   /// Whether the query is currently refetching
   final bool isRefetching;
 
@@ -146,19 +152,25 @@ class QueryLoading<T> extends QueryStatus<T> {
     required super.timeCreated,
     super.data,
     required this.isRefetching,
+    required this.isInitialFetch,
   });
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is QueryLoading &&
+          isInitialFetch == other.isInitialFetch &&
           runtimeType == other.runtimeType &&
           timeCreated == other.timeCreated &&
           isRefetching == other.isRefetching &&
           data == other.data;
 
   @override
-  int get hashCode => timeCreated.hashCode ^ data.hashCode;
+  int get hashCode =>
+      timeCreated.hashCode ^
+      data.hashCode ^
+      isRefetching.hashCode ^
+      isInitialFetch.hashCode;
 }
 
 /// {@template QueryError}

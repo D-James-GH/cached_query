@@ -210,10 +210,11 @@ class InfiniteQuery<T, Arg>
     InfiniteQueryDirection? direction,
     Arg? initialArg,
   }) async {
-    final getFromStorage = state.isInitial;
+    final getFromStorage = state.isInitial && config.storeQuery;
 
     _setState(
       InfiniteQueryLoading(
+        isInitialFetch: state.isInitial,
         isFetchingNextPage: direction?.isForward ?? false,
         isRefetching: direction == null,
         data: _state.data,

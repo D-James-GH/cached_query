@@ -44,6 +44,7 @@ sealed class InfiniteQueryStatus<T, Arg>
     required List<Arg>? pageParams,
     required bool isRefetching,
     required bool isFetchingNextPage,
+    required bool isInitialFetch,
   }) = InfiniteQueryLoading<T, Arg>;
 
   ///{@macro InfiniteQueryError}
@@ -143,6 +144,9 @@ class InfiniteQueryInitial<T, Arg> extends InfiniteQueryStatus<T, Arg> {
 /// {@endtemplate}
 class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
     implements InfiniteQueryData<T, Arg> {
+  /// True if the query has never been fetched before.
+  final bool isInitialFetch;
+
   /// True if the query is currently re-fetching data.
   final bool isRefetching;
 
@@ -159,6 +163,7 @@ class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
     required this.pageParams,
     required this.isRefetching,
     required this.isFetchingNextPage,
+    required this.isInitialFetch,
   });
 
   @override
@@ -166,6 +171,7 @@ class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
       identical(this, other) ||
       other is InfiniteQueryLoading &&
           runtimeType == other.runtimeType &&
+          isInitialFetch == other.isInitialFetch &&
           isRefetching == other.isRefetching &&
           isFetchingNextPage == other.isFetchingNextPage &&
           data == other.data &&
@@ -174,6 +180,7 @@ class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
 
   @override
   int get hashCode =>
+      isInitialFetch.hashCode ^
       isRefetching.hashCode ^
       isFetchingNextPage.hashCode ^
       data.hashCode ^
@@ -183,6 +190,7 @@ class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
   @override
   InfiniteQueryLoading<T, Arg> copyWithData(List<T>? data) {
     return InfiniteQueryLoading<T, Arg>(
+      isInitialFetch: isInitialFetch,
       timeCreated: timeCreated,
       data: data,
       pageParams: pageParams,
