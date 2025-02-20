@@ -256,20 +256,24 @@ void main() {
       verifyNever(query3.update(any));
     });
 
-    test("update infinite query", () {
-      final query = MockInfiniteQuery<String, int>();
-      when(query.key).thenReturn("update");
-      CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..updateQuery(
-          key: "update",
-          updateFn: (dynamic value) {
-            if (value is List<String>) {
-              return <String>[];
-            }
-          },
-        );
-      verify(query.update(any));
+    test("update infinite query", () async {
+      final cache = CachedQuery.asNewInstance();
+      final query = InfiniteQuery<String, int>(
+        cache: cache,
+        key: "update",
+        getNextArg: (_) => 1,
+        queryFn: (page) => Future.value(""),
+      );
+      await query.result;
+      cache.updateQuery(
+        key: "update",
+        updateFn: (dynamic v) {
+          final value = v as List<String>;
+          return [...value, "new"];
+        },
+      );
+      expect(query.state.data!.length, 2);
+      expect(query.state.data![1], "new");
     });
   });
 
