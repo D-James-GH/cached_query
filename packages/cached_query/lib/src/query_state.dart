@@ -25,7 +25,7 @@ sealed class QueryState<T> {
   bool get isError;
 
   /// Copy the current state with new data
-  QueryState<T> copyWithData(T? data);
+  QueryState<T> copyWithData(T data);
 }
 
 /// {@template QueryState}
@@ -36,10 +36,10 @@ sealed class QueryStatus<T> implements QueryState<T> {
   final DateTime timeCreated;
 
   @override
-  final T? data;
+  T? get data;
 
   /// {@macro QueryState}
-  const QueryStatus({required this.timeCreated, this.data});
+  const QueryStatus({required this.timeCreated});
 
   const factory QueryStatus.initial({
     required DateTime timeCreated,
@@ -62,11 +62,11 @@ sealed class QueryStatus<T> implements QueryState<T> {
 
   const factory QueryStatus.success({
     required DateTime timeCreated,
-    T? data,
+    required T data,
   }) = QuerySuccess<T>;
 
   @override
-  QueryStatus<T> copyWithData(T? data) {
+  QueryStatus<T> copyWithData(T data) {
     return switch (this) {
       QueryInitial<T>() => QueryInitial(timeCreated: timeCreated, data: data),
       QuerySuccess<T>() => QuerySuccess(timeCreated: timeCreated, data: data),
@@ -103,8 +103,11 @@ sealed class QueryStatus<T> implements QueryState<T> {
 /// The initial state of the query, before the `queryFn` has been called.
 /// {@endtemplate}
 class QueryInitial<T> extends QueryStatus<T> {
+  @override
+  final T? data;
+
   /// {@macro QueryInitial}
-  const QueryInitial({required super.timeCreated, super.data});
+  const QueryInitial({required super.timeCreated, this.data});
 
   @override
   bool operator ==(Object other) =>
@@ -122,8 +125,11 @@ class QueryInitial<T> extends QueryStatus<T> {
 /// The state of the query when the `queryFn` has been successfully called.
 /// {@endtemplate}
 class QuerySuccess<T> extends QueryStatus<T> {
+  @override
+  final T data;
+
   /// {@macro QuerySuccess}
-  const QuerySuccess({required super.timeCreated, super.data});
+  const QuerySuccess({required super.timeCreated, required this.data});
 
   @override
   bool operator ==(Object other) =>
@@ -141,6 +147,9 @@ class QuerySuccess<T> extends QueryStatus<T> {
 /// The state of the query when the `queryFn` is currently being called.
 /// {@endtemplate}
 class QueryLoading<T> extends QueryStatus<T> {
+  @override
+  final T? data;
+
   /// True if the query has never been fetched before.
   final bool isInitialFetch;
 
@@ -150,7 +159,7 @@ class QueryLoading<T> extends QueryStatus<T> {
   /// {@macro QueryLoading}
   const QueryLoading({
     required super.timeCreated,
-    super.data,
+    this.data,
     required this.isRefetching,
     required this.isInitialFetch,
   });
@@ -177,6 +186,9 @@ class QueryLoading<T> extends QueryStatus<T> {
 /// The state of the query when an error is thrown.
 /// {@endtemplate}
 class QueryError<T> extends QueryStatus<T> {
+  @override
+  final T? data;
+
   /// Current error for the query.
   ///
   /// Equal to null if there is no error.
@@ -188,7 +200,7 @@ class QueryError<T> extends QueryStatus<T> {
   ///{@macro QueryError}
   const QueryError({
     required super.timeCreated,
-    super.data,
+    this.data,
     required this.stackTrace,
     required this.error,
   });

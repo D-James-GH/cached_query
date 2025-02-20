@@ -29,7 +29,7 @@ typedef KeyFilterFunc = bool Function(Object unencodedKey, String key);
 /// Update function used to update the data in a query.
 ///
 /// Must return the new data.
-typedef UpdateFunc<T> = T? Function(T? oldData);
+typedef UpdateFunc<T> = T Function(T? oldData);
 
 ///[CachedQuery] is a singleton that keeps track of all the cached queries
 class CachedQuery {
