@@ -1,3 +1,7 @@
+## 3.0.0-dev.6
+
+ - **FEAT**: query success data is now just the type T not T?, data can still be nullable by passing T? as the generic. ([ba5e2b74](https://github.com/D-James-GH/cached_query/commit/ba5e2b74d75a9a743d2492f26e927f592dd83db4))
+
 ## 3.0.0-dev.5
 
  - **FEAT**: add isInitialFetch to loading state. ([c3799a95](https://github.com/D-James-GH/cached_query/commit/c3799a95287804a84e2c89f309964c26bc0addfa))
