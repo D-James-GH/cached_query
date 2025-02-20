@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-02-19
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.0-dev.6`](#cached_query---v300-dev6)
+ - [`cached_query_flutter` - `v3.0.0-dev.6`](#cached_query_flutter---v300-dev6)
+ - [`cached_storage` - `v3.0.0-dev.6`](#cached_storage---v300-dev6)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.6`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.6`
+
+ - **FEAT**: query success data is now just the type T not T?, data can still be nullable by passing T? as the generic. ([ba5e2b74](https://github.com/D-James-GH/cached_query/commit/ba5e2b74d75a9a743d2492f26e927f592dd83db4))
+
+#### `cached_query_flutter` - `v3.0.0-dev.6`
+
+ - **FIX**: broken test. ([84c885c3](https://github.com/D-James-GH/cached_query/commit/84c885c3bd017fc34d940ed40c7cc6c3455317a7))
+
+
 ## 2025-02-14
 
 ### Changes

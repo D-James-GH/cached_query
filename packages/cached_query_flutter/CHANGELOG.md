@@ -1,3 +1,7 @@
+## 3.0.0-dev.6
+
+ - **FIX**: broken test. ([84c885c3](https://github.com/D-James-GH/cached_query/commit/84c885c3bd017fc34d940ed40c7cc6c3455317a7))
+
 ## 3.0.0-dev.5
 
  - Update a dependency to the latest release.
