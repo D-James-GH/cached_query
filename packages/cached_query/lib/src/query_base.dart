@@ -10,6 +10,13 @@ typedef OnQuerySuccessCallback<T> = void Function(T data);
 /// Passes the error through.
 typedef OnQueryErrorCallback<T> = void Function(dynamic error);
 
+///
+sealed class _FetchOptions {
+  final bool isInitialFetch;
+
+  _FetchOptions({required this.isInitialFetch});
+}
+
 /// {@template queryBase}
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
@@ -93,13 +100,22 @@ abstract class QueryBase<T, State extends QueryState<T>> {
   /// Refetch the query immediately.
   ///
   /// Returns the updated [State] and will notify the [stream].
-  Future<State> refetch();
+  Future<State> refetch() => _getResult(forceRefetch: true);
 
-  /// Update the current [Query] data.
+  /// Update the current query data.
   ///
   /// The [updateFn] passes the current query data and must return new data of
   /// the same type as the original query/infiniteQuery.
-  void update(UpdateFunc<T> updateFn);
+  void update(UpdateFunc<T> updateFn) {
+    final newData = updateFn(_state.data);
+    final newState = _state.copyWithData(newData);
+
+    _setState(newState as State);
+    if (config.storeQuery) {
+      _saveToStorage();
+    }
+    _emit();
+  }
 
   /// Mark query as stale.
   ///
@@ -124,7 +140,24 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     _cache.deleteCache(key: key, deleteStorage: deleteStorage);
   }
 
-  Future<State> _getResult();
+  Future<State> _getResult({bool forceRefetch = false}) async {
+    final hasData = _state.data != null;
+    if (!stale && !forceRefetch && !_state.isError && hasData) {
+      _emit();
+      return _state;
+    }
+
+    final shouldRefetch =
+        (config.shouldRefetch?.call(this, false) ?? true) || forceRefetch;
+    if (shouldRefetch || _state.isInitial) {
+      _currentFuture ??= _fetch(initialFetch: _state.isInitial);
+      await _currentFuture;
+      _staleOverride = false;
+    }
+    return _state;
+  }
+
+  Future<void> _fetch({required bool initialFetch});
 
   /// Sets the new state.
   void _setState(State newState) {

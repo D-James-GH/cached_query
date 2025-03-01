@@ -71,9 +71,6 @@ class InfiniteQuery<T, Arg>
 
   final List<T>? _initialData;
 
-  @override
-  Future<InfiniteQueryStatus<T, Arg>> get result => _getResult();
-
   /// Get the last page in the [InfiniteQueryStatus.data]
   T? get lastPage => state.lastPage;
 
@@ -142,40 +139,19 @@ class InfiniteQuery<T, Arg>
     return query;
   }
 
+  @override
+  Future<InfiniteQueryStatus<T, Arg>> get result => _getResult();
+
   /// Get the next page in an [InfiniteQuery] and cache the result.
   Future<InfiniteQueryStatus<T, Arg>?> getNextPage() async {
     final arg = _getNextArg(state);
     if (arg == null) return null;
-    _currentFuture ??= _fetch(direction: InfiniteQueryDirection.forward);
+    _currentFuture ??= _fetch(
+      initialFetch: false,
+      direction: InfiniteQueryDirection.forward,
+    );
     await _currentFuture;
     return state;
-  }
-
-  /// Refetch the query immediately.
-  ///
-  /// Returns the updated [StateBase] and will notify the [stream].
-  @override
-  Future<InfiniteQueryStatus<T, Arg>> refetch() async {
-    _currentFuture ??= _fetch();
-    await _currentFuture;
-    return state;
-  }
-
-  /// Update the current [InfiniteQuery] data.
-  ///
-  /// The [updateFn] passes the current query data and must return new data of
-  /// type [T]
-  @override
-  void update(UpdateFunc<List<T>> updateFn) {
-    final newData = updateFn(_state.data);
-    final newState = _state.copyWithData(newData);
-
-    _setState(newState);
-    if (config.storeQuery) {
-      // save to local storage if exists
-      _saveToStorage();
-    }
-    _emit();
   }
 
   /// True if there are no more pages available to fetch.
@@ -186,29 +162,10 @@ class InfiniteQuery<T, Arg>
   }
 
   @override
-  Future<InfiniteQueryStatus<T, Arg>> _getResult({
-    bool forceRefetch = false,
-  }) async {
-    final hasData = _state.data != null && _state.data!.isNotEmpty;
-    if (!stale && !forceRefetch && !_state.isError && hasData) {
-      _emit();
-      return _state;
-    }
-
-    final shouldRefetch = config.shouldRefetch?.call(this, false) ?? true;
-    if (shouldRefetch || _state.isInitial) {
-      _currentFuture ??= _fetch(
-        initialArg: _state.isInitial ? _getInitialArg() : null,
-      );
-      await _currentFuture;
-      _staleOverride = false;
-    }
-    return _state;
-  }
-
   Future<void> _fetch({
+    required bool initialFetch,
+    Arg? arg,
     InfiniteQueryDirection? direction,
-    Arg? initialArg,
   }) async {
     final getFromStorage = state.isInitial && config.storeQuery;
 
@@ -305,8 +262,7 @@ class InfiniteQuery<T, Arg>
           ),
         );
       } else {
-        final arg =
-            initialArg ?? (direction.isForward ? _getNextArg(_state) : null);
+        arg ??= (direction.isForward ? _getNextArg(_state) : null);
         if (arg == null) {
           return;
         }
@@ -373,7 +329,8 @@ class InfiniteQuery<T, Arg>
   void _preFetchPages(List<Arg> arguments) async {
     for (final arg in arguments) {
       await _fetch(
-        initialArg: arg,
+        initialFetch: false,
+        arg: arg,
         direction: InfiniteQueryDirection.forward,
       );
     }
