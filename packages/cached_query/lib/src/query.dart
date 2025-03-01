@@ -85,48 +85,7 @@ class Query<T> extends QueryBase<T, QueryStatus<T>> {
     return query;
   }
 
-  /// Refetch the query immediately.
-  ///
-  /// Returns the updated [QueryStatus] and will notify the [stream].
-  @override
-  Future<QueryStatus<T>> refetch() => _getResult(forceRefetch: true);
-
-  /// Update the current [Query] data.
-  ///
-  /// The [updateFn] passes the current query data and must return new data of
-  /// type [T]
-  @override
-  void update(UpdateFunc<T> updateFn) {
-    final newData = updateFn(_state.data);
-    final newState = _state.copyWithData(newData);
-
-    _setState(newState);
-    if (config.storeQuery) {
-      // save to local storage if exists
-      _saveToStorage();
-    }
-    _emit();
-  }
-
-  @override
-  Future<QueryStatus<T>> _getResult({bool forceRefetch = false}) async {
-    if (!stale &&
-        !forceRefetch &&
-        _state is! QueryError &&
-        _state.data != null) {
-      _emit();
-      return _state;
-    }
-    final shouldRefetch = config.shouldRefetch?.call(this, false) ?? true;
-    if (shouldRefetch || _state is QueryInitial || forceRefetch) {
-      _currentFuture ??= _fetch();
-      await _currentFuture;
-      _staleOverride = false;
-    }
-    return _state;
-  }
-
-  Future<void> _fetch() async {
+  Future<void> _fetch({required bool initialFetch}) async {
     _setState(
       QueryLoading(
         isInitialFetch: state.isInitial,
