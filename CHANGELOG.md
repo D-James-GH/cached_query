@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-03-01
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.0-dev.7`](#cached_query---v300-dev7)
+ - [`cached_query_flutter` - `v3.0.0-dev.7`](#cached_query_flutter---v300-dev7)
+ - [`cached_storage` - `v3.0.0-dev.7`](#cached_storage---v300-dev7)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.0.0-dev.7`
+ - `cached_storage` - `v3.0.0-dev.7`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.7`
+
+ - **REFACTOR**: move more core logic to query base. ([3a266f79](https://github.com/D-James-GH/cached_query/commit/3a266f79d00e02c79055d7ff3f2ea5e84b9031ad))
+
+
 ## 2025-02-19
 
 ### Changes
