@@ -1,16 +1,10 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'cached_query_test.mocks.dart';
+import 'test_implementations.dart';
 
-@GenerateMocks([StorageInterface, Query, InfiniteQuery])
 void main() {
-  setUp(() {
-    CachedQuery.instance.deleteCache();
-    provideDummy(QueryStatus<String>.initial(timeCreated: DateTime.now()));
-  });
+  setUp(CachedQuery.instance.deleteCache);
   test("Add and get a Query", () {
     final query = Query(key: "query", queryFn: () => Future.value("query"));
     final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
@@ -46,25 +40,27 @@ void main() {
   });
   group("Invalidate cache", () {
     test("Invalidate the whole cache", () async {
-      final query = MockQuery<String>();
-      when(query.key).thenReturn("query");
+      final query = createQuery();
+      // await query.result;
+      expect(query.stale, false);
+      await query.result;
+      expect(query.stale, false);
       CachedQuery.asNewInstance()
         ..addQuery(query)
         ..invalidateCache();
-      verify(query.invalidateQuery());
+      expect(query.stale, true);
     });
 
     test("Invalidate using filter", () async {
-      final query = MockQuery<String>();
-      final query2 = MockQuery<String>();
-      final query3 = MockQuery<String>();
-      when(query.key).thenReturn("query");
-      when(query.unencodedKey).thenReturn("query");
-      when(query2.key).thenReturn("query2");
-      when(query2.unencodedKey).thenReturn("query2");
-      when(query3.key).thenReturn("other_key");
-      when(query3.unencodedKey).thenReturn("other_key");
+      final query = createQuery();
+      final query2 = createQuery();
+      final query3 = createQuery(key: "other_invalid_key");
       CachedQuery.asNewInstance()
+        ..config(
+          config: QueryConfig(
+            refetchDuration: const Duration(minutes: 5),
+          ),
+        )
         ..addQuery(query)
         ..addQuery(query2)
         ..addQuery(query3)
@@ -76,23 +72,23 @@ void main() {
             return false;
           },
         );
-      verify(query.invalidateQuery());
-      verify(query2.invalidateQuery());
-      verifyNever(query3.invalidateQuery());
+      // verify(query.invalidateQuery());
+      // verify(query2.invalidateQuery());
+      // verifyNever(query3.invalidateQuery());
+      expect(query.stale, true);
+      expect(query2.stale, true);
+      expect(query3.stale, false);
     });
 
     test("Invalidate the query", () async {
-      final query = MockQuery<String>();
-      when(query.key).thenReturn("query");
-
-      final query2 = MockQuery<String>();
-      when(query2.key).thenReturn("query2");
+      final query = createQuery(key: "query");
+      final query2 = createQuery();
       CachedQuery.asNewInstance()
         ..addQuery(query)
         ..addQuery(query)
         ..invalidateCache(key: "query");
-      verify(query.invalidateQuery());
-      verifyNever(query2.invalidateQuery());
+      expect(query.stale, true);
+      expect(query2.stale, false);
     });
 
     test("Invalidate fetches active query", () async {
@@ -141,8 +137,7 @@ void main() {
   });
   group("Delete cache", () {
     test("Delete the whole cache", () async {
-      final query = MockQuery<String>();
-      when(query.key).thenReturn("delete");
+      final query = createQuery();
       final cachedQuery = CachedQuery.asNewInstance()
         ..addQuery(query)
         ..deleteCache();
@@ -150,15 +145,9 @@ void main() {
     });
 
     test("Delete using filter", () async {
-      final query = MockQuery<String>();
-      final query2 = MockQuery<String>();
-      final query3 = MockQuery<String>();
-      when(query.key).thenReturn("query");
-      when(query.unencodedKey).thenReturn("query");
-      when(query2.key).thenReturn("query2");
-      when(query2.unencodedKey).thenReturn("query2");
-      when(query3.key).thenReturn("other_key");
-      when(query3.unencodedKey).thenReturn("other_key");
+      final query = createQuery();
+      final query2 = createQuery();
+      final query3 = createQuery(key: "other_key");
       final cache = CachedQuery.asNewInstance()
         ..addQuery(query)
         ..addQuery(query2)
@@ -177,83 +166,93 @@ void main() {
     });
 
     test("Delete using filter with storage", () async {
-      final query = MockQuery<String>();
-      final storage = MockStorageInterface();
-      when(query.key).thenReturn("query");
-      when(query.unencodedKey).thenReturn("query");
-      CachedQuery.asNewInstance()
-        ..config(storage: storage)
-        ..addQuery(query)
-        ..deleteCache(
-          deleteStorage: true,
-          filterFn: (unencodedKey, key) {
-            if (key.contains("query")) {
-              return true;
-            }
-            return false;
-          },
-        );
-      verify(storage.delete("query"));
+      var deletedKey = "";
+      final storage = TestStorage(
+        onDelete: (key) {
+          deletedKey = key;
+        },
+      );
+
+      final cache = CachedQuery.asNewInstance()..config(storage: storage);
+
+      final query = createQuery(
+        cache: cache,
+        key: "query",
+      );
+      await query.result;
+      cache.deleteCache(
+        deleteStorage: true,
+        filterFn: (unencodedKey, key) {
+          if (key.contains("query")) {
+            return true;
+          }
+          return false;
+        },
+      );
+
+      expect(deletedKey, "query");
+      expect(cache.getQuery("query"), isNull);
     });
+
     test("Delete whole cache and storage", () async {
-      final query = MockQuery<String>();
-      when(query.key).thenReturn("delete");
-      final storage = MockStorageInterface();
-      CachedQuery.asNewInstance()
-        ..config(storage: storage)
-        ..addQuery(query)
-        ..deleteCache(deleteStorage: true);
-      verify(storage.deleteAll());
+      var deletedAll = false;
+      final storage = TestStorage(
+        onDeleteAll: () {
+          deletedAll = true;
+        },
+      );
+
+      final cache = CachedQuery.asNewInstance()..config(storage: storage);
+
+      final query = createQuery(
+        cache: cache,
+        key: "query",
+      );
+      await query.result;
+      cache.deleteCache(deleteStorage: true);
+
+      expect(deletedAll, true);
     });
 
     test("Delete the query", () async {
-      final query = MockQuery<String>();
-      when(query.key).thenReturn("delete");
-      final query2 = MockQuery<String>();
-      when(query2.key).thenReturn("delete2");
-      final cachedQuery = CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..addQuery(query2)
-        ..deleteCache(key: "delete2");
+      createQuery(key: "delete");
+      createQuery(key: "delete2");
 
-      expect(cachedQuery.getQuery("delete"), isNotNull);
-      expect(cachedQuery.getQuery("delete2"), isNull);
+      CachedQuery.instance.deleteCache(key: "delete2");
+
+      expect(CachedQuery.instance.getQuery("delete"), isNotNull);
+      expect(CachedQuery.instance.getQuery("delete2"), isNull);
     });
   });
   group("group", () {
-    test("update query", () {
-      final query = MockQuery<String>();
-      when(query.key).thenReturn("update");
-      CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..updateQuery(
-          key: "update",
-          updateFn: (dynamic value) => "",
-        );
-      verify(query.update(any));
+    test("update query", () async {
+      const res = "updated value";
+      final query = createQuery(key: "update");
+      await query.result;
+      expect(query.state.data, "result");
+      CachedQuery.instance.updateQuery(
+        key: "update",
+        updateFn: (dynamic value) => res,
+      );
+      expect(query.state.data, res);
     });
 
-    test("update query multiple queries with filter", () {
-      final query = MockQuery<String>();
-      final query2 = MockQuery<String>();
-      final query3 = MockQuery<String>();
-      when(query.key).thenReturn("query");
-      when(query.unencodedKey).thenReturn("query");
-      when(query2.key).thenReturn("query2");
-      when(query2.unencodedKey).thenReturn("query2");
-      when(query3.key).thenReturn("other_key");
-      when(query3.unencodedKey).thenReturn("other_key");
-      CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..addQuery(query2)
-        ..addQuery(query3)
-        ..updateQuery(
-          filterFn: (unencodedKey, key) => key.startsWith("query"),
-          updateFn: (dynamic value) => "",
-        );
-      verify(query.update(any));
-      verify(query2.update(any));
-      verifyNever(query3.update(any));
+    test("update query multiple queries with filter", () async {
+      final query = createQuery();
+      await query.result;
+      final query2 = createQuery();
+      await query2.result;
+      final query3 = createQuery(key: "other_key");
+      await query3.result;
+
+      CachedQuery.instance.updateQuery(
+        filterFn: (unencodedKey, key) => key.startsWith("query"),
+        updateFn: (dynamic value) => "updated",
+      );
+
+      expect(query.state.data, "updated");
+      expect(query2.state.data, "updated");
+      expect(query3.state.data, testQueryRes);
     });
 
     test("update infinite query", () async {
@@ -361,14 +360,9 @@ void main() {
     });
   });
   test("Where query", () {
-    final query = MockQuery<String>();
-    when(query.key).thenReturn("1");
-    final query2 = MockQuery<String>();
-    when(query2.key).thenReturn("2");
-    final cachedQuery = CachedQuery.asNewInstance()
-      ..addQuery(query)
-      ..addQuery(query2);
-    final queries = cachedQuery.whereQuery((p) => p.key == "2");
+    createQuery(key: "1");
+    createQuery(key: "2");
+    final queries = CachedQuery.instance.whereQuery((p) => p.key == "2");
     expect(queries!.length, 1);
     expect(queries.first.key, "2");
   });

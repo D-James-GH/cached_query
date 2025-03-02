@@ -1,8 +1,8 @@
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
-import 'mock_storage.dart';
 import 'repos/query_test_repo.dart';
+import 'test_implementations.dart';
 
 void main() {
   final cachedQuery = CachedQuery.instance;
@@ -238,7 +238,7 @@ void main() {
   });
 
   group("Fetch from storage", () {
-    final storage = MockStorage();
+    final storage = TestStorage();
     setUpAll(() => CachedQuery.instance.config(storage: storage));
     tearDown(cachedQuery.deleteCache);
 
@@ -251,8 +251,8 @@ void main() {
         queryFn: () => Future.value(data),
       );
       await query.result;
-      expect(storage.store.length, 1);
-      expect(storage.store.firstWhere((e) => e.key == key).data, data);
+      expect(storage.queries.length, 1);
+      expect(storage.queries.values.firstWhere((e) => e.key == key).data, data);
     });
 
     test("Should not return if expired", () async {
@@ -323,8 +323,8 @@ void main() {
         ),
       );
       await query.result;
-      expect(storage.store.length, 1);
-      expect(storage.store.firstWhere((e) => e.key == key).data, convertedData);
+      expect(storage.queries.length, 1);
+      expect(storage.queries[key]!.data, convertedData);
     });
 
     test("Should not store query if specified", () async {
@@ -337,14 +337,14 @@ void main() {
         ),
       );
       await query.result;
-      expect(storage.store.length, 0);
+      expect(storage.queries.length, 0);
     });
 
     test("Should get initial data from storage before queryFn", () async {
       const key = "getInitial";
       final storedQuery = StoredQuery(
         key: key,
-        data: MockStorage.data,
+        data: testQueryRes,
         createdAt: DateTime.now(),
       );
       // Make sure the storage has initial data
@@ -362,7 +362,7 @@ void main() {
               output.add(event.data!);
             }
             if (output.length == 1) {
-              expect(output[0], MockStorage.data);
+              expect(output[0], testQueryRes);
             }
           },
           max: 3,
@@ -375,7 +375,7 @@ void main() {
       final storedQuery = StoredQuery(
         key: key,
         data: {
-          key: {"name": MockStorage.data},
+          key: {"name": testQueryRes},
         },
         createdAt: DateTime.now(),
       );
@@ -399,7 +399,7 @@ void main() {
             }
             if (output.length == 1) {
               expect(output[0], isA<Serializable>());
-              expect((output[0] as Serializable).name, MockStorage.data);
+              expect((output[0] as Serializable).name, testQueryRes);
             }
           },
           max: 3,
@@ -420,11 +420,11 @@ void main() {
       await query.result;
       final res2 = await query.refetch();
       expect(
-        storage.store.firstWhere((element) => element.key == key).data,
+        storage.queries[key]!.data,
         count,
       );
       expect(
-        storage.store.firstWhere((element) => element.key == key).data,
+        storage.queries[key]!.data,
         res2.data,
       );
     });
@@ -433,7 +433,7 @@ void main() {
       int numCalls = 0;
       const key = "query_no_fetch_storage";
       const data = {"test": "storage_data"};
-      storage.store[0] =
+      storage.queries[key] =
           StoredQuery(key: key, data: data, createdAt: DateTime.now());
       final query = Query<Map<String, dynamic>>(
         key: key,

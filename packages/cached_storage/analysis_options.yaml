@@ -17,7 +17,6 @@ linter:
   rules:
     cancel_subscriptions: true
     avoid_print: true
-    package_api_docs: true
     unnecessary_statements: true
     sort_child_properties_last: true
     always_declare_return_types: true
