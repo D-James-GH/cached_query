@@ -1,3 +1,7 @@
+## 3.0.0-dev.8
+
+ - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
+
 ## 3.0.0-dev.7
 
  - **REFACTOR**: move more core logic to query base. ([3a266f79](https://github.com/D-James-GH/cached_query/commit/3a266f79d00e02c79055d7ff3f2ea5e84b9031ad))

@@ -1,3 +1,7 @@
+## 3.0.0-dev.8
+
+ - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
+
 ## 3.0.0-dev.7
 
  - Update a dependency to the latest release.
