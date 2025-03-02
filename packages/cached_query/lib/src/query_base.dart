@@ -10,13 +10,6 @@ typedef OnQuerySuccessCallback<T> = void Function(T data);
 /// Passes the error through.
 typedef OnQueryErrorCallback<T> = void Function(dynamic error);
 
-///
-sealed class _FetchOptions {
-  final bool isInitialFetch;
-
-  _FetchOptions({required this.isInitialFetch});
-}
-
 /// {@template queryBase}
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
@@ -42,13 +35,15 @@ abstract class QueryBase<T, State extends QueryState<T>> {
   /// The current state of the query.
   State get state => _state;
 
+  bool _invalidated = false;
+
   /// Whether the current query is marked as stale and therefore requires a
   /// refetch.
   bool get stale {
     return _state.timeCreated
             .add(config.refetchDuration)
             .isBefore(DateTime.now()) ||
-        _staleOverride;
+        _invalidated;
   }
 
   /// The config for this specific query.
@@ -80,6 +75,7 @@ abstract class QueryBase<T, State extends QueryState<T>> {
 
   /// Broadcast stream controller that reacts to changes to the query state
   BehaviorSubject<State>? _streamController;
+  State _state;
 
   final CachedQuery _cache;
   Timer? _deleteQueryTimer;
@@ -90,12 +86,9 @@ abstract class QueryBase<T, State extends QueryState<T>> {
   set _currentFuture(Future<void>? future) {
     _f = future?.whenComplete(() {
       _currentFuture = null;
+      _invalidated = false;
     });
   }
-
-// Initialise the query as stale so the first fetch is guaranteed to happen
-  bool _staleOverride = true;
-  State _state;
 
   /// Refetch the query immediately.
   ///
@@ -128,10 +121,10 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     bool refetchActive = true,
     bool refetchInactive = false,
   }) {
-    _staleOverride = true;
     if ((hasListener && refetchActive) || refetchInactive) {
       return refetch();
     }
+    _invalidated = true;
     return Future.value();
   }
 
@@ -142,7 +135,11 @@ abstract class QueryBase<T, State extends QueryState<T>> {
 
   Future<State> _getResult({bool forceRefetch = false}) async {
     final hasData = _state.data != null;
-    if (!stale && !forceRefetch && !_state.isError && hasData) {
+    if (!stale &&
+        !forceRefetch &&
+        !_state.isError &&
+        hasData &&
+        !state.isInitial) {
       _emit();
       return _state;
     }
@@ -152,7 +149,6 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     if (shouldRefetch || _state.isInitial) {
       _currentFuture ??= _fetch(initialFetch: _state.isInitial);
       await _currentFuture;
-      _staleOverride = false;
     }
     return _state;
   }

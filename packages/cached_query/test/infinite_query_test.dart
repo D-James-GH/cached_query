@@ -6,8 +6,8 @@ import 'dart:math';
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
-import 'mock_storage.dart';
 import 'repos/infinite_query_test_repo.dart';
+import 'test_implementations.dart';
 
 void main() async {
   final repo = InfiniteQueryTestRepository();
@@ -421,7 +421,7 @@ void main() async {
     });
   });
   group("Infinite Query storage", () {
-    final storage = MockStorage();
+    final storage = TestStorage();
     setUpAll(() => CachedQuery.instance.config(storage: storage));
     tearDown(() {
       storage.deleteAll();
@@ -441,9 +441,9 @@ void main() async {
         },
       );
       await query.result;
-      expect(storage.store.length, 1);
+      expect(storage.queries.values.length, 1);
       expect(
-        storage.store.firstWhere((element) => element.key == key).data,
+        storage.queries.values.firstWhere((element) => element.key == key).data,
         [0],
       );
     });
@@ -523,12 +523,13 @@ void main() async {
         },
       );
       await query.result;
-      expect(storage.store.length, 1);
+      expect(storage.queries.length, 1);
       expect(
-        storage.store.firstWhere((element) => element.key == key).data,
+        storage.queries[key]!.data,
         convertedData,
       );
     });
+
     test("Should not store infinite query if specified", () async {
       storage.deleteAll();
       const key = "store";
@@ -542,7 +543,7 @@ void main() async {
         },
       );
       await query.result;
-      expect(storage.store.length, 0);
+      expect(storage.queries.length, 0);
     });
 
     test("Should get Infinite Query initial data from storage before queryFn",
@@ -585,7 +586,7 @@ void main() async {
       const key = "serialize";
       final storedQuery = StoredQuery(
         key: key,
-        data: jsonEncode([Serializable(MockStorage.data)]),
+        data: jsonEncode([Serializable(testQueryRes)]),
         createdAt: DateTime.now(),
       );
       // Make sure the storage has initial data
@@ -617,7 +618,7 @@ void main() async {
               expect(output[0], isA<List<Serializable>>());
               expect(
                 (output[0] as List<Serializable>).first.name,
-                MockStorage.data,
+                testQueryRes,
               );
             }
             count++;
@@ -644,11 +645,11 @@ void main() async {
       await query.result;
       final res2 = await query.refetch();
       expect(
-        (storage.store.firstWhere((e) => e.key == key).data as List).first,
+        storage.queries[key]!.data.first,
         count,
       );
       expect(
-        (storage.store.firstWhere((e) => e.key == key).data as List).first,
+        storage.queries[key]!.data.first,
         res2.data!.first,
       );
     });
@@ -658,12 +659,10 @@ void main() async {
       const key = "query_no_fetch_storage";
       const data = 1000;
       storage.deleteAll();
-      storage.store.add(
-        StoredQuery(
-          key: key,
-          data: [data],
-          createdAt: DateTime.now(),
-        ),
+      storage.queries[key] = StoredQuery(
+        key: key,
+        data: [data],
+        createdAt: DateTime.now(),
       );
 
       final query = InfiniteQuery<int, int>(

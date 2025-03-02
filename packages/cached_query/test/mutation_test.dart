@@ -1,13 +1,10 @@
 import 'dart:convert';
 
 import 'package:cached_query/cached_query.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'mutation_test.mocks.dart';
+import 'test_implementations.dart';
 
-@GenerateMocks([Query])
 void main() {
   group("Creating a mutation", () {
     test("Can create a mutation object", () {
@@ -201,16 +198,15 @@ void main() {
     });
     test("Queries should be invalidated", () async {
       const key = "invalidate";
-      final query = MockQuery<String>();
-      when(query.key).thenReturn(key);
-      CachedQuery.instance.addQuery(query);
-
+      final query = createQuery(key: key);
+      await query.result;
+      expect(query.stale, false);
       final mutation = Mutation<String, void>(
         invalidateQueries: [key],
         queryFn: (_) async => "",
       );
       await mutation.mutate();
-      verify(query.invalidateQuery());
+      expect(query.stale, true);
     });
   });
 }
