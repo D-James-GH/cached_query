@@ -15,6 +15,37 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`cached_query` - `v3.0.0-dev.8`](#cached_query---v300-dev8)
+ - [`cached_query_flutter` - `v3.0.0-dev.8`](#cached_query_flutter---v300-dev8)
+ - [`cached_storage` - `v3.0.0-dev.8`](#cached_storage---v300-dev8)
+
+---
+
+#### `cached_query` - `v3.0.0-dev.8`
+
+ - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
+
+#### `cached_query_flutter` - `v3.0.0-dev.8`
+
+ - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
+
+#### `cached_storage` - `v3.0.0-dev.8`
+
+ - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
+
+
+## 2025-03-01
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`cached_query` - `v3.0.0-dev.7`](#cached_query---v300-dev7)
  - [`cached_query_flutter` - `v3.0.0-dev.7`](#cached_query_flutter---v300-dev7)
  - [`cached_storage` - `v3.0.0-dev.7`](#cached_storage---v300-dev7)
