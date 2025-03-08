@@ -1,5 +1,3 @@
-library cached_query;
-
 export './src/cached_query.dart';
 export 'src/mutation.dart';
 export 'src/query_config.dart';

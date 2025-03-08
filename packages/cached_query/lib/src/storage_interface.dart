@@ -28,7 +28,7 @@ class StoredQuery {
   final String key;
 
   /// The query data
-  final dynamic data;
+  final Object? data;
 
   /// The query expiry
   final DateTime createdAt;
@@ -67,4 +67,25 @@ class StoredQuery {
       storageDuration: storageDuration ?? this.storageDuration,
     );
   }
+
+  @override
+  String toString() {
+    return 'StoredQuery(key: $key, data: $data, createdAt: $createdAt, storageDuration: $storageDuration)';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StoredQuery &&
+          key == other.key &&
+          data == other.data &&
+          createdAt == other.createdAt &&
+          storageDuration == other.storageDuration;
+
+  @override
+  int get hashCode =>
+      key.hashCode ^
+      data.hashCode ^
+      createdAt.hashCode ^
+      storageDuration.hashCode;
 }

@@ -645,11 +645,11 @@ void main() async {
       await query.result;
       final res2 = await query.refetch();
       expect(
-        storage.queries[key]!.data.first,
+        (storage.queries[key]!.data as List<int>).first,
         count,
       );
       expect(
-        storage.queries[key]!.data.first,
+        (storage.queries[key]!.data as List<int>).first,
         res2.data!.first,
       );
     });
