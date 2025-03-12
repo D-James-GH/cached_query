@@ -1,4 +1,4 @@
-part of "cached_query.dart";
+part of "./_query.dart";
 
 /// On success is called when the query function is executed successfully.
 ///
@@ -13,8 +13,8 @@ typedef OnQueryErrorCallback<T> = void Function(dynamic error);
 /// {@template queryBase}
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
-abstract class QueryBase<T, State extends QueryState<T>> {
-  QueryBase._internal({
+abstract final class QueryController<T, State extends QueryState<T>> {
+  QueryController._internal({
     required this.key,
     required this.unencodedKey,
     required State state,
@@ -110,6 +110,18 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     _emit();
   }
 
+  /// Invalidate the query. Deprecated use [invalidate] instead.
+  @Deprecated("Use invalidate instead.")
+  Future<void> invalidateQuery({
+    bool refetchActive = true,
+    bool refetchInactive = false,
+  }) {
+    return invalidate(
+      refetchActive: refetchActive,
+      refetchInactive: refetchInactive,
+    );
+  }
+
   /// Mark query as stale.
   ///
   /// Pass [refetchActive] as true (default) to refetch the query if it has listeners.
@@ -117,7 +129,7 @@ abstract class QueryBase<T, State extends QueryState<T>> {
   /// Pass [refetchInactive] as true (default = false) to refetch the query even if it has no listeners.
   ///
   /// Will force a fetch next time the query is accessed.
-  Future<void> invalidateQuery({
+  Future<void> invalidate({
     bool refetchActive = true,
     bool refetchInactive = false,
   }) {
@@ -145,7 +157,8 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     }
 
     final shouldRefetch =
-        (config.shouldRefetch?.call(this, false) ?? true) || forceRefetch;
+        (config.shouldRefetch?.call(this as QueryBase, false) ?? true) ||
+            forceRefetch;
     if (shouldRefetch || _state.isInitial) {
       _currentFuture ??= _fetch(initialFetch: _state.isInitial);
       await _currentFuture;
@@ -158,14 +171,14 @@ abstract class QueryBase<T, State extends QueryState<T>> {
   /// Sets the new state.
   void _setState(State newState) {
     for (final observer in _cache.observers) {
-      observer.onChange(this, newState);
+      observer.onChange(this as QueryBase, newState);
     }
     _state = newState;
     switch (_state) {
       case InfiniteQueryError(:final stackTrace) ||
             QueryError(:final stackTrace):
         for (final observer in _cache.observers) {
-          observer.onError(this, stackTrace);
+          observer.onError(this as QueryBase, stackTrace);
         }
       default:
         break;
@@ -190,7 +203,7 @@ abstract class QueryBase<T, State extends QueryState<T>> {
         createdAt: _state.timeCreated,
         storageDuration: config.storageDuration,
       );
-      _cache._storage!.put(storedQuery);
+      _cache.storage!.put(storedQuery);
     }
   }
 

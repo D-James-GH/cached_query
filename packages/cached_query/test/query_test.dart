@@ -196,7 +196,7 @@ void main() {
       final query = Query(
         key: "invalidate",
         queryFn: fetchFunction,
-      )..invalidateQuery();
+      )..invalidate();
       expect(query.stale, true);
     });
 
@@ -213,7 +213,7 @@ void main() {
       );
       final sub = query1.stream.listen((state) {});
       await Future<void>.delayed(Duration.zero);
-      await query1.invalidateQuery();
+      await query1.invalidate();
       expect(query1Count, 2);
       await sub.cancel();
     });
@@ -230,9 +230,9 @@ void main() {
         cache: cache,
       );
       await query.result;
-      await query.invalidateQuery();
+      await query.invalidate();
       expect(query1Count, 1);
-      query.invalidateQuery(refetchInactive: true);
+      query.invalidate(refetchInactive: true);
       expect(query1Count, 2);
     });
   });

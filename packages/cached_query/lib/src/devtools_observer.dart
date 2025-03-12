@@ -1,5 +1,5 @@
-import 'package:cached_query/src/cached_query.dart';
 import 'package:cached_query/src/mutation.dart';
+import 'package:cached_query/src/query/_query.dart';
 import 'package:cached_query/src/query_observer.dart';
 import 'package:cached_query/src/query_state.dart';
 import 'dart:developer' as developer;
@@ -12,14 +12,14 @@ class DevtoolsObserver implements QueryObserver {
 
   @override
   void onChange(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     QueryState<dynamic> nextState,
   ) {
     _emit("query_changed", {"key": query.key});
   }
 
   @override
-  void onError(QueryBase<dynamic, dynamic> query, StackTrace stackTrace) {
+  void onError(QueryBase query, StackTrace stackTrace) {
     _emit("query_error", {"key": query.key});
   }
 
@@ -50,7 +50,7 @@ class DevtoolsObserver implements QueryObserver {
   }
 
   @override
-  void onQueryCreation(QueryBase<dynamic, dynamic> query) {
+  void onQueryCreation(QueryBase query) {
     _emit("query_created", {"key": query.key});
   }
 

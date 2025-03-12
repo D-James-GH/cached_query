@@ -27,7 +27,7 @@ typedef QueryListenerCondition<T extends QueryState<dynamic>> = FutureOr<bool>
 /// {@endtemplate}
 class QueryListener<T extends QueryState<dynamic>> extends StatefulWidget {
   /// The [Query] to used to update the listener.
-  final QueryBase<dynamic, T>? query;
+  final QueryController<dynamic, T>? query;
 
   /// Whether the query should be called immediately.
   final bool enabled;
@@ -67,7 +67,7 @@ class QueryListener<T extends QueryState<dynamic>> extends StatefulWidget {
 
 class _QueryListenerState<T extends QueryState<dynamic>>
     extends State<QueryListener<T>> {
-  late QueryBase<dynamic, T> _query;
+  late QueryController<dynamic, T> _query;
   late T _previousState;
 
   StreamSubscription<T>? _subscription;
@@ -82,10 +82,10 @@ class _QueryListenerState<T extends QueryState<dynamic>>
         "No query found with the key ${widget.queryKey}, have you created it yet?",
       );
       assert(
-        q is QueryBase<dynamic, T>,
+        q is QueryController<dynamic, T>,
         "Query found is not of type QueryBase<dynamic, $T>",
       );
-      _query = q! as QueryBase<dynamic, T>;
+      _query = q! as QueryController<dynamic, T>;
     }
     if (widget.query != null) {
       _query = widget.query!;
@@ -101,11 +101,14 @@ class _QueryListenerState<T extends QueryState<dynamic>>
         oldWidget.query ?? CachedQuery.instance.getQuery(oldWidget.queryKey!);
     final currentQuery =
         widget.query ?? CachedQuery.instance.getQuery(widget.queryKey!);
-    assert(currentQuery is Query<T>, "Query found is not of type $T");
+    assert(
+      currentQuery is QueryController<dynamic, T>,
+      "Query found is not of type $T",
+    );
     if (oldQuery != currentQuery) {
       if (_subscription != null) {
         _unsubscribe();
-        _query = currentQuery as QueryBase<dynamic, T>;
+        _query = currentQuery as QueryController<dynamic, T>;
         _previousState = _query.state;
       }
       if (widget.enabled) {

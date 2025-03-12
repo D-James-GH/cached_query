@@ -3,11 +3,11 @@ import 'package:cached_query/cached_query.dart';
 class SimpleObserver extends QueryObserver {}
 
 class CreationObserver extends QueryObserver {
-  final void Function(QueryBase<dynamic, dynamic>) onCreate;
+  final void Function(QueryBase) onCreate;
 
   CreationObserver(this.onCreate);
   @override
-  void onQueryCreation(QueryBase<dynamic, dynamic> query) {
+  void onQueryCreation(QueryBase query) {
     onCreate(query);
     super.onQueryCreation(query);
   }
@@ -45,7 +45,7 @@ class MutationCreationObserver extends QueryObserver {
 
 class QueryChangeObserver extends QueryObserver {
   final void Function(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     QueryState<dynamic> state,
   ) onLoadingEvent;
 
@@ -53,7 +53,7 @@ class QueryChangeObserver extends QueryObserver {
 
   @override
   void onChange(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     QueryState<dynamic> nextState,
   ) {
     onLoadingEvent(query, nextState);
@@ -63,7 +63,7 @@ class QueryChangeObserver extends QueryObserver {
 
 class QueryFailObserver extends QueryObserver {
   final void Function(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     StackTrace,
   ) onFailEvent;
 
@@ -71,7 +71,7 @@ class QueryFailObserver extends QueryObserver {
 
   @override
   void onError(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     StackTrace stackTrace,
   ) {
     onFailEvent(query, stackTrace);

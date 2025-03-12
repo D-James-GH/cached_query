@@ -1,4 +1,4 @@
-part of 'cached_query.dart';
+part of '_query.dart';
 
 /// The result of the [InfiniteQueryFunc] will be cached.
 typedef InfiniteQueryFunc<T, A> = Future<T> Function(A pageArgs);
@@ -47,8 +47,8 @@ enum InfiniteQueryDirection {
 /// [onError].
 ///
 /// {@endtemplate}
-class InfiniteQuery<T, Arg>
-    extends QueryBase<List<T>, InfiniteQueryStatus<T, Arg>> {
+final class InfiniteQuery<T, Arg>
+    extends QueryController<List<T>, InfiniteQueryStatus<T, Arg>> implements QueryBase {
   /// On success is called when the query function is executed successfully.
   ///
   /// Passes the returned data.
@@ -303,7 +303,7 @@ class InfiniteQuery<T, Arg>
           pageParams: _state.pageParams,
         ),
       );
-      if (CachedQuery.instance._config.shouldRethrow) {
+      if (CachedQuery.instance.defaultConfig.shouldRethrow) {
         rethrow;
       }
     }

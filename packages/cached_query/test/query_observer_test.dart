@@ -13,7 +13,7 @@ void main() {
       expect(CachedQuery.instance.observers.first, isA<SimpleObserver>());
     });
     test("Creating a query is observed", () {
-      QueryBase<dynamic, dynamic>? query;
+      QueryBase? query;
       CachedQuery.instance
           .config(observers: [CreationObserver((q) => query = q)]);
       Query(
@@ -24,7 +24,7 @@ void main() {
     });
 
     test("Creating an infinite query is observed", () {
-      QueryBase<dynamic, dynamic>? query;
+      QueryBase? query;
       CachedQuery.instance
           .config(observers: [CreationObserver((q) => query = q)]);
       InfiniteQuery<String, int>(
@@ -108,7 +108,7 @@ void main() {
 
     test("Should be called when a query is loading", () async {
       int count = 0;
-      QueryBase<dynamic, dynamic>? queryChange;
+      QueryBase? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, nextState) {
           if (nextState.isLoading) {
@@ -128,7 +128,7 @@ void main() {
 
     test("Should be called when a query succeeds", () async {
       int count = 0;
-      QueryBase<dynamic, dynamic>? queryChange;
+      QueryBase? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, nextState) {
           if (nextState.isLoading) {
@@ -148,7 +148,7 @@ void main() {
     test("Should be called when a query fails", () async {
       int count = 0;
       StackTrace? trace;
-      QueryBase<dynamic, dynamic>? queryError;
+      QueryBase? queryError;
       CachedQuery.instance.observers = [
         QueryFailObserver((query, stacktrace) {
           count++;
@@ -168,7 +168,7 @@ void main() {
 
     test("Should be called when a infinite query is fetching", () async {
       int count = 0;
-      QueryBase<dynamic, dynamic>? queryChange;
+      QueryBase? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, next) {
           if (next.isLoading) {
@@ -188,7 +188,7 @@ void main() {
     });
     test("Should be called when a infinite query has succeeded", () async {
       int count = 0;
-      QueryBase<dynamic, dynamic>? queryChange;
+      QueryBase? queryChange;
       CachedQuery.instance.observers = [
         QueryChangeObserver((query, next) {
           if (next.isLoading) {
@@ -209,7 +209,7 @@ void main() {
 
     test("Should be called when a infinite query has failed", () async {
       int count = 0;
-      QueryBase<dynamic, dynamic>? queryChange;
+      QueryBase? queryChange;
       StackTrace? trace;
       CachedQuery.instance.observers = [
         QueryFailObserver((query, stackTrace) {
