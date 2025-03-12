@@ -76,7 +76,7 @@ class QueryLoggingObserver implements QueryObserver {
 
   @override
   void onQueryCreation(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
   ) {
     if (!queryCreation) return;
     _log(
@@ -96,14 +96,18 @@ class QueryLoggingObserver implements QueryObserver {
 
   @override
   void onChange(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     QueryState<dynamic> nextState,
   ) {
     if (!queryChange) return;
     List<String> message;
+    final currentState = switch (query) {
+      InfiniteQuery() => query.state.toString(),
+      Query() => query.state.toString(),
+    };
     if (verbose) {
       message = [
-        _AnsiColors("Prev State: ${query.state}", colors: colors)
+        _AnsiColors("Prev State: $currentState", colors: colors)
             .green
             .toString(),
         _AnsiColors("", colors: colors).reset.toString(),
@@ -112,7 +116,7 @@ class QueryLoggingObserver implements QueryObserver {
       ];
     } else {
       message = [
-        "Prev State: ${query.state}",
+        "Prev State: $currentState",
         "Next State: $nextState",
       ];
     }
@@ -125,13 +129,21 @@ class QueryLoggingObserver implements QueryObserver {
 
   @override
   Future<void> onError(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     StackTrace stackTrace,
   ) async {
     if (!queryError) return;
     var error = "";
-    if (query is InfiniteQuery || query is Query) {
-      error = query.state.error.toString();
+    switch (query) {
+      case InfiniteQuery():
+        if (query.state case InfiniteQueryError(error: final e)) {
+          error = e.toString();
+        }
+      case Query():
+        if (query.state case QueryError(error: final e)) {
+          error = e.toString();
+        }
+        break;
     }
     _log(
       _AnsiColors("[ERROR]", colors: colors).bold.red.toString(),

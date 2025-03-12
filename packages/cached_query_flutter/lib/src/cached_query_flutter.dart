@@ -59,18 +59,21 @@ extension CachedQueryExt on CachedQuery {
   /// A query is considered on screen or active if it has listeners. If a reason
   /// is given then the individual query config will be checked and used to determine
   /// if a query should be re-fetched.
-  void refetchCurrentQueries([RefetchReason? reason]) {
+  Future<void> refetchCurrentQueries([RefetchReason? reason]) async {
     // Check if any queries have listeners and refetch.
-    final queries = whereQuery((query) => query.hasListener);
+    final queries = whereQuery((query) {
+      return query.hasListener;
+    });
 
     if (queries == null) return;
+    final futures = <Future<dynamic>>[];
     for (final query in queries) {
       bool shouldRefetch = false;
       final config = query.config;
 
       // Allow normal refetch rules if user has not configured shouldRefetch
       final bool configShouldRefetch =
-          query.config.shouldRefetch?.call(query, false) ?? true;
+          query.config.shouldRefetch?.call(query as QueryBase, false) ?? true;
 
       if (reason == null) {
         shouldRefetch = configShouldRefetch;
@@ -91,9 +94,10 @@ extension CachedQueryExt on CachedQuery {
       }
 
       if (shouldRefetch) {
-        query.refetch();
+        futures.add(query.refetch());
       }
     }
+    await Future.wait(futures);
   }
 
   /// If the app comes back into the foreground refetch any queries that have listeners.

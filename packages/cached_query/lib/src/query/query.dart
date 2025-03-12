@@ -1,4 +1,4 @@
-part of 'cached_query.dart';
+part of '_query.dart';
 
 /// The result of the [QueryFunc] will be cached.
 typedef QueryFunc<T> = Future<T> Function();
@@ -22,19 +22,8 @@ typedef QueryFunc<T> = Future<T> Function();
 /// [onError].
 ///
 /// {@endtemplate}
-class Query<T> extends QueryBase<T, QueryStatus<T>> {
-  final Future<T> Function() _queryFn;
-
-  /// On success is called when the query function is executed successfully.
-  ///
-  /// Passes the returned data.
-  final OnQuerySuccessCallback<T>? _onSuccess;
-
-  /// On success is called when the query function is executed successfully.
-  ///
-  /// Passes the error through.
-  final OnQueryErrorCallback<T>? _onError;
-
+final class Query<T> extends QueryController<T, QueryStatus<T>>
+    implements QueryBase {
   Query._internal({
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
@@ -84,6 +73,18 @@ class Query<T> extends QueryBase<T, QueryStatus<T>> {
 
     return query;
   }
+
+  final Future<T> Function() _queryFn;
+
+  /// On success is called when the query function is executed successfully.
+  ///
+  /// Passes the returned data.
+  final OnQuerySuccessCallback<T>? _onSuccess;
+
+  /// On success is called when the query function is executed successfully.
+  ///
+  /// Passes the error through.
+  final OnQueryErrorCallback<T>? _onError;
 
   Future<void> _fetch({required bool initialFetch}) async {
     _setState(

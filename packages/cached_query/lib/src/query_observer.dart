@@ -16,7 +16,7 @@ abstract class QueryObserver {
 
   /// Called when an infinite query or query are created in the cache
   void onQueryCreation(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
   ) {}
 
   /// Called when an infinite query or query are deleted from the cache
@@ -26,13 +26,13 @@ abstract class QueryObserver {
   ///
   /// Called before the state changes
   void onChange(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     QueryState<dynamic> nextState,
   ) {}
 
   /// Called if a query fails.
   void onError(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     StackTrace stackTrace,
   ) {}
 

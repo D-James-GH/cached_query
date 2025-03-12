@@ -3,7 +3,7 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 class Observer extends QueryObserver {
   @override
   void onChange(
-    QueryBase<dynamic, dynamic> query,
+    QueryBase query,
     QueryState<dynamic> nextState,
   ) {
     // Do something when changing

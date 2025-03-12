@@ -10,7 +10,7 @@ import 'query_listener.dart';
 /// {@endtemplate}
 class QueryConsumer<T extends QueryState<dynamic>> extends StatelessWidget {
   /// The [Query] to used to update the listener.
-  final QueryBase<dynamic, T> query;
+  final QueryController<dynamic, T> query;
 
   /// Whether the query should be called immediately.
   final bool enabled;
