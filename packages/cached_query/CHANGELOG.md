@@ -1,3 +1,10 @@
+## 3.0.0-dev.9
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: add equlaity to stored query. ([2c4eaa12](https://github.com/D-James-GH/cached_query/commit/2c4eaa1272bd881a9f98ed155de319ccfe0b95b0))
+ - **BREAKING** **REFACTOR**: Rename QueryBase to QueryController. QueryBase is now just a sealed class extended by Query and InfiniteQuery. This is to allow for more specific typing of QueryController if needed without requiring observers to change. ([5dfc7611](https://github.com/D-James-GH/cached_query/commit/5dfc7611c99bb33d459d75e1716d8859fbe9560c))
+
 ## 3.0.0-dev.8
 
  - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
