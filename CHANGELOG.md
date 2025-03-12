@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-03-12
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v3.0.0-dev.9`](#cached_query---v300-dev9)
+ - [`cached_query_flutter` - `v3.0.0-dev.9`](#cached_query_flutter---v300-dev9)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v3.0.0-dev.9`](#cached_storage---v300-dev9)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.9`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.9`
+
+ - **REFACTOR**: add equlaity to stored query. ([2c4eaa12](https://github.com/D-James-GH/cached_query/commit/2c4eaa1272bd881a9f98ed155de319ccfe0b95b0))
+ - **BREAKING** **REFACTOR**: Rename QueryBase to QueryController. QueryBase is now just a sealed class extended by Query and InfiniteQuery. This is to allow for more specific typing of QueryController if needed without requiring observers to change. ([5dfc7611](https://github.com/D-James-GH/cached_query/commit/5dfc7611c99bb33d459d75e1716d8859fbe9560c))
+
+#### `cached_query_flutter` - `v3.0.0-dev.9`
+
+ - **BREAKING** **REFACTOR**: Rename QueryBase to QueryController. QueryBase is now just a sealed class extended by Query and InfiniteQuery. This is to allow for more specific typing of QueryController if needed without requiring observers to change. ([5dfc7611](https://github.com/D-James-GH/cached_query/commit/5dfc7611c99bb33d459d75e1716d8859fbe9560c))
+
+
 ## 2025-03-01
 
 ### Changes
