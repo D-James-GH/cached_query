@@ -48,7 +48,8 @@ enum InfiniteQueryDirection {
 ///
 /// {@endtemplate}
 final class InfiniteQuery<T, Arg>
-    extends QueryController<List<T>, InfiniteQueryStatus<T, Arg>> implements QueryBase {
+    extends QueryController<List<T>, InfiniteQueryStatus<T, Arg>>
+    implements QueryBase {
   /// On success is called when the query function is executed successfully.
   ///
   /// Passes the returned data.
@@ -139,9 +140,6 @@ final class InfiniteQuery<T, Arg>
     return query;
   }
 
-  @override
-  Future<InfiniteQueryStatus<T, Arg>> get result => _getResult();
-
   /// Get the next page in an [InfiniteQuery] and cache the result.
   Future<InfiniteQueryStatus<T, Arg>?> getNextPage() async {
     final arg = _getNextArg(state);
@@ -167,11 +165,11 @@ final class InfiniteQuery<T, Arg>
     Arg? arg,
     InfiniteQueryDirection? direction,
   }) async {
-    final getFromStorage = state.isInitial && config.storeQuery;
+    final getFromStorage = initialFetch && config.storeQuery;
 
     _setState(
       InfiniteQueryLoading(
-        isInitialFetch: state.isInitial,
+        isInitialFetch: initialFetch,
         isFetchingNextPage: direction?.isForward ?? false,
         isRefetching: direction == null,
         data: _state.data,
