@@ -89,9 +89,9 @@ final class Query<T> extends QueryController<T, QueryStatus<T>>
   Future<void> _fetch({required bool initialFetch}) async {
     _setState(
       QueryLoading(
-        isInitialFetch: state.isInitial,
+        isInitialFetch: initialFetch,
         timeCreated: _state.timeCreated,
-        isRefetching: !state.isInitial,
+        isRefetching: !initialFetch,
         data: _state.data,
       ),
     );
