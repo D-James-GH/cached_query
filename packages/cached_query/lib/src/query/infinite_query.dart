@@ -63,13 +63,6 @@ final class InfiniteQuery<T, Arg>
   final GetNextArg<T, Arg> _getNextArg;
   final InfiniteQueryFunc<T, Arg> _queryFn;
 
-  /// Whether the Query should always refetch all pages, not just check the first
-  /// for changes.
-  final bool forceRevalidateAll;
-
-  /// If the fist page has changed then revalidate all pages. Defaults to false. Otherwise replace current data with first page only.
-  final bool revalidateAll;
-
   final List<T>? _initialData;
 
   /// Get the last page in the [InfiniteQueryStatus.data]
@@ -82,8 +75,6 @@ final class InfiniteQuery<T, Arg>
     required GetNextArg<T, Arg> getNextArg,
     required super.config,
     required List<T>? initialData,
-    required this.forceRevalidateAll,
-    required this.revalidateAll,
     required super.cache,
     OnQueryErrorCallback<T>? onError,
     OnQuerySuccessCallback<T>? onSuccess,
@@ -121,8 +112,6 @@ final class InfiniteQuery<T, Arg>
         queryFn: queryFn,
         unencodedKey: key,
         getNextArg: getNextArg,
-        forceRevalidateAll: forceRevalidateAll,
-        revalidateAll: revalidateAll,
         onError: onError,
         onSuccess: onSuccess,
         key: queryKey,
@@ -190,7 +179,7 @@ final class InfiniteQuery<T, Arg>
             _setState(
               InfiniteQuerySuccess(
                 timeCreated: _state.timeCreated,
-                data: _state.data,
+                data: dataFromStorage,
                 pageParams: _state.pageParams ?? [],
               ),
             );
@@ -217,21 +206,21 @@ final class InfiniteQuery<T, Arg>
         }
         final firstPage = await _fetchPage(arg);
 
-        // Check first page for changes.
-        if (!forceRevalidateAll &&
-            _state.data.isNotNullOrEmpty &&
-            pageEquality(firstPage, _state.data![0])) {
-          // As the first pages are equal assume data hasn't changed
-          _onSuccess?.call(firstPage);
-          _setState(
-            InfiniteQuerySuccess(
-              timeCreated: DateTime.now(),
-              data: _state.data,
-              pageParams: _state.pageParams ?? [],
-            ),
-          );
-          return;
-        }
+        // // Check first page for changes.
+        // if (!forceRevalidateAll &&
+        //     _state.data.isNotNullOrEmpty &&
+        //     pageEquality(firstPage, _state.data![0])) {
+        //   // As the first pages are equal assume data hasn't changed
+        //   _onSuccess?.call(firstPage);
+        //   _setState(
+        //     InfiniteQuerySuccess(
+        //       timeCreated: DateTime.now(),
+        //       data: _state.data,
+        //       pageParams: _state.pageParams ?? [],
+        //     ),
+        //   );
+        //   return;
+        // }
 
         InfiniteQuerySuccess<T, Arg> newState = InfiniteQuerySuccess(
           pageParams: [arg],
@@ -239,17 +228,13 @@ final class InfiniteQuery<T, Arg>
           data: [firstPage],
         );
 
-        // Note: Removed re-fetching all pages if the first page has changed unless force revalidate is on.
-        // this was taking too long and didn't seam worth it.
-        if (forceRevalidateAll || revalidateAll) {
-          for (int i = 1; i < (_state.data ?? []).length; i++) {
-            final arg = _getNextArg(newState);
-            if (arg == null) {
-              break;
-            }
-            final res = await _queryFn(arg);
-            newState = newState.copyWithData([...?newState.data, res]);
+        for (int i = 1; i < (_state.data ?? []).length; i++) {
+          final arg = _getNextArg(newState);
+          if (arg == null) {
+            break;
           }
+          final res = await _queryFn(arg);
+          newState = newState.copyWithData([...newState.data, res]);
         }
 
         _setState(

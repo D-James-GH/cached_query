@@ -146,24 +146,29 @@ abstract final class QueryController<T, State extends QueryState<T>> {
   }
 
   Future<State> _getResult({bool forceRefetch = false}) async {
-    final hasData = _state.data != null;
-    if (!stale &&
-        !forceRefetch &&
-        !_state.isError &&
-        hasData &&
-        !state.isInitial) {
+    if (!stale && !forceRefetch && !_state.isError && !state.isInitial) {
       _emit();
       return _state;
     }
 
-    final shouldRefetch =
-        (config.shouldRefetch?.call(this as QueryBase, false) ?? true) ||
-            forceRefetch;
-    if (shouldRefetch || _state.isInitial) {
-      _currentFuture ??= _fetch(initialFetch: _state.isInitial);
-      await _currentFuture;
-    }
+    _currentFuture ??= _createResult(initialFetch: _state.isInitial);
+    await _currentFuture;
     return _state;
+  }
+
+  Future<void> _createResult({required bool initialFetch}) async {
+    final getFromStorage = initialFetch && config.storeQuery;
+    if (getFromStorage) {
+      try {
+        final storedData = await _fetchFromStorage();
+        if (storedData != null) {
+          _setState(_state.copyWithData(storedData) as State);
+        }
+      } catch (e) {
+        //TODO: handle error
+      }
+    }
+    await _fetch(initialFetch: initialFetch);
   }
 
   Future<void> _fetch({required bool initialFetch});

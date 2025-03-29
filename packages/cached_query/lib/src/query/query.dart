@@ -96,18 +96,6 @@ final class Query<T> extends QueryController<T, QueryStatus<T>>
       ),
     );
     try {
-      if (_state.data == null && config.storeQuery) {
-        // try to get any data from storage if the query has no data
-        final storedData = await _fetchFromStorage();
-        if (storedData != null) {
-          _setState(_state.copyWithData(storedData));
-          final shouldRefetch = config.shouldRefetch?.call(this, true) ?? true;
-          if (!shouldRefetch) {
-            return;
-          }
-        }
-      }
-
       final res = await _queryFn();
       if (_onSuccess != null) {
         _onSuccess!(res);
