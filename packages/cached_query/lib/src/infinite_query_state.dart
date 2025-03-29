@@ -20,10 +20,10 @@ sealed class InfiniteQueryStatus<T, Arg>
   final DateTime timeCreated;
 
   @override
-  final List<T>? data;
+  List<T>? get data;
 
   /// {@macro infiniteQueryState}
-  const InfiniteQueryStatus({required this.timeCreated, required this.data});
+  const InfiniteQueryStatus({required this.timeCreated});
 
   const factory InfiniteQueryStatus.initial({
     required DateTime timeCreated,
@@ -58,7 +58,7 @@ sealed class InfiniteQueryStatus<T, Arg>
 
   /// Copy the current state with new data
   @override
-  InfiniteQueryStatus<T, Arg> copyWithData(List<T>? data);
+  InfiniteQueryStatus<T, Arg> copyWithData(List<T> data);
 
   @override
   bool get isInitial => this is InfiniteQueryInitial;
@@ -113,10 +113,13 @@ sealed class InfiniteQueryStatus<T, Arg>
 /// The initial state of the query, before the `queryFn` has been called.
 /// {@endtemplate}
 class InfiniteQueryInitial<T, Arg> extends InfiniteQueryStatus<T, Arg> {
+  @override
+  final List<T>? data;
+
   /// {@macro InfiniteQueryInitial}
   const InfiniteQueryInitial({
     required super.timeCreated,
-    super.data,
+    this.data,
   });
 
   @override
@@ -144,6 +147,9 @@ class InfiniteQueryInitial<T, Arg> extends InfiniteQueryStatus<T, Arg> {
 /// {@endtemplate}
 class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
     implements InfiniteQueryData<T, Arg> {
+  @override
+  final List<T>? data;
+
   /// True if the query has never been fetched before.
   final bool isInitialFetch;
 
@@ -159,7 +165,7 @@ class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg>
   /// {@macro InfiniteQueryLoading}
   const InfiniteQueryLoading({
     required super.timeCreated,
-    required super.data,
+    required this.data,
     required this.pageParams,
     required this.isRefetching,
     required this.isFetchingNextPage,
@@ -208,10 +214,13 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg>
   @override
   final List<Arg> pageParams;
 
+  @override
+  final List<T> data;
+
   ///{@macro InfiniteQuerySuccess}
   const InfiniteQuerySuccess({
     required super.timeCreated,
-    required super.data,
+    required this.data,
     required this.pageParams,
   });
 
@@ -229,7 +238,7 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg>
       data.hashCode ^ pageParams.hashCode ^ timeCreated.hashCode;
 
   @override
-  InfiniteQuerySuccess<T, Arg> copyWithData(List<T>? data) {
+  InfiniteQuerySuccess<T, Arg> copyWithData(List<T> data) {
     return InfiniteQuerySuccess<T, Arg>(
       timeCreated: timeCreated,
       data: data,
@@ -243,6 +252,9 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg>
 /// {@endtemplate}
 class InfiniteQueryError<T, Arg> extends InfiniteQueryStatus<T, Arg>
     implements InfiniteQueryData<T, Arg> {
+  @override
+  final List<T>? data;
+
   /// Current error for the query.
   ///
   /// Equal to null if there is no error.
@@ -257,7 +269,7 @@ class InfiniteQueryError<T, Arg> extends InfiniteQueryStatus<T, Arg>
   /// {@macro InfiniteQueryError}
   const InfiniteQueryError({
     required super.timeCreated,
-    required super.data,
+    required this.data,
     required this.error,
     required this.stackTrace,
     required this.pageParams,
