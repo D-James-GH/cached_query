@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 /// Should return true if a condition is met.
 ///
 /// Similar to List.where.
-typedef WhereCallback = bool Function(QueryController<dynamic, dynamic> query);
+typedef WhereCallback = bool Function(QueryBase query);
 
 /// Used to serialize or deserialize the query from storage.
 typedef Serializer = dynamic Function(dynamic json);
@@ -33,9 +33,9 @@ class CachedQuery {
 
   bool _configSet = false;
 
-  QueryConfig _config = QueryConfig.defaults();
+  GlobalQueryConfig _config = GlobalQueryConfig();
 
-  Map<String, QueryController<dynamic, dynamic>> _queryCache = {};
+  Map<String, Cacheable<dynamic, dynamic, dynamic>> _queryCache = {};
 
   StorageInterface? _storage;
 
@@ -43,7 +43,7 @@ class CachedQuery {
   StorageInterface? get storage => _storage;
 
   /// The current global config that is set.
-  QueryConfig get defaultConfig => _config;
+  GlobalQueryConfig get defaultConfig => _config;
 
   /// Whether global configs have been set.
   bool get isConfigSet => _configSet;
@@ -60,7 +60,7 @@ class CachedQuery {
   @visibleForTesting
   void reset() {
     _configSet = false;
-    _config = QueryConfig.defaults();
+    _config = GlobalQueryConfig();
     deleteCache();
   }
 
@@ -83,7 +83,7 @@ class CachedQuery {
   /// {@endtemplate}
   void config({
     StorageInterface? storage,
-    QueryConfig? config,
+    GlobalQueryConfig? config,
     List<QueryObserver>? observers,
   }) {
     assert(_configSet == false, "Config defaults must only be set once.");
@@ -105,10 +105,10 @@ class CachedQuery {
   }
 
   /// Get a [Query] at a given key.
-  QueryController<dynamic, dynamic>? getQuery(Object key) {
+  QueryBase? getQuery(Object key) {
     final k = encodeKey(key);
     if (_queryCache.containsKey(k)) {
-      return _queryCache[k];
+      return _queryCache[k] as QueryBase;
     }
     return null;
   }
@@ -125,11 +125,11 @@ class CachedQuery {
       key != null || filterFn != null,
       "key or filterFn must not be null",
     );
-    List<QueryController<dynamic, dynamic>> queries = [];
+    List<Cacheable<dynamic, dynamic, dynamic>> queries = [];
     if (filterFn != null) {
       queries = _filterQueryKey(filter: filterFn);
     } else if (key != null) {
-      final query = getQuery(key);
+      final query = getQuery(key) as Cacheable<dynamic, dynamic, dynamic>?;
       if (query != null) {
         queries.add(query);
       }
@@ -140,13 +140,13 @@ class CachedQuery {
   }
 
   /// Find and return a list of [Query]'s matching a given condition.
-  List<QueryController<dynamic, dynamic>>? whereQuery(
+  List<QueryBase>? whereQuery(
     WhereCallback findCallback,
   ) {
-    final List<QueryController<dynamic, dynamic>> result = [];
+    final List<QueryBase> result = [];
     for (final query in _queryCache.values) {
-      if (findCallback(query)) {
-        result.add(query);
+      if (findCallback(query as QueryBase)) {
+        result.add(query as QueryBase);
       }
     }
     return result.isNotEmpty ? result : null;
@@ -174,7 +174,7 @@ class CachedQuery {
       key == null || filterFn == null,
       "Cannot pass both key and filterFn",
     );
-    List<QueryController<dynamic, dynamic>> queries = [];
+    List<Cacheable<dynamic, dynamic, dynamic>> queries = [];
 
     if (filterFn != null) {
       queries = _filterQueryKey(filter: filterFn);
@@ -248,7 +248,7 @@ class CachedQuery {
       "Either filterFn or keys must not be null",
     );
 
-    final List<QueryController<dynamic, dynamic>> queries = [];
+    final List<Cacheable<dynamic, dynamic, dynamic>> queries = [];
 
     if (filterFn != null) {
       queries.addAll(_filterQueryKey(filter: filterFn));
@@ -268,14 +268,14 @@ class CachedQuery {
   ///
   /// Shouldn't normally need to add a query manually. Queries are automatically
   /// added to the cache when they are constructed.
-  void addQuery(QueryController<dynamic, dynamic> query) {
+  void addQuery(QueryBase query) {
     for (final ob in observers) {
-      ob.onQueryCreation(query as QueryBase);
+      ob.onQueryCreation(query);
     }
-    _queryCache[query.key] = query;
+    _queryCache[query.key] = query as Cacheable<dynamic, dynamic, dynamic>;
   }
 
-  List<QueryController<dynamic, dynamic>> _filterQueryKey({
+  List<Cacheable<dynamic, dynamic, dynamic>> _filterQueryKey({
     required KeyFilterFunc filter,
   }) {
     return _queryCache.values

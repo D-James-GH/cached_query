@@ -8,21 +8,47 @@ typedef OnQuerySuccessCallback<T> = void Function(T data);
 /// On success is called when the query function is executed successfully.
 ///
 /// Passes the error through.
-typedef OnQueryErrorCallback<T> = void Function(dynamic error);
+typedef OnQueryErrorCallback = void Function(dynamic error);
+
+class FetchOptions {
+  const FetchOptions();
+}
+
+class ControllerState<T> {
+  final T? data;
+  final DateTime timeCreated;
+  ControllerState({
+    required this.data,
+    required this.timeCreated,
+  });
+}
 
 /// {@template queryBase}
 /// An Interface for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
-abstract final class QueryController<T, State extends QueryState<T>> {
-  QueryController._internal({
+final class QueryController<T> {
+  QueryController({
     required this.key,
     required this.unencodedKey,
-    required State state,
-    required QueryConfig? config,
+    required this.onFetch,
+    required T? initialData,
+    required QueryConfig<T>? config,
     required CachedQuery cache,
-  })  : config = config ?? cache.defaultConfig,
-        _cache = cache,
-        _state = state;
+  })  : _cache = cache,
+        state = ControllerState(
+          timeCreated: DateTime.now(),
+          data: initialData,
+        ) {
+    config ??= QueryConfig<T>();
+    this.config = config.mergeWithGlobal(cache.defaultConfig);
+  }
+
+  final Future<T> Function({
+    required FetchOptions options,
+    T? state,
+  }) onFetch;
+
+  ControllerState<T> state;
 
   /// The key used to store and access the query. Encoded using jsonEncode.
   ///
@@ -32,50 +58,41 @@ abstract final class QueryController<T, State extends QueryState<T>> {
   /// The original key.
   final Object unencodedKey;
 
-  /// The current state of the query.
-  State get state => _state;
-
   bool _invalidated = false;
 
   /// Whether the current query is marked as stale and therefore requires a
   /// refetch.
   bool get stale {
-    return _state.timeCreated
+    return state.timeCreated
             .add(config.refetchDuration)
             .isBefore(DateTime.now()) ||
+        state.data == null ||
         _invalidated;
   }
 
   /// The config for this specific query.
-  final QueryConfig config;
+  late final QueryConfig<T> config;
 
-  /// Weather the query stream has any listeners.
-  bool get hasListener => _streamController?.hasListener ?? false;
-
-  /// Stream the state of the query.
-  ///
-  /// When the state is updated either by a mutation or a new query [stream]
-  /// will be notified.
-  Stream<State> get stream => _getStream();
-
-  /// Get the result of calling the queryFn.
-  ///
-  /// If [result] is used when the [stream] has no listeners [result] will start
-  /// the delete timer once complete. For full caching functionality see [stream].
-  Future<State> get result {
+  Future<void> fetch({
+    bool forceRefetch = false,
+    FetchOptions options = const FetchOptions(),
+  }) async {
     _resetDeleteTimer();
-    // if there are no other listeners and result has been called schedule
-    // a delete.
-    if (!(_streamController?.hasListener ?? false) &&
-        !(_deleteQueryTimer?.isActive ?? false)) {
-      _scheduleDelete();
-    }
-    return _getResult();
+
+    _currentFuture ??= _createResult(
+      forceRefetch: forceRefetch,
+      options: options,
+    );
+    await _currentFuture;
   }
 
   /// Broadcast stream controller that reacts to changes to the query state
-  BehaviorSubject<State>? _streamController;
-  State _state;
+  final StreamController<ControllerAction> _streamController =
+      StreamController(sync: true);
+
+  bool _hasListener = false;
+
+  Stream<ControllerAction> get stream => _streamController.stream;
 
   final CachedQuery _cache;
   Timer? _deleteQueryTimer;
@@ -90,53 +107,35 @@ abstract final class QueryController<T, State extends QueryState<T>> {
     });
   }
 
-  /// Refetch the query immediately.
-  ///
-  /// Returns the updated [State] and will notify the [stream].
-  Future<State> refetch() => _getResult(forceRefetch: true);
-
   /// Update the current query data.
   ///
   /// The [updateFn] passes the current query data and must return new data of
   /// the same type as the original query/infiniteQuery.
   void update(UpdateFunc<T> updateFn) {
-    final newData = updateFn(_state.data);
-    final newState = _state.copyWithData(newData);
+    final newData = updateFn(state.data);
 
-    _setState(newState as State);
-    if (config.storeQuery) {
-      _saveToStorage();
-    }
-    _emit();
-  }
-
-  /// Invalidate the query. Deprecated use [invalidate] instead.
-  @Deprecated("Use invalidate instead.")
-  Future<void> invalidateQuery({
-    bool refetchActive = true,
-    bool refetchInactive = false,
-  }) {
-    return invalidate(
-      refetchActive: refetchActive,
-      refetchInactive: refetchInactive,
+    _setState(
+      ControllerState(
+        data: newData,
+        timeCreated: state.timeCreated,
+      ),
     );
+    _saveToStorage();
   }
 
-  /// Mark query as stale.
-  ///
-  /// Pass [refetchActive] as true (default) to refetch the query if it has listeners.
-  ///
-  /// Pass [refetchInactive] as true (default = false) to refetch the query even if it has no listeners.
-  ///
-  /// Will force a fetch next time the query is accessed.
+  void markAsStale() {
+    _invalidated = true;
+  }
+
   Future<void> invalidate({
     bool refetchActive = true,
     bool refetchInactive = false,
-  }) {
-    if ((hasListener && refetchActive) || refetchInactive) {
-      return refetch();
+  }) async {
+    if ((_hasListener && refetchActive) || refetchInactive) {
+      return fetch(forceRefetch: true);
     }
-    _invalidated = true;
+
+    markAsStale();
     return Future.value();
   }
 
@@ -145,67 +144,110 @@ abstract final class QueryController<T, State extends QueryState<T>> {
     _cache.deleteCache(key: key, deleteStorage: deleteStorage);
   }
 
-  Future<State> _getResult({bool forceRefetch = false}) async {
-    if (!stale && !forceRefetch && !_state.isError && !state.isInitial) {
-      _emit();
-      return _state;
-    }
-
-    _currentFuture ??= _createResult(initialFetch: _state.isInitial);
-    await _currentFuture;
-    return _state;
+  void addListener() {
+    _cancelDelete();
+    _hasListener = true;
   }
 
-  Future<void> _createResult({required bool initialFetch}) async {
-    final getFromStorage = initialFetch && config.storeQuery;
+  void removeListener() {
+    _hasListener = false;
+    _scheduleDelete();
+  }
+
+  Future<void> _createResult({
+    required bool forceRefetch,
+    required FetchOptions options,
+  }) async {
+    if ((!stale && !forceRefetch) ||
+        !config.shouldFetch(key, state.data, state.timeCreated)) {
+      return;
+    }
+    _streamController.add(
+      Fetch(fetchOptions: options, isInitialFetch: state.data == null),
+    );
+    final getFromStorage = state.data == null && config.storeQuery;
     if (getFromStorage) {
       try {
         final storedData = await _fetchFromStorage();
         if (storedData != null) {
-          _setState(_state.copyWithData(storedData) as State);
+          state = ControllerState(
+            data: storedData.data,
+            timeCreated: storedData.createdAt,
+          );
+          _streamController.add(DataUpdated(data: state.data));
         }
-      } catch (e) {
-        //TODO: handle error
+      } catch (e, s) {
+        _streamController.add(StorageError(error: e, stackTrace: s));
       }
     }
-    await _fetch(initialFetch: initialFetch);
+
+    final shouldContinue =
+        config.shouldFetch(key, state.data, state.timeCreated);
+
+    if ((stale || forceRefetch) && shouldContinue) {
+      try {
+        final res = await onFetch(options: options, state: state.data);
+        state = ControllerState(data: res, timeCreated: DateTime.now());
+        _streamController.add(
+          Success(data: state.data, timeCreated: state.timeCreated),
+        );
+        _saveToStorage();
+        if (!_hasListener) {
+          _scheduleDelete();
+        }
+      } catch (e, s) {
+        _streamController.add(FetchError(error: e, stackTrace: s));
+        if (!_hasListener) {
+          _scheduleDelete();
+        }
+        if (config.shouldRethrow) {
+          rethrow;
+        }
+      }
+    } else {
+      _streamController.add(
+        Success(data: state.data, timeCreated: state.timeCreated),
+      );
+    }
   }
 
-  Future<void> _fetch({required bool initialFetch});
-
   /// Sets the new state.
-  void _setState(State newState) {
-    for (final observer in _cache.observers) {
-      observer.onChange(this as QueryBase, newState);
-    }
-    _state = newState;
-    switch (_state) {
-      case InfiniteQueryError(:final stackTrace) ||
-            QueryError(:final stackTrace):
-        for (final observer in _cache.observers) {
-          observer.onError(this as QueryBase, stackTrace);
-        }
-      default:
-        break;
-    }
-    _emit();
+  void _setState(ControllerState<T> newState) {
+    state = newState;
+    _streamController
+        .add(Success(data: state.data, timeCreated: state.timeCreated));
+    // for (final observer in _cache.observers) {
+    //   observer.onChange(this as QueryBase, newState);
+    // }
+    // _state = newState;
+    // switch (_state) {
+    //   case InfiniteQueryError(:final stackTrace) ||
+    //         QueryError(:final stackTrace):
+    //     for (final observer in _cache.observers) {
+    //       observer.onError(this as QueryBase, stackTrace);
+    //     }
+    //   default:
+    //     break;
+    // }
+    // _emit();
   }
 
   /// Emits the current state down the stream.
-  void _emit() {
-    _streamController?.add(_state);
-  }
+  // void _emit() {
+  //   _streamController?.add(_state);
+  // }
 
   void _saveToStorage() {
-    if (_cache.storage != null && _state.data != null) {
-      dynamic dataToStore = _state.data;
+    if (!config.storeQuery) return;
+    if (_cache.storage != null && state.data != null) {
+      dynamic dataToStore = state.data;
       if (config.storageSerializer != null) {
         dataToStore = config.storageSerializer!(dataToStore);
       }
       final storedQuery = StoredQuery(
         key: key,
         data: dataToStore,
-        createdAt: _state.timeCreated,
+        createdAt: state.timeCreated,
         storageDuration: config.storageDuration,
       );
       _cache.storage!.put(storedQuery);
@@ -213,7 +255,7 @@ abstract final class QueryController<T, State extends QueryState<T>> {
   }
 
   /// If the data is expired this will return null.
-  Future<T?> _fetchFromStorage() async {
+  Future<({T data, DateTime createdAt})?> _fetchFromStorage() async {
     if (_cache.storage == null) {
       return null;
     }
@@ -238,29 +280,10 @@ abstract final class QueryController<T, State extends QueryState<T>> {
     }
 
     if (data is T) {
-      return data;
+      return (data: data, createdAt: storedData.createdAt);
     }
 
     return null;
-  }
-
-  Stream<State> _getStream() {
-    if (_streamController != null) {
-      _getResult();
-      return _streamController!.stream;
-    }
-    _streamController = BehaviorSubject.seeded(
-      _state,
-      onListen: _cancelDelete,
-      onCancel: () {
-        _streamController!.close();
-        _streamController = null;
-        _scheduleDelete();
-      },
-    );
-    _getResult();
-
-    return _streamController!.stream;
   }
 
   /// After the [_cacheTime] is up remove the query from the global cache.
@@ -285,7 +308,6 @@ abstract final class QueryController<T, State extends QueryState<T>> {
 
   /// Closes the stream and therefore starts the delete timer.
   Future<void> close() async {
-    await _streamController?.close();
-    _streamController = null;
+    await _streamController.close();
   }
 }

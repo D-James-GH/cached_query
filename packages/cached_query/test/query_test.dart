@@ -14,6 +14,12 @@ void main() {
 
       expect(query, queryFromCache);
     });
+    test("One query is created per key", () {
+      final query1 = Query(key: "query created", queryFn: fetchFunction);
+      final query2 = Query(key: "query created", queryFn: fetchFunction);
+
+      expect(query1, same(query2));
+    });
     test("Query should de-duplicate requests", () async {
       int fetchCount = 0;
       final query1 = Query(
@@ -30,7 +36,7 @@ void main() {
           return fetchFunction();
         },
       );
-      await Future.wait<dynamic>([query1.result, query2.result]);
+      await Future.wait<dynamic>([query1.fetch(), query2.fetch()]);
       expect(fetchCount, 1);
     });
     test("Can create with initial data", () {
@@ -47,25 +53,30 @@ void main() {
     tearDown(cachedQuery.deleteCache);
     test("result returns the return string", () async {
       final query = Query(key: "result", queryFn: fetchFunction);
-      final QueryState<String> res = await query.result;
-      expect(returnString, res.data);
+      final res = await query.fetch();
+      expect(res.data, returnString);
     });
-    test("calling query result twice is de-duped", () async {
-      final QueryState<String> res1 =
-          await Query(key: "calling twice", queryFn: fetchFunction).result;
-      final QueryState<String> res2 =
-          await Query(key: "calling twice", queryFn: fetchFunction).result;
+    test("Calling twice while not stale returns the same result", () async {
+      final QueryState<String> res1 = await Query(
+        key: "calling twice",
+        queryFn: fetchFunction,
+      ).fetch();
+      final QueryState<String> res2 = await Query(
+        key: "calling twice",
+        queryFn: fetchFunction,
+      ).fetch();
       expect(res1.timeCreated, res2.timeCreated);
     });
+
     test("re-fetching does not give the same result", () async {
       final query = Query(key: "re-fetching", queryFn: fetchFunction);
-      final QueryState<String> res1 = await query.result;
+      final QueryState<String> res1 = await query.fetch();
       final QueryState<String> res2 = await query.refetch();
       expect(res1.timeCreated, isNot(res2.timeCreated));
     });
     test("Query does not refetch if refetch duration is not up.", () async {
       int fetchCount = 0;
-      final query1 = Query(
+      final query1 = Query<String>(
         key: "de-dupe",
         config: QueryConfig(
           refetchDuration: const Duration(seconds: 2),
@@ -75,8 +86,8 @@ void main() {
           return fetchFunction();
         },
       );
-      await query1.result;
-      await query1.result;
+      await query1.fetch();
+      await query1.fetch();
       expect(fetchCount, 1);
     });
 
@@ -120,22 +131,25 @@ void main() {
       int i = 0;
 
       Query(
-        key: "stream emits 2 values",
+        key: "stream emits 3 values",
         queryFn: fetchFunction,
       ).stream.listen(
             expectAsync1(
               (event) {
                 if (i == 0) {
                   expect(event.data, isNull);
-                  expect(event, isA<QueryLoading<String>>());
+                  expect(event, isA<QueryInitial<String>>());
                 } else if (i == 1) {
+                  expect(event.data, isNull);
+                  expect(event, isA<QueryLoading<String>>());
+                } else if (i == 2) {
                   expect(event.data, returnString);
                   expect(event, isA<QuerySuccess<String>>());
                 }
                 i++;
               },
-              count: 2,
-              max: 2,
+              count: 3,
+              max: 3,
             ),
           );
     });
@@ -144,6 +158,7 @@ void main() {
       int i = 0;
       QueryState<String>? firstQuery;
       final expectedValues = [
+        isA<QueryInitial<String>>(),
         isA<QueryLoading<String>>(),
         isA<QuerySuccess<String>>(),
         isA<QueryLoading<String>>(),
@@ -177,7 +192,7 @@ void main() {
         key: "update func",
         queryFn: fetchFunction,
       );
-      final res = await query.result;
+      final res = await query.fetch();
       query.update((oldData) {
         expect(oldData, res.data);
         return "Changed query data";
@@ -238,21 +253,30 @@ void main() {
   });
 
   group("Fetch from storage", () {
-    final storage = TestStorage();
-    setUpAll(() => CachedQuery.instance.config(storage: storage));
-    tearDown(cachedQuery.deleteCache);
-
+    TestStorage? storage;
+    CachedQuery? cache;
+    setUp(() {
+      storage = TestStorage();
+      cache = CachedQuery.asNewInstance()
+        ..config(storage: storage, config: GlobalQueryConfig(storeQuery: true));
+    });
+    tearDown(() {
+      storage = null;
+      cache = null;
+    });
     test("Should store the query on fetch", () async {
       const key = "store";
       const data = "someData";
-      storage.deleteAll();
+
       final query = Query<String>(
         key: key,
+        cache: cache,
         queryFn: () => Future.value(data),
       );
-      await query.result;
-      expect(storage.queries.length, 1);
-      expect(storage.queries.values.firstWhere((e) => e.key == key).data, data);
+      await query.fetch();
+      expect(storage!.queries.length, 1);
+      expect(
+          storage!.queries.values.firstWhere((e) => e.key == key).data, data);
     });
 
     test("Should not return if expired", () async {
@@ -260,7 +284,7 @@ void main() {
       const expiredData = "expiredData";
       const newData = "newData";
       const storageDuration = Duration(minutes: 1);
-      storage
+      storage!
         ..deleteAll()
         ..put(
           StoredQuery(
@@ -275,6 +299,7 @@ void main() {
 
       final query = Query<String>(
         key: key,
+        cache: cache,
         config: QueryConfig(storageDuration: storageDuration),
         queryFn: () => Future.value(newData),
       );
@@ -288,7 +313,7 @@ void main() {
       const key = "notExpired";
       const data = "data";
       const storageDuration = Duration(minutes: 1);
-      storage
+      storage!
         ..deleteAll()
         ..put(
           StoredQuery(
@@ -301,6 +326,7 @@ void main() {
 
       final query = Query<String>(
         key: key,
+        cache: cache,
         config: QueryConfig(storageDuration: storageDuration),
         queryFn: () => Future.value("newData"),
       );
@@ -314,30 +340,30 @@ void main() {
       const key = "store";
       const data = "someData";
       const convertedData = "convertedData";
-      storage.deleteAll();
       final query = Query<String>(
         key: key,
+        cache: cache,
         queryFn: () => Future.value(data),
         config: QueryConfig(
           storageSerializer: (_) => convertedData,
         ),
       );
-      await query.result;
-      expect(storage.queries.length, 1);
-      expect(storage.queries[key]!.data, convertedData);
+      await query.fetch();
+      expect(storage!.queries.length, 1);
+      expect(storage!.queries[key]!.data, convertedData);
     });
 
     test("Should not store query if specified", () async {
-      storage.deleteAll();
       final query = Query<String>(
         key: "noStore",
+        cache: cache,
         queryFn: () async => Future.value("data"),
         config: QueryConfig(
           storeQuery: false,
         ),
       );
-      await query.result;
-      expect(storage.queries.length, 0);
+      await query.fetch();
+      expect(storage!.queries.length, 0);
     });
 
     test("Should get initial data from storage before queryFn", () async {
@@ -347,9 +373,11 @@ void main() {
         data: testQueryRes,
         createdAt: DateTime.now(),
       );
-      // Make sure the storage has initial data
-      storage.put(storedQuery);
+
+      storage!.put(storedQuery);
+
       final query = Query<String>(
+        cache: cache,
         key: key,
         queryFn: () async => Future.value("data"),
       );
@@ -365,7 +393,8 @@ void main() {
               expect(output[0], testQueryRes);
             }
           },
-          max: 3,
+          max: 4,
+          count: 4,
         ),
       );
     });
@@ -374,14 +403,13 @@ void main() {
       const key = "serialize";
       final storedQuery = StoredQuery(
         key: key,
-        data: {
-          key: {"name": testQueryRes},
-        },
+        data: {"name": testQueryRes},
         createdAt: DateTime.now(),
       );
       // Make sure the storage has initial data
-      storage.put(storedQuery);
+      storage!.put(storedQuery);
       final query = Query<Serializable>(
+        cache: cache,
         key: key,
         queryFn: () async => Future.value(Serializable("Fetched")),
         config: QueryConfig(
@@ -392,19 +420,18 @@ void main() {
 
       final output = <dynamic>[];
       query.stream.listen(
-        expectAsync1(
-          (event) {
-            if (event.data != null) {
-              output.add(event.data!);
-            }
-            if (output.length == 1) {
-              expect(output[0], isA<Serializable>());
-              expect((output[0] as Serializable).name, testQueryRes);
-            }
-          },
-          max: 3,
-        ),
+        (event) {
+          if (event.data != null) {
+            output.add(event.data);
+          }
+        },
       );
+      await query.fetch();
+      if (output.length == 1) {
+        expect(output[0], isA<Serializable>());
+        expect((output[0] as Serializable).name, testQueryRes);
+        expect((output[1] as Serializable).name, "Fetched");
+      }
     });
 
     test("Storage should update on each fetch", () async {
@@ -412,19 +439,20 @@ void main() {
       const key = "updateStore";
       final query = Query<int>(
         key: key,
+        cache: cache,
         queryFn: () {
           count++;
           return Future.value(count);
         },
       );
-      await query.result;
+      await query.fetch();
       final res2 = await query.refetch();
       expect(
-        storage.queries[key]!.data,
+        storage!.queries[key]!.data,
         count,
       );
       expect(
-        storage.queries[key]!.data,
+        storage!.queries[key]!.data,
         res2.data,
       );
     });
@@ -433,21 +461,27 @@ void main() {
       int numCalls = 0;
       const key = "query_no_fetch_storage";
       const data = {"test": "storage_data"};
-      storage.queries[key] =
+      storage!.queries[key] =
           StoredQuery(key: key, data: data, createdAt: DateTime.now());
       final query = Query<Map<String, dynamic>>(
         key: key,
+        cache: cache,
         queryFn: () {
           numCalls++;
           return Future.value({"test": "data"});
         },
-        config: QueryConfig(
-          shouldRefetch: (query, afterStorage) => !afterStorage,
+        config: QueryConfig<Map<String, dynamic>>(
+          shouldFetch: (key, data, createdAt) {
+            if (data != null) {
+              return false;
+            }
+            return true;
+          },
           refetchDuration: Duration.zero,
         ),
       );
 
-      final res = await query.result;
+      final res = await query.fetch();
 
       expect(numCalls, 0);
       expect(res.data, data);
@@ -464,24 +498,24 @@ void main() {
         key: "error",
         queryFn: () async => throw "This is an error",
       );
-      final res = await query.result;
+      final res = await query.fetch();
       expect(res.isError, true);
     });
     test("Result should rethrow if specified ", () async {
-      cachedQuery
-        ..reset()
-        ..config(config: QueryConfig(shouldRethrow: true));
+      final cache = CachedQuery.asNewInstance()
+        ..config(config: GlobalQueryConfig(shouldRethrow: true));
       try {
         final query = Query<String>(
           key: "error2",
+          cache: cache,
           queryFn: () async {
             throw "this is an error";
           },
         );
-        await query.result;
+        await query.fetch();
         fail("Should throw");
       } catch (e) {
-        expect(e, "this is an error");
+        expect(e.toString(), "this is an error");
       }
     });
     test("onError should be called", () async {
@@ -508,42 +542,44 @@ void main() {
   });
 
   group("Should refetch", () {
-    tearDownAll(cachedQuery.deleteCache);
     test("query should never refresh if returning false", () async {
+      final cache = CachedQuery.asNewInstance();
       int numCalls = 0;
-      final query = Query(
+      final query = Query<String>(
         key: "should_refetch_false",
+        cache: cache,
         queryFn: () {
           numCalls++;
           return Future.value("");
         },
         config: QueryConfig(
-          shouldRefetch: (query, _) => false,
+          shouldFetch: (_, __, ___) => false,
           refetchDuration: Duration.zero,
         ),
       );
 
-      await query.result;
-      await query.result;
+      await query.fetch();
+      await query.fetch();
 
-      expect(numCalls, 1);
+      expect(numCalls, 0);
     });
 
     test("can still force refetch", () async {
       int numCalls = 0;
-      final query = Query(
+      final cache = CachedQuery.asNewInstance();
+      final query = Query<String>(
         key: "force_refetch_should_refetch",
-        queryFn: () {
+        cache: cache,
+        queryFn: () async {
           numCalls++;
           return Future.value("");
         },
         config: QueryConfig(
-          shouldRefetch: (query, _) => false,
           refetchDuration: Duration.zero,
         ),
       );
 
-      await query.result;
+      await query.fetch();
       await query.refetch();
 
       expect(numCalls, 2);
