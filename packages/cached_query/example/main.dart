@@ -6,8 +6,8 @@ import 'package:cached_query/cached_query.dart';
 void main() async {
   // Optionally initialise cached query with a config
   CachedQuery.instance.config(
-    config: QueryConfig(
-      cacheDuration: const Duration(minutes: 5),
+    config: GlobalQueryConfig(
+      cacheDuration: const Duration(minutes: 4),
     ),
   );
   final filmTitle = getFilmTitle();
@@ -18,7 +18,7 @@ void main() async {
   });
 
   // Or just await the result
-  print(await filmTitle.result);
+  print(await filmTitle.fetch());
 
   // Calling again gets the same query instance and data from cache
   final sameQuery = getFilmTitle();

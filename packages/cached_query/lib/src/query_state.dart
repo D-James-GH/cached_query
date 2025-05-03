@@ -50,12 +50,12 @@ sealed class QueryStatus<T> implements QueryState<T> {
     required DateTime timeCreated,
     required bool isRefetching,
     required bool isInitialFetch,
-    T? data,
+    required T? data,
   }) = QueryLoading<T>;
 
   const factory QueryStatus.error({
     required DateTime timeCreated,
-    T? data,
+    required T? data,
     required StackTrace stackTrace,
     required dynamic error,
   }) = QueryError<T>;

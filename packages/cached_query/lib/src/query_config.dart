@@ -1,23 +1,21 @@
 import '../cached_query.dart';
 
 /// {@template QueryConfig.ShouldRefetch}
-/// ShouldRefetch is called before a query is fetched, both after the data is fetched from storage
+/// ShouldFetch is called before a query is fetched, both after the data is fetched from storage
 /// and when a query is stale. This would usually not be necessary to use but can give
-/// a high level of control over when a query should be re-fetched. The second
-/// parameter (storageOnly) is true if the query has only been fetched from storage.
+/// a high level of control over when a query should be fetched.
 ///
-/// If no [ShouldRefetch] is passed; all normal caching rules apply.
+/// If no [ShouldFetch] is passed; all normal caching rules apply.
 /// {@endtemplate}
-typedef ShouldRefetch = bool Function(
-  QueryBase query,
-  // ignore: avoid_positional_boolean_parameters
-  bool afterStorage,
+typedef ShouldFetch<Data> = bool Function(
+  Object key,
+  Data? data,
+  DateTime createdAt,
 );
 
-/// {@template queryConfig}
-/// [QueryConfig] is used to configure a [Query].
-/// {@endtemplate}
-class QueryConfig {
+final _defaultConfig = GlobalQueryConfig();
+
+class GlobalQueryConfig {
   /// {@template QueryConfig.refetchDuration}
   /// Use the [refetchDuration] Specify how long before the query is re-fetched
   /// in the background.
@@ -74,33 +72,8 @@ class QueryConfig {
   /// {@endtemplate}
   final bool ignoreCacheDuration;
 
-  ///{@macro QueryConfig.ShouldRefetch}
-  final ShouldRefetch? shouldRefetch;
-
-  const QueryConfig._({
-    required this.shouldRefetch,
-    required this.storageSerializer,
-    required this.storageDeserializer,
-    required this.ignoreCacheDuration,
-    required this.storeQuery,
-    required this.storageDuration,
-    required this.refetchDuration,
-    required this.cacheDuration,
-    required this.shouldRethrow,
-  });
-
-  /// Returns a query config with the default values.
-  factory QueryConfig.defaults() => const QueryConfig._(
-        storageSerializer: null,
-        shouldRefetch: null,
-        storageDeserializer: null,
-        storageDuration: null,
-        ignoreCacheDuration: false,
-        storeQuery: true,
-        refetchDuration: Duration(seconds: 4),
-        cacheDuration: Duration(minutes: 5),
-        shouldRethrow: false,
-      );
+  ///{@macro QueryConfig.ShouldFetch}
+  final ShouldFetch<dynamic>? shouldFetch;
 
   /// {@macro queryConfig}
   ///
@@ -121,35 +94,166 @@ class QueryConfig {
   /// {@macro QueryConfig.cacheDuration}
   ///
   /// {@macro QueryConfig.shouldRethrow}
-  QueryConfig({
-    Serializer? storageSerializer,
-    Serializer? storageDeserializer,
-    ShouldRefetch? shouldRefetch,
-    Duration? storageDuration,
+  const GlobalQueryConfig({
+    this.shouldFetch,
+    this.storageSerializer,
+    this.storageDeserializer,
+    this.ignoreCacheDuration = false,
+    this.storeQuery = false,
+    this.storageDuration,
+    this.refetchDuration = const Duration(seconds: 4),
+    this.cacheDuration = const Duration(minutes: 5),
+    this.shouldRethrow = false,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GlobalQueryConfig &&
+          runtimeType == other.runtimeType &&
+          refetchDuration == other.refetchDuration &&
+          storeQuery == other.storeQuery &&
+          cacheDuration == other.cacheDuration &&
+          shouldRethrow == other.shouldRethrow &&
+          storageDeserializer == other.storageDeserializer &&
+          storageSerializer == other.storageSerializer &&
+          shouldFetch == other.shouldFetch &&
+          ignoreCacheDuration == other.ignoreCacheDuration;
+
+  @override
+  int get hashCode =>
+      refetchDuration.hashCode ^
+      storeQuery.hashCode ^
+      cacheDuration.hashCode ^
+      shouldRethrow.hashCode ^
+      shouldFetch.hashCode ^
+      storageSerializer.hashCode ^
+      storageDeserializer.hashCode ^
+      ignoreCacheDuration.hashCode;
+}
+
+/// {@template queryConfig}
+/// [QueryConfig] is used to configure a [Query].
+/// {@endtemplate}
+class QueryConfig<Data> {
+  /// {@template QueryConfig.refetchDuration}
+  /// Use the [refetchDuration] Specify how long before the query is re-fetched
+  /// in the background.
+  ///
+  /// Defaults to 4 seconds
+  /// {@endtemplate}
+  Duration get refetchDuration =>
+      _refetchDuration ?? _defaultConfig.refetchDuration;
+  final Duration? _refetchDuration;
+
+  final bool? _storeQuery;
+
+  /// {@template QueryConfig.storeQuery}
+  /// Use [storeQuery] to set whether a query should be stored or not.
+  /// Defaults to true;
+  ///
+  /// Only effective when [CachedQuery] storage is set.
+  /// {@endtemplate}
+  bool get storeQuery => _storeQuery ?? _defaultConfig.storeQuery;
+
+  /// {@template QueryConfig.storageDuration}
+  /// Use [storageDuration] to specify how long a query is stored in the database.
+  /// Defaults to Null (forever).
+  /// {@endtemplate}
+  final Duration? storageDuration;
+
+  /// {@template QueryConfig.cacheDuration}
+  /// Use [cacheDuration] to specify how long a query that has zero listeners
+  /// stays in memory.
+  ///
+  /// Defaults to 5 minutes.
+  /// {@endtemplate}
+  Duration get cacheDuration => _cacheDuration ?? _defaultConfig.cacheDuration;
+  final Duration? _cacheDuration;
+
+  /// {@template QueryConfig.shouldRethrow}
+  /// [shouldRethrow] Tells cached query whether it should rethrow any error
+  /// caught in the query.
+  ///
+  /// [shouldRethrow] is useful if you use try catches in your app for
+  /// error handling/logout. By default a query will catch all errors and exceptions
+  /// and update the state.
+  /// {@endtemplate}
+  bool get shouldRethrow => _shouldRethrow ?? _defaultConfig.shouldRethrow;
+  final bool? _shouldRethrow;
+
+  /// {@template QueryConfig.storageSerializer}
+  /// Converts the query data to a storable format.
+  /// {@endtemplate}
+  final Serializer? storageSerializer;
+
+  /// {@template QueryConfig.storageDeserializer}
+  /// Called when the query is fetched from storage and should
+  /// convert the stored data to the usable data.
+  /// {@endtemplate}
+  final Serializer? storageDeserializer;
+
+  /// {@template QueryConfig.ignoreCacheDuration}
+  /// If set to true the query(ies) will never be removed from cache.
+  /// {@endtemplate}
+  bool get ignoreCacheDuration =>
+      _ignoreCacheDuration ?? _defaultConfig.ignoreCacheDuration;
+  final bool? _ignoreCacheDuration;
+
+  final ShouldFetch<Data>? _shouldFetch;
+
+  ///{@macro QueryConfig.ShouldFetch}
+  ShouldFetch<Data> get shouldFetch => _shouldFetch ?? (_, __, ___) => true;
+
+  /// {@macro queryConfig}
+  ///
+  /// {@macro QueryConfig.storageSerializer}
+  ///
+  /// {@macro QueryConfig.storageDeserializer}
+  ///
+  /// {@macro QueryConfig.storageDuration}
+  ///
+  /// {@macro QueryConfig.ShouldRefetch}
+  ///
+  /// {@macro QueryConfig.ignoreCacheDuration}
+  ///
+  /// {@macro QueryConfig.storeQuery}
+  ///
+  /// {@macro QueryConfig.refetchDuration}
+  ///
+  /// {@macro QueryConfig.cacheDuration}
+  ///
+  /// {@macro QueryConfig.shouldRethrow}
+  const QueryConfig({
+    ShouldFetch<Data>? shouldFetch,
+    this.storageSerializer,
+    this.storageDeserializer,
     bool? ignoreCacheDuration,
     bool? storeQuery,
+    this.storageDuration,
     Duration? refetchDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
-    // use the defaults if not set
-  })  : storageSerializer = storageSerializer ??
-            CachedQuery.instance.defaultConfig.storageSerializer,
-        storageDeserializer = storageDeserializer ??
-            CachedQuery.instance.defaultConfig.storageDeserializer,
-        ignoreCacheDuration = ignoreCacheDuration ??
-            CachedQuery.instance.defaultConfig.ignoreCacheDuration,
-        storeQuery =
-            storeQuery ?? CachedQuery.instance.defaultConfig.storeQuery,
-        refetchDuration = refetchDuration ??
-            CachedQuery.instance.defaultConfig.refetchDuration,
-        storageDuration = storageDuration ??
-            CachedQuery.instance.defaultConfig.storageDuration,
-        cacheDuration =
-            cacheDuration ?? CachedQuery.instance.defaultConfig.cacheDuration,
-        shouldRefetch =
-            shouldRefetch ?? CachedQuery.instance.defaultConfig.shouldRefetch,
-        shouldRethrow =
-            shouldRethrow ?? CachedQuery.instance.defaultConfig.shouldRethrow;
+  })  : _storeQuery = storeQuery,
+        _shouldFetch = shouldFetch,
+        _ignoreCacheDuration = ignoreCacheDuration,
+        _refetchDuration = refetchDuration,
+        _shouldRethrow = shouldRethrow,
+        _cacheDuration = cacheDuration;
+
+  QueryConfig<Data> mergeWithGlobal(GlobalQueryConfig global) {
+    return QueryConfig<Data>(
+      shouldFetch: _shouldFetch ?? global.shouldFetch,
+      storageSerializer: storageSerializer ?? global.storageSerializer,
+      storageDeserializer: storageDeserializer ?? global.storageDeserializer,
+      ignoreCacheDuration: _ignoreCacheDuration ?? global.ignoreCacheDuration,
+      storeQuery: _storeQuery ?? global.storeQuery,
+      storageDuration: storageDuration ?? global.storageDuration,
+      refetchDuration: _refetchDuration ?? global.refetchDuration,
+      cacheDuration: _cacheDuration ?? global.cacheDuration,
+      shouldRethrow: _shouldRethrow ?? global.shouldRethrow,
+    );
+  }
 
   @override
   bool operator ==(Object other) =>

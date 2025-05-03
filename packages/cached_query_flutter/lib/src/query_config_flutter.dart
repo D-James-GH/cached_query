@@ -3,7 +3,7 @@ import 'package:cached_query/cached_query.dart';
 /// {@template queryConfigFlutter}
 /// Query config including flutter options
 /// {@endtemplate}
-class QueryConfigFlutter extends QueryConfig {
+class GlobalQueryConfigFlutter extends GlobalQueryConfig {
   /// Whether this query should be re-fetched when the app comes into the foreground
   ///
   /// Defaults to true.
@@ -28,34 +28,19 @@ class QueryConfigFlutter extends QueryConfig {
   final bool refetchOnConnection;
 
   /// {@macro queryConfigFlutter}
-  QueryConfigFlutter({
+  GlobalQueryConfigFlutter({
     this.refetchOnResume = true,
     this.refetchOnResumeMinBackgroundDuration = const Duration(seconds: 5),
     this.refetchOnConnection = true,
-    @Deprecated('Use QueryConfig.storageDeserializer instead')
-    Serializer? serializer,
     super.storageSerializer,
     super.storageDeserializer,
     super.ignoreCacheDuration,
     super.storeQuery,
     super.refetchDuration,
-    super.shouldRefetch,
+    super.shouldFetch,
     super.storageDuration,
     super.cacheDuration,
     super.shouldRethrow,
   });
 
-  /// Returns a flutter query config with the default values.
-  static final QueryConfigFlutter defaults = QueryConfigFlutter(
-    // Note: leaving out non optional parameters, as they get their defaults
-    // inside the constructor.
-    storageSerializer: QueryConfig.defaults().storageSerializer,
-    storageDeserializer: QueryConfig.defaults().storageDeserializer,
-    storageDuration: QueryConfig.defaults().storageDuration,
-    ignoreCacheDuration: QueryConfig.defaults().ignoreCacheDuration,
-    storeQuery: QueryConfig.defaults().storeQuery,
-    refetchDuration: QueryConfig.defaults().refetchDuration,
-    cacheDuration: QueryConfig.defaults().cacheDuration,
-    shouldRethrow: QueryConfig.defaults().shouldRethrow,
-  );
 }

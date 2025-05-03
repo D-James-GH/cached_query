@@ -29,9 +29,7 @@ InfiniteQuery<String, int> createInfiniteQuery({
   key ??= 'query_${_serial++}';
   return InfiniteQuery(
     key: key,
-    getNextArg: (state) {
-      return (state.data?.length ?? 0) + 1;
-    },
+    getNextArg: (state) => (state?.pages.length ?? 0) + 1,
     queryFn: (arg) async {
       return "$res $arg";
     },

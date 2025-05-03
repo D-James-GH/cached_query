@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_redundant_argument_values
 import 'package:cached_query/cached_query.dart';
 import 'package:test/test.dart';
 
@@ -14,20 +15,18 @@ void main() {
   group("Config", () {
     test("Should be able to set config", () {
       final cachedQuery = CachedQuery.asNewInstance()
-        ..config(config: QueryConfig());
+        ..config(config: GlobalQueryConfig());
       expect(cachedQuery.isConfigSet, true);
     });
-    test("Defaults should be set", () {
-      final config = QueryConfig();
-      expect(config, QueryConfig.defaults());
-    });
     test("Different caches have different config", () {
-      final cache1 = CachedQuery.asNewInstance()..config(config: QueryConfig());
-      final cache2 = CachedQuery.asNewInstance()..config(config: QueryConfig());
+      final cache1 = CachedQuery.asNewInstance()
+        ..config(config: GlobalQueryConfig());
+      final cache2 = CachedQuery.asNewInstance()
+        ..config(config: GlobalQueryConfig());
       expect(cache1.defaultConfig, isNot(same(cache2.defaultConfig)));
     });
     test("Should be able to override default values", () async {
-      final config = QueryConfig(
+      final config = GlobalQueryConfig(
         storeQuery: false,
         shouldRethrow: true,
         refetchDuration: Duration.zero,
@@ -36,6 +35,7 @@ void main() {
       );
       final cachedQuery = CachedQuery.asNewInstance()..config(config: config);
       expect(cachedQuery.defaultConfig, config);
+      expect(cachedQuery.defaultConfig, isNot(GlobalQueryConfig()));
     });
   });
   group("Invalidate cache", () {
@@ -43,7 +43,7 @@ void main() {
       final query = createQuery();
       // await query.result;
       expect(query.stale, false);
-      await query.result;
+      await query.fetch();
       expect(query.stale, false);
       CachedQuery.asNewInstance()
         ..addQuery(query)
@@ -57,7 +57,7 @@ void main() {
       final query3 = createQuery(key: "other_invalid_key");
       CachedQuery.asNewInstance()
         ..config(
-          config: QueryConfig(
+          config: GlobalQueryConfig(
             refetchDuration: const Duration(minutes: 5),
           ),
         )
@@ -271,16 +271,18 @@ void main() {
           return [...value, "new"];
         },
       );
-      expect(query.state.data!.length, 2);
-      expect(query.state.data![1], "new");
+      expect(query.state.data!.pages.length, 2);
+      expect(query.state.data!.pages[1], "new");
     });
   });
 
   group("Refetch Queries", () {
     test("Refetch using filter", () async {
+      final cache = CachedQuery.asNewInstance();
       int query1Count = 0;
       final query = Query<String>(
         key: "query1",
+        cache: cache,
         queryFn: () {
           query1Count++;
           return Future.value("nothing");
@@ -289,24 +291,23 @@ void main() {
       var query2Count = 0;
       final query2 = InfiniteQuery<String, int>(
         key: "infinite_query_1",
+        cache: cache,
         getNextArg: (_) => 1,
         queryFn: (page) {
           query2Count++;
           return Future.value("nothing");
         },
       );
+      final res = await query2.fetch();
       int query3Count = 0;
       final query3 = Query<String>(
         key: "other_key3",
+        cache: cache,
         queryFn: () {
           query3Count++;
           return Future.value("nothing");
         },
       );
-      final cache = CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..addQuery(query2)
-        ..addQuery(query3);
       await cache.refetchQueries(
         filterFn: (unencodedKey, key) {
           if (key.contains("query")) {

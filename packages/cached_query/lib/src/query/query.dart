@@ -22,35 +22,16 @@ typedef QueryFunc<T> = Future<T> Function();
 /// [onError].
 ///
 /// {@endtemplate}
-final class Query<T> extends QueryController<T, QueryStatus<T>>
-    implements QueryBase {
-  Query._internal({
-    OnQueryErrorCallback<T>? onError,
-    OnQuerySuccessCallback<T>? onSuccess,
-    required super.cache,
-    required super.key,
-    required super.unencodedKey,
-    required super.config,
-    required Future<T> Function() queryFn,
-    required T? initialData,
-  })  : _queryFn = queryFn,
-        _onError = onError,
-        _onSuccess = onSuccess,
-        super._internal(
-          state: QueryInitial(
-            timeCreated: DateTime.now(),
-            data: initialData,
-          ),
-        );
-
+final class Query<T> extends QueryBase
+    implements Cacheable<T, T, QueryStatus<T>> {
   /// {@macro query}
   factory Query({
     required Object key,
     required Future<T> Function() queryFn,
-    OnQueryErrorCallback<T>? onError,
+    OnQueryErrorCallback? onError,
     OnQuerySuccessCallback<T>? onSuccess,
     T? initialData,
-    QueryConfig? config,
+    QueryConfig<T>? config,
     CachedQuery? cache,
   }) {
     cache = cache ?? CachedQuery.instance;
@@ -58,15 +39,24 @@ final class Query<T> extends QueryController<T, QueryStatus<T>>
 
     // if query is null check the storage
     if (query == null) {
-      query = Query<T>._internal(
+      final encodedKey = encodeKey(key);
+      final controller = QueryController(
         cache: cache,
-        key: encodeKey(key),
+        key: encodedKey,
         unencodedKey: key,
-        queryFn: queryFn,
+        initialData: initialData,
+        onFetch: ({required options, state}) {
+          return queryFn();
+        },
+        config: config,
+      );
+
+      query = Query<T>._internal(
+        key: encodedKey,
+        unencodedKey: key,
         onError: onError,
         onSuccess: onSuccess,
-        initialData: initialData,
-        config: config,
+        controller: controller,
       );
       cache.addQuery(query);
     }
@@ -74,51 +64,117 @@ final class Query<T> extends QueryController<T, QueryStatus<T>>
     return query;
   }
 
-  final Future<T> Function() _queryFn;
-
-  /// On success is called when the query function is executed successfully.
-  ///
-  /// Passes the returned data.
-  final OnQuerySuccessCallback<T>? _onSuccess;
-
-  /// On success is called when the query function is executed successfully.
-  ///
-  /// Passes the error through.
-  final OnQueryErrorCallback<T>? _onError;
-
-  Future<void> _fetch({required bool initialFetch}) async {
-    _setState(
-      QueryLoading(
-        isInitialFetch: initialFetch,
-        timeCreated: _state.timeCreated,
-        isRefetching: !initialFetch,
-        data: _state.data,
-      ),
+  Query._internal({
+    OnQueryErrorCallback? onError,
+    OnQuerySuccessCallback<T>? onSuccess,
+    required super.key,
+    required super.unencodedKey,
+    required QueryController<T> controller,
+  })  : _onError = onError,
+        _onSuccess = onSuccess,
+        _controller = controller {
+    _state = QueryInitial(
+      timeCreated: controller.state.timeCreated,
+      data: controller.state.data,
     );
-    try {
-      final res = await _queryFn();
-      if (_onSuccess != null) {
-        _onSuccess!(res);
+    _stateSubject = BehaviorSubject.seeded(
+      state,
+      onListen: () {
+        controller
+          ..addListener()
+          ..fetch(options: FetchOptions());
+      },
+      onCancel: () {
+        controller.removeListener();
+      },
+    );
+    _init();
+  }
+
+  QueryConfig<T> get config => _controller.config;
+  late QueryStatus<T> _state;
+  QueryStatus<T> get state => _state;
+  Stream<QueryStatus<T>> get stream => _stateSubject.stream;
+  bool get stale => _controller.stale;
+
+  bool get hasListener => _stateSubject.hasListener;
+
+  Future<QueryStatus<T>> fetch() async {
+    await _controller.fetch();
+    return state;
+  }
+
+  @Deprecated("Use fetch() instead.")
+  Future<QueryStatus<T>> get result => fetch();
+
+  Future<QueryStatus<T>> refetch() async {
+    await _controller.fetch(forceRefetch: true);
+    return state;
+  }
+
+  Future<void> invalidate({
+    bool refetchActive = true,
+    bool refetchInactive = false,
+  }) {
+    return _controller.invalidate(
+      refetchActive: refetchActive,
+      refetchInactive: refetchInactive,
+    );
+  }
+
+  void update(UpdateFunc<T> updateFn) {
+    return _controller.update(updateFn);
+  }
+
+  void deleteQuery({bool deleteStorage = false}) {
+    _controller.deleteQuery(deleteStorage: deleteStorage);
+  }
+
+  late final BehaviorSubject<QueryStatus<T>> _stateSubject;
+  final OnQuerySuccessCallback<T>? _onSuccess;
+  final OnQueryErrorCallback? _onError;
+  final QueryController<T> _controller;
+
+  void _setState(QueryStatus<T> state) {
+    _state = state;
+    _stateSubject.add(state);
+  }
+
+  void _init() {
+    _controller.stream.listen((action) {
+      switch (action) {
+        case Fetch(:final isInitialFetch):
+          _setState(
+            QueryStatus.loading(
+              data: state.data,
+              timeCreated: state.timeCreated,
+              isRefetching: !isInitialFetch,
+              isInitialFetch: isInitialFetch,
+            ),
+          );
+        case FetchError(:final error, :final stackTrace):
+          _onError?.call(error);
+          _setState(
+            QueryStatus.error(
+              timeCreated: state.timeCreated,
+              data: state.data,
+              stackTrace: stackTrace,
+              error: error,
+            ),
+          );
+        case StorageError(:final error, :final stackTrace):
+          _onError?.call(error);
+        case DataUpdated(:final data):
+          _setState(this.state.copyWithData(data as T));
+        case Success(:final data, :final timeCreated):
+          _onSuccess?.call(data as T);
+          _setState(
+            QueryStatus.success(
+              timeCreated: timeCreated,
+              data: data as T,
+            ),
+          );
       }
-      _setState(QuerySuccess(timeCreated: DateTime.now(), data: res));
-      if (config.storeQuery) {
-        _saveToStorage();
-      }
-    } catch (e, trace) {
-      if (_onError != null) {
-        _onError!(e);
-      }
-      _setState(
-        QueryError(
-          error: e,
-          data: _state.data,
-          stackTrace: trace,
-          timeCreated: _state.timeCreated,
-        ),
-      );
-      if (config.shouldRethrow) {
-        rethrow;
-      }
-    }
+    });
   }
 }

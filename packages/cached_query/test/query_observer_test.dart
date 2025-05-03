@@ -179,7 +179,7 @@ void main() {
       ];
       final query = InfiniteQuery(
         key: "queryLoading",
-        getNextArg: (p) => p.length + 1,
+        getNextArg: (p) => (p?.pages.length ?? 0) + 1,
         queryFn: (a) => Future.value("response"),
       );
       await query.result;
@@ -199,7 +199,7 @@ void main() {
       ];
       final query = InfiniteQuery(
         key: "querySuccess",
-        getNextArg: (p) => p.length + 1,
+        getNextArg: (p) => (p?.pages.length ?? 0) + 1,
         queryFn: (a) => Future.value("response"),
       );
       await query.result;
@@ -220,7 +220,7 @@ void main() {
       ];
       final query = InfiniteQuery<String, int>(
         key: "queryFail",
-        getNextArg: (p) => p.length + 1,
+        getNextArg: (p) => (p?.pages.length ?? 0) + 1,
         queryFn: (a) => throw "error",
       );
       await query.result;
