@@ -1,3 +1,10 @@
+## 3.0.0-dev.10
+
+> Note: This release has breaking changes.
+
+ - **FIX**: observer not supported in new architecture. Multiple fixes for tests. ([5716dd84](https://github.com/D-James-GH/cached_query/commit/5716dd84b555636488dd481f09ddbd5850b3ab60))
+ - **BREAKING** **REFACTOR**: Have different global and query config objects. ([ec9cae10](https://github.com/D-James-GH/cached_query/commit/ec9cae10b48e4f32e2421cd094b0b814d127e897))
+
 ## 3.0.0-dev.9
 
 > Note: This release has breaking changes.
