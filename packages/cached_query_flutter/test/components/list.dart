@@ -37,11 +37,11 @@ class _ListQueryState extends State<ListQuery> {
               }),
               child: const Text("enable"),
             ),
-            if (state.data == null || state.data!.isEmpty) ...[
+            if (state.data == null || state.data!.pages.isEmpty) ...[
               const SizedBox(key: Key("empty-box")),
             ] else ...[
               const Text("title"),
-              for (final item in state.data!) Text(item),
+              for (final item in state.data!.pages) Text(item),
             ],
           ],
         ),
@@ -85,7 +85,7 @@ class ListValue extends StatelessWidget {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: state.data!.length,
+                  itemCount: state.data?.pages.length,
                   itemBuilder: (context, i) {
                     return Text("$i$response");
                   },

@@ -13,18 +13,6 @@ final class InfiniteQueryData<T, Arg> {
   /// {@macro InfiniteQueryData}
   InfiniteQueryData({required this.pages, required this.pageParams});
 
-  factory InfiniteQueryData.fromJson(Map<String, dynamic> json) {
-    return InfiniteQueryData<T, Arg>(
-      // data:
-      // (json['data'] as List<dynamic>)
-      //     .map((e) => CollectionModel.fromJson(e as Map<String, dynamic>))
-      //     .toList(),
-      pages: (json['pages'] as List<dynamic>).map((e) => e as T).toList(),
-      pageParams:
-          (json['pageParams'] as List<dynamic>).map((e) => e as Arg).toList(),
-    );
-  }
-
   Map<String, dynamic> toJson() {
     return {
       'pages': pages,

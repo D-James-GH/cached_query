@@ -7,13 +7,13 @@ class InfiniteQueryRepo {
 
   InfiniteQuery<String, int> fetchList({String? key}) {
     return InfiniteQuery<String, int>(
-      getNextArg: (state) {
-        if (state.data == null) return 1;
-        return state.data!.length + 1;
+      getNextArg: (data) {
+        if (data == null) return 1;
+        return data.pages.length + 1;
       },
       key: key ?? queryKey,
       queryFn: (page) async => response,
-      config: QueryConfig(ignoreCacheDuration: true),
+      config: const QueryConfig(ignoreCacheDuration: true),
     );
   }
 }

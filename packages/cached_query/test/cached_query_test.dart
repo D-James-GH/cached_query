@@ -40,53 +40,51 @@ void main() {
   });
   group("Invalidate cache", () {
     test("Invalidate the whole cache", () async {
-      final query = createQuery();
-      // await query.result;
-      expect(query.stale, false);
+      final cache = CachedQuery.asNewInstance();
+      final query = createQuery(cache: cache);
       await query.fetch();
       expect(query.stale, false);
-      CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..invalidateCache();
+
+      cache.invalidateCache();
+
       expect(query.stale, true);
     });
 
     test("Invalidate using filter", () async {
-      final query = createQuery();
-      final query2 = createQuery();
-      final query3 = createQuery(key: "other_invalid_key");
-      CachedQuery.asNewInstance()
+      final cache = CachedQuery.asNewInstance()
         ..config(
           config: GlobalQueryConfig(
             refetchDuration: const Duration(minutes: 5),
           ),
-        )
-        ..addQuery(query)
-        ..addQuery(query2)
-        ..addQuery(query3)
-        ..invalidateCache(
-          filterFn: (unencodedKey, key) {
-            if (key.contains("query")) {
-              return true;
-            }
-            return false;
-          },
         );
-      // verify(query.invalidateQuery());
-      // verify(query2.invalidateQuery());
-      // verifyNever(query3.invalidateQuery());
+      final query = createQuery(cache: cache);
+      await query.fetch();
+      final query2 = createQuery(cache: cache);
+      await query2.fetch();
+      final query3 = createQuery(key: "other_invalid_key", cache: cache);
+      await query3.fetch();
+      cache.invalidateCache(
+        filterFn: (unencodedKey, key) {
+          if (key.contains("query")) {
+            return true;
+          }
+          return false;
+        },
+      );
       expect(query.stale, true);
       expect(query2.stale, true);
       expect(query3.stale, false);
     });
 
     test("Invalidate the query", () async {
-      final query = createQuery(key: "query");
-      final query2 = createQuery();
-      CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..addQuery(query)
-        ..invalidateCache(key: "query");
+      final cache = CachedQuery.asNewInstance();
+      final query = createQuery(key: "query", cache: cache);
+      final query2 = createQuery(cache: cache);
+      await query.fetch();
+      await query2.fetch();
+      expect(query.stale, false);
+      expect(query2.stale, false);
+      cache.invalidateCache(key: "query");
       expect(query.stale, true);
       expect(query2.stale, false);
     });
@@ -112,7 +110,7 @@ void main() {
         cache: cache,
       );
       final sub = query1.stream.listen((state) {});
-      await query2.result;
+      await query2.fetch();
       cache.invalidateCache(key: "query1");
       expect(query1Count, 2);
       expect(query2Count, 1);
@@ -130,7 +128,7 @@ void main() {
         },
         cache: cache,
       );
-      await query.result;
+      await query.fetch();
       cache.invalidateCache(key: "query1", refetchInactive: true);
       expect(query1Count, 2);
     });
@@ -145,21 +143,18 @@ void main() {
     });
 
     test("Delete using filter", () async {
-      final query = createQuery();
-      final query2 = createQuery();
-      final query3 = createQuery(key: "other_key");
-      final cache = CachedQuery.asNewInstance()
-        ..addQuery(query)
-        ..addQuery(query2)
-        ..addQuery(query3)
-        ..deleteCache(
-          filterFn: (unencodedKey, key) {
-            if (key.contains("query")) {
-              return true;
-            }
-            return false;
-          },
-        );
+      final cache = CachedQuery.asNewInstance();
+      createQuery(cache: cache);
+      createQuery(cache: cache);
+      createQuery(key: "other_key", cache: cache);
+      cache.deleteCache(
+        filterFn: (unencodedKey, key) {
+          if (key.contains("query")) {
+            return true;
+          }
+          return false;
+        },
+      );
       expect(cache.getQuery("query"), isNull);
       expect(cache.getQuery("query2"), isNull);
       expect(cache.getQuery("other_key"), isNotNull);
@@ -179,7 +174,7 @@ void main() {
         cache: cache,
         key: "query",
       );
-      await query.result;
+      await query.fetch();
       cache.deleteCache(
         deleteStorage: true,
         filterFn: (unencodedKey, key) {
@@ -208,7 +203,7 @@ void main() {
         cache: cache,
         key: "query",
       );
-      await query.result;
+      await query.fetch();
       cache.deleteCache(deleteStorage: true);
 
       expect(deletedAll, true);
@@ -228,7 +223,7 @@ void main() {
     test("update query", () async {
       const res = "updated value";
       final query = createQuery(key: "update");
-      await query.result;
+      await query.fetch();
       expect(query.state.data, "result");
       CachedQuery.instance.updateQuery(
         key: "update",
@@ -239,11 +234,11 @@ void main() {
 
     test("update query multiple queries with filter", () async {
       final query = createQuery();
-      await query.result;
+      await query.fetch();
       final query2 = createQuery();
-      await query2.result;
+      await query2.fetch();
       final query3 = createQuery(key: "other_key");
-      await query3.result;
+      await query3.fetch();
 
       CachedQuery.instance.updateQuery(
         filterFn: (unencodedKey, key) => key.startsWith("query"),
@@ -263,12 +258,15 @@ void main() {
         getNextArg: (_) => 1,
         queryFn: (page) => Future.value(""),
       );
-      await query.result;
+      await query.fetch();
       cache.updateQuery(
         key: "update",
-        updateFn: (dynamic v) {
-          final value = v as List<String>;
-          return [...value, "new"];
+        updateFn: (v) {
+          final value = v as InfiniteQueryData<String, int>;
+          return InfiniteQueryData(
+            pages: [...value.pages, "new"],
+            pageParams: value.pageParams,
+          );
         },
       );
       expect(query.state.data!.pages.length, 2);
@@ -298,7 +296,6 @@ void main() {
           return Future.value("nothing");
         },
       );
-      final res = await query2.fetch();
       int query3Count = 0;
       final query3 = Query<String>(
         key: "other_key3",
@@ -308,6 +305,9 @@ void main() {
           return Future.value("nothing");
         },
       );
+      await query.fetch();
+      await query2.fetch();
+      await query3.fetch();
       await cache.refetchQueries(
         filterFn: (unencodedKey, key) {
           if (key.contains("query")) {
@@ -317,9 +317,9 @@ void main() {
         },
       );
 
-      expect(query1Count, 1);
-      expect(query2Count, 1);
-      expect(query3Count, 0);
+      expect(query1Count, 2);
+      expect(query2Count, 2);
+      expect(query3Count, 1);
     });
     test("Refetch queries", () async {
       int query1Count = 0;

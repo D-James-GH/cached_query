@@ -9,11 +9,11 @@ import 'package:meta/meta.dart';
 /// Similar to List.where.
 typedef WhereCallback = bool Function(QueryBase query);
 
-/// Used to serialize or deserialize the query from storage.
-typedef Serializer = dynamic Function(dynamic json);
+/// Used to serialize the query from storage.
+typedef Serializer<T> = dynamic Function(T data);
 
-// /// Used to serialize or deserialize the query data when fetched from local storage.
-// typedef StorageConverter = dynamic Function(dynamic data);
+/// Used to deserialize the query from storage.
+typedef Deserializer<T> = T Function(dynamic data);
 
 /// Used to match multiple queries.
 typedef KeyFilterFunc = bool Function(Object unencodedKey, String key);
@@ -35,7 +35,7 @@ class CachedQuery {
 
   GlobalQueryConfig _config = GlobalQueryConfig();
 
-  Map<String, Cacheable<dynamic, dynamic, dynamic>> _queryCache = {};
+  Map<String, Cacheable<dynamic, dynamic>> _queryCache = {};
 
   StorageInterface? _storage;
 
@@ -125,11 +125,11 @@ class CachedQuery {
       key != null || filterFn != null,
       "key or filterFn must not be null",
     );
-    List<Cacheable<dynamic, dynamic, dynamic>> queries = [];
+    List<Cacheable<dynamic, dynamic>> queries = [];
     if (filterFn != null) {
-      queries = _filterQueryKey(filter: filterFn);
+      queries = _filterQueryKey(filter: filterFn).toList();
     } else if (key != null) {
-      final query = getQuery(key) as Cacheable<dynamic, dynamic, dynamic>?;
+      final query = getQuery(key) as Cacheable<dynamic, dynamic>?;
       if (query != null) {
         queries.add(query);
       }
@@ -174,10 +174,10 @@ class CachedQuery {
       key == null || filterFn == null,
       "Cannot pass both key and filterFn",
     );
-    List<Cacheable<dynamic, dynamic, dynamic>> queries = [];
+    List<Cacheable<dynamic, dynamic>> queries = [];
 
     if (filterFn != null) {
-      queries = _filterQueryKey(filter: filterFn);
+      queries = _filterQueryKey(filter: filterFn).toList();
     } else if (key != null) {
       final k = encodeKey(key);
       if (_queryCache.containsKey(k) && _queryCache[k] != null) {
@@ -211,7 +211,7 @@ class CachedQuery {
       ob.onQueryDeletion(key);
     }
     if (filterFn != null) {
-      final queries = _filterQueryKey(filter: filterFn);
+      final queries = _filterQueryKey(filter: filterFn).toList();
       for (final query in queries) {
         _queryCache.remove(query.key);
         if (deleteStorage && storage != null) {
@@ -239,29 +239,53 @@ class CachedQuery {
   ///
   /// Pass a List of keys to refetch specific queries.
   /// Pass a [filterFn] to "fuzzy" match queries to refetch.
+  ///
+  /// If [ignoreStale] is true (default) then the query fetch new data regardless of
+  /// whether the query is stale or not. If it is false then the query will only
+  /// fetch if it is stale.
   Future<void> refetchQueries({
     KeyFilterFunc? filterFn,
     List<Object>? keys,
+    bool refetchActive = true,
+    bool refetchInactive = true,
+    bool ignoreStale = true,
   }) async {
-    assert(
-      filterFn != null || keys != null,
-      "Either filterFn or keys must not be null",
-    );
+    final List<Cacheable<dynamic, dynamic>> queries = [];
 
-    final List<Cacheable<dynamic, dynamic, dynamic>> queries = [];
+    if (keys == null && filterFn == null) {
+      queries.addAll(
+        _queryCache.values.where(
+          (q) =>
+              (refetchActive && q.hasListener) ||
+              (refetchInactive && !q.hasListener),
+        ),
+      );
+    } else {
+      if (filterFn != null) {
+        queries.addAll(
+          _filterQueryKey(filter: filterFn).where((q) {
+            return (refetchActive && q.hasListener) ||
+                (refetchInactive && !q.hasListener);
+          }),
+        );
+      }
 
-    if (filterFn != null) {
-      queries.addAll(_filterQueryKey(filter: filterFn));
-    }
-    if (keys != null) {
-      for (final key in keys) {
-        final k = encodeKey(key);
-        if (_queryCache.containsKey(k)) {
-          queries.add(_queryCache[k]!);
+      if (keys != null) {
+        for (final key in keys) {
+          final k = encodeKey(key);
+          if (_queryCache.containsKey(k)) {
+            final query = _queryCache[k]!;
+            if ((refetchActive && query.hasListener) ||
+                (refetchInactive && !query.hasListener)) {
+              queries.add(query);
+            }
+          }
         }
       }
     }
-    await Future.wait(queries.map((q) => q.refetch()));
+    await Future.wait(
+      queries.map((q) => ignoreStale ? q.refetch() : q.fetch()),
+    );
   }
 
   /// Add a query to the cache.
@@ -272,14 +296,13 @@ class CachedQuery {
     for (final ob in observers) {
       ob.onQueryCreation(query);
     }
-    _queryCache[query.key] = query as Cacheable<dynamic, dynamic, dynamic>;
+    _queryCache[query.key] = query as Cacheable<dynamic, dynamic>;
   }
 
-  List<Cacheable<dynamic, dynamic, dynamic>> _filterQueryKey({
+  Iterable<Cacheable<dynamic, dynamic>> _filterQueryKey({
     required KeyFilterFunc filter,
   }) {
     return _queryCache.values
-        .where((element) => filter(element.unencodedKey, element.key))
-        .toList();
+        .where((element) => filter(element.unencodedKey, element.key));
   }
 }

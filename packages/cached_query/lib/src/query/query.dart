@@ -22,8 +22,7 @@ typedef QueryFunc<T> = Future<T> Function();
 /// [onError].
 ///
 /// {@endtemplate}
-final class Query<T> extends QueryBase
-    implements Cacheable<T, T, QueryStatus<T>> {
+final class Query<T> extends QueryBase implements Cacheable<T, QueryStatus<T>> {
   /// {@macro query}
   factory Query({
     required Object key,
@@ -136,6 +135,14 @@ final class Query<T> extends QueryBase
   final QueryController<T> _controller;
 
   void _setState(QueryStatus<T> state) {
+    final observers = _controller._cache.observers;
+    for (final observer in observers) {
+      observer.onChange(this, state);
+      if (state case QueryError(:final stackTrace)) {
+        observer.onError(this, stackTrace);
+      }
+    }
+
     _state = state;
     _stateSubject.add(state);
   }

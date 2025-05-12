@@ -28,12 +28,10 @@ class GlobalQueryConfigFlutter extends GlobalQueryConfig {
   final bool refetchOnConnection;
 
   /// {@macro queryConfigFlutter}
-  GlobalQueryConfigFlutter({
+  const GlobalQueryConfigFlutter({
     this.refetchOnResume = true,
     this.refetchOnResumeMinBackgroundDuration = const Duration(seconds: 5),
     this.refetchOnConnection = true,
-    super.storageSerializer,
-    super.storageDeserializer,
     super.ignoreCacheDuration,
     super.storeQuery,
     super.refetchDuration,
@@ -42,5 +40,68 @@ class GlobalQueryConfigFlutter extends GlobalQueryConfig {
     super.cacheDuration,
     super.shouldRethrow,
   });
+}
 
+///
+const defaultFlutterConfig = GlobalQueryConfigFlutter();
+
+/// {@macro queryConfigFlutter}
+class QueryConfigFlutter<Data> extends QueryConfig<Data> {
+  /// Whether this query should be re-fetched when the app comes into the foreground
+  ///
+  /// Defaults to true.
+  bool get refetchOnResume =>
+      _refetchOnResume ?? defaultFlutterConfig.refetchOnResume;
+  final bool? _refetchOnResume;
+
+  /// Whether this query should be re-fetched when the device gains connection
+  ///
+  /// Defaults to true.
+  bool get refetchOnConnection =>
+      _refetchOnConnection ?? defaultFlutterConfig.refetchOnConnection;
+  final bool? _refetchOnConnection;
+
+  /// {@macro queryConfigFlutter}
+  const QueryConfigFlutter({
+    bool? refetchOnResume,
+    bool? refetchOnConnection,
+    super.ignoreCacheDuration,
+    super.storeQuery,
+    super.refetchDuration,
+    super.shouldFetch,
+    super.storageDuration,
+    super.cacheDuration,
+    super.shouldRethrow,
+    super.storageDeserializer,
+    super.storageSerializer,
+  })  : _refetchOnResume = refetchOnResume,
+        _refetchOnConnection = refetchOnConnection;
+
+  @override
+  QueryConfig<Data> mergeWithGlobal(GlobalQueryConfig global) {
+    final superConfig = super.mergeWithGlobal(global);
+    return QueryConfigFlutter(
+      refetchOnConnection: switch (global) {
+        GlobalQueryConfigFlutter() =>
+          _refetchOnConnection ?? global.refetchOnConnection,
+        _ => _refetchOnConnection ?? defaultFlutterConfig.refetchOnConnection,
+      },
+      refetchOnResume: switch (global) {
+        GlobalQueryConfigFlutter() =>
+          _refetchOnResume ?? global.refetchOnResume,
+        _ => _refetchOnResume ?? defaultFlutterConfig.refetchOnResume,
+      },
+
+      //
+      storageDeserializer: superConfig.storageDeserializer,
+      storageSerializer: superConfig.storageSerializer,
+      ignoreCacheDuration: superConfig.ignoreCacheDuration,
+      shouldFetch: superConfig.shouldFetch,
+      storeQuery: superConfig.storeQuery,
+      storageDuration: superConfig.storageDuration,
+      refetchDuration: superConfig.refetchDuration,
+      cacheDuration: superConfig.cacheDuration,
+      shouldRethrow: superConfig.shouldRethrow,
+    );
+  }
 }

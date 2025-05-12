@@ -9,16 +9,21 @@ class TitleRepo {
 
   Query<String> fetchTitle({
     String? initialTitle,
+    CachedQuery? cache,
     void Function()? onQueryCalled,
   }) {
     return Query<String>(
       key: key,
+      cache: cache,
       queryFn: () {
         onQueryCalled?.call();
         return Future.delayed(queryDelay ?? Duration.zero, () => response);
       },
       initialData: initialTitle,
-      config: QueryConfig(ignoreCacheDuration: true),
+      config: const QueryConfig(
+        ignoreCacheDuration: true,
+        refetchDuration: Duration.zero,
+      ),
     );
   }
 

@@ -119,6 +119,11 @@ class QueryInitial<T> extends QueryStatus<T> {
 
   @override
   int get hashCode => timeCreated.hashCode ^ data.hashCode;
+
+  @override
+  String toString() {
+    return 'QueryInitial(timeCreated: $timeCreated, data: $data)';
+  }
 }
 
 /// {@template QuerySuccess}
@@ -141,6 +146,11 @@ class QuerySuccess<T> extends QueryStatus<T> {
 
   @override
   int get hashCode => timeCreated.hashCode ^ data.hashCode;
+
+  @override
+  String toString() {
+    return 'QuerySuccess(timeCreated: $timeCreated, data: $data)';
+  }
 }
 
 /// {@template QueryLoading}
@@ -180,6 +190,11 @@ class QueryLoading<T> extends QueryStatus<T> {
       data.hashCode ^
       isRefetching.hashCode ^
       isInitialFetch.hashCode;
+
+  @override
+  String toString() {
+    return 'QueryLoading(timeCreated: $timeCreated, data: $data, isInitialFetch: $isInitialFetch, isRefetching: $isRefetching)';
+  }
 }
 
 /// {@template QueryError}
@@ -221,4 +236,9 @@ class QueryError<T> extends QueryStatus<T> {
       data.hashCode ^
       error.hashCode ^
       stackTrace.hashCode;
+
+  @override
+  String toString() {
+    return 'QueryError(timeCreated: $timeCreated, data: $data, error: $error, stackTrace: $stackTrace)';
+  }
 }

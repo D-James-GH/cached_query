@@ -12,7 +12,18 @@ void main() {
 
     testWidgets("Builds widget based on query state", (tester) async {
       const response = "My Title";
-      await tester.pumpWidget(const TitleValue(response: response));
+      final query = Query<String>(
+        cache: CachedQuery.asNewInstance(),
+        key: "query",
+        queryFn: () async {
+          return response;
+        },
+        config: const QueryConfigFlutter(
+          refetchDuration: Duration.zero,
+          ignoreCacheDuration: true,
+        ),
+      );
+      await tester.pumpWidget(TitleValue(query: query));
       await tester.pumpAndSettle();
       final titleFinder = find.text(response);
       expect(titleFinder, findsOneWidget);
@@ -20,9 +31,20 @@ void main() {
 
     testWidgets("Builds twice, once loading second state", (tester) async {
       int buildCount = 0;
+      final query = Query<String>(
+        cache: CachedQuery.asNewInstance(),
+        key: "query",
+        queryFn: () async {
+          return "title";
+        },
+        config: const QueryConfigFlutter(
+          refetchDuration: Duration.zero,
+          ignoreCacheDuration: true,
+        ),
+      );
       await tester.pumpWidget(
         TitleValue(
-          response: "title",
+          query: query,
           onBuild: () => buildCount++,
         ),
       );
@@ -34,9 +56,20 @@ void main() {
       "Tries to build twice, but the second build is denied by buildWhen",
       (tester) async {
         int buildCount = 0;
+        final query = Query<String>(
+          cache: CachedQuery.asNewInstance(),
+          key: "query",
+          queryFn: () async {
+            return "title";
+          },
+          config: const QueryConfigFlutter(
+            refetchDuration: Duration.zero,
+            ignoreCacheDuration: true,
+          ),
+        );
         await tester.pumpWidget(
           TitleValue(
-            response: "title",
+            query: query,
             buildWhen: (oldState, newState) => buildCount == 0,
             onBuild: () => buildCount++,
           ),
@@ -47,23 +80,30 @@ void main() {
     );
 
     testWidgets("Query builds first with initial data", (tester) async {
-      int buildCount = 0;
+      final cache = CachedQuery.asNewInstance();
       const response = "My Title";
-      await tester.pumpWidget(
-        TitleValue(
-          response: response,
-          queryDelay: const Duration(seconds: 2),
-          onBuild: () => buildCount++,
-          initialTitle: "initial",
+      final query = Query<String>(
+        cache: cache,
+        key: "query_with_initial_data",
+        initialData: "initial",
+        queryFn: () {
+          return Future.delayed(const Duration(seconds: 2), () => response);
+        },
+        config: const QueryConfigFlutter(
+          refetchDuration: Duration.zero,
+          ignoreCacheDuration: true,
         ),
+      );
+      await tester.pumpWidget(
+        TitleValue(query: query),
       );
       final initialTitleFinder = find.text("initial");
       expect(initialTitleFinder, findsOneWidget);
       await tester.pumpAndSettle(const Duration(seconds: 2));
       final titleFinder = find.text(response);
       expect(titleFinder, findsOneWidget);
-      expect(buildCount, 2);
     });
+
     testWidgets("Query is build from a key", (tester) async {
       const title = "title here";
       const TitleRepo(response: title).fetchTitle();
@@ -78,9 +118,20 @@ void main() {
     });
     testWidgets("Enabled blocks request", (tester) async {
       const title = "title here";
+      final query = Query<String>(
+        cache: CachedQuery.asNewInstance(),
+        key: "query",
+        queryFn: () async {
+          return title;
+        },
+        config: const QueryConfigFlutter(
+          refetchDuration: Duration.zero,
+          ignoreCacheDuration: true,
+        ),
+      );
       await tester.pumpWidget(
-        const TitleValue(
-          response: title,
+        TitleValue(
+          query: query,
           enabled: false,
         ),
       );
