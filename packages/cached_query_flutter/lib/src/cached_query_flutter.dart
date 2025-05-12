@@ -32,7 +32,7 @@ extension CachedQueryExt on CachedQuery {
   void configFlutter({
     bool neverCheckConnection = false,
     StorageInterface? storage,
-    QueryConfigFlutter? config,
+    GlobalQueryConfigFlutter config = const GlobalQueryConfigFlutter(),
     List<QueryObserver>? observers,
   }) {
     this.config(
@@ -41,9 +41,7 @@ extension CachedQueryExt on CachedQuery {
       observers: observers,
     );
 
-    final minBackgroundDuration =
-        config?.refetchOnResumeMinBackgroundDuration ??
-            QueryConfigFlutter.defaults.refetchOnResumeMinBackgroundDuration;
+    final minBackgroundDuration = config.refetchOnResumeMinBackgroundDuration;
 
     _setupRefetchOnResume(minBackgroundDuration);
 
@@ -60,44 +58,55 @@ extension CachedQueryExt on CachedQuery {
   /// is given then the individual query config will be checked and used to determine
   /// if a query should be re-fetched.
   Future<void> refetchCurrentQueries([RefetchReason? reason]) async {
-    // Check if any queries have listeners and refetch.
-    final queries = whereQuery((query) {
-      return query.hasListener;
-    });
+    List<QueryBase>? queries;
+    final globalConfig = defaultConfig;
+    if (reason == RefetchReason.resume) {
+      queries = whereQuery((query) {
+        final config = switch (query) {
+          Query() => query.config,
+          InfiniteQuery() => query.config,
+        };
+        final globalResumeConfig = switch (globalConfig) {
+          GlobalQueryConfigFlutter() => globalConfig.refetchOnResume,
+          _ => defaultFlutterConfig.refetchOnResume
+        };
+        return switch (config) {
+          QueryConfigFlutter() => config.refetchOnResume,
+          _ => globalResumeConfig,
+        };
+      });
+    } else if (reason == RefetchReason.connectivity) {
+      final queries = whereQuery((query) {
+        final config = switch (query) {
+          Query() => query.config,
+          InfiniteQuery() => query.config,
+        };
+        final globalConnectionConfig = switch (globalConfig) {
+          GlobalQueryConfigFlutter() => globalConfig.refetchOnConnection,
+          _ => defaultFlutterConfig.refetchOnConnection
+        };
+        return switch (config) {
+          QueryConfigFlutter() => config.refetchOnConnection,
+          _ => globalConnectionConfig,
+        };
+      });
 
-    if (queries == null) return;
-    final futures = <Future<dynamic>>[];
-    for (final query in queries) {
-      bool shouldRefetch = false;
-      final config = query.config;
-
-      // Allow normal refetch rules if user has not configured shouldRefetch
-      final bool configShouldRefetch =
-          query.config.shouldRefetch?.call(query as QueryBase, false) ?? true;
-
-      if (reason == null) {
-        shouldRefetch = configShouldRefetch;
-      } else if (reason == RefetchReason.resume) {
-        if (config is QueryConfigFlutter) {
-          shouldRefetch = config.refetchOnResume && configShouldRefetch;
-        } else {
-          shouldRefetch = QueryConfigFlutter.defaults.refetchOnResume &&
-              configShouldRefetch;
-        }
-      } else if (reason == RefetchReason.connectivity) {
-        if (config is QueryConfigFlutter) {
-          shouldRefetch = config.refetchOnConnection && configShouldRefetch;
-        } else {
-          shouldRefetch = QueryConfigFlutter.defaults.refetchOnConnection &&
-              configShouldRefetch;
-        }
-      }
-
-      if (shouldRefetch) {
-        futures.add(query.refetch());
+      if (queries != null) {
+        refetchQueries(
+          keys: queries.map((q) => q.unencodedKey).toList(),
+          refetchInactive: false,
+          ignoreStale: false,
+        );
       }
     }
-    await Future.wait(futures);
+
+    if (queries != null) {
+      await refetchQueries(
+        keys: queries.map((q) => q.unencodedKey).toList(),
+        refetchInactive: false,
+        ignoreStale: false,
+      );
+    }
   }
 
   /// If the app comes back into the foreground refetch any queries that have listeners.

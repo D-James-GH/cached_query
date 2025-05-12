@@ -28,7 +28,10 @@ typedef QueryBuilderCondition<T extends QueryState<dynamic>> = FutureOr<bool>
 /// {@endtemplate}
 class QueryBuilder<T extends QueryState<dynamic>> extends StatefulWidget {
   /// The [Query] to used to update the ui.
-  final QueryController<dynamic, T>? query;
+  final Cacheable<dynamic, T>? query;
+
+  /// Optional cache used for the query.
+  final CachedQuery? cache;
 
   /// Whether the query should be called immediately.
   final bool enabled;
@@ -49,6 +52,7 @@ class QueryBuilder<T extends QueryState<dynamic>> extends StatefulWidget {
   const QueryBuilder({
     super.key,
     this.query,
+    this.cache,
     this.enabled = true,
     this.queryKey,
     this.buildWhen,
@@ -64,48 +68,45 @@ class QueryBuilder<T extends QueryState<dynamic>> extends StatefulWidget {
 
 class _QueryBuilderState<T extends QueryState<dynamic>>
     extends State<QueryBuilder<T>> {
-  late QueryController<dynamic, T> _query;
+  late Cacheable<dynamic, T> _query;
   late T _state;
+  late final CachedQuery _cache;
 
   StreamSubscription<QueryState<dynamic>>? _subscription;
 
   @override
   void initState() {
     super.initState();
+    _cache = widget.cache ?? CachedQuery.instance;
     if (widget.queryKey != null) {
-      final q = CachedQuery.instance.getQuery(widget.queryKey!);
+      final q = _cache.getQuery(widget.queryKey!);
       assert(
         q != null,
         "No query found with the key ${widget.queryKey}, have you created it yet?",
       );
-      assert(
-        q is QueryController<dynamic, T>,
-        "Query found is not of type QueryBase<dynamic, $T>",
-      );
-      _query = q! as QueryController<dynamic, T>;
+      _query = q as Cacheable<dynamic, T>;
     }
     if (widget.query != null) {
       _query = widget.query!;
     }
     _subscribe();
+
     _state = _query.state;
   }
 
   @override
   void didUpdateWidget(covariant QueryBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final oldQuery =
-        oldWidget.query ?? CachedQuery.instance.getQuery(oldWidget.queryKey!);
-    final currentQuery =
-        widget.query ?? CachedQuery.instance.getQuery(widget.queryKey!);
+    final oldQuery = oldWidget.query ?? _cache.getQuery(oldWidget.queryKey!);
+    final currentQuery = widget.query ?? _cache.getQuery(widget.queryKey!);
     assert(
-      currentQuery is QueryController<dynamic, T>,
+      currentQuery is QueryBase,
       "Query found is not of type $T",
     );
     if (oldQuery != currentQuery) {
       if (_subscription != null) {
         _unsubscribe();
-        _query = currentQuery as QueryController<dynamic, T>;
+        _query = currentQuery as Cacheable<dynamic, T>;
         _state = _query.state;
       }
       if (widget.enabled) {

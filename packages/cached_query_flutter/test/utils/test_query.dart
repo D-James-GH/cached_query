@@ -6,12 +6,12 @@ int _serial = 0;
 const testQueryRes = 'result';
 
 class QueryTester {
-  late final QueryController<dynamic, dynamic> query;
+  late final Cacheable<dynamic, dynamic> query;
   int _numFetches = 0;
   int get numFetches => _numFetches;
 
   QueryTester({
-    QueryConfigFlutter? config,
+    QueryConfigFlutter<String>? config,
     String? key,
     String res = testQueryRes,
     void Function()? onFetch,
@@ -30,7 +30,7 @@ class QueryTester {
   }
 
   QueryTester.infinite({
-    QueryConfigFlutter? config,
+    QueryConfigFlutter<InfiniteQueryData<String, int>>? config,
     String? key,
     String res = testQueryRes,
     void Function()? onFetch,
@@ -50,7 +50,7 @@ class QueryTester {
 }
 
 Query<String> createQuery({
-  QueryConfigFlutter? config,
+  QueryConfigFlutter<String>? config,
   String? key,
   String res = testQueryRes,
   void Function()? onFetch,
@@ -69,7 +69,7 @@ Query<String> createQuery({
 }
 
 InfiniteQuery<String, int> createInfiniteQuery({
-  QueryConfigFlutter? config,
+  QueryConfigFlutter<InfiniteQueryData<String, int>>? config,
   String? key,
   String res = testQueryRes,
   void Function()? onFetch,
@@ -80,8 +80,8 @@ InfiniteQuery<String, int> createInfiniteQuery({
     cache: cache,
     config: config,
     key: key,
-    getNextArg: (state) {
-      return (state.data?.length ?? 0) + 1;
+    getNextArg: (data) {
+      return (data?.pages.length ?? 0) + 1;
     },
     queryFn: (arg) async {
       onFetch?.call();

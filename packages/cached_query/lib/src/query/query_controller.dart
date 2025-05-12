@@ -239,11 +239,12 @@ final class QueryController<T> {
 
   void _saveToStorage() {
     if (!config.storeQuery) return;
-    if (_cache.storage != null && state.data != null) {
-      dynamic dataToStore = state.data;
-      if (config.storageSerializer != null) {
-        dataToStore = config.storageSerializer!(dataToStore);
-      }
+    final data = state.data;
+    if (_cache.storage != null && data != null) {
+      final dataToStore = switch (config.storageSerializer) {
+        null => data,
+        _ => config.storageSerializer!(data),
+      };
       final storedQuery = StoredQuery(
         key: key,
         data: dataToStore,

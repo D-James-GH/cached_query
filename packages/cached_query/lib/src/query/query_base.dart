@@ -3,13 +3,17 @@ part of "_query.dart";
 sealed class QueryBase {
   final String key;
   final Object unencodedKey;
-  QueryBase({required this.key, required this.unencodedKey});
+  bool get hasListener;
+  QueryBase({
+    required this.key,
+    required this.unencodedKey,
+  });
 
   // Future<State> refetch();
   // void update(UpdateFunc<dynamic> updateFn);
 }
 
-abstract interface class Cacheable<T, Data, State> {
+abstract interface class Cacheable<Data, State> {
   String get key;
   Object get unencodedKey;
   State get state;

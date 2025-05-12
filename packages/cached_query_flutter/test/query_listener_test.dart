@@ -1,3 +1,4 @@
+//ignore_for_file: avoid_redundant_argument_values
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,7 +18,14 @@ void main() {
         const child = Text('Hello world');
         final sink = expectQueryStates<String>([
           isQueryState(
+            QueryStatus.initial(
+              data: null,
+              timeCreated: DateTime.now(),
+            ),
+          ),
+          isQueryState(
             QueryStatus.loading(
+              data: null,
               isInitialFetch: true,
               timeCreated: DateTime.now(),
               isRefetching: false,
@@ -78,7 +86,14 @@ void main() {
         const child = Text('Hello world');
         final sink = expectQueryStates<String>([
           isQueryState(
+            QueryStatus.initial(
+              data: null,
+              timeCreated: DateTime.now(),
+            ),
+          ),
+          isQueryState(
             QueryStatus.loading(
+              data: null,
               isInitialFetch: true,
               timeCreated: DateTime.now(),
               isRefetching: false,

@@ -34,7 +34,7 @@ typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryData<T, Arg>? state);
 /// {@endtemplate}
 final class InfiniteQuery<T, Arg> extends QueryBase
     implements
-        Cacheable<T, InfiniteQueryData<T, Arg>, InfiniteQueryStatus<T, Arg>> {
+        Cacheable<InfiniteQueryData<T, Arg>, InfiniteQueryStatus<T, Arg>> {
   /// {@macro infiniteQuery}
   factory InfiniteQuery({
     required Object key,
@@ -193,6 +193,13 @@ final class InfiniteQuery<T, Arg> extends QueryBase
   }
 
   void _setState(InfiniteQueryStatus<T, Arg> state) {
+    final observers = _controller._cache.observers;
+    for (final observer in observers) {
+      observer.onChange(this, state);
+      if (state case InfiniteQueryError(:final stackTrace)) {
+        observer.onError(this, stackTrace);
+      }
+    }
     _state = state;
     _stateSubject.add(state);
   }

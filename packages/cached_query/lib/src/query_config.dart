@@ -56,17 +56,6 @@ class GlobalQueryConfig {
   /// {@endtemplate}
   final bool shouldRethrow;
 
-  /// {@template QueryConfig.storageSerializer}
-  /// Converts the query data to a storable format.
-  /// {@endtemplate}
-  final Serializer? storageSerializer;
-
-  /// {@template QueryConfig.storageDeserializer}
-  /// Called when the query is fetched from storage and should
-  /// convert the stored data to the usable data.
-  /// {@endtemplate}
-  final Serializer? storageDeserializer;
-
   /// {@template QueryConfig.ignoreCacheDuration}
   /// If set to true the query(ies) will never be removed from cache.
   /// {@endtemplate}
@@ -96,8 +85,6 @@ class GlobalQueryConfig {
   /// {@macro QueryConfig.shouldRethrow}
   const GlobalQueryConfig({
     this.shouldFetch,
-    this.storageSerializer,
-    this.storageDeserializer,
     this.ignoreCacheDuration = false,
     this.storeQuery = false,
     this.storageDuration,
@@ -115,8 +102,6 @@ class GlobalQueryConfig {
           storeQuery == other.storeQuery &&
           cacheDuration == other.cacheDuration &&
           shouldRethrow == other.shouldRethrow &&
-          storageDeserializer == other.storageDeserializer &&
-          storageSerializer == other.storageSerializer &&
           shouldFetch == other.shouldFetch &&
           ignoreCacheDuration == other.ignoreCacheDuration;
 
@@ -127,8 +112,6 @@ class GlobalQueryConfig {
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^
       shouldFetch.hashCode ^
-      storageSerializer.hashCode ^
-      storageDeserializer.hashCode ^
       ignoreCacheDuration.hashCode;
 }
 
@@ -185,13 +168,13 @@ class QueryConfig<Data> {
   /// {@template QueryConfig.storageSerializer}
   /// Converts the query data to a storable format.
   /// {@endtemplate}
-  final Serializer? storageSerializer;
+  final Serializer<Data>? storageSerializer;
 
   /// {@template QueryConfig.storageDeserializer}
   /// Called when the query is fetched from storage and should
   /// convert the stored data to the usable data.
   /// {@endtemplate}
-  final Serializer? storageDeserializer;
+  final Deserializer<Data>? storageDeserializer;
 
   /// {@template QueryConfig.ignoreCacheDuration}
   /// If set to true the query(ies) will never be removed from cache.
@@ -243,10 +226,10 @@ class QueryConfig<Data> {
 
   QueryConfig<Data> mergeWithGlobal(GlobalQueryConfig global) {
     return QueryConfig<Data>(
-      shouldFetch: _shouldFetch ?? global.shouldFetch,
-      storageSerializer: storageSerializer ?? global.storageSerializer,
-      storageDeserializer: storageDeserializer ?? global.storageDeserializer,
+      storageDeserializer: storageDeserializer,
+      storageSerializer: storageSerializer,
       ignoreCacheDuration: _ignoreCacheDuration ?? global.ignoreCacheDuration,
+      shouldFetch: _shouldFetch ?? global.shouldFetch,
       storeQuery: _storeQuery ?? global.storeQuery,
       storageDuration: storageDuration ?? global.storageDuration,
       refetchDuration: _refetchDuration ?? global.refetchDuration,

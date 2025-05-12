@@ -1,24 +1,18 @@
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 
-import '../repo/query_repo.dart';
-
 class TitleValue extends StatefulWidget {
-  final String response;
-  final String? initialTitle;
   final bool enabled;
   final void Function()? onBuild;
-  final Duration? queryDelay;
   final QueryBuilderCondition<QueryState<String>>? buildWhen;
+  final Query<String> query;
 
   const TitleValue({
     super.key,
-    required this.response,
     this.enabled = true,
     this.onBuild,
-    this.initialTitle,
-    this.queryDelay,
     this.buildWhen,
+    required this.query,
   });
 
   @override
@@ -46,10 +40,7 @@ class TitleValueState extends State<TitleValue> {
           ),
           QueryBuilder<QueryState<String>>(
             enabled: enabled,
-            query: TitleRepo(
-              response: widget.response,
-              queryDelay: widget.queryDelay,
-            ).fetchTitle(initialTitle: widget.initialTitle),
+            query: widget.query,
             buildWhen: widget.buildWhen,
             builder: (context, state) {
               if (widget.onBuild != null) {
