@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-05-12
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v3.0.0-dev.10`](#cached_query---v300-dev10)
+ - [`cached_query_flutter` - `v3.0.0-dev.10`](#cached_query_flutter---v300-dev10)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v3.0.0-dev.10`](#cached_storage---v300-dev10)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.10`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.10`
+
+ - **FIX**: observer not supported in new architecture. Multiple fixes for tests. ([5716dd84](https://github.com/D-James-GH/cached_query/commit/5716dd84b555636488dd481f09ddbd5850b3ab60))
+ - **FIX**: use initial fetch flag inside fetch. ([74cdd2ab](https://github.com/D-James-GH/cached_query/commit/74cdd2abc547f40980c7e06e58553f10790c3d92))
+ - **BREAKING** **REFACTOR**: Have different global and query config objects. ([ec9cae10](https://github.com/D-James-GH/cached_query/commit/ec9cae10b48e4f32e2421cd094b0b814d127e897))
+
+#### `cached_query_flutter` - `v3.0.0-dev.10`
+
+ - **FIX**: observer not supported in new architecture. Multiple fixes for tests. ([5716dd84](https://github.com/D-James-GH/cached_query/commit/5716dd84b555636488dd481f09ddbd5850b3ab60))
+ - **BREAKING** **REFACTOR**: Have different global and query config objects. ([ec9cae10](https://github.com/D-James-GH/cached_query/commit/ec9cae10b48e4f32e2421cd094b0b814d127e897))
+
+
 ## 2025-03-12
 
 ### Changes
