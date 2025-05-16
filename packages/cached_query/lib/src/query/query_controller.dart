@@ -133,9 +133,10 @@ final class QueryController<T> {
   Future<void> invalidate({
     bool refetchActive = true,
     bool refetchInactive = false,
+    FetchOptions options = const FetchOptions(),
   }) async {
     if ((_hasListener && refetchActive) || refetchInactive) {
-      return fetch(forceRefetch: true);
+      return fetch(forceRefetch: true, options: options);
     }
 
     markAsStale();

@@ -158,6 +158,26 @@ void main() async {
       await query.refetch();
       expect(fetchCount, 2);
     });
+
+    test("invalidate should refetch if query is active", () async {
+      final cache = CachedQuery.asNewInstance();
+      int fetchCount = 0;
+      final query = InfiniteQuery<String, int>(
+        cache: cache,
+        key: InfiniteQueryTestRepository.key,
+        queryFn: (page) {
+          fetchCount++;
+          return repo.getPosts(page);
+        },
+        getNextArg: (state) {
+          return (state?.pages.length ?? 0) + 1;
+        },
+      );
+      query.stream.listen((_) {});
+      await query.fetch();
+      await query.invalidate();
+      expect(fetchCount, 2);
+    });
   });
   group("Controlling refetch", () {
     test('Can prevent everything refetching if first page is the same',
