@@ -11,6 +11,36 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 Packages with breaking changes:
 
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.0-dev.12`](#cached_query---v300-dev12)
+ - [`cached_query_flutter` - `v3.0.0-dev.12`](#cached_query_flutter---v300-dev12)
+ - [`cached_storage` - `v3.0.0-dev.12`](#cached_storage---v300-dev12)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.0.0-dev.12`
+ - `cached_storage` - `v3.0.0-dev.12`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.12`
+
+ - **FEAT**: added convenience methods to infinite query data. ([fec46348](https://github.com/D-James-GH/cached_query/commit/fec4634852ba92cb86904fd47d4ecfa7cd568a87))
+
+
+## 2025-05-16
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
  - [`cached_query` - `v3.0.0-dev.11`](#cached_query---v300-dev11)
  - [`cached_query_flutter` - `v3.0.0-dev.11`](#cached_query_flutter---v300-dev11)
 
