@@ -22,7 +22,7 @@ typedef QueryFunc<T> = Future<T> Function();
 /// [onError].
 ///
 /// {@endtemplate}
-final class Query<T> extends QueryBase implements Cacheable<T, QueryStatus<T>> {
+final class Query<T> extends Cacheable<QueryStatus<T>> {
   /// {@macro query}
   factory Query({
     required Object key,
@@ -34,7 +34,7 @@ final class Query<T> extends QueryBase implements Cacheable<T, QueryStatus<T>> {
     CachedQuery? cache,
   }) {
     cache = cache ?? CachedQuery.instance;
-    var query = cache.getQuery(key) as Query<T>?;
+    var query = cache.getQuery<QueryState<T>>(key) as Query<T>?;
 
     // if query is null check the storage
     if (query == null) {
@@ -51,8 +51,6 @@ final class Query<T> extends QueryBase implements Cacheable<T, QueryStatus<T>> {
       );
 
       query = Query<T>._internal(
-        key: encodedKey,
-        unencodedKey: key,
         onError: onError,
         onSuccess: onSuccess,
         controller: controller,
@@ -66,8 +64,6 @@ final class Query<T> extends QueryBase implements Cacheable<T, QueryStatus<T>> {
   Query._internal({
     OnQueryErrorCallback? onError,
     OnQuerySuccessCallback<T>? onSuccess,
-    required super.key,
-    required super.unencodedKey,
     required QueryController<T> controller,
   })  : _onError = onError,
         _onSuccess = onSuccess,
@@ -89,6 +85,9 @@ final class Query<T> extends QueryBase implements Cacheable<T, QueryStatus<T>> {
     );
     _init();
   }
+
+  String get key => _controller.key;
+  Object get unencodedKey => _controller.unencodedKey;
 
   QueryConfig<T> get config => _controller.config;
   late QueryStatus<T> _state;
@@ -123,6 +122,10 @@ final class Query<T> extends QueryBase implements Cacheable<T, QueryStatus<T>> {
 
   void update(UpdateFunc<T> updateFn) {
     return _controller.update(updateFn);
+  }
+
+  void setData(T data) {
+    return _controller.setData(data);
   }
 
   void deleteQuery({bool deleteStorage = false}) {

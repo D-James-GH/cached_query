@@ -64,7 +64,7 @@ extension CachedQueryExt on CachedQuery {
   /// is given then the individual query config will be checked and used to determine
   /// if a query should be re-fetched.
   Future<void> refetchCurrentQueries([RefetchReason? reason]) async {
-    List<QueryBase>? queries;
+    List<Cacheable<dynamic>>? queries;
     final globalConfig = defaultConfig;
     if (reason == RefetchReason.resume) {
       queries = whereQuery((query) {

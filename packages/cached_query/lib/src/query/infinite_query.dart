@@ -32,9 +32,8 @@ typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryData<T, Arg>? state);
 /// [onError].
 ///
 /// {@endtemplate}
-final class InfiniteQuery<T, Arg> extends QueryBase
-    implements
-        Cacheable<InfiniteQueryData<T, Arg>, InfiniteQueryStatus<T, Arg>> {
+final class InfiniteQuery<T, Arg>
+    extends Cacheable<InfiniteQueryStatus<T, Arg>> {
   /// {@macro infiniteQuery}
   factory InfiniteQuery({
     required Object key,
@@ -53,7 +52,7 @@ final class InfiniteQuery<T, Arg> extends QueryBase
       "Prefetch pages must be greater than or equal to 0",
     );
     cache = cache ?? CachedQuery.instance;
-    var query = cache.getQuery(key);
+    var query = cache.getQuery<InfiniteQueryStatus<T, Arg>>(key);
     assert(
       query is InfiniteQuery<T, Arg> || query == null,
       "Query found with key $key is not an InfiniteQuery<$T, $Arg>",
@@ -78,12 +77,10 @@ final class InfiniteQuery<T, Arg> extends QueryBase
       );
 
       query = InfiniteQuery<T, Arg>._internal(
-        unencodedKey: key,
         controller: controller,
         getNextArg: getNextArg,
         onError: onError,
         onSuccess: onSuccess,
-        key: queryKey,
       );
       cache.addQuery(query);
 
@@ -98,8 +95,6 @@ final class InfiniteQuery<T, Arg> extends QueryBase
   }
 
   InfiniteQuery._internal({
-    required super.key,
-    required super.unencodedKey,
     required GetNextArg<T, Arg> getNextArg,
     required QueryController<InfiniteQueryData<T, Arg>> controller,
     OnQueryErrorCallback? onError,
@@ -126,6 +121,8 @@ final class InfiniteQuery<T, Arg> extends QueryBase
     _init();
   }
 
+  String get key => _controller.key;
+  Object get unencodedKey => _controller.unencodedKey;
   QueryConfig<InfiniteQueryData<T, Arg>> get config => _controller.config;
   late InfiniteQueryStatus<T, Arg> _state;
   InfiniteQueryStatus<T, Arg> get state => _state;
@@ -157,6 +154,10 @@ final class InfiniteQuery<T, Arg> extends QueryBase
 
   void update(UpdateFunc<InfiniteQueryData<T, Arg>> updateFn) {
     _controller.update(updateFn);
+  }
+
+  void setData(InfiniteQueryData<T, Arg> data) {
+    return _controller.setData(data);
   }
 
   Future<InfiniteQueryStatus<T, Arg>> refetch() async {

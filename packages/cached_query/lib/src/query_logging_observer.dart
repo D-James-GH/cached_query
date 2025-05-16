@@ -76,7 +76,7 @@ class QueryLoggingObserver implements QueryObserver {
 
   @override
   void onQueryCreation(
-    QueryBase query,
+    Cacheable<dynamic> query,
   ) {
     if (!queryCreation) return;
     _log(
@@ -96,7 +96,7 @@ class QueryLoggingObserver implements QueryObserver {
 
   @override
   void onChange(
-    QueryBase query,
+    Cacheable<dynamic> query,
     QueryState<dynamic> nextState,
   ) {
     if (!queryChange) return;
@@ -129,7 +129,7 @@ class QueryLoggingObserver implements QueryObserver {
 
   @override
   Future<void> onError(
-    QueryBase query,
+    Cacheable<dynamic> query,
     StackTrace stackTrace,
   ) async {
     if (!queryError) return;

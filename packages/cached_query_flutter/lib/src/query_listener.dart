@@ -27,7 +27,7 @@ typedef QueryListenerCondition<T extends QueryState<dynamic>> = FutureOr<bool>
 /// {@endtemplate}
 class QueryListener<T extends QueryState<dynamic>> extends StatefulWidget {
   /// The [Query] to used to update the listener.
-  final Cacheable<dynamic, T>? query;
+  final Cacheable<T>? query;
 
   /// Whether the query should be called immediately.
   final bool enabled;
@@ -71,7 +71,7 @@ class QueryListener<T extends QueryState<dynamic>> extends StatefulWidget {
 
 class _QueryListenerState<T extends QueryState<dynamic>>
     extends State<QueryListener<T>> {
-  late Cacheable<dynamic, T> _query;
+  late Cacheable<T> _query;
   late T _previousState;
   late final CachedQuery _cache;
 
@@ -83,19 +83,19 @@ class _QueryListenerState<T extends QueryState<dynamic>>
     _cache = widget.cache ?? CachedQuery.instance;
 
     if (widget.queryKey != null) {
-      final q = _cache.getQuery(widget.queryKey!);
+      final q = _cache.getQuery<T>(widget.queryKey!);
       assert(
         q != null,
         "No query found with the key ${widget.queryKey}, have you created it yet?",
       );
       assert(
-        q is Cacheable<dynamic, T>,
+        q is Cacheable<T>,
         "Query found is not of type QueryBase<dynamic, $T>",
       );
-      _query = q! as Cacheable<dynamic, T>;
+      _query = q!;
     }
     if (widget.query != null) {
-      _query = widget.query! as Cacheable<dynamic, T>;
+      _query = widget.query!;
     }
     _subscribe();
     _previousState = _query.state;
@@ -107,13 +107,13 @@ class _QueryListenerState<T extends QueryState<dynamic>>
     final oldQuery = oldWidget.query ?? _cache.getQuery(oldWidget.queryKey!);
     final currentQuery = widget.query ?? _cache.getQuery(widget.queryKey!);
     assert(
-      currentQuery is Cacheable<dynamic, T>,
+      currentQuery is Cacheable<T>,
       "Query found is not of type $T",
     );
     if (oldQuery != currentQuery) {
       if (_subscription != null) {
         _unsubscribe();
-        _query = currentQuery as Cacheable<dynamic, T>;
+        _query = currentQuery!;
         _previousState = _query.state;
       }
       if (widget.enabled) {
