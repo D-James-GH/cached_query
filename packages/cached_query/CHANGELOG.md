@@ -1,3 +1,7 @@
+## 3.0.0-dev.12
+
+ - **FEAT**: added convenience methods to infinite query data. ([fec46348](https://github.com/D-James-GH/cached_query/commit/fec4634852ba92cb86904fd47d4ecfa7cd568a87))
+
 ## 3.0.0-dev.11
 
 > Note: This release has breaking changes.
