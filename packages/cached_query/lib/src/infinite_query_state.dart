@@ -20,6 +20,18 @@ final class InfiniteQueryData<T, Arg> {
     };
   }
 
+  T? get lastPage {
+    if (pages.isEmpty) return null;
+    return pages.last;
+  }
+
+  T? get firstPage {
+    if (pages.isEmpty) return null;
+    return pages.first;
+  }
+
+  int get length => pages.length;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
