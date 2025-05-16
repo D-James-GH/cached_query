@@ -1,3 +1,7 @@
+## 3.0.0-dev.13
+
+ - **FIX**: infinite query invalidate not working. ([1883bdd7](https://github.com/D-James-GH/cached_query/commit/1883bdd70f80c122e40c6e09a7f28b282cd546e5))
+
 ## 3.0.0-dev.12
 
  - **FEAT**: added convenience methods to infinite query data. ([fec46348](https://github.com/D-James-GH/cached_query/commit/fec4634852ba92cb86904fd47d4ecfa7cd568a87))

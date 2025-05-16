@@ -15,6 +15,36 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`cached_query` - `v3.0.0-dev.13`](#cached_query---v300-dev13)
+ - [`cached_query_flutter` - `v3.0.0-dev.13`](#cached_query_flutter---v300-dev13)
+ - [`cached_storage` - `v3.0.0-dev.13`](#cached_storage---v300-dev13)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.0.0-dev.13`
+ - `cached_storage` - `v3.0.0-dev.13`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.13`
+
+ - **FIX**: infinite query invalidate not working. ([1883bdd7](https://github.com/D-James-GH/cached_query/commit/1883bdd70f80c122e40c6e09a7f28b282cd546e5))
+
+
+## 2025-05-16
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`cached_query` - `v3.0.0-dev.12`](#cached_query---v300-dev12)
  - [`cached_query_flutter` - `v3.0.0-dev.12`](#cached_query_flutter---v300-dev12)
  - [`cached_storage` - `v3.0.0-dev.12`](#cached_storage---v300-dev12)
