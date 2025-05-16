@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-05-16
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v3.0.0-dev.11`](#cached_query---v300-dev11)
+ - [`cached_query_flutter` - `v3.0.0-dev.11`](#cached_query_flutter---v300-dev11)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v3.0.0-dev.11`](#cached_storage---v300-dev11)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.11`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.11`
+
+ - **BREAKING** **REFACTOR**: merge QueryBase and Cacheable so queries only extend one sealed class. ([33d8566d](https://github.com/D-James-GH/cached_query/commit/33d8566dca472e236019de34110945a03eab3cd1))
+
+#### `cached_query_flutter` - `v3.0.0-dev.11`
+
+ - **FEAT**: expose the connetion state for flutter apps. ([334f25c9](https://github.com/D-James-GH/cached_query/commit/334f25c92d4a332a7c6fb01b9c3be858b3660bda))
+ - **BREAKING** **REFACTOR**: merge QueryBase and Cacheable so queries only extend one sealed class. ([33d8566d](https://github.com/D-James-GH/cached_query/commit/33d8566dca472e236019de34110945a03eab3cd1))
+
+
 ## 2025-05-12
 
 ### Changes
