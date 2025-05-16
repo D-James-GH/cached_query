@@ -1,3 +1,9 @@
+## 3.0.0-dev.11
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **REFACTOR**: merge QueryBase and Cacheable so queries only extend one sealed class. ([33d8566d](https://github.com/D-James-GH/cached_query/commit/33d8566dca472e236019de34110945a03eab3cd1))
+
 ## 3.0.0-dev.10
 
 > Note: This release has breaking changes.

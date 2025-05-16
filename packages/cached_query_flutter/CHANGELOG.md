@@ -1,3 +1,10 @@
+## 3.0.0-dev.11
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: expose the connetion state for flutter apps. ([334f25c9](https://github.com/D-James-GH/cached_query/commit/334f25c92d4a332a7c6fb01b9c3be858b3660bda))
+ - **BREAKING** **REFACTOR**: merge QueryBase and Cacheable so queries only extend one sealed class. ([33d8566d](https://github.com/D-James-GH/cached_query/commit/33d8566dca472e236019de34110945a03eab3cd1))
+
 ## 3.0.0-dev.10
 
 > Note: This release has breaking changes.
