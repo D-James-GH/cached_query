@@ -7,7 +7,7 @@ import 'package:meta/meta.dart';
 /// Should return true if a condition is met.
 ///
 /// Similar to List.where.
-typedef WhereCallback = bool Function(QueryBase query);
+typedef WhereCallback = bool Function(Cacheable<dynamic> query);
 
 /// Used to serialize the query from storage.
 typedef Serializer<T> = dynamic Function(T data);
@@ -35,7 +35,7 @@ class CachedQuery {
 
   GlobalQueryConfig _config = GlobalQueryConfig();
 
-  Map<String, Cacheable<dynamic, dynamic>> _queryCache = {};
+  Map<String, Cacheable<dynamic>> _queryCache = {};
 
   StorageInterface? _storage;
 
@@ -105,10 +105,10 @@ class CachedQuery {
   }
 
   /// Get a [Query] at a given key.
-  QueryBase? getQuery(Object key) {
+  Cacheable<State>? getQuery<State>(Object key) {
     final k = encodeKey(key);
     if (_queryCache.containsKey(k)) {
-      return _queryCache[k] as QueryBase;
+      return _queryCache[k] as Cacheable<State>?;
     }
     return null;
   }
@@ -125,28 +125,35 @@ class CachedQuery {
       key != null || filterFn != null,
       "key or filterFn must not be null",
     );
-    List<Cacheable<dynamic, dynamic>> queries = [];
+    List<Cacheable<dynamic>> queries = [];
     if (filterFn != null) {
       queries = _filterQueryKey(filter: filterFn).toList();
     } else if (key != null) {
-      final query = getQuery(key) as Cacheable<dynamic, dynamic>?;
+      final query = getQuery(key);
       if (query != null) {
         queries.add(query);
       }
     }
     for (final query in queries) {
-      query.update(updateFn);
+      switch (query) {
+        case Query():
+          final currentData = query.state.data;
+          query.setData(updateFn(currentData));
+        case InfiniteQuery():
+          final currentData = query.state.data;
+          query.setData(updateFn(currentData) as InfiniteQueryData);
+      }
     }
   }
 
   /// Find and return a list of [Query]'s matching a given condition.
-  List<QueryBase>? whereQuery(
+  List<Cacheable<Object?>>? whereQuery(
     WhereCallback findCallback,
   ) {
-    final List<QueryBase> result = [];
+    final List<Cacheable<Object?>> result = [];
     for (final query in _queryCache.values) {
-      if (findCallback(query as QueryBase)) {
-        result.add(query as QueryBase);
+      if (findCallback(query)) {
+        result.add(query);
       }
     }
     return result.isNotEmpty ? result : null;
@@ -174,7 +181,7 @@ class CachedQuery {
       key == null || filterFn == null,
       "Cannot pass both key and filterFn",
     );
-    List<Cacheable<dynamic, dynamic>> queries = [];
+    List<Cacheable<dynamic>> queries = [];
 
     if (filterFn != null) {
       queries = _filterQueryKey(filter: filterFn).toList();
@@ -250,7 +257,7 @@ class CachedQuery {
     bool refetchInactive = true,
     bool ignoreStale = true,
   }) async {
-    final List<Cacheable<dynamic, dynamic>> queries = [];
+    final List<Cacheable<dynamic>> queries = [];
 
     if (keys == null && filterFn == null) {
       queries.addAll(
@@ -292,14 +299,14 @@ class CachedQuery {
   ///
   /// Shouldn't normally need to add a query manually. Queries are automatically
   /// added to the cache when they are constructed.
-  void addQuery(QueryBase query) {
+  void addQuery(Cacheable<QueryState<dynamic>> query) {
     for (final ob in observers) {
       ob.onQueryCreation(query);
     }
-    _queryCache[query.key] = query as Cacheable<dynamic, dynamic>;
+    _queryCache[query.key] = query;
   }
 
-  Iterable<Cacheable<dynamic, dynamic>> _filterQueryKey({
+  Iterable<Cacheable<Object?>> _filterQueryKey({
     required KeyFilterFunc filter,
   }) {
     return _queryCache.values

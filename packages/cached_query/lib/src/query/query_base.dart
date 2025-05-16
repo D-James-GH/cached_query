@@ -1,19 +1,19 @@
 part of "_query.dart";
 
-sealed class QueryBase {
-  final String key;
-  final Object unencodedKey;
-  bool get hasListener;
-  QueryBase({
-    required this.key,
-    required this.unencodedKey,
-  });
+// sealed class QueryBase {
+//   final String key;
+//   final Object unencodedKey;
+//   bool get hasListener;
+//   QueryBase({
+//     required this.key,
+//     required this.unencodedKey,
+//   });
+//
+//   // Future<State> refetch();
+//   // void update(UpdateFunc<dynamic> updateFn);
+// }
 
-  // Future<State> refetch();
-  // void update(UpdateFunc<dynamic> updateFn);
-}
-
-abstract interface class Cacheable<Data, State> {
+sealed class Cacheable<State> {
   String get key;
   Object get unencodedKey;
   State get state;
@@ -23,7 +23,6 @@ abstract interface class Cacheable<Data, State> {
 
   Future<State> fetch();
   Future<State> refetch();
-  void update(UpdateFunc<Data> updateFn);
   void deleteQuery({bool deleteStorage});
   Future<void> invalidate({
     bool refetchActive,

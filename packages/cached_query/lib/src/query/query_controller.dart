@@ -113,10 +113,13 @@ final class QueryController<T> {
   /// the same type as the original query/infiniteQuery.
   void update(UpdateFunc<T> updateFn) {
     final newData = updateFn(state.data);
+    return setData(newData);
+  }
 
+  void setData(T data) {
     _setState(
       ControllerState(
-        data: newData,
+        data: data,
         timeCreated: state.timeCreated,
       ),
     );

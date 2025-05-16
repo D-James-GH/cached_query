@@ -10,7 +10,7 @@ void main() {
     final query = Query(key: "query", queryFn: () => Future.value("query"));
     final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
-    expect(cachedQuery.getQuery("query"), isNotNull);
+    expect(cachedQuery.getQuery<QueryState<String>>("query"), isNotNull);
   });
   group("Config", () {
     test("Should be able to set config", () {
@@ -233,20 +233,34 @@ void main() {
     });
 
     test("update query multiple queries with filter", () async {
-      final query = createQuery();
+      final cache = CachedQuery.asNewInstance();
+      final query = createQuery(cache: cache);
       await query.fetch();
-      final query2 = createQuery();
-      await query2.fetch();
+      final infiniteQuery = InfiniteQuery(
+        key: "query_infinite",
+        queryFn: (arg) => Future.value(arg.toString()),
+        getNextArg: (data) => (data?.pages.length ?? 0) > 4 ? null : 1,
+        cache: cache,
+      );
+      await infiniteQuery.fetch();
       final query3 = createQuery(key: "other_key");
       await query3.fetch();
 
-      CachedQuery.instance.updateQuery(
+      cache.updateQuery(
         filterFn: (unencodedKey, key) => key.startsWith("query"),
-        updateFn: (dynamic value) => "updated",
+        updateFn: (dynamic value) {
+          if (value is InfiniteQueryData<String, int>) {
+            return InfiniteQueryData(pages: ["updated"], pageParams: [1]);
+          }
+          if (value is String) {
+            return "updated";
+          }
+          return value;
+        },
       );
 
       expect(query.state.data, "updated");
-      expect(query2.state.data, "updated");
+      expect(infiniteQuery.state.data!.pages.first, "updated");
       expect(query3.state.data, testQueryRes);
     });
 

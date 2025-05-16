@@ -6,7 +6,7 @@ int _serial = 0;
 const testQueryRes = 'result';
 
 class QueryTester {
-  late final Cacheable<dynamic, dynamic> query;
+  late final Cacheable<dynamic> query;
   int _numFetches = 0;
   int get numFetches => _numFetches;
 

@@ -10,7 +10,7 @@ import 'query_listener.dart';
 /// {@endtemplate}
 class QueryConsumer<T extends QueryState<dynamic>> extends StatelessWidget {
   /// The [Query] to used to update the listener.
-  final Cacheable<dynamic, T> query;
+  final Cacheable<T> query;
 
   /// Whether the query should be called immediately.
   final bool enabled;

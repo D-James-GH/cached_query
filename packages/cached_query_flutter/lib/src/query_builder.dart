@@ -28,7 +28,7 @@ typedef QueryBuilderCondition<T extends QueryState<dynamic>> = FutureOr<bool>
 /// {@endtemplate}
 class QueryBuilder<T extends QueryState<dynamic>> extends StatefulWidget {
   /// The [Query] to used to update the ui.
-  final Cacheable<dynamic, T>? query;
+  final Cacheable<T>? query;
 
   /// Optional cache used for the query.
   final CachedQuery? cache;
@@ -68,7 +68,7 @@ class QueryBuilder<T extends QueryState<dynamic>> extends StatefulWidget {
 
 class _QueryBuilderState<T extends QueryState<dynamic>>
     extends State<QueryBuilder<T>> {
-  late Cacheable<dynamic, T> _query;
+  late Cacheable<T> _query;
   late T _state;
   late final CachedQuery _cache;
 
@@ -79,12 +79,12 @@ class _QueryBuilderState<T extends QueryState<dynamic>>
     super.initState();
     _cache = widget.cache ?? CachedQuery.instance;
     if (widget.queryKey != null) {
-      final q = _cache.getQuery(widget.queryKey!);
+      final q = _cache.getQuery<T>(widget.queryKey!);
       assert(
         q != null,
         "No query found with the key ${widget.queryKey}, have you created it yet?",
       );
-      _query = q as Cacheable<dynamic, T>;
+      _query = q!;
     }
     if (widget.query != null) {
       _query = widget.query!;
@@ -100,13 +100,17 @@ class _QueryBuilderState<T extends QueryState<dynamic>>
     final oldQuery = oldWidget.query ?? _cache.getQuery(oldWidget.queryKey!);
     final currentQuery = widget.query ?? _cache.getQuery(widget.queryKey!);
     assert(
-      currentQuery is QueryBase,
+      currentQuery is Cacheable<T>,
       "Query found is not of type $T",
+    );
+    assert(
+      currentQuery != null,
+      "No query found with the key ${widget.queryKey}, have you created it yet?",
     );
     if (oldQuery != currentQuery) {
       if (_subscription != null) {
         _unsubscribe();
-        _query = currentQuery as Cacheable<dynamic, T>;
+        _query = currentQuery!;
         _state = _query.state;
       }
       if (widget.enabled) {
