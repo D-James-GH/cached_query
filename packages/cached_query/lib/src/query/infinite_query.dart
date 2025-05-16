@@ -190,6 +190,7 @@ final class InfiniteQuery<T, Arg>
     return _controller.invalidate(
       refetchActive: refetchActive,
       refetchInactive: refetchInactive,
+      options: InfiniteFetchOptions(),
     );
   }
 
