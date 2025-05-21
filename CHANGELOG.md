@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-05-21
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.0-dev.14`](#cached_query---v300-dev14)
+ - [`cached_query_flutter` - `v3.0.0-dev.14`](#cached_query_flutter---v300-dev14)
+ - [`cached_storage` - `v3.0.0-dev.14`](#cached_storage---v300-dev14)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.14`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.14`
+
+ - **FEAT**: expose check connection. ([3e8f6bbf](https://github.com/D-James-GH/cached_query/commit/3e8f6bbff701ee70ad2815c7457a0ddb1477040c))
+
+#### `cached_query_flutter` - `v3.0.0-dev.14`
+
+ - **FEAT**: expose check connection. ([3e8f6bbf](https://github.com/D-James-GH/cached_query/commit/3e8f6bbff701ee70ad2815c7457a0ddb1477040c))
+
+
 ## 2025-05-16
 
 ### Changes

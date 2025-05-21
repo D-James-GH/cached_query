@@ -1,3 +1,7 @@
+## 3.0.0-dev.14
+
+ - **FEAT**: expose check connection. ([3e8f6bbf](https://github.com/D-James-GH/cached_query/commit/3e8f6bbff701ee70ad2815c7457a0ddb1477040c))
+
 ## 3.0.0-dev.13
 
  - **FIX**: infinite query invalidate not working. ([1883bdd7](https://github.com/D-James-GH/cached_query/commit/1883bdd70f80c122e40c6e09a7f28b282cd546e5))
