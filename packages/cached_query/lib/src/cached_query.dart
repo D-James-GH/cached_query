@@ -13,7 +13,7 @@ typedef WhereCallback = bool Function(Cacheable<dynamic> query);
 typedef Serializer<T> = dynamic Function(T data);
 
 /// Used to deserialize the query from storage.
-typedef Deserializer<T> = T Function(dynamic data);
+typedef Deserializer<T> = T Function(dynamic json);
 
 /// Used to match multiple queries.
 typedef KeyFilterFunc = bool Function(Object unencodedKey, String key);
