@@ -58,6 +58,12 @@ extension CachedQueryExt on CachedQuery {
   /// Whether the device has access to the internet.
   bool get hasConnection => ConnectivityController.instance.hasConnection;
 
+  /// Check the current connection state.
+  /// Returns true if the device is connected to the internet.
+  /// Updates the connection state if it has changed.
+  Future<bool> checkConnection() =>
+      ConnectivityController.instance.checkConnection();
+
   /// Refetch all queries and infinite queries with listeners.
   ///
   /// A query is considered on screen or active if it has listeners. If a reason
