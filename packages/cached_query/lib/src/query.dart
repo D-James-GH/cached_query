@@ -44,6 +44,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     required QueryConfig? config,
     required Future<T> Function() queryFn,
     required T? initialData,
+    bool staleOverride = true,
   })  : _queryFn = queryFn,
         _onError = onError,
         _onSuccess = onSuccess,
@@ -56,6 +57,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
             timeCreated: DateTime.now(),
             data: initialData,
           ),
+          staleOverride: staleOverride,
         );
 
   /// {@macro query}
@@ -67,6 +69,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     T? initialData,
     QueryConfig? config,
     CachedQuery? cache,
+    bool staleOverride = true,
   }) {
     cache = cache ?? CachedQuery.instance;
     var query = cache.getQuery(key) as Query<T>?;
@@ -82,6 +85,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
         onSuccess: onSuccess,
         initialData: initialData,
         config: config,
+        staleOverride: staleOverride,
       );
       cache.addQuery(query);
     }

@@ -41,9 +41,11 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     required State state,
     required QueryConfig? config,
     required CachedQuery cache,
+    bool staleOverride = true,
   })  : config = config ?? cache.defaultConfig,
         _cache = cache,
-        _state = state;
+        _state = state,
+        _staleOverride = staleOverride;
 
   /// The key used to store and access the query. Encoded using jsonEncode.
   ///
@@ -108,7 +110,7 @@ abstract class QueryBase<T, State extends QueryState<T>> {
   }
 
 // Initialise the query as stale so the first fetch is guaranteed to happen
-  bool _staleOverride = true;
+  bool _staleOverride;
   State _state;
 
   /// Refetch the query immediately.
