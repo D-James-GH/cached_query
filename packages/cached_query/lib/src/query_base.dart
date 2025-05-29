@@ -41,11 +41,11 @@ abstract class QueryBase<T, State extends QueryState<T>> {
     required State state,
     required QueryConfig? config,
     required CachedQuery cache,
-    bool staleOverride = true,
+    bool? staleOverride,
   })  : config = config ?? cache.defaultConfig,
         _cache = cache,
         _state = state,
-        _staleOverride = staleOverride;
+        _staleOverride = staleOverride ?? true;
 
   /// The key used to store and access the query. Encoded using jsonEncode.
   ///

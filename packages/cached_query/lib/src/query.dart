@@ -44,7 +44,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     required QueryConfig? config,
     required Future<T> Function() queryFn,
     required T? initialData,
-    bool staleOverride = true,
+    bool? staleOverride,
   })  : _queryFn = queryFn,
         _onError = onError,
         _onSuccess = onSuccess,
@@ -69,7 +69,7 @@ class Query<T> extends QueryBase<T, QueryState<T>> {
     T? initialData,
     QueryConfig? config,
     CachedQuery? cache,
-    bool staleOverride = true,
+    bool? staleOverride,
   }) {
     cache = cache ?? CachedQuery.instance;
     var query = cache.getQuery(key) as Query<T>?;
