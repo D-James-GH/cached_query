@@ -35,7 +35,7 @@ class InfiniteFetchOptions extends FetchOptions {
 /// 1. If the first page is different only return the first page
 ///
 /// ```dart
-/// final MergeRefetchResult<T, Arg> mergeRefetchResult = (
+/// final OnPageRefetched<T, Arg> onPageRefetched = (
 ///   T page,
 ///   InfiniteQueryData<T, Arg> currentResult,
 ///   InfiniteQueryData<T, Arg> cachedData,
@@ -51,7 +51,7 @@ class InfiniteFetchOptions extends FetchOptions {
 /// if the first page is the same as the cached. Below only refetches the whole list if the first pages are different.
 ///
 /// ```dart
-/// final MergeRefetchResult<T, Arg> mergeRefetchResult = (
+/// final OnPageRefetched<T, Arg> onPageRefetched = (
 ///   T page,
 ///   InfiniteQueryData<T, Arg> currentResult,
 ///   InfiniteQueryData<T, Arg> cachedData,
@@ -64,7 +64,7 @@ class InfiniteFetchOptions extends FetchOptions {
 ///
 /// ```
 ///
-typedef MergeRefetchResult<T, Arg> = InfiniteQueryData<T, Arg>? Function(
+typedef OnPageRefetched<T, Arg> = InfiniteQueryData<T, Arg>? Function(
   T page,
   InfiniteQueryData<T, Arg> currentResult,
   InfiniteQueryData<T, Arg> cachedData,
@@ -79,7 +79,7 @@ typedef InfiniteFetchFunc<T, Arg> = Future<InfiniteQueryData<T, Arg>> Function({
 /// Function to fetch and refetch an infinite query.
 InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
   required GetNextArg<T, Arg> getNextArg,
-  required MergeRefetchResult<T, Arg>? mergeRefetchResult,
+  required OnPageRefetched<T, Arg>? onPageRefetched,
   required InfiniteQueryFunc<T, Arg> queryFn,
   required Arg? initialArg,
 }) {
@@ -120,8 +120,8 @@ InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
           pageParams: [...result.pageParams, arg],
         );
 
-        if (mergeRefetchResult != null) {
-          final continueFetching = mergeRefetchResult(res, result, state);
+        if (onPageRefetched != null) {
+          final continueFetching = onPageRefetched(res, result, state);
           if (continueFetching != null) {
             result = continueFetching;
             break;
