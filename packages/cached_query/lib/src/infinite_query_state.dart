@@ -20,6 +20,17 @@ final class InfiniteQueryData<T, Arg> {
     };
   }
 
+  factory InfiniteQueryData.fromJson(
+    dynamic json, {
+    required List<T> Function(List<dynamic> json) pagesConverter,
+    required List<Arg> Function(List<dynamic> json) argsConverter,
+  }) {
+    return InfiniteQueryData(
+      pages: pagesConverter(json['pages'] as List<dynamic>),
+      pageParams: argsConverter(json['pageParams'] as List<dynamic>),
+    );
+  }
+
   T? get lastPage {
     if (pages.isEmpty) return null;
     return pages.last;
@@ -113,8 +124,6 @@ sealed class InfiniteQueryStatus<T, Arg>
   }
 
   /// The number of pages that have been fetched
-  //TODO: should this be removed?
-  @Deprecated("Use data.pages.length instead")
   int get length {
     return data?.pages.length ?? 0;
   }

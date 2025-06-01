@@ -1,3 +1,5 @@
+import 'package:cached_query/cached_query.dart';
+
 part "infinite_query_state.dart";
 
 /// {@template QueryState}

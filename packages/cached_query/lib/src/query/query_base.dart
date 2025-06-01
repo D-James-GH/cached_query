@@ -1,18 +1,5 @@
 part of "_query.dart";
 
-// sealed class QueryBase {
-//   final String key;
-//   final Object unencodedKey;
-//   bool get hasListener;
-//   QueryBase({
-//     required this.key,
-//     required this.unencodedKey,
-//   });
-//
-//   // Future<State> refetch();
-//   // void update(UpdateFunc<dynamic> updateFn);
-// }
-
 sealed class Cacheable<State> {
   String get key;
   Object get unencodedKey;

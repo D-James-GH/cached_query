@@ -12,8 +12,9 @@ class JokeService {
     return Query<JokeModel>(
       key: 'joke',
       config: QueryConfigFlutter(
+        storeQuery: true,
         refetchDuration: const Duration(seconds: 4),
-        storageDeserializer: (dynamic json) =>
+        storageDeserializer: (json) =>
             JokeModel.fromJson(json as Map<String, dynamic>),
       ),
       queryFn: () async {
