@@ -31,7 +31,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       query.stream,
       onData: (queryState) {
         return state.copyWith(
-          posts: queryState.data?.expand((page) => page).toList() ?? [],
+          posts: queryState.data?.pages.expand((page) => page).toList() ?? [],
           status:
               queryState.isLoading ? PostStatus.loading : PostStatus.success,
           hasReachedMax: query.hasReachedMax(),

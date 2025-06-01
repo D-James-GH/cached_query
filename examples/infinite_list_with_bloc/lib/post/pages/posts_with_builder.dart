@@ -60,8 +60,8 @@ class _ListState extends State<_List> {
           return QueryBuilder<InfiniteQueryStatus<List<PostModel>, int>>(
             query: state.postQuery,
             builder: (context, state) {
-              if (state.data != null && state.data!.isNotEmpty) {
-                final allPosts = state.data!.expand((e) => e).toList();
+              if (state.data != null && state.data!.pages.isNotEmpty) {
+                final allPosts = state.data!.pages.expand((e) => e).toList();
                 return CustomScrollView(
                   controller: _scrollController,
                   slivers: [

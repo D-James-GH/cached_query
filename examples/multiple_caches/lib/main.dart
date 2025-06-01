@@ -6,8 +6,8 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   // Set the default configuration for the CachedQuery instance.
   CachedQuery.instance.configFlutter(
-    config: QueryConfigFlutter(
-      refetchDuration: const Duration(seconds: 4),
+    config: const GlobalQueryConfigFlutter(
+      refetchDuration: Duration(seconds: 4),
     ),
   );
   runApp(const MyApp());
