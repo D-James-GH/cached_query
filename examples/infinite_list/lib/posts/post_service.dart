@@ -9,17 +9,21 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
     key: 'posts',
     config: QueryConfig(
       refetchDuration: const Duration(seconds: 2),
-      storageDeserializer: (dynamic postJson) {
-        return (postJson as List<dynamic>)
-            .map(
-              (dynamic page) => PostModel.listFromJson(page as List<dynamic>),
-            )
-            .toList();
+      storageDeserializer: (json) {
+        return InfiniteQueryData.fromJson(
+          json,
+          pagesConverter: (p) => p
+              .map(
+                (dynamic page) => PostModel.listFromJson(page as List<dynamic>),
+              )
+              .toList(),
+          argsConverter: (p) => p.cast<int>(),
+        );
       },
     ),
     getNextArg: (state) {
-      if (state.lastPage?.isEmpty ?? false) return null;
-      return (state.data?.length ?? 0) + 1;
+      if (state?.lastPage?.isEmpty ?? false) return null;
+      return (state?.pages.length ?? 0) + 1;
     },
     queryFn: (arg) async {
       final uri = Uri.parse(

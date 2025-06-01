@@ -48,7 +48,7 @@ class _PostListScreenState extends State<PostListScreen> {
       body: QueryBuilder<InfiniteQueryStatus<List<PostModel>, int>>(
           query: getPosts(),
           builder: (context, state) {
-            final allPosts = state.data?.expand((e) => e).toList();
+            final allPosts = state.data?.pages.expand((e) => e).toList();
             final error = switch (state) {
               InfiniteQueryError(:final error) => error,
               _ => null,
