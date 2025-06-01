@@ -47,32 +47,48 @@ class JokeScreen extends StatelessWidget {
       body: QueryBuilder<QueryState<JokeModel?>>(
         query: service.getJoke(),
         builder: (_, state) {
-          return Column(
-            children: [
-              if (state.isError &&
-                  (state as QueryError).error is SocketException)
-                Container(
-                  width: double.infinity,
-                  decoration:
-                      BoxDecoration(color: Theme.of(context).colorScheme.error),
-                  child: const Text(
-                    "No internet connection",
-                    style: TextStyle(color: Colors.white),
-                    textAlign: TextAlign.center,
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              children: [
+                if (state.isError &&
+                    (state as QueryError).error is SocketException)
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.error),
+                    child: const Text(
+                      "No internet connection",
+                      style: TextStyle(color: Colors.white, fontSize: 24),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                Expanded(
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (state.isLoading) const CircularProgressIndicator(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                                child: Text(state.data?.joke ?? "",
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 24))),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        IconButton(
+                          icon: const Icon(Icons.refresh_rounded, size: 40),
+                          onPressed: () => service.getJoke().refetch(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              Expanded(
-                child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(child: Text(state.data?.joke ?? "")),
-                      if (state.isLoading) const CircularProgressIndicator(),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),

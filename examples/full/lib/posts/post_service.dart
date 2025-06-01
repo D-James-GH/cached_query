@@ -5,24 +5,29 @@ import 'package:full/posts/post_model/post_model.dart';
 import 'package:http/http.dart' as http;
 
 InfiniteQuery<List<PostModel>, int> getPosts() {
-  return InfiniteQuery<List<PostModel>, int>(
+  return InfiniteQuery(
     key: 'posts',
     config: QueryConfigFlutter(
-      // storageDuration: const Duration(seconds: 10),
+      storageDuration: const Duration(seconds: 60),
       storeQuery: true,
-      refetchDuration: const Duration(seconds: 2),
-      shouldRefetch: (state, fromStorage) => true,
-      storageDeserializer: (dynamic postJson) {
-        return (postJson as List<dynamic>)
-            .map(
-              (dynamic page) => PostModel.listFromJson(page as List<dynamic>),
-            )
-            .toList();
+      refetchDuration: const Duration(seconds: 5),
+      shouldFetch: (key, data, createdAt) => true,
+      storageDeserializer: (json) {
+        return InfiniteQueryData.fromJson(
+          json,
+          pagesConverter: (pages) => pages
+              .map(
+                (page) => PostModel.listFromJson(page as List<dynamic>),
+              )
+              .toList(),
+          argsConverter: (args) => args.cast<int>(),
+        );
       },
     ),
+    onError: print,
     getNextArg: (state) {
-      if (state.lastPage?.isEmpty ?? false) return null;
-      return (state.data?.length ?? 0) + 1;
+      if (state?.lastPage?.isEmpty ?? false) return null;
+      return (state?.length ?? 0) + 1;
     },
     queryFn: (arg) async {
       final uri = Uri.parse(
@@ -75,24 +80,36 @@ Mutation<PostModel, PostModel> createPost() {
     },
     onStartMutation: (newPost) {
       final query = CachedQuery.instance.getQuery("posts")
-          as InfiniteQuery<List<PostModel>, int>;
+          as InfiniteQuery<List<PostModel>, int>?;
+      if (query == null) return null;
 
       final fallback = query.state.data;
+
       query.update(
-        (old) => [
-          [newPost, ...?old?.first],
-          ...?old?.sublist(1),
-        ],
+        (old) {
+          return InfiniteQueryData(
+            pageParams: old?.pageParams ?? [],
+            pages: [
+              [newPost, ...?old?.pages.first],
+              ...?old?.pages.sublist(1),
+            ],
+          );
+        },
       );
 
       return fallback;
     },
-    onSuccess: (args, newPost) {},
+    onSuccess: (args, newPost) {
+      CachedQuery.instance.invalidateCache(key: "posts");
+    },
     onError: (arg, error, fallback) {
-      CachedQuery.instance.updateQuery(
-        key: "posts",
-        updateFn: (dynamic old) => fallback as List<List<PostModel>>,
-      );
+      if (fallback != null) {
+        (CachedQuery.instance.getQuery("posts")
+                as InfiniteQuery<List<PostModel>, int>)
+            .update(
+          (old) => fallback as InfiniteQueryData<List<PostModel>, int>,
+        );
+      }
     },
   );
 }

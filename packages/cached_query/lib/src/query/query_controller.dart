@@ -284,6 +284,11 @@ final class QueryController<T> {
       data = config.storageDeserializer!(storedData.data);
     }
 
+    assert(
+      data is T,
+      "The data type fetched from storage (${data.runtimeType}) does not match the query type ($T). Have you added a storageDeserializer?",
+    );
+
     if (data is T) {
       return (data: data, createdAt: storedData.createdAt);
     }
