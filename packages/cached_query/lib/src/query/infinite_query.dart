@@ -45,7 +45,7 @@ final class InfiniteQuery<T, Arg>
     OnQueryErrorCallback? onError,
     OnQuerySuccessCallback<InfiniteQueryData<T, Arg>>? onSuccess,
     CachedQuery? cache,
-    MergeRefetchResult<T, Arg>? mergeRefetchResult,
+    OnPageRefetched<T, Arg>? onPageRefetched,
   }) {
     assert(
       (prefetchPages ?? 0) >= 0,
@@ -69,7 +69,7 @@ final class InfiniteQuery<T, Arg>
         initialData: initialData,
         onFetch: infiniteFetch<T, Arg>(
           getNextArg: getNextArg,
-          mergeRefetchResult: mergeRefetchResult,
+          onPageRefetched: onPageRefetched,
           queryFn: queryFn,
           initialArg: getNextArg(initialData),
         ),

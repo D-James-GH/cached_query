@@ -186,7 +186,7 @@ void main() async {
       int page2Count = 0;
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
-        mergeRefetchResult: (page, currentResult, cachedData) {
+        onPageRefetched: (page, currentResult, cachedData) {
           if (page == cachedData.pages.firstOrNull &&
               currentResult.pages.length == 1) {
             return cachedData;
@@ -229,7 +229,7 @@ void main() async {
         config: QueryConfig(
           refetchDuration: Duration.zero,
         ),
-        mergeRefetchResult: (page, currentResult, cachedData) {
+        onPageRefetched: (page, currentResult, cachedData) {
           if (page != cachedData.pages.firstOrNull &&
               currentResult.pages.length == 1) {
             return currentResult;
@@ -353,7 +353,7 @@ void main() async {
         () async {
       final query = InfiniteQuery<String, int>(
         key: "hasReachedMax",
-        mergeRefetchResult: (page, currentResult, cachedData) {
+        onPageRefetched: (page, currentResult, cachedData) {
           if (page != cachedData.pages.firstOrNull &&
               currentResult.pages.length == 1) {
             return currentResult;
