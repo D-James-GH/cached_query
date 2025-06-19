@@ -1,3 +1,9 @@
+## 3.0.0-dev.15
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **REFACTOR**: change type params of get query to a query rather than state. ([f62e5eec](https://github.com/D-James-GH/cached_query/commit/f62e5eec0160345714c2b26b7a07654d1eac5654))
+
 ## 3.0.0-dev.14
 
  - **FEAT**: expose check connection. ([3e8f6bbf](https://github.com/D-James-GH/cached_query/commit/3e8f6bbff701ee70ad2815c7457a0ddb1477040c))
