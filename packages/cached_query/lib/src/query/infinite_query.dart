@@ -52,12 +52,12 @@ final class InfiniteQuery<T, Arg>
       "Prefetch pages must be greater than or equal to 0",
     );
     cache = cache ?? CachedQuery.instance;
-    var query = cache.getQuery<InfiniteQueryStatus<T, Arg>>(key);
+    var query = cache.getQuery<InfiniteQuery<T, Arg>>(key);
     assert(
       query is InfiniteQuery<T, Arg> || query == null,
       "Query found with key $key is not an InfiniteQuery<$T, $Arg>",
     );
-    query = query as InfiniteQuery<T, Arg>?;
+    query = query;
 
     if (query == null) {
       final queryKey = encodeKey(key);

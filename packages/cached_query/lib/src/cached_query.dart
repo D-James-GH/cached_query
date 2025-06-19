@@ -105,10 +105,10 @@ class CachedQuery {
   }
 
   /// Get a [Query] at a given key.
-  Cacheable<State>? getQuery<State>(Object key) {
+  QueryType? getQuery<QueryType extends Cacheable<dynamic>>(Object key) {
     final k = encodeKey(key);
     if (_queryCache.containsKey(k)) {
-      return _queryCache[k] as Cacheable<State>?;
+      return _queryCache[k] as QueryType?;
     }
     return null;
   }
