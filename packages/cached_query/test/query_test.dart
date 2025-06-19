@@ -11,7 +11,7 @@ void main() {
     test("query is created and added to cache", () {
       final query = Query(key: "query created", queryFn: fetchFunction);
       final queryFromCache =
-          cachedQuery.getQuery<QueryState<String>>("query created");
+          cachedQuery.getQuery<Query<String>>("query created");
 
       expect(query, queryFromCache);
     });

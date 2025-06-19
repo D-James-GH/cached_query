@@ -34,7 +34,7 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     CachedQuery? cache,
   }) {
     cache = cache ?? CachedQuery.instance;
-    var query = cache.getQuery<QueryState<T>>(key) as Query<T>?;
+    var query = cache.getQuery<Query<T>>(key);
 
     // if query is null check the storage
     if (query == null) {

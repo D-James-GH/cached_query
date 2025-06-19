@@ -79,7 +79,7 @@ class _QueryBuilderState<T extends QueryState<dynamic>>
     super.initState();
     _cache = widget.cache ?? CachedQuery.instance;
     if (widget.queryKey != null) {
-      final q = _cache.getQuery<T>(widget.queryKey!);
+      final q = _cache.getQuery(widget.queryKey!) as Cacheable<T>?;
       assert(
         q != null,
         "No query found with the key ${widget.queryKey}, have you created it yet?",

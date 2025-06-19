@@ -10,7 +10,7 @@ void main() {
     final query = Query(key: "query", queryFn: () => Future.value("query"));
     final cachedQuery = CachedQuery.asNewInstance()..addQuery(query);
 
-    expect(cachedQuery.getQuery<QueryState<String>>("query"), isNotNull);
+    expect(cachedQuery.getQuery<Query<String>>("query"), isNotNull);
   });
   group("Config", () {
     test("Should be able to set config", () {
