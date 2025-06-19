@@ -3,6 +3,40 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-06-19
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v3.0.0-dev.15`](#cached_query---v300-dev15)
+ - [`cached_query_flutter` - `v3.0.0-dev.15`](#cached_query_flutter---v300-dev15)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v3.0.0-dev.15`](#cached_storage---v300-dev15)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.15`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.15`
+
+ - **REFACTOR**: change name of infinite refetch function to onpagerefetched. ([756cdaf4](https://github.com/D-James-GH/cached_query/commit/756cdaf4cf1c933b98020b583854dc0947577819))
+ - **DOCS**: update full example. ([1f653adb](https://github.com/D-James-GH/cached_query/commit/1f653adb2ddfc1f66ff8de0c9ad4d2cd067ff45d))
+ - **BREAKING** **REFACTOR**: change type params of get query to a query rather than state. ([f62e5eec](https://github.com/D-James-GH/cached_query/commit/f62e5eec0160345714c2b26b7a07654d1eac5654))
+
+#### `cached_query_flutter` - `v3.0.0-dev.15`
+
+ - **BREAKING** **REFACTOR**: change type params of get query to a query rather than state. ([f62e5eec](https://github.com/D-James-GH/cached_query/commit/f62e5eec0160345714c2b26b7a07654d1eac5654))
+
+
 ## 2025-05-21
 
 ### Changes

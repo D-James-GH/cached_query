@@ -37,7 +37,7 @@ dependencies:
   flutter_bloc: ^8.1.1
   equatable: ^2.0.5
   bloc_concurrency: ^0.2.0
-  cached_query_flutter: ^3.0.0-dev.14
+  cached_query_flutter: ^3.0.0-dev.15
   http: ^0.13.5
 
 dev_dependencies:
