@@ -1,6 +1,7 @@
 //ignore_for_file: avoid_print
 
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/mutation/mutation_state.dart';
 import 'package:cached_query/src/util/encode_key.dart';
 
 /// {@template query_logging_observer}
@@ -159,9 +160,10 @@ class QueryLoggingObserver implements QueryObserver {
     StackTrace stackTrace,
   ) {
     if (!mutationError) return;
+    final state = mutation.state as MutationError<dynamic>;
     _log(
       _AnsiColors("[MUTATION ERROR]", colors: colors).bold.red.toString(),
-      message: 'Error: ${mutation.state.error}',
+      message: 'Error: ${state.error}',
       key: mutation.key,
       stackTrace: stackTrace,
     );
@@ -186,8 +188,8 @@ class QueryLoggingObserver implements QueryObserver {
       ];
     } else {
       message = [
-        "Prev State: ${mutation.state.status}",
-        "Next State: ${nextState.status}",
+        "Prev State: ${mutation.state}",
+        "Next State: $nextState",
       ];
     }
     _log(

@@ -60,7 +60,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
       mutation.stream,
       onData: (mutationState) {
         return state.copyWith(
-          isMutationLoading: mutationState.status == MutationStatus.loading,
+          isMutationLoading: mutationState.isLoading,
         );
       },
     );

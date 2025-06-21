@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/mutation/mutation_state.dart';
 import 'package:test/test.dart';
 
 import 'test_implementations.dart';
@@ -68,7 +69,7 @@ void main() {
         expectAsync1(
           (event) {
             if (count == 1) {
-              expect(event.status, MutationStatus.loading);
+              expect(event, isA<MutationLoading<dynamic>>());
             }
             count++;
           },

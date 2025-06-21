@@ -6,7 +6,7 @@ documentation: https://cachedquery.dev/
 homepage: https://cachedquery.dev/
 
 funding:
- - https://github.com/sponsors/D-James-GH
+  - https://github.com/sponsors/D-James-GH
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -14,9 +14,7 @@ environment:
 dependencies:
   rxdart: ^0.28.0
   meta: ^1.9.1
-  collection: ^1.17.0
 
 dev_dependencies:
   test: ^1.25.15
   flutter_lints: ^5.0.0
-
