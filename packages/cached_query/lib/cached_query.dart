@@ -1,7 +1,9 @@
 export './src/cached_query.dart';
 export "./src/query/_query.dart";
 export 'src/devtools_observer.dart';
-export 'src/mutation.dart';
+export 'src/mutation/mutation_cache.dart';
+export 'src/mutation/mutation_state.dart';
+export 'src/mutation/mutation.dart';
 export 'src/query_config.dart';
 export 'src/query_logging_observer.dart';
 export 'src/query_observer.dart';

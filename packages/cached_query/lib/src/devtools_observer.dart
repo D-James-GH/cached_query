@@ -1,9 +1,7 @@
 import 'dart:developer' as developer;
 
-import 'package:cached_query/src/mutation.dart';
-import 'package:cached_query/src/query/_query.dart';
-import 'package:cached_query/src/query_observer.dart';
-import 'package:cached_query/src/query_state.dart';
+import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/mutation/mutation_state.dart';
 
 /// An observer to sent change events to the dev tools.
 class DevtoolsObserver implements QueryObserver {

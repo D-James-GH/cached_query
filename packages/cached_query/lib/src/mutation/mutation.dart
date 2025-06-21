@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import "mutation_state.dart";
 import 'package:cached_query/src/util/encode_key.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -59,7 +60,7 @@ class Mutation<ReturnType, Arg> {
   final List<Object>? _refetchQueries;
   MutationState<ReturnType> _state;
   BehaviorSubject<MutationState<ReturnType>>? _streamController;
-  final _cache = MutationCache.instance;
+  final MutationCache _cache;
 
   /// Current [MutationState] of the mutation.
   MutationState<ReturnType> get state => _state;
@@ -72,6 +73,7 @@ class Mutation<ReturnType, Arg> {
 
   Mutation._internal({
     this.key,
+    required MutationCache cache,
     OnStartMutateCallback<Arg>? onStartMutation,
     OnSuccessCallback<ReturnType, Arg>? onSuccess,
     OnErrorCallback<Arg>? onError,
@@ -81,10 +83,11 @@ class Mutation<ReturnType, Arg> {
   })  : _queryFn = queryFn,
         _invalidateQueries = invalidateQueries,
         _onError = onError,
+        _cache = cache,
         _onStartMutation = onStartMutation,
         _onSuccess = onSuccess,
         _refetchQueries = refetchQueries,
-        _state = MutationState<ReturnType>() {
+        _state = MutationInitial<ReturnType>() {
     if (key != null) {
       _cache.addMutation(this);
     }
@@ -93,6 +96,7 @@ class Mutation<ReturnType, Arg> {
   /// {@macro mutation}
   factory Mutation({
     Object? key,
+    MutationCache? cache,
     OnStartMutateCallback<Arg>? onStartMutation,
     OnSuccessCallback<ReturnType, Arg>? onSuccess,
     OnErrorCallback<Arg>? onError,
@@ -100,11 +104,11 @@ class Mutation<ReturnType, Arg> {
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
   }) {
+    cache = cache ?? MutationCache.instance;
     String? stringKey;
     if (key != null) {
       stringKey = encodeKey(key);
-      final mutationFromCache =
-          MutationCache.instance.getMutation<ReturnType, Arg>(stringKey);
+      final mutationFromCache = cache.getMutation<ReturnType, Arg>(stringKey);
       if (mutationFromCache != null) {
         for (final ob in CachedQuery.instance.observers) {
           ob.onMutationReuse(mutationFromCache);
@@ -114,6 +118,7 @@ class Mutation<ReturnType, Arg> {
     }
     final mutation = Mutation._internal(
       key: stringKey,
+      cache: cache,
       onStartMutation: onStartMutation,
       onSuccess: onSuccess,
       onError: onError,
@@ -154,7 +159,7 @@ class Mutation<ReturnType, Arg> {
   }
 
   Future<MutationState<ReturnType?>> _fetch(Arg arg) async {
-    _setState(_state.copyWith(status: MutationStatus.loading));
+    _setState(MutationLoading(data: state.data));
     _emit();
     dynamic startMutationResponse;
     if (_onStartMutation != null) {
@@ -166,24 +171,26 @@ class Mutation<ReturnType, Arg> {
       if (_onSuccess != null) {
         await _onSuccess!(res, arg);
       }
-      _setState(_state.copyWith(status: MutationStatus.success, data: res));
+
+      _setState(MutationSuccess(data: res));
+
       if (_invalidateQueries != null) {
         for (final k in _invalidateQueries!) {
           CachedQuery.instance.invalidateCache(key: k);
         }
       }
+
       if (_refetchQueries != null) {
         CachedQuery.instance.refetchQueries(keys: _refetchQueries!);
       }
+
       return state;
     } catch (e, trace) {
       if (_onError != null) {
         await _onError!(arg, e, startMutationResponse);
       }
-      _setState(
-        _state.copyWith(status: MutationStatus.error, error: e),
-        trace,
-      );
+
+      _setState(MutationError(data: state.data, error: e, stackTrace: trace));
 
       return state;
     } finally {
@@ -191,12 +198,12 @@ class Mutation<ReturnType, Arg> {
     }
   }
 
-  void _setState(MutationState<ReturnType> newState, [StackTrace? stackTrace]) {
+  void _setState(MutationState<ReturnType> newState) {
     for (final ob in CachedQuery.instance.observers) {
       ob.onMutationChange(this, newState);
     }
     _state = newState;
-    if (stackTrace != null) {
+    if (state case MutationError(:final stackTrace)) {
       for (final ob in CachedQuery.instance.observers) {
         ob.onMutationError(this, stackTrace);
       }
@@ -206,68 +213,4 @@ class Mutation<ReturnType, Arg> {
   void _emit() {
     _streamController?.add(_state);
   }
-}
-
-/// The status of the mutation.
-enum MutationStatus {
-  /// The mutation has not been called.
-  initial,
-
-  /// The mutation is currently running.
-  loading,
-
-  /// The mutation has completed successfully.
-  success,
-
-  /// The mutation has completed with an error.
-  error,
-}
-
-/// {@template mutationState}
-/// [MutationState] holds the current state of an [InfiniteQuery].
-///
-/// Should not be instantiated manually. Instead should be read from [Mutation].
-/// {@endtemplate}
-class MutationState<ReturnType> {
-  /// Response of the [MutationQueryCallback].
-  final ReturnType? data;
-
-  /// Status of the [MutationQueryCallback].
-  final MutationStatus status;
-
-  /// Current error of the [MutationQueryCallback].
-  final dynamic error;
-
-  /// {@macro mutationState}
-  const MutationState({
-    this.data,
-    this.status = MutationStatus.initial,
-    this.error,
-  });
-
-  /// Creates a copy of the current [MutationState] with the given filed
-  /// replaced.
-  MutationState<ReturnType> copyWith({
-    ReturnType? data,
-    MutationStatus? status,
-    dynamic error,
-  }) {
-    return MutationState(
-      data: data ?? this.data,
-      status: status ?? this.status,
-      error: error ?? this.error,
-    );
-  }
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is MutationState &&
-          runtimeType == other.runtimeType &&
-          data == other.data &&
-          status == other.status &&
-          error == other.error;
-
-  @override
-  int get hashCode => data.hashCode ^ status.hashCode ^ error.hashCode;
 }

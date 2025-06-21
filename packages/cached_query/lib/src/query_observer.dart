@@ -1,3 +1,5 @@
+import 'package:cached_query/src/mutation/mutation_state.dart';
+
 import '../cached_query.dart';
 
 /// Query Observer
