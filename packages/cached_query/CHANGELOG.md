@@ -1,3 +1,9 @@
+## 3.0.0-dev.16
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: change mutation state to sealed classes. ([5ea683a6](https://github.com/D-James-GH/cached_query/commit/5ea683a646c566b0e127a145cd7b39addbfda3f9))
+
 ## 3.0.0-dev.15
 
 > Note: This release has breaking changes.

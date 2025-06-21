@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-06-21
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v3.0.0-dev.16`](#cached_query---v300-dev16)
+
+Packages with other changes:
+
+ - [`cached_query_flutter` - `v3.0.0-dev.16`](#cached_query_flutter---v300-dev16)
+ - [`cached_storage` - `v3.0.0-dev.16`](#cached_storage---v300-dev16)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.0.0-dev.16`
+ - `cached_storage` - `v3.0.0-dev.16`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.16`
+
+ - **BREAKING** **FEAT**: change mutation state to sealed classes. ([5ea683a6](https://github.com/D-James-GH/cached_query/commit/5ea683a646c566b0e127a145cd7b39addbfda3f9))
+
+
 ## 2025-06-19
 
 ### Changes
