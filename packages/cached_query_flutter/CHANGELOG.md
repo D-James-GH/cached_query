@@ -1,3 +1,38 @@
+## 3.0.0-dev.17
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: remove mocks in cached query tests. ([5e4f480b](https://github.com/D-James-GH/cached_query/commit/5e4f480b8917ab2449412fc4f89c1f1e740f328e))
+ - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
+ - **FIX**: observer not supported in new architecture. Multiple fixes for tests. ([2975288c](https://github.com/D-James-GH/cached_query/commit/2975288c02560e757d857b47c6dca4c37b3d024d))
+ - **FIX**: broken test. ([0ff238d2](https://github.com/D-James-GH/cached_query/commit/0ff238d2bf2a05ad88550ac15c1df30dc3cdfb96))
+ - **FIX**: after rebasing 2.6. ([2f35ddd5](https://github.com/D-James-GH/cached_query/commit/2f35ddd50b3f22cab456fff300ffb24e61571089))
+ - **FIX**: observer not supported in new architecture. Multiple fixes for tests. ([5716dd84](https://github.com/D-James-GH/cached_query/commit/5716dd84b555636488dd481f09ddbd5850b3ab60))
+ - **FIX**: broken test. ([84c885c3](https://github.com/D-James-GH/cached_query/commit/84c885c3bd017fc34d940ed40c7cc6c3455317a7))
+ - **FIX**: after rebasing 2.6. ([378858f9](https://github.com/D-James-GH/cached_query/commit/378858f9b0c62c9fd271d250b155b0f8f138156d))
+ - **FEAT**: expose check connection. ([342aa0a4](https://github.com/D-James-GH/cached_query/commit/342aa0a4be5a0db9c748269972c94b30945a1b5d))
+ - **FEAT**: expose the connetion state for flutter apps. ([e0c7bff3](https://github.com/D-James-GH/cached_query/commit/e0c7bff332d1fb29de10d405b2dfbe12e6f4f07a))
+ - **FEAT**: invalidating a query will, by default, refetch active queries. ([e84067fe](https://github.com/D-James-GH/cached_query/commit/e84067fe624637abf1fdba32532afb0b09bd9e45))
+ - **FEAT**: update devtools for 3. ([a888bba3](https://github.com/D-James-GH/cached_query/commit/a888bba38618547f005b0dc4683f5a418e7003c6))
+ - **FEAT**: expose check connection. ([3e8f6bbf](https://github.com/D-James-GH/cached_query/commit/3e8f6bbff701ee70ad2815c7457a0ddb1477040c))
+ - **FEAT**: expose the connetion state for flutter apps. ([334f25c9](https://github.com/D-James-GH/cached_query/commit/334f25c92d4a332a7c6fb01b9c3be858b3660bda))
+ - **FEAT**: invalidating a query will, by default, refetch active queries. ([d63579f5](https://github.com/D-James-GH/cached_query/commit/d63579f57b73442ccafcb9b3f94188a85e95198d))
+ - **FEAT**: update devtools for 3. ([f462df2b](https://github.com/D-James-GH/cached_query/commit/f462df2b5df460dfa47d41a576aa32af7feee5d9))
+ - **BREAKING** **REFACTOR**: change type params of get query to a query rather than state. ([1ad59615](https://github.com/D-James-GH/cached_query/commit/1ad59615a106c2f3fc0b2a1f5b3ce294bbd70d3a))
+ - **BREAKING** **REFACTOR**: merge QueryBase and Cacheable so queries only extend one sealed class. ([fddddeb9](https://github.com/D-James-GH/cached_query/commit/fddddeb912839df27fc77171af6851469e734a40))
+ - **BREAKING** **REFACTOR**: Have different global and query config objects. ([736c310b](https://github.com/D-James-GH/cached_query/commit/736c310b1c8fcb1d0d393667e4cc2d1e6b6effb0))
+ - **BREAKING** **REFACTOR**: Rename QueryBase to QueryController. QueryBase is now just a sealed class extended by Query and InfiniteQuery. This is to allow for more specific typing of QueryController if needed without requiring observers to change. ([52631c6d](https://github.com/D-James-GH/cached_query/commit/52631c6d1e2d40216161b255e64b31cc751bec01))
+ - **BREAKING** **REFACTOR**: change type params of get query to a query rather than state. ([f62e5eec](https://github.com/D-James-GH/cached_query/commit/f62e5eec0160345714c2b26b7a07654d1eac5654))
+ - **BREAKING** **REFACTOR**: merge QueryBase and Cacheable so queries only extend one sealed class. ([33d8566d](https://github.com/D-James-GH/cached_query/commit/33d8566dca472e236019de34110945a03eab3cd1))
+ - **BREAKING** **REFACTOR**: Have different global and query config objects. ([ec9cae10](https://github.com/D-James-GH/cached_query/commit/ec9cae10b48e4f32e2421cd094b0b814d127e897))
+ - **BREAKING** **REFACTOR**: Rename QueryBase to QueryController. QueryBase is now just a sealed class extended by Query and InfiniteQuery. This is to allow for more specific typing of QueryController if needed without requiring observers to change. ([5dfc7611](https://github.com/D-James-GH/cached_query/commit/5dfc7611c99bb33d459d75e1716d8859fbe9560c))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([add9b594](https://github.com/D-James-GH/cached_query/commit/add9b59414e7b3f9fad90d54bc1e4f49aafcbcd4))
+ - **BREAKING** **FEAT**: Merge infinite query builder and query builder so that they function the same. Deprecated InfiniteQueryBuilder. ([6f8820ff](https://github.com/D-James-GH/cached_query/commit/6f8820ff0df40ee62c3ae0d01d3b04c1fdd94de3))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([df9886d9](https://github.com/D-James-GH/cached_query/commit/df9886d98d15a5054434844684bbeb57644b9e19))
+ - **BREAKING** **FEAT**: change state to sealed classes. ([3f4030d4](https://github.com/D-James-GH/cached_query/commit/3f4030d4d3234cd4da1ee33a3305181c6f2ae6c1))
+ - **BREAKING** **FEAT**: Merge infinite query builder and query builder so that they function the same. Deprecated InfiniteQueryBuilder. ([f4b14485](https://github.com/D-James-GH/cached_query/commit/f4b144858a7ddcc95249fcae433e0157a1a614c4))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([e35c614b](https://github.com/D-James-GH/cached_query/commit/e35c614b0f38fa213aee1bc6e01995bcd147ebf3))
+
 ## 3.0.0-dev.16
 
  - Update a dependency to the latest release.

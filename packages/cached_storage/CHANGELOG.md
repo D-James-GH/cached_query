@@ -1,3 +1,18 @@
+## 3.0.0-dev.17
+
+> Note: This release has breaking changes.
+
+ - **REFACTOR**: remove mocks in cached query tests. ([5e4f480b](https://github.com/D-James-GH/cached_query/commit/5e4f480b8917ab2449412fc4f89c1f1e740f328e))
+ - **REFACTOR**: remove mocks in cached query tests. ([bad90bfb](https://github.com/D-James-GH/cached_query/commit/bad90bfb007a6b3964f353ca7bd106974ea8a4c6))
+ - **FIX**: after rebasing 2.6. ([2f35ddd5](https://github.com/D-James-GH/cached_query/commit/2f35ddd50b3f22cab456fff300ffb24e61571089))
+ - **FIX**: after rebasing 2.6. ([378858f9](https://github.com/D-James-GH/cached_query/commit/378858f9b0c62c9fd271d250b155b0f8f138156d))
+ - **FEAT**(storage): remove stored queries after expiry. ([c6f5e68e](https://github.com/D-James-GH/cached_query/commit/c6f5e68e1121df21681f1600ea8b966c86a1ec62))
+ - **FEAT**: update devtools for 3. ([a888bba3](https://github.com/D-James-GH/cached_query/commit/a888bba38618547f005b0dc4683f5a418e7003c6))
+ - **FEAT**(storage): remove stored queries after expiry. ([885f874b](https://github.com/D-James-GH/cached_query/commit/885f874b165566a13cae115c26bfd478334270fe))
+ - **FEAT**: update devtools for 3. ([f462df2b](https://github.com/D-James-GH/cached_query/commit/f462df2b5df460dfa47d41a576aa32af7feee5d9))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([df9886d9](https://github.com/D-James-GH/cached_query/commit/df9886d98d15a5054434844684bbeb57644b9e19))
+ - **BREAKING** **FEAT**: update env to 3.0.0+ and fix lints. ([e35c614b](https://github.com/D-James-GH/cached_query/commit/e35c614b0f38fa213aee1bc6e01995bcd147ebf3))
+
 ## 3.0.0-dev.16
 
  - Update a dependency to the latest release.
