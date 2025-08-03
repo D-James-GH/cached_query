@@ -1,0 +1,174 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Migrating from 2.0 to 3.0
+
+## Query State
+
+All query, infinite query and mutation states have been changed to sealed classes
+to take advantage of dart 3 pattern matching.
+
+There is no longer a query status enum. There is now a matching sealed class: QueryLoading, QueryInitial, QuerySuccess and QueryError.
+
+For convenience you can check the current status of a query using:
+
+```dart
+final allStatuses = state.isLoading || state.isInitial || state.isError || state.isSuccess;
+```
+
+<Tabs groupId="state-sealed">
+  <TabItem value="before" label="Before">
+    ```dart
+    class Post extends StatelessWidget {
+        final int id;
+
+        const Post({required this.id, super.key});
+
+        @override
+        Widget build(BuildContext context) {
+            return QueryBuilder<PostModel>(
+            // Can use key if the query already exists.
+            queryKey: service.postKey(id),
+            builder: (context, state) {
+                final data = state.data;
+                if (state.error != null) return Text(state.error.toString());
+                if (data == null) return const SizedBox();
+                return Container(
+                margin: const EdgeInsets.all(10),
+                child: Column(
+                    children: [
+                        const Text(
+                            "Title",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20),
+                        ),
+                        Text(
+                            data.title,
+                            textAlign: TextAlign.center,
+                        ),
+                        const Text(
+                            "Body",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 20),
+                        ),
+                        Text(
+                            data.body,
+                            textAlign: TextAlign.center,
+                        ),
+                        ],
+                    ),
+                );
+            },
+            );
+        }
+    }
+    ```
+
+  </TabItem>
+  <TabItem value="after" label="After" default>
+        ```dart
+        class Post extends StatelessWidget {
+          final int id;
+          final bool enabled;
+        
+          const Post({Key? key, required this.id, required this.enabled})
+              : super(key: key);
+        
+          @override
+          Widget build(BuildContext context) {
+            return QueryBuilder<QueryState<PostModel>>(
+              enabled: enabled,
+              // Can use key if the query already exists.
+              queryKey: service.postKey(id),
+              builder: (context, state) {
+                final data = state.data;
+                if (state.isError) return Text((state as QueryError).error.toString());
+                if (data == null) return const SizedBox();
+                return Container(
+                  margin: const EdgeInsets.all(10),
+                  child: Column(
+                    children: [
+                      const Text(
+                        "Title",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Text(
+                        data.title,
+                        textAlign: TextAlign.center,
+                      ),
+                      const Text(
+                        "Body",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                      Text(
+                        data.body,
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }
+        }
+        ```
+  </TabItem>
+  <TabItem value="using-switch" label="Using Switch">
+    ```dart
+    class Post extends StatelessWidget {
+        final int id;
+        final bool enabled;
+
+        const Post({super.key, required this.id, required this.enabled});
+
+        @override
+        Widget build(BuildContext context) {
+            return QueryBuilder<QueryStatus<PostModel>>(
+            enabled: enabled,
+            // Can use key if the query already exists.
+            queryKey: service.postKey(id),
+            builder: (context, state) {
+                return switch (state) {
+                    QueryError<PostModel>() =>
+                        Text((state as QueryError).error.toString()),
+                    QueryStatus<PostModel>(:final data) when data != null => Container(
+                        margin: const EdgeInsets.all(10),
+                        child: Column(
+                            children: [
+                            const Text("Title",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 20)),
+                            Text(
+                                data.title,
+                                textAlign: TextAlign.center,
+                            ),
+                            const Text(
+                                "Body",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 20),
+                            ),
+                            Text(
+                                data.body,
+                                textAlign: TextAlign.center,
+                            ),
+                            ],
+                        ),
+                        ),
+                    _ => const SizedBox(),
+                    };
+                },
+            );
+        }
+    }
+    ```
+
+  </TabItem>
+</Tabs>
+
+The base class for each cachable item is:
+
+- QueryStatus - for single queries.
+- InfiniteQueryStatus - for infinite queries.
+- MutationState - for mutations

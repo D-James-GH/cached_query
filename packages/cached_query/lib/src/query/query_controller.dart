@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs
+
 part of "./_query.dart";
 
 /// On success is called when the query function is executed successfully.
@@ -10,23 +12,34 @@ typedef OnQuerySuccessCallback<T> = void Function(T data);
 /// Passes the error through.
 typedef OnQueryErrorCallback = void Function(dynamic error);
 
+/// Base class for [QueryController] and [InfiniteQueryController].
 class FetchOptions {
+  /// Base class for [QueryController] and [InfiniteQueryController].
   const FetchOptions();
 }
 
+/// {@template controllerState}
+/// Internal state for the query controller.
+/// {@endtemplate}
 class ControllerState<T> {
+  /// The data of the query.
   final T? data;
+
+  /// The time the query was last fetched.
   final DateTime timeCreated;
+
+  /// {@macro controllerState}
   ControllerState({
     required this.data,
     required this.timeCreated,
   });
 }
 
-/// {@template queryBase}
-/// An Interface for both [Query] and [InfiniteQuery].
+/// {@template QueryController}
+/// The [QueryController] is the base class and logic for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
 final class QueryController<T> {
+  /// {@macro queryBase}
   QueryController({
     required this.key,
     required this.unencodedKey,
@@ -43,11 +56,13 @@ final class QueryController<T> {
     this.config = config.mergeWithGlobal(cache.defaultConfig);
   }
 
+  /// The function that is called when the query is fetched.
   final Future<T> Function({
     required FetchOptions options,
     T? state,
   }) onFetch;
 
+  /// The current state of the query.
   ControllerState<T> state;
 
   /// The key used to store and access the query. Encoded using jsonEncode.
@@ -73,6 +88,7 @@ final class QueryController<T> {
   /// The config for this specific query.
   late final QueryConfig<T> config;
 
+  /// Fetches the query.
   Future<void> fetch({
     bool forceRefetch = false,
     FetchOptions options = const FetchOptions(),
@@ -148,11 +164,13 @@ final class QueryController<T> {
     _cache.deleteCache(key: key, deleteStorage: deleteStorage);
   }
 
+  /// Add a new query listener.
   void addListener() {
     _cancelDelete();
     _hasListener = true;
   }
 
+  /// Removes a listener from the query.
   void removeListener() {
     _hasListener = false;
     _scheduleDelete();

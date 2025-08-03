@@ -1,12 +1,8 @@
+// ignore_for_file: public_member_api_docs
 import 'package:cached_query/src/query/_query.dart';
 
 sealed class ControllerAction {}
 
-// class Fetch extends ControllerAction {
-//   final String reason;
-//
-//   Fetch({required this.reason});
-// }
 final class Fetch extends ControllerAction {
   final FetchOptions fetchOptions;
   final bool isInitialFetch;

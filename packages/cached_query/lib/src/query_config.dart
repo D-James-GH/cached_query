@@ -15,6 +15,9 @@ typedef ShouldFetch<Data> = bool Function(
 
 final _defaultConfig = GlobalQueryConfig();
 
+/// {@template GlobalQueryConfig}
+/// The global config for all queries.
+/// {@endtemplate}
 class GlobalQueryConfig {
   /// {@template QueryConfig.refetchDuration}
   /// Use the [refetchDuration] Specify how long before the query is re-fetched
@@ -224,6 +227,7 @@ class QueryConfig<Data> {
         _shouldRethrow = shouldRethrow,
         _cacheDuration = cacheDuration;
 
+  /// Merges the global config with the local config.
   QueryConfig<Data> mergeWithGlobal(GlobalQueryConfig global) {
     return QueryConfig<Data>(
       storageDeserializer: storageDeserializer,

@@ -1,5 +1,4 @@
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/mutation/mutation_state.dart';
 
 class SimpleObserver extends QueryObserver {}
 

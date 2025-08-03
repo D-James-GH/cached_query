@@ -86,30 +86,45 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     _init();
   }
 
+  @override
   String get key => _controller.key;
+  @override
   Object get unencodedKey => _controller.unencodedKey;
 
+  /// The config for this specific query.
   QueryConfig<T> get config => _controller.config;
+
   late QueryStatus<T> _state;
+
+  @override
   QueryStatus<T> get state => _state;
+
+  @override
   Stream<QueryStatus<T>> get stream => _stateSubject.stream;
+
+  @override
   bool get stale => _controller.stale;
 
+  @override
   bool get hasListener => _stateSubject.hasListener;
 
+  @override
   Future<QueryStatus<T>> fetch() async {
     await _controller.fetch();
     return state;
   }
 
+  /// Fetch the query as a future.
   @Deprecated("Use fetch() instead.")
   Future<QueryStatus<T>> get result => fetch();
 
+  @override
   Future<QueryStatus<T>> refetch() async {
     await _controller.fetch(forceRefetch: true);
     return state;
   }
 
+  @override
   Future<void> invalidate({
     bool refetchActive = true,
     bool refetchInactive = false,
@@ -120,14 +135,17 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     );
   }
 
+  /// Update the current query data.
   void update(UpdateFunc<T> updateFn) {
     return _controller.update(updateFn);
   }
 
+  /// Set the current query data.
   void setData(T data) {
     return _controller.setData(data);
   }
 
+  @override
   void deleteQuery({bool deleteStorage = false}) {
     _controller.deleteQuery(deleteStorage: deleteStorage);
   }
@@ -172,7 +190,7 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
               error: error,
             ),
           );
-        case StorageError(:final error, :final stackTrace):
+        case StorageError(:final error):
           _onError?.call(error);
         case DataUpdated(:final data):
           _setState(this.state.copyWithData(data as T));

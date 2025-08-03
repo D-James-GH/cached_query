@@ -1,7 +1,6 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/mutation/mutation_state.dart';
 import 'package:test/test.dart';
 
 import 'observers/observers.dart';
