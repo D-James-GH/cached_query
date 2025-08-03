@@ -56,7 +56,8 @@ class JokeScreen extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.error),
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                     child: const Text(
                       "No internet connection",
                       style: TextStyle(color: Colors.white, fontSize: 24),
@@ -73,9 +74,12 @@ class JokeScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Expanded(
-                                child: Text(state.data?.joke ?? "",
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 24))),
+                              child: Text(
+                                state.data?.joke ?? "",
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(fontSize: 24),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 24),

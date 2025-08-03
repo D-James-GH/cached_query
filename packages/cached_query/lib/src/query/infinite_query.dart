@@ -121,13 +121,22 @@ final class InfiniteQuery<T, Arg>
     _init();
   }
 
+  @override
   String get key => _controller.key;
+  @override
   Object get unencodedKey => _controller.unencodedKey;
+
+  /// The config for this specific query.
   QueryConfig<InfiniteQueryData<T, Arg>> get config => _controller.config;
   late InfiniteQueryStatus<T, Arg> _state;
+  @override
   InfiniteQueryStatus<T, Arg> get state => _state;
+
+  @override
   Stream<InfiniteQueryStatus<T, Arg>> get stream => _stateSubject.stream;
+  @override
   bool get stale => _controller.stale;
+  @override
   bool get hasListener => _stateSubject.hasListener;
 
   final OnQuerySuccessCallback<InfiniteQueryData<T, Arg>>? _onSuccess;
@@ -137,11 +146,13 @@ final class InfiniteQuery<T, Arg>
   late final BehaviorSubject<InfiniteQueryStatus<T, Arg>> _stateSubject;
   final GetNextArg<T, Arg> _getNextArg;
 
+  @override
   Future<InfiniteQueryStatus<T, Arg>> fetch() async {
     await _controller.fetch(options: InfiniteFetchOptions());
     return _state;
   }
 
+  /// Fetch the query as a future.
   @Deprecated("Use fetch() instead.")
   Future<InfiniteQueryStatus<T, Arg>> get result => fetch();
 
@@ -152,14 +163,17 @@ final class InfiniteQuery<T, Arg>
     return _getNextArg(_stateSubject.valueOrNull?.data) == null;
   }
 
+  /// Update the current query data.
   void update(UpdateFunc<InfiniteQueryData<T, Arg>> updateFn) {
     _controller.update(updateFn);
   }
 
+  /// Set the current query data.
   void setData(InfiniteQueryData<T, Arg> data) {
     return _controller.setData(data);
   }
 
+  @override
   Future<InfiniteQueryStatus<T, Arg>> refetch() async {
     await _controller.fetch(
       forceRefetch: true,
@@ -232,7 +246,7 @@ final class InfiniteQuery<T, Arg>
               timeCreated: state.timeCreated,
             ),
           );
-        case StorageError(:final error, :final stackTrace):
+        case StorageError(:final error):
           _onError?.call(error);
         case DataUpdated(:final data):
           _setState(state.copyWithData(data as InfiniteQueryData<T, Arg>));

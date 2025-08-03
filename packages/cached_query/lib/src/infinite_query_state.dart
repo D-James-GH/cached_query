@@ -13,6 +13,7 @@ final class InfiniteQueryData<T, Arg> {
   /// {@macro InfiniteQueryData}
   InfiniteQueryData({required this.pages, required this.pageParams});
 
+  /// Converts the data to a json object.
   Map<String, dynamic> toJson() {
     return {
       'pages': pages,
@@ -20,6 +21,7 @@ final class InfiniteQueryData<T, Arg> {
     };
   }
 
+  /// Converts the json object to a [InfiniteQueryData].
   factory InfiniteQueryData.fromJson(
     dynamic json, {
     required List<T> Function(List<dynamic> json) pagesConverter,
@@ -31,16 +33,19 @@ final class InfiniteQueryData<T, Arg> {
     );
   }
 
+  /// The last page of the infinite query.
   T? get lastPage {
     if (pages.isEmpty) return null;
     return pages.last;
   }
 
+  /// The first page of the infinite query.
   T? get firstPage {
     if (pages.isEmpty) return null;
     return pages.first;
   }
 
+  /// The number of pages in the infinite query.
   int get length => pages.length;
 
   @override

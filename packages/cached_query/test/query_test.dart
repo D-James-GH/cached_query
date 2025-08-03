@@ -102,7 +102,7 @@ void main() {
           return response;
         },
       );
-      await query.result;
+      await query.fetch();
       expect(res, response);
     });
   });
@@ -245,7 +245,7 @@ void main() {
         },
         cache: cache,
       );
-      await query.result;
+      await query.fetch();
       await query.invalidate();
       expect(query1Count, 1);
       query.invalidate(refetchInactive: true);
@@ -277,7 +277,9 @@ void main() {
       await query.fetch();
       expect(storage!.queries.length, 1);
       expect(
-          storage!.queries.values.firstWhere((e) => e.key == key).data, data);
+        storage!.queries.values.firstWhere((e) => e.key == key).data,
+        data,
+      );
     });
 
     test("Should not return if expired", () async {
@@ -528,14 +530,14 @@ void main() {
           throw "this is an error";
         },
       );
-      await query.result;
+      await query.fetch();
       expect(error, "this is an error");
     });
   });
   test("Can set local query config", () {
     final query = Query(
       key: "local",
-      config: QueryConfig(shouldRethrow: true),
+      config: QueryConfig<String>(shouldRethrow: true),
       queryFn: () async => "",
     );
 

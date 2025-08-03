@@ -16,9 +16,17 @@ enum InfiniteQueryDirection {
   bool get isBackward => this == InfiniteQueryDirection.backward;
 }
 
+/// {@template infiniteFetchOptions}
+/// Options for fetching an infinite query.
+/// {@endtemplate}
 class InfiniteFetchOptions extends FetchOptions {
+  /// The direction of the fetch. Currently only forward is supported.
   final InfiniteQueryDirection? direction;
+
+  /// The number of pages to prefetch.
   final int? prefetchPages;
+
+  /// {@macro infiniteFetchOptions}
   InfiniteFetchOptions({
     this.prefetchPages,
     this.direction,

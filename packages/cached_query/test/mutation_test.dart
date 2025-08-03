@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cached_query/cached_query.dart';
-import 'package:cached_query/src/mutation/mutation_state.dart';
 import 'package:test/test.dart';
 
 import 'test_implementations.dart';
@@ -200,7 +199,7 @@ void main() {
     test("Queries should be invalidated", () async {
       const key = "invalidate";
       final query = createQuery(key: key);
-      await query.result;
+      await query.fetch();
       expect(query.stale, false);
       final mutation = Mutation<String, void>(
         invalidateQueries: [key],

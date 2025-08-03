@@ -8,44 +8,43 @@ class Post extends StatelessWidget {
   final int id;
   final bool enabled;
 
-  const Post({Key? key, required this.id, required this.enabled})
-      : super(key: key);
+  const Post({super.key, required this.id, required this.enabled});
 
   @override
   Widget build(BuildContext context) {
-    return QueryBuilder<QueryState<PostModel>>(
+    return QueryBuilder<QueryStatus<PostModel>>(
       enabled: enabled,
       // Can use key if the query already exists.
       queryKey: service.postKey(id),
       builder: (context, state) {
-        final data = state.data;
-        if (state.isError) return Text((state as QueryError).error.toString());
-        if (data == null) return const SizedBox();
-        return Container(
-          margin: const EdgeInsets.all(10),
-          child: Column(
-            children: [
-              const Text(
-                "Title",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20),
+        return switch (state) {
+          QueryError<PostModel>() =>
+            Text((state as QueryError).error.toString()),
+          QueryStatus<PostModel>(:final data) when data != null => Container(
+              margin: const EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  const Text("Title",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 20)),
+                  Text(
+                    data.title,
+                    textAlign: TextAlign.center,
+                  ),
+                  const Text(
+                    "Body",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  Text(
+                    data.body,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              Text(
-                data.title,
-                textAlign: TextAlign.center,
-              ),
-              const Text(
-                "Body",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20),
-              ),
-              Text(
-                data.body,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        );
+            ),
+          _ => const SizedBox(),
+        };
       },
     );
   }
