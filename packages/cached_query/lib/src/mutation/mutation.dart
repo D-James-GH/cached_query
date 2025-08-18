@@ -37,8 +37,8 @@ typedef MutationQueryCallback<ReturnType, Arg> = Future<ReturnType> Function(
 /// type [ReturnType] and takes any argument of type [Arg].
 ///
 /// The mutation takes multiple lifecycle callbacks:
-/// - [onStartMutation] is called before the mutation [_queryFn] is run.
-/// - [onSuccess] is called after the [_queryFn] has completed with no error.
+/// - [onStartMutation] is called before the mutation [mutationFn] is run.
+/// - [onSuccess] is called after the [mutationFn] has completed with no error.
 /// - [onError] is called if the [queryFn] throws and error.
 ///
 /// After a mutation it is common to [invalidateQueries]. Pass a list of query
@@ -55,7 +55,7 @@ class Mutation<ReturnType, Arg> {
   final OnStartMutateCallback<Arg>? _onStartMutation;
   final OnSuccessCallback<ReturnType, Arg>? _onSuccess;
   final OnErrorCallback<Arg>? _onError;
-  final MutationQueryCallback<ReturnType, Arg> _queryFn;
+  final MutationQueryCallback<ReturnType, Arg> _mutationFn;
   final List<Object>? _invalidateQueries;
   final List<Object>? _refetchQueries;
   MutationState<ReturnType> _state;
@@ -77,10 +77,10 @@ class Mutation<ReturnType, Arg> {
     OnStartMutateCallback<Arg>? onStartMutation,
     OnSuccessCallback<ReturnType, Arg>? onSuccess,
     OnErrorCallback<Arg>? onError,
-    required MutationQueryCallback<ReturnType, Arg> queryFn,
+    required MutationQueryCallback<ReturnType, Arg> mutationFn,
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
-  })  : _queryFn = queryFn,
+  })  : _mutationFn = mutationFn,
         _invalidateQueries = invalidateQueries,
         _onError = onError,
         _cache = cache,
@@ -100,7 +100,7 @@ class Mutation<ReturnType, Arg> {
     OnStartMutateCallback<Arg>? onStartMutation,
     OnSuccessCallback<ReturnType, Arg>? onSuccess,
     OnErrorCallback<Arg>? onError,
-    required MutationQueryCallback<ReturnType, Arg> queryFn,
+    required MutationQueryCallback<ReturnType, Arg> mutationFn,
     List<Object>? invalidateQueries,
     List<Object>? refetchQueries,
   }) {
@@ -124,7 +124,7 @@ class Mutation<ReturnType, Arg> {
       onError: onError,
       invalidateQueries: invalidateQueries,
       refetchQueries: refetchQueries,
-      queryFn: queryFn,
+      mutationFn: mutationFn,
     );
     for (final ob in CachedQuery.instance.observers) {
       ob.onMutationCreation(mutation);
@@ -167,7 +167,7 @@ class Mutation<ReturnType, Arg> {
     }
     // call query fn
     try {
-      final res = await _queryFn(arg);
+      final res = await _mutationFn(arg);
       if (_onSuccess != null) {
         await _onSuccess!(res, arg);
       }

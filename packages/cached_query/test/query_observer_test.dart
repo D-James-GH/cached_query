@@ -65,7 +65,7 @@ void main() {
         ],
       );
       final mutation = Mutation<String, void>(
-        queryFn: (_) => Future.value("res"),
+        mutationFn: (_) => Future.value("res"),
       );
       expect(m, same(mutation));
     });
@@ -79,7 +79,7 @@ void main() {
       );
       final mutation = Mutation<String, void>(
         key: "mutation",
-        queryFn: (_) => Future.value("res"),
+        mutationFn: (_) => Future.value("res"),
       );
       expect(m, same(mutation));
     });
@@ -94,13 +94,13 @@ void main() {
 
       Mutation<String, void>(
         key: "mutation-reuse",
-        queryFn: (_) => Future.value("res"),
+        mutationFn: (_) => Future.value("res"),
       );
       expect(m, isNull);
 
       final mutation2 = Mutation<String, void>(
         key: "mutation-reuse",
-        queryFn: (_) => Future.value("res"),
+        mutationFn: (_) => Future.value("res"),
       );
 
       expect(m, same(mutation2));
@@ -239,7 +239,7 @@ void main() {
         }),
       ];
       final mutation = Mutation<String, int>(
-        queryFn: (a) => Future.value("response"),
+        mutationFn: (a) => Future.value("response"),
       );
       await mutation.mutate(1);
       expect(count, 1);
@@ -254,7 +254,7 @@ void main() {
         }),
       ];
       final mutation = Mutation<String, int>(
-        queryFn: (a) => throw "error",
+        mutationFn: (a) => throw "error",
       );
       await mutation.mutate(1);
       expect(count, 1);
@@ -271,7 +271,7 @@ void main() {
         }),
       ];
       final mutation = Mutation<String, int>(
-        queryFn: (a) => Future.value("response"),
+        mutationFn: (a) => Future.value("response"),
       );
       await mutation.mutate(1);
       expect(count, 1);

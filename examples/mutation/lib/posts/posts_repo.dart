@@ -17,7 +17,7 @@ Query<List<PostModel>> getPostsQuery() {
 Mutation<PostModel, PostModel> createPostMutation() {
   return Mutation(
     refetchQueries: [queryKey],
-    queryFn: (post) async => PostModel.fromJson(
+    mutationFn: (post) async => PostModel.fromJson(
       await service.createPost(post.toJson()),
     ),
     onStartMutation: (post) {

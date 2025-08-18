@@ -66,7 +66,7 @@ Mutation<PostModel, PostModel> createPost() {
   return Mutation<PostModel, PostModel>(
     key: "createPost",
     invalidateQueries: ['posts'],
-    queryFn: (post) async {
+    mutationFn: (post) async {
       final res = await Future.delayed(
         const Duration(milliseconds: 400),
         () => {

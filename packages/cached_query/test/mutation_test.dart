@@ -9,14 +9,14 @@ void main() {
   group("Creating a mutation", () {
     test("Can create a mutation object", () {
       final mutation = Mutation<String, void>(
-        queryFn: (_) => Future.value(""),
+        mutationFn: (_) => Future.value(""),
       );
       expect(mutation, isA<Mutation<String, void>>());
     });
     test("Optional key should be serializable", () {
       final key = ["this is a key", 1];
       final mutation = Mutation<String, void>(
-        queryFn: (_) => Future.value(""),
+        mutationFn: (_) => Future.value(""),
         key: key,
       );
       expect(mutation.key, jsonEncode(key));
@@ -25,14 +25,14 @@ void main() {
   group("Using a mutation", () {
     test("Calling a mutation returns a future<T>", () {
       final mutation = Mutation<String, void>(
-        queryFn: (_) => Future.value(""),
+        mutationFn: (_) => Future.value(""),
       );
       expect(mutation.mutate(), isA<Future<MutationState<String?>>>());
     });
     test("Mutation returns the value of the queryFn", () async {
       const returnString = "return string";
       final mutation = Mutation<String, void>(
-        queryFn: (_) => Future.value(returnString),
+        mutationFn: (_) => Future.value(returnString),
       );
       final res = await mutation.mutate();
       expect(res.data, returnString);
@@ -41,7 +41,7 @@ void main() {
   group("Listening to a mutation", () {
     test("Creating a mutation emits a mutation state", () async {
       final mutation = Mutation<String, void>(
-        queryFn: (_) => Future.value(""),
+        mutationFn: (_) => Future.value(""),
       )..mutate();
       final stream = mutation.stream;
       final res = await stream.first;
@@ -50,9 +50,9 @@ void main() {
     test("mutations with key are equal", () async {
       const key = "key";
       Future<String> query(void _) => Future.value("");
-      final mutation = Mutation<String, void>(queryFn: query, key: key);
+      final mutation = Mutation<String, void>(mutationFn: query, key: key);
 
-      final mutation2 = Mutation<String, void>(queryFn: query, key: key);
+      final mutation2 = Mutation<String, void>(mutationFn: query, key: key);
       expect(mutation, same(mutation2));
     });
     test("Loading is scoped to key", () async {
@@ -61,8 +61,8 @@ void main() {
 
       Future<String> query(void _) => Future.value("");
 
-      final mutation = Mutation<String, void>(queryFn: query, key: key);
-      final mutation2 = Mutation<String, void>(queryFn: query, key: key);
+      final mutation = Mutation<String, void>(mutationFn: query, key: key);
+      final mutation2 = Mutation<String, void>(mutationFn: query, key: key);
 
       mutation2.stream.listen(
         expectAsync1(
@@ -85,7 +85,7 @@ void main() {
 
       Future<String> query(void _) => Future.value(res);
 
-      final mutation = Mutation<String, void>(queryFn: query);
+      final mutation = Mutation<String, void>(mutationFn: query);
 
       mutation.stream.listen(
         expectAsync1(
@@ -114,7 +114,7 @@ void main() {
       }
 
       final mutation = Mutation<String, void>(
-        queryFn: query,
+        mutationFn: query,
         onStartMutation: (_) {
           responses.add(onStart);
         },
@@ -133,7 +133,7 @@ void main() {
       }
 
       final mutation = Mutation<String, void>(
-        queryFn: query,
+        mutationFn: query,
         onStartMutation: (_) {
           final initialData = [...responses];
           responses.add(onStart);
@@ -156,7 +156,7 @@ void main() {
       }
 
       final mutation = Mutation<String, void>(
-        queryFn: query,
+        mutationFn: query,
         onSuccess: (_, __) {
           responses.add(onSuccess);
         },
@@ -167,7 +167,7 @@ void main() {
     test("onError should be called if mutation fails", () async {
       int errorCount = 0;
       final mutation = Mutation<String, void>(
-        queryFn: (_) async => throw "Should throw",
+        mutationFn: (_) async => throw "Should throw",
         onError: (_, __, ___) {
           errorCount++;
         },
@@ -190,7 +190,7 @@ void main() {
       CachedQuery.instance.addQuery(query);
       final mutation = Mutation<String, void>(
         refetchQueries: [key],
-        queryFn: (_) async => "",
+        mutationFn: (_) async => "",
       );
       await mutation.mutate();
       await Future<void>.delayed(const Duration(milliseconds: 100));
@@ -203,7 +203,7 @@ void main() {
       expect(query.stale, false);
       final mutation = Mutation<String, void>(
         invalidateQueries: [key],
-        queryFn: (_) async => "",
+        mutationFn: (_) async => "",
       );
       await mutation.mutate();
       expect(query.stale, true);

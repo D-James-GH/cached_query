@@ -29,7 +29,7 @@ class TitleRepo {
 
   Mutation<String, String> updateTitle() {
     return Mutation(
-      queryFn: (title) =>
+      mutationFn: (title) =>
           Future.delayed(queryDelay ?? Duration.zero, () => title),
     );
   }
