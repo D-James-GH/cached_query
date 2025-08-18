@@ -1,3 +1,9 @@
+## 3.0.0-dev.18
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: change name of mutation funciton to mutationFn for clarity. ([f91ed15d](https://github.com/D-James-GH/cached_query/commit/f91ed15db13e22a5fa105478a3d76e89985f2ac4))
+
 ## 3.0.0-dev.17
 
 > Note: This release has breaking changes.
