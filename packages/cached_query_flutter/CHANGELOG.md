@@ -1,3 +1,9 @@
+## 3.0.0-dev.19
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FEAT**: make refetchDuration staleDuration for more clarity. ([e52d72fa](https://github.com/D-James-GH/cached_query/commit/e52d72fa80b86842aa207a7d42781d395a540ba5))
+
 ## 3.0.0-dev.18
 
 > Note: This release has breaking changes.

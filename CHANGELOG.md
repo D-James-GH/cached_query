@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-08-29
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`cached_query` - `v3.0.0-dev.19`](#cached_query---v300-dev19)
+ - [`cached_query_flutter` - `v3.0.0-dev.19`](#cached_query_flutter---v300-dev19)
+
+Packages with other changes:
+
+ - [`cached_storage` - `v3.0.0-dev.19`](#cached_storage---v300-dev19)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.0-dev.19`
+
+---
+
+#### `cached_query` - `v3.0.0-dev.19`
+
+ - **FEAT**: update name of pageParams to args. ([0808f615](https://github.com/D-James-GH/cached_query/commit/0808f61505e6a608cc5dd0aa844c01831daaab3e))
+ - **BREAKING** **FEAT**: make refetchDuration staleDuration for more clarity. ([e52d72fa](https://github.com/D-James-GH/cached_query/commit/e52d72fa80b86842aa207a7d42781d395a540ba5))
+
+#### `cached_query_flutter` - `v3.0.0-dev.19`
+
+ - **BREAKING** **FEAT**: make refetchDuration staleDuration for more clarity. ([e52d72fa](https://github.com/D-James-GH/cached_query/commit/e52d72fa80b86842aa207a7d42781d395a540ba5))
+
+
 ## 2025-08-18
 
 ### Changes
