@@ -8,7 +8,7 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
   return InfiniteQuery<List<PostModel>, int>(
     key: 'posts',
     config: QueryConfig(
-      refetchDuration: const Duration(seconds: 2),
+      staleDuration: const Duration(seconds: 2),
       storageDeserializer: (json) {
         return InfiniteQueryData.fromJson(
           json,

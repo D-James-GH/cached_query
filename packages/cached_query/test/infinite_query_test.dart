@@ -79,7 +79,7 @@ void main() async {
         key: "Posts",
         queryFn: repo.getPosts,
         config: QueryConfig(
-          refetchDuration: const Duration(milliseconds: 200),
+          staleDuration: const Duration(milliseconds: 200),
         ),
         getNextArg: (state) {
           return (state?.pages.length ?? 0) + 1;
@@ -123,7 +123,7 @@ void main() async {
         key: InfiniteQueryTestRepository.key,
         queryFn: createResponse,
         config: QueryConfig(
-          refetchDuration: const Duration(seconds: 5),
+          staleDuration: const Duration(seconds: 5),
         ),
         getNextArg: (state) {
           return (state?.pages.length ?? 0) + 1;
@@ -194,7 +194,7 @@ void main() async {
           return null;
         },
         config: QueryConfig(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
         getNextArg: (state) {
           return (state?.pages.length ?? 0) + 1;
@@ -227,7 +227,7 @@ void main() async {
         key: "refetch list",
         cache: cache,
         config: QueryConfig(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
         onPageRefetched: (page, currentResult, cachedData) {
           if (page != cachedData.pages.firstOrNull &&
@@ -270,7 +270,7 @@ void main() async {
         cache: cache,
         key: "refetch list",
         config: QueryConfig(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
         getNextArg: (state) => (state?.pages.length ?? 0) + 1,
         queryFn: (page) {
@@ -289,7 +289,7 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
         config: QueryConfig(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
         getNextArg: (state) => (state?.pages.length ?? 0) + 1,
         queryFn: (page) {
@@ -313,7 +313,7 @@ void main() async {
       final query = InfiniteQuery<String, int>(
         key: "refetch list",
         config: QueryConfig(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
         getNextArg: (state) => (state?.pages.length ?? 0) + 1,
         queryFn: (page) {
@@ -580,13 +580,14 @@ void main() async {
             final json = jsonDecode(str as String) as Map<String, dynamic>;
             return InfiniteQueryData(
               pages: Serializable.listFromJson(json["pages"] as List<dynamic>),
-              args: (json["pageParams"] as List<dynamic>).cast<int>(),
+              args: (json["args"] as List<dynamic>).cast<int>(),
             );
           },
         ),
         getNextArg: (state) => (state?.pages.length ?? 0) + 1,
       );
       final res = await query.fetch();
+      expect(res.isError, false);
       expect(res.data!.pages[0].name, testQueryRes);
     });
     test("Storage should update on each fetch", () async {
@@ -645,7 +646,7 @@ void main() async {
             }
             return true;
           },
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
       );
 
@@ -745,7 +746,7 @@ void main() async {
         },
         config: QueryConfig(
           shouldFetch: (_, __, ___) => false,
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
       );
 
@@ -766,7 +767,7 @@ void main() async {
         },
         config: QueryConfig(
           // shouldRefetch: (query, _) => false,
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
       );
 

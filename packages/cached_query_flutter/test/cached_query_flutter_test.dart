@@ -13,7 +13,7 @@ void main() {
       final tester1 = QueryTester(
         cache: cache,
         config: const QueryConfigFlutter(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
           refetchOnConnection: false,
           refetchOnResume: true,
         ),
@@ -21,7 +21,7 @@ void main() {
       final tester2 = QueryTester(
         cache: cache,
         config: const QueryConfigFlutter(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
           refetchOnConnection: true,
           refetchOnResume: false,
         ),
@@ -29,7 +29,7 @@ void main() {
       final tester3 = QueryTester(
         cache: cache,
         config: const QueryConfigFlutter(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
           refetchOnConnection: true,
           refetchOnResume: true,
         ),
@@ -67,7 +67,7 @@ void main() {
           shouldFetch: (_, __, ___) => shouldFetch,
           refetchOnConnection: true,
           refetchOnResume: true,
-          refetchDuration: const Duration(milliseconds: 300),
+          staleDuration: const Duration(milliseconds: 300),
         ),
       );
       await tester.query.fetch();

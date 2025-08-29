@@ -80,7 +80,7 @@ void main() {
       final query1 = Query<String>(
         key: "de-dupe",
         config: QueryConfig(
-          refetchDuration: const Duration(seconds: 2),
+          staleDuration: const Duration(seconds: 2),
         ),
         queryFn: () {
           fetchCount++;
@@ -480,7 +480,7 @@ void main() {
             }
             return true;
           },
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
       );
 
@@ -557,7 +557,7 @@ void main() {
         },
         config: QueryConfig(
           shouldFetch: (_, __, ___) => false,
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
       );
 
@@ -578,7 +578,7 @@ void main() {
           return Future.value("");
         },
         config: QueryConfig(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
         ),
       );
 

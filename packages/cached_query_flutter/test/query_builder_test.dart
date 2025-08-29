@@ -19,7 +19,7 @@ void main() {
           return response;
         },
         config: const QueryConfigFlutter(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),
       );
@@ -38,7 +38,7 @@ void main() {
           return "title";
         },
         config: const QueryConfigFlutter(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),
       );
@@ -63,7 +63,7 @@ void main() {
             return "title";
           },
           config: const QueryConfigFlutter(
-            refetchDuration: Duration.zero,
+            staleDuration: Duration.zero,
             ignoreCacheDuration: true,
           ),
         );
@@ -90,7 +90,7 @@ void main() {
           return Future.delayed(const Duration(seconds: 2), () => response);
         },
         config: const QueryConfigFlutter(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),
       );
@@ -125,7 +125,7 @@ void main() {
           return title;
         },
         config: const QueryConfigFlutter(
-          refetchDuration: Duration.zero,
+          staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),
       );

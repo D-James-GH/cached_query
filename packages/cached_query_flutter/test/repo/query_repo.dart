@@ -22,7 +22,7 @@ class TitleRepo {
       initialData: initialTitle,
       config: const QueryConfig(
         ignoreCacheDuration: true,
-        refetchDuration: Duration.zero,
+        staleDuration: Duration.zero,
       ),
     );
   }

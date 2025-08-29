@@ -19,13 +19,14 @@ final _defaultConfig = GlobalQueryConfig();
 /// The global config for all queries.
 /// {@endtemplate}
 class GlobalQueryConfig {
-  /// {@template QueryConfig.refetchDuration}
-  /// Use the [refetchDuration] Specify how long before the query is re-fetched
-  /// in the background.
+  /// {@template QueryConfig.staleDuration}
+  /// Use the [staleDuration] to specify how long before the query is considered stale.
+  ///
+  /// If a query is stale it will be re-fetched next time it is listened to, or fetch() is called.
   ///
   /// Defaults to 4 seconds
   /// {@endtemplate}
-  final Duration refetchDuration;
+  final Duration staleDuration;
 
   /// {@template QueryConfig.storeQuery}
   /// Use [storeQuery] to set whether a query should be stored or not.
@@ -81,7 +82,7 @@ class GlobalQueryConfig {
   ///
   /// {@macro QueryConfig.storeQuery}
   ///
-  /// {@macro QueryConfig.refetchDuration}
+  /// {@macro QueryConfig.staleDuration}
   ///
   /// {@macro QueryConfig.cacheDuration}
   ///
@@ -91,17 +92,20 @@ class GlobalQueryConfig {
     this.ignoreCacheDuration = false,
     this.storeQuery = false,
     this.storageDuration,
-    this.refetchDuration = const Duration(seconds: 4),
+    @Deprecated('Use staleDuration instead, for clearer naming')
+    Duration? refetchDuration,
+    Duration? staleDuration,
     this.cacheDuration = const Duration(minutes: 5),
     this.shouldRethrow = false,
-  });
+  }) : staleDuration =
+            staleDuration ?? refetchDuration ?? const Duration(seconds: 4);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is GlobalQueryConfig &&
           runtimeType == other.runtimeType &&
-          refetchDuration == other.refetchDuration &&
+          staleDuration == other.staleDuration &&
           storeQuery == other.storeQuery &&
           cacheDuration == other.cacheDuration &&
           shouldRethrow == other.shouldRethrow &&
@@ -110,7 +114,7 @@ class GlobalQueryConfig {
 
   @override
   int get hashCode =>
-      refetchDuration.hashCode ^
+      staleDuration.hashCode ^
       storeQuery.hashCode ^
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^
@@ -122,66 +126,33 @@ class GlobalQueryConfig {
 /// [QueryConfig] is used to configure a [Query].
 /// {@endtemplate}
 class QueryConfig<Data> {
-  /// {@template QueryConfig.refetchDuration}
-  /// Use the [refetchDuration] Specify how long before the query is re-fetched
-  /// in the background.
-  ///
-  /// Defaults to 4 seconds
-  /// {@endtemplate}
-  Duration get refetchDuration =>
-      _refetchDuration ?? _defaultConfig.refetchDuration;
-  final Duration? _refetchDuration;
+  /// {@macro QueryConfig.staleDuration}
+  Duration get staleDuration => _staleDuration ?? _defaultConfig.staleDuration;
+  final Duration? _staleDuration;
 
   final bool? _storeQuery;
 
-  /// {@template QueryConfig.storeQuery}
-  /// Use [storeQuery] to set whether a query should be stored or not.
-  /// Defaults to true;
-  ///
-  /// Only effective when [CachedQuery] storage is set.
-  /// {@endtemplate}
+  /// {@macro QueryConfig.storeQuery}
   bool get storeQuery => _storeQuery ?? _defaultConfig.storeQuery;
 
-  /// {@template QueryConfig.storageDuration}
-  /// Use [storageDuration] to specify how long a query is stored in the database.
-  /// Defaults to Null (forever).
-  /// {@endtemplate}
+  /// {@macro QueryConfig.storageDuration}
   final Duration? storageDuration;
 
-  /// {@template QueryConfig.cacheDuration}
-  /// Use [cacheDuration] to specify how long a query that has zero listeners
-  /// stays in memory.
-  ///
-  /// Defaults to 5 minutes.
-  /// {@endtemplate}
+  /// {@macro QueryConfig.cacheDuration}
   Duration get cacheDuration => _cacheDuration ?? _defaultConfig.cacheDuration;
   final Duration? _cacheDuration;
 
-  /// {@template QueryConfig.shouldRethrow}
-  /// [shouldRethrow] Tells cached query whether it should rethrow any error
-  /// caught in the query.
-  ///
-  /// [shouldRethrow] is useful if you use try catches in your app for
-  /// error handling/logout. By default a query will catch all errors and exceptions
-  /// and update the state.
-  /// {@endtemplate}
+  /// {@macro QueryConfig.shouldRethrow}
   bool get shouldRethrow => _shouldRethrow ?? _defaultConfig.shouldRethrow;
   final bool? _shouldRethrow;
 
-  /// {@template QueryConfig.storageSerializer}
-  /// Converts the query data to a storable format.
-  /// {@endtemplate}
+  /// {@macro QueryConfig.storageSerializer}
   final Serializer<Data>? storageSerializer;
 
-  /// {@template QueryConfig.storageDeserializer}
-  /// Called when the query is fetched from storage and should
-  /// convert the stored data to the usable data.
-  /// {@endtemplate}
+  /// {@macro QueryConfig.storageDeserializer}
   final Deserializer<Data>? storageDeserializer;
 
-  /// {@template QueryConfig.ignoreCacheDuration}
-  /// If set to true the query(ies) will never be removed from cache.
-  /// {@endtemplate}
+  /// {@macro QueryConfig.ignoreCacheDuration}
   bool get ignoreCacheDuration =>
       _ignoreCacheDuration ?? _defaultConfig.ignoreCacheDuration;
   final bool? _ignoreCacheDuration;
@@ -217,13 +188,15 @@ class QueryConfig<Data> {
     bool? ignoreCacheDuration,
     bool? storeQuery,
     this.storageDuration,
+    @Deprecated('Use staleDuration instead, for clearer naming')
     Duration? refetchDuration,
+    Duration? staleDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
   })  : _storeQuery = storeQuery,
         _shouldFetch = shouldFetch,
         _ignoreCacheDuration = ignoreCacheDuration,
-        _refetchDuration = refetchDuration,
+        _staleDuration = staleDuration,
         _shouldRethrow = shouldRethrow,
         _cacheDuration = cacheDuration;
 
@@ -236,7 +209,7 @@ class QueryConfig<Data> {
       shouldFetch: _shouldFetch ?? global.shouldFetch,
       storeQuery: _storeQuery ?? global.storeQuery,
       storageDuration: storageDuration ?? global.storageDuration,
-      refetchDuration: _refetchDuration ?? global.refetchDuration,
+      staleDuration: _staleDuration ?? global.staleDuration,
       cacheDuration: _cacheDuration ?? global.cacheDuration,
       shouldRethrow: _shouldRethrow ?? global.shouldRethrow,
     );
@@ -247,7 +220,7 @@ class QueryConfig<Data> {
       identical(this, other) ||
       other is QueryConfig &&
           runtimeType == other.runtimeType &&
-          refetchDuration == other.refetchDuration &&
+          staleDuration == other.staleDuration &&
           storeQuery == other.storeQuery &&
           cacheDuration == other.cacheDuration &&
           shouldRethrow == other.shouldRethrow &&
@@ -257,7 +230,7 @@ class QueryConfig<Data> {
 
   @override
   int get hashCode =>
-      refetchDuration.hashCode ^
+      staleDuration.hashCode ^
       storeQuery.hashCode ^
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^

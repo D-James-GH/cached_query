@@ -6,7 +6,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
     config: const GlobalQueryConfigFlutter(
-      refetchDuration: Duration(seconds: 4),
+      staleDuration: Duration(seconds: 4),
     ),
   );
   runApp(const MyApp());

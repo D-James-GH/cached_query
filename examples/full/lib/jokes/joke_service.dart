@@ -13,7 +13,7 @@ class JokeService {
       key: 'joke',
       config: QueryConfigFlutter(
         storeQuery: true,
-        refetchDuration: const Duration(seconds: 4),
+        staleDuration: const Duration(seconds: 4),
         storageDeserializer: (json) =>
             JokeModel.fromJson(json as Map<String, dynamic>),
       ),

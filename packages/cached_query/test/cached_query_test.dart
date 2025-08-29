@@ -29,7 +29,7 @@ void main() {
       final config = GlobalQueryConfig(
         storeQuery: false,
         shouldRethrow: true,
-        refetchDuration: Duration.zero,
+        staleDuration: Duration.zero,
         cacheDuration: Duration.zero,
         ignoreCacheDuration: true,
       );
@@ -54,7 +54,7 @@ void main() {
       final cache = CachedQuery.asNewInstance()
         ..config(
           config: GlobalQueryConfig(
-            refetchDuration: const Duration(minutes: 5),
+            staleDuration: const Duration(minutes: 5),
           ),
         );
       final query = createQuery(cache: cache);

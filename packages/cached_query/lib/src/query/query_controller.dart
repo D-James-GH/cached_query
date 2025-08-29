@@ -78,9 +78,9 @@ final class QueryController<T> {
   /// Whether the current query is marked as stale and therefore requires a
   /// refetch.
   bool get stale {
-    return state.timeCreated
-            .add(config.refetchDuration)
-            .isBefore(DateTime.now()) ||
+    final currentTime = DateTime.now();
+    final staleTime = state.timeCreated.add(config.staleDuration);
+    return staleTime.isBefore(currentTime) ||
         state.data == null ||
         _invalidated;
   }
