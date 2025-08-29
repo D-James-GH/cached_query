@@ -88,7 +88,7 @@ Mutation<PostModel, PostModel> createPost() {
       query.update(
         (old) {
           return InfiniteQueryData(
-            pageParams: old?.pageParams ?? [],
+            args: old?.args ?? [],
             pages: [
               [newPost, ...?old?.pages.first],
               ...?old?.pages.sublist(1),

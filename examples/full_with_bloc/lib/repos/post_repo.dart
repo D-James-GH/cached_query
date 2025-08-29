@@ -35,17 +35,33 @@ class PostRepository {
         return PostModel.fromJson(res);
       },
       onStartMutation: (postArg) {
-        CachedQuery.instance.updateQuery(
-          key: "posts",
-          updateFn: (dynamic old) {
-            if (old is List<List<PostModel>>) {
-              return <List<PostModel>>[
-                [postArg, ...old[0]],
-                ...old.sublist(1).toList(),
-              ];
-            }
-          },
-        );
+        final query = CachedQuery.instance
+            .getQuery<InfiniteQuery<List<PostModel>, int>>("posts");
+        if (query == null) return null;
+        final fallback = query.state.data;
+
+        query.update((old) {
+          return InfiniteQueryData(
+            args: old?.args ?? [],
+            pages: [
+              [postArg, ...?old?.pages.first],
+              ...?old?.pages.sublist(1),
+            ],
+          );
+        });
+        return fallback;
+      },
+      onSuccess: (args, newPost) {
+        CachedQuery.instance.invalidateCache(key: "posts");
+      },
+      onError: (arg, error, fallback) {
+        if (fallback != null) {
+          (CachedQuery.instance.getQuery("posts")
+                  as InfiniteQuery<List<PostModel>, int>)
+              .update(
+            (old) => fallback as InfiniteQueryData<List<PostModel>, int>,
+          );
+        }
       },
     );
   }
