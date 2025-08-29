@@ -7,17 +7,17 @@ final class InfiniteQueryData<T, Arg> {
   /// The pages of data returned from the queryFn
   List<T> pages;
 
-  /// The pageParams used to fetch the page of the same index
-  List<Arg> pageParams;
+  /// The arguments used to fetch the page of the same index
+  List<Arg> args;
 
   /// {@macro InfiniteQueryData}
-  InfiniteQueryData({required this.pages, required this.pageParams});
+  InfiniteQueryData({required this.pages, required this.args});
 
   /// Converts the data to a json object.
   Map<String, dynamic> toJson() {
     return {
       'pages': pages,
-      'pageParams': pageParams,
+      'args': args,
     };
   }
 
@@ -29,7 +29,7 @@ final class InfiniteQueryData<T, Arg> {
   }) {
     return InfiniteQueryData(
       pages: pagesConverter(json['pages'] as List<dynamic>),
-      pageParams: argsConverter(json['pageParams'] as List<dynamic>),
+      args: argsConverter(json['args'] as List<dynamic>),
     );
   }
 
@@ -54,10 +54,10 @@ final class InfiniteQueryData<T, Arg> {
       other is InfiniteQueryData &&
           runtimeType == other.runtimeType &&
           pages == other.pages &&
-          pageParams == other.pageParams;
+          args == other.args;
 
   @override
-  int get hashCode => pages.hashCode ^ pageParams.hashCode;
+  int get hashCode => pages.hashCode ^ args.hashCode;
 }
 
 /// {@template infiniteQueryState}

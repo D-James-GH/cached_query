@@ -250,7 +250,7 @@ void main() {
         filterFn: (unencodedKey, key) => key.startsWith("query"),
         updateFn: (dynamic value) {
           if (value is InfiniteQueryData<String, int>) {
-            return InfiniteQueryData(pages: ["updated"], pageParams: [1]);
+            return InfiniteQueryData(pages: ["updated"], args: [1]);
           }
           if (value is String) {
             return "updated";
@@ -279,7 +279,7 @@ void main() {
           final value = v as InfiniteQueryData<String, int>;
           return InfiniteQueryData(
             pages: [...value.pages, "new"],
-            pageParams: value.pageParams,
+            args: value.args,
           );
         },
       );

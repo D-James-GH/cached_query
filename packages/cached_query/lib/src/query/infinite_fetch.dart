@@ -101,17 +101,17 @@ InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
     );
     final InfiniteFetchOptions(:direction, :prefetchPages) =
         options as InfiniteFetchOptions;
-    state ??= InfiniteQueryData(pages: [], pageParams: []);
+    state ??= InfiniteQueryData(pages: [], args: []);
     final InfiniteQueryData<T, Arg>(
       pages: currentPages,
-      pageParams: currentPageParams
+      args: currentPageParams
     ) = state;
 
     if (direction == null) {
       final totalPages = prefetchPages ?? currentPages.length;
       var result = InfiniteQueryData<T, Arg>(
         pages: [],
-        pageParams: [],
+        args: [],
       );
       var i = 0;
       do {
@@ -125,7 +125,7 @@ InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
         final res = await queryFn(arg);
         result = InfiniteQueryData(
           pages: [...result.pages, res],
-          pageParams: [...result.pageParams, arg],
+          args: [...result.args, arg],
         );
 
         if (onPageRefetched != null) {
@@ -154,11 +154,11 @@ InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
     return switch (direction) {
       InfiniteQueryDirection.forward => InfiniteQueryData(
           pages: [...state.pages, res],
-          pageParams: [...state.pageParams, arg],
+          args: [...state.args, arg],
         ),
       InfiniteQueryDirection.backward => InfiniteQueryData(
           pages: [res, ...state.pages],
-          pageParams: [arg, ...state.pageParams],
+          args: [arg, ...state.args],
         ),
     };
   };

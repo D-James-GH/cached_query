@@ -31,7 +31,7 @@ void main() async {
         key: "initial",
         queryFn: repo.getPosts,
         getNextArg: (state) => 1,
-        initialData: InfiniteQueryData(pages: ["initialData"], pageParams: [1]),
+        initialData: InfiniteQueryData(pages: ["initialData"], args: [1]),
       );
       expect(query.state.data!.pages.first, "initialData");
     });
@@ -40,7 +40,7 @@ void main() async {
         key: "initial",
         queryFn: repo.getPosts,
         getNextArg: (state) => 1,
-        initialData: InfiniteQueryData(pages: ["initialData"], pageParams: [1]),
+        initialData: InfiniteQueryData(pages: ["initialData"], args: [1]),
       ).stream.first;
       expect(initialQuery.data!.pages.first, "initialData");
     });
@@ -465,7 +465,7 @@ void main() async {
       storage!.put(
         StoredQuery(
           key: key,
-          data: InfiniteQueryData(pages: [data], pageParams: [1]),
+          data: InfiniteQueryData(pages: [data], args: [1]),
           storageDuration: storageDuration,
           createdAt: DateTime.now(),
         ),
@@ -524,7 +524,7 @@ void main() async {
       const initialData = [3];
       final storedQuery = StoredQuery(
         key: key,
-        data: InfiniteQueryData(pages: initialData, pageParams: [1]),
+        data: InfiniteQueryData(pages: initialData, args: [1]),
         createdAt: DateTime.now(),
       );
       // Make sure the storage has initial data
@@ -559,7 +559,7 @@ void main() async {
         data: jsonEncode(
           InfiniteQueryData(
             pages: [Serializable(testQueryRes)],
-            pageParams: [1],
+            args: [1],
           ),
         ),
         createdAt: DateTime.now(),
@@ -580,7 +580,7 @@ void main() async {
             final json = jsonDecode(str as String) as Map<String, dynamic>;
             return InfiniteQueryData(
               pages: Serializable.listFromJson(json["pages"] as List<dynamic>),
-              pageParams: (json["pageParams"] as List<dynamic>).cast<int>(),
+              args: (json["pageParams"] as List<dynamic>).cast<int>(),
             );
           },
         ),
@@ -624,7 +624,7 @@ void main() async {
           key: key,
           data: InfiniteQueryData(
             pages: [data],
-            pageParams: [1],
+            args: [1],
           ),
           createdAt: DateTime.now(),
         ),
