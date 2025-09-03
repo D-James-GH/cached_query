@@ -9,46 +9,53 @@ shown below. No global configuration is needed, although possible.
 
 ```dart
 final query = Query(
-  key: "my_data", 
+  key: "my_data",
   initialData: "Pre-populated data",
   queryFn: () => api.getData(),
 );
 ```
 
-Each Query must have a queryFn. This is an asynchronous function that can return any custom or built in type. The return 
-value of the queryFn will be cached. 
+Each Query must have a `queryFn` and a key. The `queryFn` is an asynchronous function that can return any value which will then be cached.
+
+## Query Key
 
 A query must be given a unique key which can be any json serializable value. Each unique key will create a new query in
-the cache. Initial data can be passed to the query. On the first request this initial data will be emitted as part of the state 
-rather than null. Any global query configuration can be overridden when instantiating a new query. See [configuration](/docs/guides/configuration)
-for more details.
+the cache. Initial data can be passed to the query. On the first request this initial data will be emitted as part of the state
+rather than null.
 
-Each query can be updated using `Query.update`. This change will be emitted to any listening query. For more information
-on updating a query see [optimistic updates](/docs/guides/optimistic-updates)
+Only one query will ever exist for each key. If a query is instantiated with a key that already exists the existing query will be returned.
 
-### Query State
-`QueryState` is the object containing the current state of the query. It holds the **data** returned from the queryFn
-along with the current status of the query (loading, success, error, initial), the time of the last fetch and any errors
-throw in the fetch.
+A good query key is important to ensure data is not overridden. Include any parameters and variable in a query key:
+
 ```dart
-final state = query.state;
-final isLoading = state.status == QueryStatus.loading;
-final data = state.data;
+String createPostKey(String id) => "post/$id";
 ```
 
-A query can only hold one future at a time. This is so that the result can be requested from many places at once but only
-one call to the queryFn will be made. A query will not invoke the queryFn until one of two things is used:
+### Query State
 
-1. The `result` is requested via the future `Query.result`
+`QueryStatus` is the sealed class containing the current state of the query.
+
+- `QueryInitial` - The query has been created but the queryFn has not been called yet.
+- `QueryLoading` - The queryFn is currently running.
+- `QuerySuccess` - The queryFn has completed successfully and data is available.
+- `QueryError` - The queryFn has failed and an error is available.
+
+The current data is available on all states. On the `QuerySuccess` state the data will be the exact type of the generic passed in. On all other states
+data will be nullable as there is a chance the queryFn hasn't returned anything yet.
+
+## Fetching Data
+
+A query will not invoke the queryFn until one of two things is used:
+
+1. The `fetch()` method is invoked
 2. A listener is added to the query stream.
 
 ## Query Stream
 
-Each query manages its own stream controller. Streams enable a query to display currently existing data while fetching 
-new data in the background. When the new data is ready it will be emitted. A query stream will also emit any time the 
-state of the query is changed, this is useful for [mutations](/docs/guides/mutations) and 
+Each query manages its own stream controller. Streams enable a query to display currently existing data while fetching
+new data in the background. When the new data is ready it will be emitted. A query stream will also emit any time the
+state of the query is changed, this is useful for [mutations](/docs/guides/mutations) and
 [optimistic updates](/docs/guides/optimistic-updates).
-
 
 ```dart
 final query = Query(key: "my_data", queryFn: () => api.getData());
@@ -63,40 +70,41 @@ query.stream((state) {
 });
 ```
 
-## Query Result
+## Query Fetch
 
-`Query.result` is a quick and easy way to request the result of a queryFn. It returns [QueryState](#query-state) once
+`Query.fetch()` is a quick and easy way to request the result of a queryFn. It returns [QueryState](#query-state) once
 the queryFn has completed. For the full benefits of Cached Query use the stream api.
-
 
 ```dart
 final query = Query(key: "my_data", queryFn: () => api.getData());
 
-final queryState = await query.result;
+final queryState = await query.fetch();
 ```
 
-There are a few downsides to using a query this way. The future always completes after the queryFn has completed. If the 
-data is stale then nothing will show until fresh data is available, meaning you are not getting the benefits of 
-background fetches. 
+There are a few downsides to using a query this way. The future always completes after the queryFn has completed. If the
+data is stale then nothing will show until fresh data is available, meaning you are not getting the benefits of
+background fetches.
 
-As the Queries use streams to detect how many listeners they have left, using `Query.result` never adds a 
+As the Queries use streams to detect how many listeners they have left, using `Query.fetch` never adds a
 listener to the query. So, when the future is requested the [cache duration](/docs/guides/configuration) timer is started
 immediately if there are no other listeners attached.
 
 ## Error Handling
 
 If a query, infinite query or a mutation throws an error or exception it will be caught and the current state will be
-updated with the error. 
+updated with the error.
 
 ## Side Effects
 
-There are two side effects that can be passed to a query. 
+There are two side effects that can be passed to a query.
+
 - `onSuccess` - This is called after the query function succeeds but before the query state is updated.
 - `onError` - This is called if the query function fails but before the query state is updated.
+
 ```dart
 final query = Query<String>(
   key: "onSuccess",
-  onSuccess: (dynamic r) { 
+  onSuccess: (dynamic r) {
     // do something with the response
   },
   onError: (dynamic e){
@@ -107,9 +115,11 @@ final query = Query<String>(
   },
 );
 ```
+
 ## Local Cache
-By default, all queries will be saved inside the `CachedQuery.instance` singleton. Most of the time this is enough. 
-However, it may be useful to have full control of the cache for different areas of an app to prevent leaking sensitive 
+
+By default, all queries will be saved inside the `CachedQuery.instance` singleton. Most of the time this is enough.
+However, it may be useful to have full control of the cache for different areas of an app to prevent leaking sensitive
 information by not deleting the queries. Each query has a `cache` prop which allows you to pass in specific instance of `CachedQuery`.
 
 ```dart
@@ -130,7 +140,8 @@ final query = Query(
   },
 );
 ```
-A new instance of  `CachedQuery` can have a different config to the global one. 
+
+A new instance of `CachedQuery` can have a different config to the global one.
 
 If no cache is passed the query will be cached in the default `CachedQuery.instance` singleton.
 

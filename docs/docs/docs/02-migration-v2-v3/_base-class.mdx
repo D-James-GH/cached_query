@@ -1,0 +1,16 @@
+## Query Interface and Observers
+
+The base class for queries is now `Cachable<T>`. This has changed from `QueryBase<T>`.
+
+```dart
+class Observer extends QueryObserver {
+  @override
+  void onChange(
+    Cacheable<dynamic> query,
+    QueryState<dynamic> nextState,
+  ) {
+    // Do something when changing
+    super.onChange(query, nextState);
+  }
+}
+```

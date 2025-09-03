@@ -31,9 +31,10 @@ void main() async {
   CachedQuery.instance.configFlutter(
     // Initialize Cached Storage to persist the cache to disk
     storage: await CachedStorage.ensureInitialized(),
-    config: QueryConfigFlutter(
-      // Globally set the refetch duration
-      refetchDuration: Duration(seconds: 4),
+    // Set global query defaults (optional)
+    config: GlobalQueryConfigFlutter(
+      staleDuration: const Duration(seconds: 5),
+      cacheDuration: const Duration(minutes: 5),
     ),
   );
   runApp(const MyApp());
@@ -61,13 +62,13 @@ class _MyAppState extends State<MyApp> {
             builder: (context, state) => Column(
               children: [
                 if (state.data != null) Text(state.data),
-                if (state.status == QueryStatus.loading)
+                if (state.isLoading)
                   const SizedBox(
                     height: 30,
                     width: 30,
                     child: CircularProgressIndicator(),
                   ),
-                if (state.status == QueryStatus.error)
+                if (state.isError)
                   const Text("An error occurred"),
               ],
             ),

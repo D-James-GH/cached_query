@@ -1,0 +1,22 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import QueryStateMigration from "./_query-state.mdx";
+import ConfigChanges from "./_config-changes.mdx";
+import DataTypeChanges from "./_data-type.mdx";
+import BaseClasses from "./_base-class.mdx";
+
+# Migrating from 2.x to 3.x
+
+## Environment Requirements
+
+Cached Query 3.0 requires Dart 3.0.0 or higher. Make sure to update your `pubspec.yaml`:
+
+```yaml
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+```
+
+<QueryStateMigration />
+<ConfigChanges />
+<DataTypeChanges />
+<BaseClasses />

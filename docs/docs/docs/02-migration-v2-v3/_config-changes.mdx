@@ -1,0 +1,51 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Configuration Changes
+
+The configuration system has been updated with separate global and query-specific config objects.
+
+Classes are now:
+
+- `GlobalQueryConfigFlutter` - Global config for all queries, infinite queries and mutations. If using Cached Query Flutter.
+- `QueryConfigFlutter` - Query specific config for queries and infinite queries. If using Cached Query Flutter.
+- `GlobalQueryConfig` - Global config for all queries, infinite queries and mutations. If using Cached Query (non-Flutter).
+- `QueryConfig` - Query specific config for queries and infinite queries. If using Cached Query (non-Flutter).
+
+The local config will still inherit from the global config which is the same as before.
+
+<Tabs groupId="config-changes">
+  <TabItem value="before" label="Before">
+    ```dart
+    void main() {
+      CachedQuery.instance.configFlutter(
+        config: QueryConfigFlutter(
+          refetchDuration: Duration(seconds: 4),
+        ),
+        storage: await CachedStorage.ensureInitialized(),
+      );
+      runApp(MyApp());
+    }
+    ```
+  </TabItem>
+  <TabItem value="after" label="After" default>
+    ```dart
+    void main() async {
+      WidgetsFlutterBinding.ensureInitialized();
+      CachedQuery.instance.configFlutter(
+        config: GlobalQueryConfigFlutter(
+          refetchOnResume: true,
+        ),
+        storage: await CachedStorage.ensureInitialized(),
+        observers: [
+          Observer(),
+          QueryLoggingObserver(colors: !Platform.isIOS),
+        ],
+      );
+      runApp(const MyApp());
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+Multiple observers can now be passed to the global config.

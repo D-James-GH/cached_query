@@ -1,0 +1,45 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## Data Type Changes
+
+Query success state data is now the type of the generic, usually this is a non-null type. If you need nullable data, explicitly pass `T?` as the generic type.
+
+<Tabs groupId="data-type-changes">
+  <TabItem value="before" label="Before">
+    ```dart
+    QueryBuilder<PostModel>(
+      queryKey: ['post', id],
+      queryFn: () => api.getPost(id),
+      builder: (context, state) {
+        final data = state.data; // data is PostModel?
+        if (data == null) return const SizedBox();
+        return Text(data.title);
+      },
+    )
+    ```
+  </TabItem>
+  <TabItem value="after" label="After" default>
+    ```dart
+    QueryBuilder<PostModel>(
+      queryKey: ['post', id],
+      queryFn: () => api.getPost(id),
+      builder: (context, state) {
+        return switch (state) {
+          QuerySuccess<PostModel>(:final data) => Text(data.title), // data is PostModel (non-nullable)
+          QueryError<PostModel>() => Text('Error: ${state.error}'),
+          _ => const SizedBox(),
+        };
+      },
+    )
+    ```
+  </TabItem>
+</Tabs>
+
+For nullable data, use:
+
+```dart
+Query<PostModel?>(
+    ...
+)
+```

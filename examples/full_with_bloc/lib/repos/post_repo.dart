@@ -25,7 +25,6 @@ class PostRepository {
 
   Mutation<PostModel, PostModel> createPostMutation() {
     return Mutation<PostModel, PostModel>(
-      refetchQueries: ["posts"],
       mutationFn: (post) async {
         final res = await _service.createPost(
           title: post.title,
