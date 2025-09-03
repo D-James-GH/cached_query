@@ -79,13 +79,12 @@ Mutation<PostModel, PostModel> createPost() {
       return PostModel.fromJson(res);
     },
     onStartMutation: (newPost) {
-      final query = CachedQuery.instance.getQuery("posts")
-          as InfiniteQuery<List<PostModel>, int>?;
-      if (query == null) return null;
+      final query = CachedQuery.instance
+          .getQuery<InfiniteQuery<List<PostModel>, int>>("posts");
 
-      final fallback = query.state.data;
+      final fallback = query?.state.data;
 
-      query.update(
+      query?.update(
         (old) {
           return InfiniteQueryData(
             args: old?.args ?? [],
@@ -99,16 +98,13 @@ Mutation<PostModel, PostModel> createPost() {
 
       return fallback;
     },
-    onSuccess: (args, newPost) {
-      CachedQuery.instance.invalidateCache(key: "posts");
-    },
     onError: (arg, error, fallback) {
       if (fallback != null) {
-        (CachedQuery.instance.getQuery("posts")
-                as InfiniteQuery<List<PostModel>, int>)
-            .update(
-          (old) => fallback as InfiniteQueryData<List<PostModel>, int>,
-        );
+        CachedQuery.instance
+            .getQuery<InfiniteQuery<List<PostModel>, int>>("posts")
+            ?.update(
+              (old) => fallback as InfiniteQueryData<List<PostModel>, int>,
+            );
       }
     },
   );

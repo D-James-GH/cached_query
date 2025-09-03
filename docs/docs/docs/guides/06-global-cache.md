@@ -3,45 +3,58 @@
 The instance of the query cache is available through a singleton `CachedQuery.instance`. It has a few useful utilities on it.
 
 ## Where Query
-Where query works much like where on an iterable. It returns a list of queries and infinite queries that satisfy the 
+
+Where query works much like where on an iterable. It returns a iterable of queries and infinite queries that satisfy the
 given test.
 
 The example below returns all queries/infinite queries whose key contains the word "Post".
 
-*Note: The key on a query object will always be a string*
+_Note: The key on a query object will always be a string, the original key is accessible under unencodedKey_
+
 ```dart
 final queries = CachedQuery.instance.whereQuery((query) => query.key.contains("post"));
 ```
 
-## Re-fetch, Invalidate and Delete
+## Invalidate Queries
 
-Use the Cached Query instance to easily invalidate or re-fetch the whole cache or a single key.
+Invalidating will mark the specified key as stale. By default `invalidate` will refetch any query that has listeners.
+The behavior can be changed by passing the `refetchActive` (defaults to true) and `refetchInactive` (defaults to false) parameters.
+
+To invalidate the whole cache don't pass a key.
+
+```dart
+CachedQuery.instance.invalidateCache(keys: ["posts"]);
+
+// or invalidate by finding a query
+CachedQuery.instance.whereQuery((q) => q.key.startsWith("todos/")).forEach((q) => q.invalidate());
+
+// Invalidate the whole cache
+CachedQuery.instance.invalidateCache();
+```
+
+## Re-fetch, and Delete
+
+Use the Cached Query instance to easily re-fetch the whole cache or a single key.
 
 Refetch multiple queries at once by passing a list of keys.
+:::info
+Refetch is similar to invalidate however, it can ignore the stale duration and force a re-fetch.
+:::
+
 ```dart
 CachedQuery.instance.refetchQueries(keys: ["posts"]);
 ```
 
 Refetch multiple queries at once by passing a filter.
+
 ```dart
 CachedQuery.instance.refetchQueries(
     filterFn: (unencodedKey, key) => key.startsWith("todos/"),
 );
 ```
 
-Invalidating will mark the specified key as stale. By default `invalidate` will refetch any query that has listeners. 
-The behavior can be changed by passing the `refetchActive` (defaults to true) and `refetchInactive` (defaults to false) parameters.
-
-To invalidate the whole cache don't pass a key.
-```dart
-CachedQuery.instance.invalidateCache(key: "posts");
-
-// Invalidate the whole cache
-CachedQuery.instance.invalidateCache();
-```
-
-
 Deleting will remove the specified key immediately. To delete the whole cache leave the key as null.
+
 ```dart
 // Optionally delete the stored values as well.
 CachedQuery.instance.deleteCache(key: "posts", deleteStorage: true);
@@ -50,20 +63,25 @@ CachedQuery.instance.deleteCache(key: "posts", deleteStorage: true);
 CachedQuery.instance.deleteCache(deleteStorage: true);
 ```
 
-## Manually Adding and Removing Queries 
+## Manually Adding and Removing Queries
+
 You can manually add or get a query from the cache, although it is not normally necessary to add it as the query will call
 this for you.
 
-To add a query or infinite query to cache: 
+To add a query or infinite query to cache:
+
 ```dart
 CachedQuery.instance.addQuery(query);
 ```
+
 To get a query or infinite query from cache:
+
 ```dart
 CachedQuery.instance.getQuery(key);
 ```
 
 ## Updating the Cache
+
 It is often useful to be able to update the cache manually, for example, when performing [optimistic updates](/docs/guides/optimistic-updates)
 
 Use `updateQuery` to update a query or an infinite query. Any changes will be emitted down the query stream.
@@ -73,31 +91,50 @@ The update function requires either a `key` or a `filterFn` to select the query 
 CachedQuery.instance.updateQuery(
   key: "posts",
   updateFn: (dynamic old) {
-    if (old is List<List<PostModel>>) {
-      return <List<PostModel>>[
-        [newPost, ...old[0]],
-        ...old.sublist(1).toList()
-      ];
-    }
+    return InfiniteQueryData(
+        args: old?.args ?? [],
+        pages: [
+            [newPost, ...?old?.pages.first],
+            ...?old?.pages.sublist(1),
+        ],
+    );
   },
 );
 ```
 
 :::info
-As an alternative to using `CachedQuery.instance.updateQuery` you can also use the `whereQuery` method in tandem with the `update` method on the query object itself.  
+As an alternative to using `CachedQuery.instance.updateQuery` you can also use the `whereQuery` method in tandem with the `update` method on the query object itself.
 
 This would have better type safety but would result in more code.
-``
+
+```dart
+CachedQuery.instance.whereQuery((q) => q.key == "posts").forEach((query) {
+    query.update(
+      (old) {
+        return InfiniteQueryData(
+          args: old?.args ?? [],
+          pages: [
+            [newPost, ...?old?.pages.first],
+            ...?old?.pages.sublist(1),
+          ],
+        );
+      },
+    );
+  },
+);
+```
+
 :::
 
 ## Query Key Filter Function
 
-Many of the functions on the CachedQuery instance take a key or a filterFn. A key is a direct reference to a cached query where as the `filterFn` allows for selecting multiple queries at once. 
+Many of the functions on the CachedQuery instance take a key or a filterFn. A key is a direct reference to a cached query where as the `filterFn` allows for selecting multiple queries at once.
 
 For example, say you have a list of todos, and each todo has been fetched with the key `"todos/${id}"`, if a user selects a "complete all" button then we will want to find all the todos in the cache and update them, regardless of their id.
+
 ```dart
 CachedQuery.instance.updateQuery(
-  updateFn: (dynamic oldData){ 
+  updateFn: (dynamic oldData){
     if(oldData is Todo){
       return oldData?.copyWith(complete: true);
     }
@@ -110,7 +147,7 @@ Notice that the `filterFn` passes through two arguments; `unencodedKey` and `key
 
 ```dart
 CachedQuery.instance.updateQuery<Todo>(
-  updateFn: (dynamic oldData){ 
+  updateFn: (dynamic oldData){
     if(oldData is Todo){
       return oldData?.copyWith(complete: true);
     }
