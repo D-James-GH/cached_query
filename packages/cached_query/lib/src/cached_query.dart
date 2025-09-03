@@ -147,16 +147,10 @@ class CachedQuery {
   }
 
   /// Find and return a list of [Query]'s matching a given condition.
-  List<Cacheable<Object?>>? whereQuery(
+  Iterable<Cacheable<Object?>>? whereQuery(
     WhereCallback findCallback,
   ) {
-    final List<Cacheable<Object?>> result = [];
-    for (final query in _queryCache.values) {
-      if (findCallback(query)) {
-        result.add(query);
-      }
-    }
-    return result.isNotEmpty ? result : null;
+    return _queryCache.values.where(findCallback);
   }
 
   /// Invalidate cache currently stored.
