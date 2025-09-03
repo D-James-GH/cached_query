@@ -142,6 +142,14 @@ sealed class InfiniteQueryStatus<T, Arg>
     if (data == null || data.pages.isEmpty) return null;
     return data.pages.first;
   }
+
+  /// Returns the current error if the query is in an error state.
+  dynamic get error {
+    return switch (this) {
+      InfiniteQueryError<T, Arg>(:final error) => error,
+      _ => null,
+    };
+  }
 }
 
 /// {@template InfiniteQueryInitial}
@@ -280,6 +288,7 @@ final class InfiniteQueryError<T, Arg> extends InfiniteQueryStatus<T, Arg> {
   /// Current error for the query.
   ///
   /// Equal to null if there is no error.
+  @override
   final dynamic error;
 
   /// The stack trace of the error.

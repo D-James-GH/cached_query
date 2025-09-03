@@ -99,6 +99,14 @@ sealed class QueryStatus<T> implements QueryState<T> {
 
   @override
   bool get isError => this is QueryError;
+
+  /// Returns the current error if the query is in an error state.
+  dynamic get error {
+    return switch (this) {
+      QueryError<T>(:final error) => error,
+      _ => null,
+    };
+  }
 }
 
 /// {@template QueryInitial}
@@ -207,8 +215,7 @@ class QueryError<T> extends QueryStatus<T> {
   final T? data;
 
   /// Current error for the query.
-  ///
-  /// Equal to null if there is no error.
+  @override
   final dynamic error;
 
   /// The stack trace of the error.
