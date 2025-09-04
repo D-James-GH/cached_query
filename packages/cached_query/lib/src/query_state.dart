@@ -68,7 +68,8 @@ sealed class QueryStatus<T> implements QueryState<T> {
   }) = QuerySuccess<T>;
 
   @override
-  QueryStatus<T> copyWithData(T data) {
+  QueryStatus<T> copyWithData(T data, [DateTime? timeCreated]) {
+    timeCreated ??= this.timeCreated;
     return switch (this) {
       QueryInitial<T>() => QueryInitial(timeCreated: timeCreated, data: data),
       QuerySuccess<T>() => QuerySuccess(timeCreated: timeCreated, data: data),

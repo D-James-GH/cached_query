@@ -24,9 +24,11 @@ final class StorageError extends ControllerAction {
 
 final class DataUpdated<T> extends ControllerAction {
   final T data;
-  DataUpdated({required this.data});
+  final DateTime timeCreated;
+  DataUpdated({required this.data, required this.timeCreated});
 }
 
+/// Called when the fetch is successful.
 final class Success<T> extends ControllerAction {
   final T data;
   final DateTime timeCreated;

@@ -192,8 +192,8 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
           );
         case StorageError(:final error):
           _onError?.call(error);
-        case DataUpdated(:final data):
-          _setState(state.copyWithData(data as T));
+        case DataUpdated(:final data, :final timeCreated):
+          _setState(state.copyWithData(data as T, timeCreated));
         case Success(:final data, :final timeCreated):
           _onSuccess?.call(data as T);
           _setState(

@@ -46,6 +46,9 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
         ),
       );
     },
+    onSuccess: (data) {
+      print("Posts fetched: ${data.pages.length} pages");
+    },
   );
 }
 
@@ -59,6 +62,28 @@ Query<PostModel> getPostById(int id) => Query(
         return PostModel.fromJson(
           jsonDecode(res.body) as Map<String, dynamic>,
         );
+      },
+      onSuccess: (data) {
+        print("Post $id fetched, updating cache");
+        CachedQuery.instance
+            .getQuery<InfiniteQuery<List<PostModel>, int>>("posts")
+            ?.update((old) {
+          old ??= InfiniteQueryData<List<PostModel>, int>(
+            pages: [],
+            args: [],
+          );
+          final pages = old.pages.map((page) {
+            final index = page.indexWhere((element) => element.id == data.id);
+            if (index == -1) return page;
+            final newPage = List<PostModel>.from(page);
+            newPage[index] = data;
+            return newPage;
+          }).toList();
+          return InfiniteQueryData<List<PostModel>, int>(
+            pages: pages,
+            args: old.args,
+          );
+        });
       },
     );
 

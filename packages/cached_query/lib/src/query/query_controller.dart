@@ -133,12 +133,11 @@ final class QueryController<T> {
   }
 
   void setData(T data) {
-    _setState(
-      ControllerState(
-        data: data,
-        timeCreated: state.timeCreated,
-      ),
+    state = ControllerState(
+      data: data,
+      timeCreated: state.timeCreated,
     );
+    _streamController.add(DataUpdated(data: state.data, timeCreated: state.timeCreated));
     _saveToStorage();
   }
 
@@ -196,7 +195,7 @@ final class QueryController<T> {
             data: storedData.data,
             timeCreated: storedData.createdAt,
           );
-          _streamController.add(DataUpdated(data: state.data));
+          _streamController.add(DataUpdated(data: state.data, timeCreated: state.timeCreated));
         }
       } catch (e, s) {
         _streamController.add(StorageError(error: e, stackTrace: s));
@@ -235,9 +234,6 @@ final class QueryController<T> {
 
   /// Sets the new state.
   void _setState(ControllerState<T> newState) {
-    state = newState;
-    _streamController
-        .add(Success(data: state.data, timeCreated: state.timeCreated));
     // for (final observer in _cache.observers) {
     //   observer.onChange(this as QueryBase, newState);
     // }
