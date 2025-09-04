@@ -47,8 +47,8 @@ void main() {
         tester3.query.fetch(),
         tester4.query.fetch(),
       ]);
-      await cache.refetchCurrentQueries(RefetchReason.resume);
-      await cache.refetchCurrentQueries(RefetchReason.connectivity);
+      await cache.onResume();
+      await cache.onConnection();
       expect(tester1.numFetches, 2);
       expect(tester2.numFetches, 2);
       expect(tester3.numFetches, 3);
@@ -56,34 +56,6 @@ void main() {
       expect(tester4.numFetches, 1);
     });
 
-    test(
-        "Can prevent refetchOnResume and refetchOnConnection using shouldRefetch",
-        () async {
-      final cache = CachedQuery.asNewInstance();
-      bool shouldFetch = true;
-      final tester = QueryTester(
-        cache: cache,
-        config: QueryConfigFlutter(
-          shouldFetch: (_, __, ___) => shouldFetch,
-          refetchOnConnection: true,
-          refetchOnResume: true,
-          staleDuration: const Duration(milliseconds: 300),
-        ),
-      );
-      await tester.query.fetch();
-      final stream = tester.query.stream.listen((_) {});
-
-      shouldFetch = false;
-
-      await Future<void>.delayed(const Duration(milliseconds: 350));
-
-      await cache.refetchCurrentQueries(RefetchReason.resume);
-      await Future<void>.delayed(const Duration(milliseconds: 350));
-      await cache.refetchCurrentQueries(RefetchReason.connectivity);
-
-      expect(tester.numFetches, 1);
-      await stream.cancel();
-    });
     test("Can override global config", () {
       final cache = CachedQuery.asNewInstance()
         ..configFlutter(

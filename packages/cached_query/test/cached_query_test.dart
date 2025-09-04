@@ -378,7 +378,7 @@ void main() {
     createQuery(key: "1");
     createQuery(key: "2");
     final queries = CachedQuery.instance.whereQuery((p) => p.key == "2");
-    expect(queries!.length, 1);
+    expect(queries.length, 1);
     expect(queries.first.key, "2");
   });
 }

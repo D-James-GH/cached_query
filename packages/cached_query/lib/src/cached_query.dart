@@ -147,7 +147,7 @@ class CachedQuery {
   }
 
   /// Find and return a list of [Query]'s matching a given condition.
-  Iterable<Cacheable<Object?>>? whereQuery(
+  Iterable<Cacheable<Object?>> whereQuery(
     WhereCallback findCallback,
   ) {
     return _queryCache.values.where(findCallback);

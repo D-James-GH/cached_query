@@ -46,9 +46,7 @@ extension CachedQueryExt on CachedQuery {
     _setupRefetchOnResume(minBackgroundDuration);
 
     if (!neverCheckConnection) {
-      ConnectivityController.instance.addListener(() {
-        refetchCurrentQueries(RefetchReason.connectivity);
-      });
+      ConnectivityController.instance.addListener(onConnection);
     }
   }
 
@@ -69,55 +67,61 @@ extension CachedQueryExt on CachedQuery {
   /// A query is considered on screen or active if it has listeners. If a reason
   /// is given then the individual query config will be checked and used to determine
   /// if a query should be re-fetched.
+  @Deprecated(
+    "Use invalidateCache instead, this now can refetch active queries. This method will be removed in a future release.",
+  )
   Future<void> refetchCurrentQueries([RefetchReason? reason]) async {
-    List<Cacheable<dynamic>>? queries;
-    final globalConfig = defaultConfig;
-    if (reason == RefetchReason.resume) {
-      queries = whereQuery((query) {
-        final config = switch (query) {
-          Query() => query.config,
-          InfiniteQuery() => query.config,
-        };
-        final globalResumeConfig = switch (globalConfig) {
-          GlobalQueryConfigFlutter() => globalConfig.refetchOnResume,
-          _ => defaultFlutterConfig.refetchOnResume
-        };
-        return switch (config) {
-          QueryConfigFlutter() => config.refetchOnResume,
-          _ => globalResumeConfig,
-        };
-      });
-    } else if (reason == RefetchReason.connectivity) {
-      final queries = whereQuery((query) {
-        final config = switch (query) {
-          Query() => query.config,
-          InfiniteQuery() => query.config,
-        };
-        final globalConnectionConfig = switch (globalConfig) {
-          GlobalQueryConfigFlutter() => globalConfig.refetchOnConnection,
-          _ => defaultFlutterConfig.refetchOnConnection
-        };
-        return switch (config) {
-          QueryConfigFlutter() => config.refetchOnConnection,
-          _ => globalConnectionConfig,
-        };
-      });
+    return invalidateCache();
+  }
 
-      if (queries != null) {
-        refetchQueries(
-          keys: queries.map((q) => q.unencodedKey).toList(),
-          refetchInactive: false,
-          ignoreStale: false,
-        );
+  ///
+  @visibleForTesting
+  Future<void> onResume() async {
+    final globalConfig = defaultConfig;
+    final queries = whereQuery((query) {
+      final config = switch (query) {
+        Query() => query.config,
+        InfiniteQuery() => query.config,
+      };
+      final globalResumeConfig = switch (globalConfig) {
+        GlobalQueryConfigFlutter() => globalConfig.refetchOnResume,
+        _ => defaultFlutterConfig.refetchOnResume
+      };
+      return switch (config) {
+        QueryConfigFlutter() => config.refetchOnResume,
+        _ => globalResumeConfig,
+      };
+    }).toList();
+    if (queries.isNotEmpty) {
+      for (final q in queries) {
+        q.fetch();
       }
     }
+  }
 
-    if (queries != null) {
-      await refetchQueries(
-        keys: queries.map((q) => q.unencodedKey).toList(),
-        refetchInactive: false,
-        ignoreStale: false,
-      );
+  ///
+  @visibleForTesting
+  Future<void> onConnection() async {
+    final globalConfig = defaultConfig;
+    final queries = whereQuery((query) {
+      final config = switch (query) {
+        Query() => query.config,
+        InfiniteQuery() => query.config,
+      };
+      final globalConnectionConfig = switch (globalConfig) {
+        GlobalQueryConfigFlutter() => globalConfig.refetchOnConnection,
+        _ => defaultFlutterConfig.refetchOnConnection
+      };
+      return switch (config) {
+        QueryConfigFlutter() => config.refetchOnConnection,
+        _ => globalConnectionConfig,
+      };
+    }).toList();
+
+    if (queries.isNotEmpty) {
+      for (final q in queries) {
+        q.fetch();
+      }
     }
   }
 
@@ -157,7 +161,7 @@ class _LifecycleObserver extends WidgetsBindingObserver {
       _lastPaused = null;
 
       if (shouldNotify) {
-        cache.refetchCurrentQueries(RefetchReason.resume);
+        cache.onResume();
       }
       return;
     }
