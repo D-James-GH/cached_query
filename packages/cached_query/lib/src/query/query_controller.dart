@@ -137,7 +137,8 @@ final class QueryController<T> {
       data: data,
       timeCreated: state.timeCreated,
     );
-    _streamController.add(DataUpdated(data: state.data, timeCreated: state.timeCreated));
+    _streamController
+        .add(DataUpdated(data: state.data, timeCreated: state.timeCreated));
     _saveToStorage();
   }
 
@@ -195,7 +196,9 @@ final class QueryController<T> {
             data: storedData.data,
             timeCreated: storedData.createdAt,
           );
-          _streamController.add(DataUpdated(data: state.data, timeCreated: state.timeCreated));
+          _streamController.add(
+            DataUpdated(data: state.data, timeCreated: state.timeCreated),
+          );
         }
       } catch (e, s) {
         _streamController.add(StorageError(error: e, stackTrace: s));
@@ -231,29 +234,6 @@ final class QueryController<T> {
       );
     }
   }
-
-  /// Sets the new state.
-  void _setState(ControllerState<T> newState) {
-    // for (final observer in _cache.observers) {
-    //   observer.onChange(this as QueryBase, newState);
-    // }
-    // _state = newState;
-    // switch (_state) {
-    //   case InfiniteQueryError(:final stackTrace) ||
-    //         QueryError(:final stackTrace):
-    //     for (final observer in _cache.observers) {
-    //       observer.onError(this as QueryBase, stackTrace);
-    //     }
-    //   default:
-    //     break;
-    // }
-    // _emit();
-  }
-
-  /// Emits the current state down the stream.
-  // void _emit() {
-  //   _streamController?.add(_state);
-  // }
 
   void _saveToStorage() {
     if (!config.storeQuery) return;
