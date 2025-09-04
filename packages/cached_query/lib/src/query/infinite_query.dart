@@ -254,6 +254,7 @@ final class InfiniteQuery<T, Arg>
           _onSuccess?.call(data as InfiniteQueryData<T, Arg>);
           _setState(
             InfiniteQueryStatus.success(
+              hasReachedMax: hasReachedMax(),
               data: data as InfiniteQueryData<T, Arg>,
               timeCreated: timeCreated,
             ),

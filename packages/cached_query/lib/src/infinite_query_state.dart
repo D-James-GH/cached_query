@@ -83,6 +83,7 @@ sealed class InfiniteQueryStatus<T, Arg>
   const factory InfiniteQueryStatus.success({
     required DateTime timeCreated,
     required InfiniteQueryData<T, Arg> data,
+    required bool hasReachedMax,
   }) = InfiniteQuerySuccess<T, Arg>;
 
   ///{@macro InfiniteQueryLoading}
@@ -248,9 +249,13 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
   @override
   final InfiniteQueryData<T, Arg> data;
 
+  /// True if there are no more pages to fetch.
+  final bool hasReachedMax;
+
   ///{@macro InfiniteQuerySuccess}
   const InfiniteQuerySuccess({
     required super.timeCreated,
+    required this.hasReachedMax,
     required this.data,
   });
 
@@ -260,10 +265,15 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       other is InfiniteQuerySuccess &&
           runtimeType == other.runtimeType &&
           data == other.data &&
+          hasReachedMax == other.hasReachedMax &&
           timeCreated == other.timeCreated;
 
   @override
-  int get hashCode => data.hashCode ^ timeCreated.hashCode;
+  int get hashCode =>
+      data.hashCode ^
+      timeCreated.hashCode ^
+      hasReachedMax.hashCode ^
+      timeCreated.hashCode;
 
   @override
   InfiniteQuerySuccess<T, Arg> copyWithData(InfiniteQueryData<T, Arg>? data) {
@@ -273,6 +283,7 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
     );
     return InfiniteQuerySuccess<T, Arg>(
       timeCreated: timeCreated,
+      hasReachedMax: hasReachedMax,
       data: data!,
     );
   }
