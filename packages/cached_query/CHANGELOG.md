@@ -1,3 +1,7 @@
+## 3.0.1
+
+ - **FIX**: errors for version 3 in readme. ([4b6029ca](https://github.com/D-James-GH/cached_query/commit/4b6029caaeb9f8ac4683d97d13be0442b4bac997))
+
 ## 3.0.0
 
  - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.

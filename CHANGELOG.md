@@ -11,6 +11,37 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 Packages with breaking changes:
 
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.1`](#cached_query---v301)
+ - [`cached_query_flutter` - `v3.0.1`](#cached_query_flutter---v301)
+ - [`cached_storage` - `v3.0.1`](#cached_storage---v301)
+
+---
+
+#### `cached_query` - `v3.0.1`
+
+ - **FIX**: errors for version 3 in readme. ([4b6029ca](https://github.com/D-James-GH/cached_query/commit/4b6029caaeb9f8ac4683d97d13be0442b4bac997))
+
+#### `cached_query_flutter` - `v3.0.1`
+
+ - **FIX**: errors for version 3 in readme. ([4b6029ca](https://github.com/D-James-GH/cached_query/commit/4b6029caaeb9f8ac4683d97d13be0442b4bac997))
+
+#### `cached_storage` - `v3.0.1`
+
+ - **FIX**: errors for version 3 in readme. ([4b6029ca](https://github.com/D-James-GH/cached_query/commit/4b6029caaeb9f8ac4683d97d13be0442b4bac997))
+
+
+## 2025-09-06
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
 - [`cached_query` - `v3.0.0`](#cached_query---v300)
 - [`cached_query_flutter` - `v3.0.0`](#cached_query_flutter---v300)
 - [`cached_storage` - `v3.0.0`](#cached_storage---v300)
