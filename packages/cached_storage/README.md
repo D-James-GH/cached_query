@@ -8,8 +8,8 @@ Built on top of [Sqflite](https://pub.dev/packages/sqflite).
 
 ## Features
 
-* Persist queries to disk
-* Accepts any json serializable data.
+- Persist queries to disk
+- Accepts any json serializable data.
 
 ## Getting started
 
@@ -29,9 +29,9 @@ Queries will then automatically be persisted.
 
 ## Serialization
 
-Cached Storage uses `jsonEncode` to convert the data of a query to json, which is then stored. If you are returning 
-dart objects from the `queryFn` you will need to serialized the json back into the dart object. To do this, pass a 
-`serilizer` to the QueryConfig which will be used to turn the stored data back into a dart object.
+Cached Storage uses `jsonEncode` to convert the data of a query to json, which is then stored. If you are returning
+dart objects from the `queryFn` you will need to serialized the json back into the dart object. To do this, pass a
+`storageDeserializer` to the QueryConfig which will be used to turn the stored data back into a dart object.
 
 ```dart
  Query<JokeModel>(
@@ -53,7 +53,6 @@ dart objects from the `queryFn` you will need to serialized the json back into t
   },
 );
 ```
-
 
 ## Additional information
 

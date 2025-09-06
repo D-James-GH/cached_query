@@ -105,7 +105,6 @@ QueryBuilder takes a query or infinite query and will call the builder method wh
   },
 ),
 /// For an infinite query
- Infinite
 QueryBuilder<InfiniteQueryStatus<JokeModel?>>(
   query: InfiniteQuery(
     key: "a query key",
