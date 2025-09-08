@@ -521,6 +521,28 @@ void main() {
         expect(e.toString(), "this is an error");
       }
     });
+    test("Rethrowing shouldn't break state systems", () async {
+      final cache = CachedQuery.asNewInstance()
+        ..config(config: GlobalQueryConfig(shouldRethrow: true));
+      Query<String>? query;
+      try {
+        query = Query<String>(
+          key: "rethrow",
+          cache: cache,
+          queryFn: () async {
+            throw "this is an error";
+          },
+        );
+        await query.fetch();
+        fail("Should throw");
+      } catch (e, stackTrack) {
+        expect(query!.state.isError, true);
+        expect(e.toString(), "this is an error");
+        expect(cache.getQuery("rethrow"), isNotNull);
+        expect(query.state.error, e);
+        expect(stackTrack, (query.state as QueryError).stackTrace);
+      }
+    });
     test("onError should be called", () async {
       String? error;
       final query = Query<String>(

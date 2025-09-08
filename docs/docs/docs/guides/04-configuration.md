@@ -39,10 +39,6 @@ By default, a query catches any error and emits it as part of the query state. H
 useful to have the query rethrow to quickly see the full stacktrace in the console, to do this set `shouldRethrow` to
 true.
 
-:::caution
-Using `shouldRethrow` can cause unexpected errors as it prevents most things from happening after an error has occurred.
-:::
-
 ### Should fetch
 
 Should fetch callback is rarely necessary but it can offer more flexibility on when a query should be fetched.

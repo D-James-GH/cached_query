@@ -287,9 +287,6 @@ can be set to rethrow any error it catches.
   );
 ```
 
-_:warning: Warning: This may cause some unexpected functionality in queries, so it is recommended to only use this as a development
-tool._
-
 ## Devtools Extension
 
 This package comes with a devtools extension. The data of a query must be serializable to be displayed.
