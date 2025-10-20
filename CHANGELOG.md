@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-10-20
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.2`](#cached_query---v302)
+ - [`cached_query_flutter` - `v3.0.2`](#cached_query_flutter---v302)
+ - [`cached_storage` - `v3.0.2`](#cached_storage---v302)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.2`
+
+---
+
+#### `cached_query` - `v3.0.2`
+
+ - **DOCS**: remove warning for rethrow, this should not effect state management since 3.0.0. ([6b966d8d](https://github.com/D-James-GH/cached_query/commit/6b966d8d59968659b43e10267ec980599f21ed68))
+
+#### `cached_query_flutter` - `v3.0.2`
+
+ - **FIX**: Check if query has active listeners before refetching on resume or connection ([#86](https://github.com/D-James-GH/cached_query/issues/86)). ([b09ab4c6](https://github.com/D-James-GH/cached_query/commit/b09ab4c65055f9dfe41dbf9cb6fef920aed24825))
+
+
 ## 2025-09-06
 
 ### Changes

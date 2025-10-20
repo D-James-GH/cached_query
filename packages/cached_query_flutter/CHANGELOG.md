@@ -1,3 +1,7 @@
+## 3.0.2
+
+ - **FIX**: Check if query has active listeners before refetching on resume or connection ([#86](https://github.com/D-James-GH/cached_query/issues/86)). ([b09ab4c6](https://github.com/D-James-GH/cached_query/commit/b09ab4c65055f9dfe41dbf9cb6fef920aed24825))
+
 ## 3.0.1
 
  - **FIX**: errors for version 3 in readme. ([4b6029ca](https://github.com/D-James-GH/cached_query/commit/4b6029caaeb9f8ac4683d97d13be0442b4bac997))

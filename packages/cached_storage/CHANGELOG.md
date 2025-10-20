@@ -1,3 +1,7 @@
+## 3.0.2
+
+ - Update a dependency to the latest release.
+
 ## 3.0.1
 
  - **FIX**: errors for version 3 in readme. ([4b6029ca](https://github.com/D-James-GH/cached_query/commit/4b6029caaeb9f8ac4683d97d13be0442b4bac997))
