@@ -79,6 +79,9 @@ extension CachedQueryExt on CachedQuery {
   Future<void> onResume() async {
     final globalConfig = defaultConfig;
     final queries = whereQuery((query) {
+      if (!query.hasListener) {
+        return false;
+      }
       final config = switch (query) {
         Query() => query.config,
         InfiniteQuery() => query.config,
@@ -104,6 +107,9 @@ extension CachedQueryExt on CachedQuery {
   Future<void> onConnection() async {
     final globalConfig = defaultConfig;
     final queries = whereQuery((query) {
+      if (!query.hasListener) {
+        return false;
+      }
       final config = switch (query) {
         Query() => query.config,
         InfiniteQuery() => query.config,
