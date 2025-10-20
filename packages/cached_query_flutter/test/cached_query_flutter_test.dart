@@ -70,4 +70,91 @@ void main() {
       expect((q.config as QueryConfigFlutter).refetchOnResume, true);
     });
   });
+  group("Refetch onConnection and resumed", () {
+    test('On connection will only fetch queries with listeners', () async {
+      final cache = CachedQuery.asNewInstance()..configFlutter();
+      int listenerFetches = 0;
+      final queryWithListener = Query<String>(
+        cache: cache,
+        key: "withListener",
+        queryFn: () async {
+          listenerFetches++;
+          return "data";
+        },
+        config: const QueryConfigFlutter(
+          staleDuration: Duration.zero,
+          refetchOnConnection: true,
+        ),
+      );
+      final subListener = queryWithListener.stream.listen((_) {});
+
+      int noListenerFetches = 0;
+      final queryWithoutListener = Query<String>(
+        cache: cache,
+        key: "withoutListener",
+        queryFn: () async {
+          noListenerFetches++;
+          return "data";
+        },
+        config: const QueryConfigFlutter(
+          staleDuration: Duration.zero,
+          refetchOnConnection: true,
+        ),
+      );
+      final subNoListener = queryWithoutListener.stream.listen((_) {});
+      await Future.wait([
+        queryWithListener.fetch(),
+        queryWithoutListener.fetch(),
+      ]);
+      await subNoListener.cancel();
+
+      await cache.onConnection();
+      expect(listenerFetches, 2);
+      expect(noListenerFetches, 1);
+      await subListener.cancel();
+    });
+
+    test("On resume will only fetch queries with listeners", () async {
+      final cache = CachedQuery.asNewInstance()..configFlutter();
+      int listenerFetches = 0;
+      final queryWithListener = Query<String>(
+        cache: cache,
+        key: "withListener",
+        queryFn: () async {
+          listenerFetches++;
+          return "data";
+        },
+        config: const QueryConfigFlutter(
+          staleDuration: Duration.zero,
+          refetchOnResume: true,
+        ),
+      );
+      final subListener = queryWithListener.stream.listen((_) {});
+
+      int noListenerFetches = 0;
+      final queryWithoutListener = Query<String>(
+        cache: cache,
+        key: "withoutListener",
+        queryFn: () async {
+          noListenerFetches++;
+          return "data";
+        },
+        config: const QueryConfigFlutter(
+          staleDuration: Duration.zero,
+          refetchOnResume: true,
+        ),
+      );
+      final subNoListener = queryWithoutListener.stream.listen((_) {});
+      await Future.wait([
+        queryWithListener.fetch(),
+        queryWithoutListener.fetch(),
+      ]);
+      await subNoListener.cancel();
+
+      await cache.onResume();
+      expect(listenerFetches, 2);
+      expect(noListenerFetches, 1);
+      await subListener.cancel();
+    });
+  });
 }
