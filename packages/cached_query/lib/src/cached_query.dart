@@ -306,4 +306,14 @@ class CachedQuery {
     return _queryCache.values
         .where((element) => filter(element.unencodedKey, element.key));
   }
+
+  /// Dispose all queries and clear the cache.
+  /// Not recommended to call this manually. Unless you are removing the entire
+  /// cache from memory.
+  Future<void> dispose() async {
+    await Future.wait(
+      _queryCache.values.map((q) => q.dispose()),
+    );
+    _queryCache = {};
+  }
 }

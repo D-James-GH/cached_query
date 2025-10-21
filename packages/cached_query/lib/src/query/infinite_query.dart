@@ -208,6 +208,12 @@ final class InfiniteQuery<T, Arg>
     );
   }
 
+  @override
+  Future<void> dispose() async {
+    await _controller.dispose();
+    await _stateSubject.close();
+  }
+
   void _setState(InfiniteQueryStatus<T, Arg> state) {
     final observers = _controller._cache.observers;
     for (final observer in observers) {

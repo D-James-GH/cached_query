@@ -108,6 +108,9 @@ final class QueryController<T> {
 
   bool _hasListener = false;
 
+  ///
+  bool get hasListener => _hasListener;
+
   Stream<ControllerAction> get stream => _streamController.stream;
 
   final CachedQuery _cache;
@@ -313,5 +316,14 @@ final class QueryController<T> {
   /// Closes the stream and therefore starts the delete timer.
   Future<void> close() async {
     await _streamController.close();
+  }
+
+  Future<void> dispose() async {
+    if (_deleteQueryTimer?.isActive ?? false) {
+      _deleteQueryTimer!.cancel();
+      _deleteQueryTimer = null;
+    }
+    await close();
+    deleteQuery();
   }
 }

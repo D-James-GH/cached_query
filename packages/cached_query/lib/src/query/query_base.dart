@@ -36,4 +36,10 @@ sealed class Cacheable<State> {
     bool refetchActive,
     bool refetchInactive,
   });
+
+  /// Dispose the query. Cleans up streams and timers.
+  /// Generally it is not necessary to call this manually.
+  ///
+  /// Note: this will delete it from cache.
+  Future<void> dispose();
 }

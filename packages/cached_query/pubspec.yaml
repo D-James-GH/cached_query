@@ -18,3 +18,4 @@ dependencies:
 dev_dependencies:
   test: ^1.25.15
   flutter_lints: ^5.0.0
+  fake_async: ^1.3.3

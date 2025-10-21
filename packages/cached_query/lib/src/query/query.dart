@@ -150,6 +150,12 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     _controller.deleteQuery(deleteStorage: deleteStorage);
   }
 
+  @override
+  Future<void> dispose() async {
+    await _controller.dispose();
+    await _stateSubject.close();
+  }
+
   late final BehaviorSubject<QueryStatus<T>> _stateSubject;
   final OnQuerySuccessCallback<T>? _onSuccess;
   final OnQueryErrorCallback? _onError;
