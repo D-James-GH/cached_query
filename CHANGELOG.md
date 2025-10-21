@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-10-21
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.0.3`](#cached_query---v303)
+ - [`cached_query_flutter` - `v3.0.3`](#cached_query_flutter---v303)
+ - [`cached_storage` - `v3.0.3`](#cached_storage---v303)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.0.3`
+ - `cached_storage` - `v3.0.3`
+
+---
+
+#### `cached_query` - `v3.0.3`
+
+ - **FIX**: added dispose to clean up pending timers. ([8ee29b1d](https://github.com/D-James-GH/cached_query/commit/8ee29b1dd9fb4e55552b03202b973ebcfa944d64))
+
+
 ## 2025-10-20
 
 ### Changes

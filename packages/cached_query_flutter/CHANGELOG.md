@@ -1,3 +1,7 @@
+## 3.0.3
+
+ - Update a dependency to the latest release.
+
 ## 3.0.2
 
  - **FIX**: Check if query has active listeners before refetching on resume or connection ([#86](https://github.com/D-James-GH/cached_query/issues/86)). ([b09ab4c6](https://github.com/D-James-GH/cached_query/commit/b09ab4c65055f9dfe41dbf9cb6fef920aed24825))

@@ -1,3 +1,7 @@
+## 3.0.3
+
+ - **FIX**: added dispose to clean up pending timers. ([8ee29b1d](https://github.com/D-James-GH/cached_query/commit/8ee29b1dd9fb4e55552b03202b973ebcfa944d64))
+
 ## 3.0.2
 
  - **DOCS**: remove warning for rethrow, this should not effect state management since 3.0.0. ([6b966d8d](https://github.com/D-James-GH/cached_query/commit/6b966d8d59968659b43e10267ec980599f21ed68))
