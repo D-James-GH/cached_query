@@ -15,11 +15,12 @@ void main() {
 
       expect(query, queryFromCache);
     });
-    test("One query is created per key", () {
-      final query1 = Query(key: "query created", queryFn: fetchFunction);
+    test("One query controller is created per key", () {
+      final _ = Query(key: "query created", queryFn: fetchFunction)
+        ..setData("changed");
       final query2 = Query(key: "query created", queryFn: fetchFunction);
 
-      expect(query1, same(query2));
+      expect(query2.state.data, "changed");
     });
     test("Query should de-duplicate requests", () async {
       int fetchCount = 0;
@@ -612,11 +613,6 @@ void main() {
   });
   group("Caching Query", () {
     tearDownAll(cachedQuery.deleteCache);
-    test("Two keys retrieve the same instance", () {
-      final query1 = Query(key: "same", queryFn: fetchFunction);
-      final query2 = Query(key: "same", queryFn: fetchFunction);
-      expect(query1, same(query2));
-    });
     test("Pass a cache to add query to", () {
       final cache = CachedQuery.asNewInstance();
       final query = Query(
@@ -630,17 +626,23 @@ void main() {
     test("Two queries same cache", () async {
       final cache = CachedQuery.asNewInstance();
       const key = "sameCache";
+
       final query1 = Query(
         key: key,
-        queryFn: fetchFunction,
+        queryFn: () async => TestObject(),
         cache: cache,
       );
+      await query1.fetch();
+
       final query2 = Query(
         key: key,
-        queryFn: fetchFunction,
         cache: cache,
+        queryFn: () async => TestObject(),
       );
-      expect(query1, same(query2));
+
+      await query2.fetch();
+
+      expect(query1.state.data, same(query2.state.data));
     });
     test("Can pass CachedQuery for separation", () async {
       final cache = CachedQuery.asNewInstance();

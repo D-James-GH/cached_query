@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cached_query/cached_query.dart';
 
+class TestObject {}
+
 int _serial = 0;
 const testQueryRes = 'result';
 Query<String> createQuery({

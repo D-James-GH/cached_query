@@ -45,6 +45,25 @@ void main() async {
       expect(initialQuery.data!.pages.first, "initialData");
     });
   });
+  group("Get next page", () {
+    test("Can get next page", () async {
+      final cache = CachedQuery.asNewInstance();
+      final query = InfiniteQuery<String, int>(
+        key: "getNext",
+        cache: cache,
+        queryFn: repo.getPosts,
+        getNextArg: (state) {
+          if (state == null) return 1;
+          return (state.pages.length) + 1;
+        },
+      );
+      await query.fetch();
+      await query.getNextPage();
+
+      expect(query.state.data?.pages.length, 2);
+      expect(query.state.data?.args.length, 2);
+    });
+  });
   group("Infinite query as a future", () {
     test("Should return an infinite query", () async {
       final cache = CachedQuery.asNewInstance();
@@ -224,7 +243,7 @@ void main() async {
 
       final cache = CachedQuery.asNewInstance();
       final query = InfiniteQuery<String, int>(
-        key: "refetch list",
+        key: "refetchNotFirstPage",
         cache: cache,
         config: QueryConfig(
           staleDuration: Duration.zero,
@@ -310,11 +329,13 @@ void main() async {
       expect(page1, page2);
     });
     test("revalidating resets the timestamp", () async {
+      final cache = CachedQuery.asNewInstance();
       final query = InfiniteQuery<String, int>(
-        key: "refetch list",
+        key: "different_time",
         config: QueryConfig(
           staleDuration: Duration.zero,
         ),
+        cache: cache,
         getNextArg: (state) => (state?.pages.length ?? 0) + 1,
         queryFn: (page) {
           final randomNum = Random().nextInt(1000);
@@ -779,9 +800,9 @@ void main() async {
   });
 
   group("Caching Query", () {
-    test("Two keys retrieve the same instance", () {
+    test("Two keys retrieve the same instance of cached data", () {
       final cache = CachedQuery.asNewInstance();
-      Future<String> queryFunction(int page) => Future.value("data");
+      Future<TestObject> queryFunction(int page) => Future.value(TestObject());
       final query1 = InfiniteQuery(
         cache: cache,
         key: "same",
@@ -794,7 +815,7 @@ void main() async {
         queryFn: queryFunction,
         getNextArg: (_) => 1,
       );
-      expect(query1, same(query2));
+      expect(query1.state.data, same(query2.state.data));
     });
     test("Pass a cache to add query to", () {
       final cache = CachedQuery.asNewInstance();
@@ -806,28 +827,6 @@ void main() async {
         cache: cache,
       );
       expect(cache.getQuery("cacheInstance1"), query);
-    });
-
-    test("Two queries in same cache are the same", () {
-      Future<String> queryFunction(int page) => Future.value("data");
-      final cache = CachedQuery.asNewInstance();
-      const key = "differentCaches";
-
-      final query1 = InfiniteQuery(
-        key: key,
-        queryFn: queryFunction,
-        getNextArg: (_) => 1,
-        cache: cache,
-      );
-
-      final query2 = InfiniteQuery(
-        key: key,
-        queryFn: queryFunction,
-        getNextArg: (_) => 1,
-        cache: cache,
-      );
-
-      expect(query1, same(query2));
     });
 
     test("Can pass CachedQuery for separation", () async {

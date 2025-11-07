@@ -51,44 +51,52 @@ final class InfiniteQuery<T, Arg>
       (prefetchPages ?? 0) >= 0,
       "Prefetch pages must be greater than or equal to 0",
     );
+
     cache = cache ?? CachedQuery.instance;
-    var query = cache.getQuery<InfiniteQuery<T, Arg>>(key);
+    final existingQuery = cache.getQuery<InfiniteQuery<T, Arg>>(key);
+
     assert(
-      query is InfiniteQuery<T, Arg> || query == null,
+      existingQuery is InfiniteQuery<T, Arg> || existingQuery == null,
       "Query found with key $key is not an InfiniteQuery<$T, $Arg>",
     );
-    query = query;
 
-    if (query == null) {
-      final queryKey = encodeKey(key);
+    config ??= QueryConfig<InfiniteQueryData<T, Arg>>();
+    config = config.mergeWithGlobal(cache.defaultConfig);
 
-      final controller = QueryController(
-        cache: cache,
-        key: queryKey,
-        unencodedKey: key,
-        initialData: initialData,
-        onFetch: infiniteFetch<T, Arg>(
-          getNextArg: getNextArg,
-          onPageRefetched: onPageRefetched,
-          queryFn: queryFn,
-          initialArg: getNextArg(initialData),
-        ),
-        config: config,
-      );
+    final encodedKey = encodeKey(key);
 
-      query = InfiniteQuery<T, Arg>._internal(
-        controller: controller,
-        getNextArg: getNextArg,
-        onError: onError,
-        onSuccess: onSuccess,
-      );
-      cache.addQuery(query);
-
-      if (prefetchPages != null) {
-        controller.fetch(
-          options: InfiniteFetchOptions(prefetchPages: prefetchPages),
+    final controller = existingQuery?._controller ??
+        QueryController(
+          cache: cache,
+          key: encodedKey,
+          unencodedKey: key,
+          initialData: Option.fromNullable(initialData),
+          onFetch: InfiniteFetch<T, Arg>(
+            getNextArg: getNextArg,
+            onPageRefetched: onPageRefetched,
+            queryFn: queryFn,
+            initialArg: getNextArg(initialData),
+          ),
+          config: config,
         );
-      }
+    final query = InfiniteQuery<T, Arg>._internal(
+      controller: controller,
+      config: config,
+      getNextArg: getNextArg,
+      onError: onError,
+      onSuccess: onSuccess,
+    );
+
+    if (existingQuery == null) {
+      cache.addQuery(query);
+    } else if (controller._config != config) {
+      controller.updateConfig(config);
+    }
+    if (prefetchPages != null && controller.state.data.isNone) {
+      controller.fetch(
+        ignoreStale: true,
+        options: InfiniteFetchOptions(prefetchPages: prefetchPages),
+      );
     }
 
     return query;
@@ -97,6 +105,7 @@ final class InfiniteQuery<T, Arg>
   InfiniteQuery._internal({
     required GetNextArg<T, Arg> getNextArg,
     required QueryController<InfiniteQueryData<T, Arg>> controller,
+    required this.config,
     OnQueryErrorCallback? onError,
     OnQuerySuccessCallback<InfiniteQueryData<T, Arg>>? onSuccess,
   })  : _getNextArg = getNextArg,
@@ -105,37 +114,43 @@ final class InfiniteQuery<T, Arg>
         _controller = controller {
     _state = InfiniteQueryStatus.initial(
       timeCreated: controller.state.timeCreated,
-      data: controller.state.data,
+      data: controller.state.data.valueOrNull,
     );
     _stateSubject = BehaviorSubject.seeded(
       state,
       onListen: () {
         controller
-          ..addListener()
+          ..addListener(this)
           ..fetch(options: InfiniteFetchOptions());
       },
       onCancel: () {
-        controller.removeListener();
+        controller.removeListener(this);
       },
     );
     _init();
   }
 
   @override
+  final QueryConfig<InfiniteQueryData<T, Arg>> config;
+
+  @override
   String get key => _controller.key;
+
   @override
   Object get unencodedKey => _controller.unencodedKey;
 
-  /// The config for this specific query.
-  QueryConfig<InfiniteQueryData<T, Arg>> get config => _controller.config;
   late InfiniteQueryStatus<T, Arg> _state;
   @override
   InfiniteQueryStatus<T, Arg> get state => _state;
 
   @override
   Stream<InfiniteQueryStatus<T, Arg>> get stream => _stateSubject.stream;
+
   @override
-  bool get stale => _controller.stale;
+  bool get stale {
+    return _controller.isStaleOrInvalidated(config.staleDuration);
+  }
+
   @override
   bool get hasListener => _stateSubject.hasListener;
 
@@ -148,8 +163,21 @@ final class InfiniteQuery<T, Arg>
 
   @override
   Future<InfiniteQueryStatus<T, Arg>> fetch() async {
+    if (!stale) {
+      return state;
+    }
+    _controller.addListener(this);
     await _controller.fetch(options: InfiniteFetchOptions());
-    return _state;
+    if (!hasListener) {
+      _controller.removeListener(this);
+    }
+
+    if (state case InfiniteQueryError(:final stackTrace, :final error)
+        when config.shouldRethrow) {
+      Error.throwWithStackTrace(error as Object, stackTrace);
+    }
+
+    return state;
   }
 
   /// Fetch the query as a future.
@@ -175,9 +203,10 @@ final class InfiniteQuery<T, Arg>
 
   @override
   Future<InfiniteQueryStatus<T, Arg>> refetch() async {
-    await _controller.fetch(
-      forceRefetch: true,
-      options: InfiniteFetchOptions(),
+    await invalidate(
+      refetchInactive: true,
+      // ignore: avoid_redundant_argument_values
+      refetchActive: true,
     );
     return _state;
   }
@@ -185,7 +214,7 @@ final class InfiniteQuery<T, Arg>
   /// Get the next page in an [InfiniteQuery] and cache the result.
   Future<InfiniteQueryStatus<T, Arg>?> getNextPage() async {
     await _controller.fetch(
-      forceRefetch: true,
+      ignoreStale: true,
       options: InfiniteFetchOptions(direction: InfiniteQueryDirection.forward),
     );
     return state;
@@ -255,16 +284,26 @@ final class InfiniteQuery<T, Arg>
         case StorageError(:final error):
           _onError?.call(error);
         case DataUpdated(:final data):
-          _setState(state.copyWithData(data as InfiniteQueryData<T, Arg>));
+          _setState(state.copyWithData(data));
         case Success(:final data, :final timeCreated):
-          _onSuccess?.call(data as InfiniteQueryData<T, Arg>);
-          _setState(
-            InfiniteQueryStatus.success(
-              hasReachedMax: hasReachedMax(),
-              data: data as InfiniteQueryData<T, Arg>,
-              timeCreated: timeCreated,
-            ),
-          );
+          switch (data) {
+            case Some<InfiniteQueryData<T, Arg>>(:final value):
+              _onSuccess?.call(value);
+              _setState(
+                InfiniteQueryStatus.success(
+                  hasReachedMax: hasReachedMax(),
+                  data: value,
+                  timeCreated: timeCreated,
+                ),
+              );
+            case None<InfiniteQueryData<T, Arg>>():
+              _setState(
+                InfiniteQueryStatus.initial(
+                  timeCreated: timeCreated,
+                  data: state.data,
+                ),
+              );
+          }
       }
     });
   }

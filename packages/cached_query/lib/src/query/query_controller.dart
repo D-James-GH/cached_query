@@ -18,12 +18,19 @@ class FetchOptions {
   const FetchOptions();
 }
 
+abstract interface class FetchFunction<T> {
+  Future<T> call({
+    required FetchOptions options,
+    T? state,
+  });
+}
+
 /// {@template controllerState}
 /// Internal state for the query controller.
 /// {@endtemplate}
 class ControllerState<T> {
   /// The data of the query.
-  final T? data;
+  final Option<T> data;
 
   /// The time the query was last fetched.
   final DateTime timeCreated;
@@ -44,23 +51,22 @@ final class QueryController<T> {
     required this.key,
     required this.unencodedKey,
     required this.onFetch,
-    required T? initialData,
-    required QueryConfig<T>? config,
+    required Option<T>? initialData,
+    required ControllerOptions<T> config,
     required CachedQuery cache,
   })  : _cache = cache,
+        _config = config,
         state = ControllerState(
           timeCreated: DateTime.now(),
-          data: initialData,
-        ) {
-    config ??= QueryConfig<T>();
-    this.config = config.mergeWithGlobal(cache.defaultConfig);
-  }
+          data: initialData ?? Option.none(),
+        );
+
+  ControllerOptions<T> _config;
+  ControllerOptions<T> get config => _config;
+  final List<Cacheable<QueryState<T>>> _listeners = [];
 
   /// The function that is called when the query is fetched.
-  final Future<T> Function({
-    required FetchOptions options,
-    T? state,
-  }) onFetch;
+  final FetchFunction<T> onFetch;
 
   /// The current state of the query.
   ControllerState<T> state;
@@ -75,43 +81,52 @@ final class QueryController<T> {
 
   bool _invalidated = false;
 
-  /// Whether the current query is marked as stale and therefore requires a
-  /// refetch.
-  bool get stale {
-    final currentTime = DateTime.now();
-    final staleTime = state.timeCreated.add(config.staleDuration);
-    return staleTime.isBefore(currentTime) ||
-        state.data == null ||
-        _invalidated;
+  bool isInvalidated() {
+    return _invalidated || state.data.isNone;
   }
 
-  /// The config for this specific query.
-  late final QueryConfig<T> config;
+  bool isStaleOrInvalidated(Duration duration) {
+    return isInvalidated() || isStaleFromDuration(duration);
+  }
+
+  bool isStaleFromDuration(Duration duration) {
+    final currentTime = DateTime.now();
+    final staleTime = state.timeCreated.add(duration);
+    return staleTime.isBefore(currentTime);
+  }
+
+  bool _isStale() {
+    if (isInvalidated()) {
+      return true;
+    }
+    return _listeners.any((q) {
+      return q.stale;
+    });
+  }
 
   /// Fetches the query.
   Future<void> fetch({
-    bool forceRefetch = false,
+    bool ignoreStale = false,
     FetchOptions options = const FetchOptions(),
   }) async {
     _resetDeleteTimer();
 
     _currentFuture ??= _createResult(
-      forceRefetch: forceRefetch,
+      ignoreStale: ignoreStale,
       options: options,
     );
     await _currentFuture;
   }
 
   /// Broadcast stream controller that reacts to changes to the query state
-  final StreamController<ControllerAction> _streamController =
-      StreamController(sync: true);
-
-  bool _hasListener = false;
+  final BehaviorSubject<ControllerAction<T>> _streamController =
+      BehaviorSubject(sync: true);
 
   ///
-  bool get hasListener => _hasListener;
+  bool get isActive => _listeners.any((q) => q.hasListener);
+  bool get hasListeners => _listeners.isNotEmpty;
 
-  Stream<ControllerAction> get stream => _streamController.stream;
+  Stream<ControllerAction<T>> get stream => _streamController.stream;
 
   final CachedQuery _cache;
   Timer? _deleteQueryTimer;
@@ -131,17 +146,22 @@ final class QueryController<T> {
   /// The [updateFn] passes the current query data and must return new data of
   /// the same type as the original query/infiniteQuery.
   void update(UpdateFunc<T> updateFn) {
-    final newData = updateFn(state.data);
+    final newData = updateFn(state.data.valueOrNull);
     return setData(newData);
   }
 
+  void updateConfig(ControllerOptions<T> config) {
+    _config = config;
+  }
+
   void setData(T data) {
+    final newData = Some(data);
     state = ControllerState(
-      data: data,
+      data: newData,
       timeCreated: state.timeCreated,
     );
     _streamController
-        .add(DataUpdated(data: state.data, timeCreated: state.timeCreated));
+        .add(DataUpdated(data: newData.value, timeCreated: state.timeCreated));
     _saveToStorage();
   }
 
@@ -154,11 +174,11 @@ final class QueryController<T> {
     bool refetchInactive = false,
     FetchOptions options = const FetchOptions(),
   }) async {
-    if ((_hasListener && refetchActive) || refetchInactive) {
-      return fetch(forceRefetch: true, options: options);
+    markAsStale();
+    if ((isActive && refetchActive) || refetchInactive) {
+      return fetch(options: options);
     }
 
-    markAsStale();
     return Future.value();
   }
 
@@ -168,39 +188,53 @@ final class QueryController<T> {
   }
 
   /// Add a new query listener.
-  void addListener() {
+  void addListener(Cacheable<QueryState<T>> query) {
+    if (!_listeners.contains(query)) {
+      _listeners.add(query);
+    }
     _cancelDelete();
-    _hasListener = true;
   }
 
   /// Removes a listener from the query.
-  void removeListener() {
-    _hasListener = false;
-    _scheduleDelete();
+  void removeListener(Cacheable<QueryState<T>> query) {
+    _listeners.remove(query);
+    if (_listeners.isEmpty) {
+      _scheduleDelete();
+    }
   }
 
   Future<void> _createResult({
-    required bool forceRefetch,
+    required bool ignoreStale,
     required FetchOptions options,
   }) async {
-    if ((!stale && !forceRefetch) ||
-        !config.shouldFetch(key, state.data, state.timeCreated)) {
+    final shouldFetch = _listeners.every(
+      (q) {
+        final config = q.config as QueryConfig<T>;
+        return config.shouldFetch(
+          key,
+          state.data.valueOrNull,
+          state.timeCreated,
+        );
+      },
+    );
+    if (!shouldFetch) {
       return;
     }
     _streamController.add(
-      Fetch(fetchOptions: options, isInitialFetch: state.data == null),
+      Fetch(fetchOptions: options, isInitialFetch: state.data.isNone),
     );
-    final getFromStorage = state.data == null && config.storeQuery;
+    final getFromStorage = state.data.isNone && _config.storeQuery;
     if (getFromStorage) {
       try {
         final storedData = await _fetchFromStorage();
         if (storedData != null) {
+          final newData = Some(storedData.data);
           state = ControllerState(
-            data: storedData.data,
+            data: newData,
             timeCreated: storedData.createdAt,
           );
           _streamController.add(
-            DataUpdated(data: state.data, timeCreated: state.timeCreated),
+            DataUpdated(data: newData.value, timeCreated: state.timeCreated),
           );
         }
       } catch (e, s) {
@@ -208,49 +242,66 @@ final class QueryController<T> {
       }
     }
 
-    final shouldContinue =
-        config.shouldFetch(key, state.data, state.timeCreated);
+    final shouldContinue = _listeners.every(
+      (q) {
+        final config = q.config as QueryConfig<T>;
+        return config.shouldFetch(
+          key,
+          state.data.valueOrNull,
+          state.timeCreated,
+        );
+      },
+    );
 
-    if ((stale || forceRefetch) && shouldContinue) {
+    // Data from storage may be considered fresh, so we need to check if the query is stale.
+    final stale = _isStale();
+
+    if ((stale || ignoreStale) && shouldContinue) {
       try {
-        final res = await onFetch(options: options, state: state.data);
-        state = ControllerState(data: res, timeCreated: DateTime.now());
+        final res =
+            await onFetch(options: options, state: state.data.valueOrNull);
+        final newData = Some(res);
+        state = ControllerState(
+          data: newData,
+          timeCreated: DateTime.now(),
+        );
         _streamController.add(
-          Success(data: state.data, timeCreated: state.timeCreated),
+          Success(data: newData, timeCreated: state.timeCreated),
         );
         _saveToStorage();
-        if (!_hasListener) {
+        if (!isActive) {
           _scheduleDelete();
         }
       } catch (e, s) {
         _streamController.add(FetchError(error: e, stackTrace: s));
-        if (!_hasListener) {
+        if (!isActive) {
           _scheduleDelete();
-        }
-        if (config.shouldRethrow) {
-          rethrow;
         }
       }
     } else {
       _streamController.add(
+        // Nothing has failed but the data might be missing.
+        // Maybe emit the option type and let the query handle it?
         Success(data: state.data, timeCreated: state.timeCreated),
       );
     }
   }
 
   void _saveToStorage() {
-    if (!config.storeQuery) return;
+    if (!_config.storeQuery) return;
     final data = state.data;
-    if (_cache.storage != null && data != null) {
-      final dataToStore = switch (config.storageSerializer) {
-        null => data,
-        _ => config.storageSerializer!(data),
+    if (_cache.storage == null) return;
+
+    if (data case Some(:final value)) {
+      final dataToStore = switch (_config.storageSerializer) {
+        null => value,
+        _ => _config.storageSerializer!(value)
       };
       final storedQuery = StoredQuery(
         key: key,
         data: dataToStore,
         createdAt: state.timeCreated,
-        storageDuration: config.storageDuration,
+        storageDuration: _config.storageDuration,
       );
       _cache.storage!.put(storedQuery);
     }
@@ -266,7 +317,7 @@ final class QueryController<T> {
 
     // In-case the developer changes the storage duration in the code.
     final expiryHasChanged =
-        storedData?.storageDuration != config.storageDuration;
+        storedData?.storageDuration != _config.storageDuration;
 
     if (storedData == null ||
         storedData.isExpired ||
@@ -277,8 +328,8 @@ final class QueryController<T> {
 
     dynamic data = storedData.data;
 
-    if (config.storageDeserializer != null) {
-      data = config.storageDeserializer!(storedData.data);
+    if (_config.storageDeserializer != null) {
+      data = _config.storageDeserializer!(storedData.data);
     }
 
     assert(
@@ -295,8 +346,8 @@ final class QueryController<T> {
 
   /// After the [_cacheTime] is up remove the query from the global cache.
   void _scheduleDelete() {
-    if (!config.ignoreCacheDuration) {
-      _deleteQueryTimer = Timer(config.cacheDuration, deleteQuery);
+    if (!_config.ignoreCacheDuration) {
+      _deleteQueryTimer = Timer(_config.cacheDuration, deleteQuery);
     }
   }
 
@@ -309,7 +360,7 @@ final class QueryController<T> {
   void _resetDeleteTimer() {
     if (_deleteQueryTimer?.isActive ?? false) {
       _deleteQueryTimer!.cancel();
-      _deleteQueryTimer = Timer(config.cacheDuration, deleteQuery);
+      _deleteQueryTimer = Timer(_config.cacheDuration, deleteQuery);
     }
   }
 

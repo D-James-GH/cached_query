@@ -1,4 +1,5 @@
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/query/_query.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:test/test.dart';
 
@@ -11,19 +12,24 @@ void main() {
         final controller = QueryController<String>(
           key: "dispose",
           unencodedKey: "dispose",
-          onFetch: ({required options, state}) async => "data",
+          onFetch: QueryFetchFunction(queryFn: () async => "data"),
           initialData: null,
           config: QueryConfig(cacheDuration: const Duration(seconds: 5)),
           cache: cache,
         );
 
-        expect(controller.hasListener, isFalse);
+        final query = Query<String>.build(
+          controller,
+          QueryConfig(),
+        );
 
-        controller.addListener();
+        expect(controller.hasListeners, isFalse);
 
-        expect(controller.hasListener, isTrue);
+        controller.addListener(query);
 
-        controller.removeListener();
+        expect(controller.hasListeners, isTrue);
+
+        controller.removeListener(query);
 
         expect(async.pendingTimers.length, 1);
 

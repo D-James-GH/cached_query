@@ -1,3 +1,5 @@
+import 'package:cached_query/src/query/controller_options.dart';
+
 import '../cached_query.dart';
 
 /// {@template QueryConfig.ShouldRefetch}
@@ -68,6 +70,35 @@ class GlobalQueryConfig {
   ///{@macro QueryConfig.ShouldFetch}
   final ShouldFetch<dynamic>? shouldFetch;
 
+  /// {@template QueryConfig.refetchOnResume}
+  /// Whether this query should be re-fetched when the app comes into the foreground
+  ///
+  /// Defaults to true.
+  ///
+  /// Only effective when TODO:
+  /// {@endtemplate}
+  final bool refetchOnResume;
+
+  /// {@template QueryConfig.refetchOnResumeMinBackgroundDuration}
+  /// How long the app needs to stay in the background before refetching the
+  /// query if [refetchOnResume] is true.
+  ///
+  /// Defaults to 5 seconds.
+  ///
+  /// Note:
+  /// Some Android devices with miss-configured settings appear to trigger
+  /// foreground and background events in quick succession while being
+  /// constantly in the foreground.
+  /// Having a value greater than 500ms will prevent those devices from
+  /// refetching the query on these kinds of sketchy events.
+  /// {@endtemplate}
+  final Duration refetchOnResumeMinBackgroundDuration;
+
+  /// Whether this query should be re-fetched when the device gains connection
+  ///
+  /// Defaults to true.
+  final bool refetchOnConnection;
+
   /// {@macro queryConfig}
   ///
   /// {@macro QueryConfig.storageSerializer}
@@ -97,6 +128,9 @@ class GlobalQueryConfig {
     Duration? staleDuration,
     this.cacheDuration = const Duration(minutes: 5),
     this.shouldRethrow = false,
+    this.refetchOnResume = true,
+    this.refetchOnResumeMinBackgroundDuration = const Duration(seconds: 5),
+    this.refetchOnConnection = true,
   }) : staleDuration =
             staleDuration ?? refetchDuration ?? const Duration(seconds: 4);
 
@@ -124,8 +158,12 @@ class GlobalQueryConfig {
 
 /// {@template queryConfig}
 /// [QueryConfig] is used to configure a [Query].
+///
+/// The [QueryConfig] will be merged with the global config specified in the
+/// instance of cache for that specific query.
+///
 /// {@endtemplate}
-class QueryConfig<Data> {
+class QueryConfig<Data> implements ControllerOptions<Data> {
   /// {@macro QueryConfig.staleDuration}
   Duration get staleDuration => _staleDuration ?? _defaultConfig.staleDuration;
   final Duration? _staleDuration;
@@ -133,12 +171,15 @@ class QueryConfig<Data> {
   final bool? _storeQuery;
 
   /// {@macro QueryConfig.storeQuery}
+  @override
   bool get storeQuery => _storeQuery ?? _defaultConfig.storeQuery;
 
   /// {@macro QueryConfig.storageDuration}
+  @override
   final Duration? storageDuration;
 
   /// {@macro QueryConfig.cacheDuration}
+  @override
   Duration get cacheDuration => _cacheDuration ?? _defaultConfig.cacheDuration;
   final Duration? _cacheDuration;
 
@@ -147,12 +188,15 @@ class QueryConfig<Data> {
   final bool? _shouldRethrow;
 
   /// {@macro QueryConfig.storageSerializer}
+  @override
   final Serializer<Data>? storageSerializer;
 
   /// {@macro QueryConfig.storageDeserializer}
+  @override
   final Deserializer<Data>? storageDeserializer;
 
   /// {@macro QueryConfig.ignoreCacheDuration}
+  @override
   bool get ignoreCacheDuration =>
       _ignoreCacheDuration ?? _defaultConfig.ignoreCacheDuration;
   final bool? _ignoreCacheDuration;
@@ -161,6 +205,16 @@ class QueryConfig<Data> {
 
   ///{@macro QueryConfig.ShouldFetch}
   ShouldFetch<Data> get shouldFetch => _shouldFetch ?? (_, __, ___) => true;
+
+  /// {@macro QueryConfig.refetchOnResume}
+  bool get refetchOnResume =>
+      _refetchOnResume ?? _defaultConfig.refetchOnResume;
+  final bool? _refetchOnResume;
+
+  /// {@macro QueryConfig.refetchOnConnection}
+  bool get refetchOnConnection =>
+      _refetchOnConnection ?? _defaultConfig.refetchOnConnection;
+  final bool? _refetchOnConnection;
 
   /// {@macro queryConfig}
   ///
@@ -193,12 +247,16 @@ class QueryConfig<Data> {
     Duration? staleDuration,
     Duration? cacheDuration,
     bool? shouldRethrow,
+    bool? refetchOnResume,
+    bool? refetchOnConnection,
   })  : _storeQuery = storeQuery,
         _shouldFetch = shouldFetch,
         _ignoreCacheDuration = ignoreCacheDuration,
         _staleDuration = staleDuration,
         _shouldRethrow = shouldRethrow,
-        _cacheDuration = cacheDuration;
+        _cacheDuration = cacheDuration,
+        _refetchOnResume = refetchOnResume,
+        _refetchOnConnection = refetchOnConnection;
 
   /// Merges the global config with the local config.
   QueryConfig<Data> mergeWithGlobal(GlobalQueryConfig global) {
@@ -212,6 +270,8 @@ class QueryConfig<Data> {
       staleDuration: _staleDuration ?? global.staleDuration,
       cacheDuration: _cacheDuration ?? global.cacheDuration,
       shouldRethrow: _shouldRethrow ?? global.shouldRethrow,
+      refetchOnResume: _refetchOnResume ?? global.refetchOnResume,
+      refetchOnConnection: _refetchOnConnection ?? global.refetchOnConnection,
     );
   }
 
@@ -226,7 +286,9 @@ class QueryConfig<Data> {
           shouldRethrow == other.shouldRethrow &&
           storageDeserializer == other.storageDeserializer &&
           storageSerializer == other.storageSerializer &&
-          ignoreCacheDuration == other.ignoreCacheDuration;
+          ignoreCacheDuration == other.ignoreCacheDuration &&
+          refetchOnResume == other.refetchOnResume &&
+          refetchOnConnection == other.refetchOnConnection;
 
   @override
   int get hashCode =>
@@ -235,5 +297,7 @@ class QueryConfig<Data> {
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^
       storageDeserializer.hashCode ^
-      ignoreCacheDuration.hashCode;
+      ignoreCacheDuration.hashCode ^
+      refetchOnResume.hashCode ^
+      refetchOnConnection.hashCode;
 }

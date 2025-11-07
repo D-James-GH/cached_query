@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/query/_query.dart';
 import 'package:cached_query/src/util/encode_key.dart';
 import 'package:meta/meta.dart';
 
@@ -35,7 +36,7 @@ class CachedQuery {
 
   GlobalQueryConfig _config = GlobalQueryConfig();
 
-  Map<String, Cacheable<dynamic>> _queryCache = {};
+  final QueryCache _queryCache = QueryCache();
 
   StorageInterface? _storage;
 
@@ -107,10 +108,7 @@ class CachedQuery {
   /// Get a [Query] at a given key.
   QueryType? getQuery<QueryType extends Cacheable<dynamic>>(Object key) {
     final k = encodeKey(key);
-    if (_queryCache.containsKey(k)) {
-      return _queryCache[k] as QueryType?;
-    }
-    return null;
+    return _queryCache.get<QueryType>(k);
   }
 
   /// Update the data of an [Query] at a given key.
@@ -125,15 +123,16 @@ class CachedQuery {
       key != null || filterFn != null,
       "key or filterFn must not be null",
     );
-    List<Cacheable<dynamic>> queries = [];
+    List<Cacheable<Object?>> queries = [];
     if (filterFn != null) {
       queries = _filterQueryKey(filter: filterFn).toList();
     } else if (key != null) {
-      final query = getQuery(key);
+      final query = _queryCache.get(encodeKey(key));
       if (query != null) {
         queries.add(query);
       }
     }
+
     for (final query in queries) {
       switch (query) {
         case Query():
@@ -150,7 +149,7 @@ class CachedQuery {
   Iterable<Cacheable<Object?>> whereQuery(
     WhereCallback findCallback,
   ) {
-    return _queryCache.values.where(findCallback);
+    return _queryCache.where((cacheable) => findCallback(cacheable));
   }
 
   /// Invalidate cache currently stored.
@@ -175,18 +174,18 @@ class CachedQuery {
       key == null || filterFn == null,
       "Cannot pass both key and filterFn",
     );
-    List<Cacheable<dynamic>> queries = [];
+    late Iterable<Cacheable<dynamic>> queries;
 
     if (filterFn != null) {
       queries = _filterQueryKey(filter: filterFn).toList();
     } else if (key != null) {
       final k = encodeKey(key);
-      if (_queryCache.containsKey(k) && _queryCache[k] != null) {
-        queries = [_queryCache[k]!];
+      if (_queryCache.containsKey(k)) {
+        queries = [_queryCache.get(k)!];
       }
     } else {
       // invalidate the whole cache
-      queries = _queryCache.values.toList();
+      queries = _queryCache.getAll();
     }
 
     return Future.wait(
@@ -214,7 +213,7 @@ class CachedQuery {
     if (filterFn != null) {
       final queries = _filterQueryKey(filter: filterFn).toList();
       for (final query in queries) {
-        _queryCache.remove(query.key);
+        _queryCache.removeByKey(query.key);
         if (deleteStorage && storage != null) {
           storage!.delete(query.key);
         }
@@ -222,14 +221,14 @@ class CachedQuery {
     } else if (key != null) {
       final stringKey = encodeKey(key);
       if (_queryCache.containsKey(stringKey)) {
-        _queryCache.remove(stringKey);
+        _queryCache.removeByKey(stringKey);
       }
       if (deleteStorage && storage != null) {
         storage!.delete(stringKey);
       }
     } else {
       // other wise invalidate the whole cache
-      _queryCache = {};
+      _queryCache.removeAll();
       if (deleteStorage && storage != null) {
         storage!.deleteAll();
       }
@@ -255,7 +254,7 @@ class CachedQuery {
 
     if (keys == null && filterFn == null) {
       queries.addAll(
-        _queryCache.values.where(
+        _queryCache.where(
           (q) =>
               (refetchActive && q.hasListener) ||
               (refetchInactive && !q.hasListener),
@@ -275,7 +274,7 @@ class CachedQuery {
         for (final key in keys) {
           final k = encodeKey(key);
           if (_queryCache.containsKey(k)) {
-            final query = _queryCache[k]!;
+            final query = _queryCache.get(k)!;
             if ((refetchActive && query.hasListener) ||
                 (refetchInactive && !query.hasListener)) {
               queries.add(query);
@@ -284,8 +283,9 @@ class CachedQuery {
         }
       }
     }
+
     await Future.wait(
-      queries.map((q) => ignoreStale ? q.refetch() : q.fetch()),
+      queries.where((q) => ignoreStale || q.stale).map((q) => q.refetch()),
     );
   }
 
@@ -293,17 +293,19 @@ class CachedQuery {
   ///
   /// Shouldn't normally need to add a query manually. Queries are automatically
   /// added to the cache when they are constructed.
-  void addQuery(Cacheable<QueryState<dynamic>> query) {
-    for (final ob in observers) {
-      ob.onQueryCreation(query);
+  void addQuery(Cacheable<dynamic> query) {
+    if (!_queryCache.containsKey(query.key)) {
+      for (final ob in observers) {
+        ob.onQueryCreation(query);
+      }
     }
-    _queryCache[query.key] = query;
+    _queryCache.add(query);
   }
 
   Iterable<Cacheable<Object?>> _filterQueryKey({
     required KeyFilterFunc filter,
   }) {
-    return _queryCache.values
+    return _queryCache
         .where((element) => filter(element.unencodedKey, element.key));
   }
 
@@ -312,8 +314,8 @@ class CachedQuery {
   /// cache from memory.
   Future<void> dispose() async {
     await Future.wait(
-      _queryCache.values.map((q) => q.dispose()),
+      _queryCache.map((q) => q.dispose()),
     );
-    _queryCache = {};
+    _queryCache.removeAll();
   }
 }

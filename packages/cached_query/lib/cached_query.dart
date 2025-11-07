@@ -1,5 +1,5 @@
 export './src/cached_query.dart';
-export "./src/query/_query.dart";
+export "./src/query/_query.dart" hide QueryCache, QueryFetchFunction;
 export 'src/devtools_observer.dart';
 export 'src/mutation/mutation_cache.dart';
 export 'src/mutation/mutation_state.dart';

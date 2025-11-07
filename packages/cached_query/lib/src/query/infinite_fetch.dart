@@ -1,3 +1,5 @@
+// ignore_for_file: public_member_api_docs
+
 import 'package:cached_query/src/query/_query.dart';
 import 'package:cached_query/src/query_state.dart';
 
@@ -84,16 +86,30 @@ typedef InfiniteFetchFunc<T, Arg> = Future<InfiniteQueryData<T, Arg>> Function({
   InfiniteQueryData<T, Arg>? state,
 });
 
+/// {@template infiniteFetch}
 /// Function to fetch and refetch an infinite query.
-InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
-  required GetNextArg<T, Arg> getNextArg,
-  required OnPageRefetched<T, Arg>? onPageRefetched,
-  required InfiniteQueryFunc<T, Arg> queryFn,
-  required Arg? initialArg,
-}) {
-  return ({
-    required options,
-    state,
+/// {@endtemplate}
+/// Function to fetch and refetch an infinite query.
+class InfiniteFetch<T, Arg>
+    implements FetchFunction<InfiniteQueryData<T, Arg>> {
+  final GetNextArg<T, Arg> getNextArg;
+  final OnPageRefetched<T, Arg>? onPageRefetched;
+  final InfiniteQueryFunc<T, Arg> queryFn;
+  final Arg? initialArg;
+
+  /// {@macro infiniteFetch}
+  InfiniteFetch({
+    required this.getNextArg,
+    required this.onPageRefetched,
+    required this.queryFn,
+    required this.initialArg,
+  });
+
+  ///
+  @override
+  Future<InfiniteQueryData<T, Arg>> call({
+    required FetchOptions options,
+    InfiniteQueryData<T, Arg>? state,
   }) async {
     assert(
       options is InfiniteFetchOptions,
@@ -129,7 +145,7 @@ InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
         );
 
         if (onPageRefetched != null) {
-          final continueFetching = onPageRefetched(res, result, state);
+          final continueFetching = onPageRefetched!(res, result, state);
           if (continueFetching != null) {
             result = continueFetching;
             break;
@@ -161,5 +177,5 @@ InfiniteFetchFunc<T, Arg> infiniteFetch<T, Arg>({
           args: [arg, ...state.args],
         ),
     };
-  };
+  }
 }

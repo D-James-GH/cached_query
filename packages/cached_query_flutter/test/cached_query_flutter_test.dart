@@ -67,7 +67,7 @@ void main() {
         queryFn: () async => "",
         config: const QueryConfigFlutter(refetchOnResume: true),
       );
-      expect((q.config as QueryConfigFlutter).refetchOnResume, true);
+      expect(q.config.refetchOnResume, true);
     });
   });
   group("Refetch onConnection and resumed", () {
