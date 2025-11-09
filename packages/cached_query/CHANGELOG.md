@@ -1,3 +1,7 @@
+## 3.1.0-dev.0
+
+ - **FEAT**: allow for changing of config by having multiple queries attaching to one controller ([#88](https://github.com/D-James-GH/cached_query/issues/88)). ([fecf0f4a](https://github.com/D-James-GH/cached_query/commit/fecf0f4a2ed53460bf70b8da64044cecac994c9b))
+
 ## 3.0.3
 
  - **FIX**: added dispose to clean up pending timers. ([8ee29b1d](https://github.com/D-James-GH/cached_query/commit/8ee29b1dd9fb4e55552b03202b973ebcfa944d64))

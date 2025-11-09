@@ -15,6 +15,39 @@ Packages with breaking changes:
 
 Packages with other changes:
 
+ - [`cached_query` - `v3.1.0-dev.0`](#cached_query---v310-dev0)
+ - [`cached_query_flutter` - `v3.1.0-dev.0`](#cached_query_flutter---v310-dev0)
+ - [`cached_storage` - `v3.0.4-dev.0`](#cached_storage---v304-dev0)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_storage` - `v3.0.4-dev.0`
+
+---
+
+#### `cached_query` - `v3.1.0-dev.0`
+
+ - **FEAT**: allow for changing of config by having multiple queries attaching to one controller ([#88](https://github.com/D-James-GH/cached_query/issues/88)). ([fecf0f4a](https://github.com/D-James-GH/cached_query/commit/fecf0f4a2ed53460bf70b8da64044cecac994c9b))
+
+#### `cached_query_flutter` - `v3.1.0-dev.0`
+
+ - **FEAT**: allow for changing of config by having multiple queries attaching to one controller ([#88](https://github.com/D-James-GH/cached_query/issues/88)). ([fecf0f4a](https://github.com/D-James-GH/cached_query/commit/fecf0f4a2ed53460bf70b8da64044cecac994c9b))
+
+
+## 2025-11-09
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
  - [`cached_query_flutter` - `v3.0.4`](#cached_query_flutter---v304)
 
 ---
