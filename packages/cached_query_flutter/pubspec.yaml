@@ -16,7 +16,7 @@ dependencies:
   flutter:
     sdk: flutter
   cached_query: ^3.0.3
-  connectivity_plus: ^6.1.1
+  connectivity_plus: ^7.0.0
 
 dev_dependencies:
   flutter_lints: ^3.0.0

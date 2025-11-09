@@ -2,7 +2,7 @@ name: full
 description: A new Flutter project.
 
 # Prevent accidental publishing to pub.dev.
-publish_to: 'none'
+publish_to: "none"
 
 version: 1.0.0+1
 
@@ -16,6 +16,8 @@ dependencies:
   http: ^1.1.0
   meta: ^1.9.1
   json_annotation: ^4.8.1
+  connectivity_plus: ^7.0.0
+
   freezed_annotation: ^2.4.1
   cached_query_flutter:
     path: ../../packages/cached_query_flutter
