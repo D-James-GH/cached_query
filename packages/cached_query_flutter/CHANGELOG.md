@@ -1,3 +1,7 @@
+## 3.0.4
+
+ - **FIX**: update connectivity dep. ([d61dc4b6](https://github.com/D-James-GH/cached_query/commit/d61dc4b6350f9802fb1d21de7683eec6d908d501))
+
 ## 3.0.3
 
  - Update a dependency to the latest release.

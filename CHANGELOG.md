@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-11-09
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query_flutter` - `v3.0.4`](#cached_query_flutter---v304)
+
+---
+
+#### `cached_query_flutter` - `v3.0.4`
+
+ - **FIX**: update connectivity dep. ([d61dc4b6](https://github.com/D-James-GH/cached_query/commit/d61dc4b6350f9802fb1d21de7683eec6d908d501))
+
+
 ## 2025-10-21
 
 ### Changes
