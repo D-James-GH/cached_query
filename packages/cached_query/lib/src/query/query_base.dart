@@ -42,4 +42,7 @@ sealed class Cacheable<State> {
   ///
   /// Note: this will delete it from cache.
   Future<void> dispose();
+
+  /// Query config
+  QueryConfig<Object?> get config;
 }

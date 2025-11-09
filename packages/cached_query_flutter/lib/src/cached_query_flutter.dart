@@ -77,7 +77,6 @@ extension CachedQueryExt on CachedQuery {
   ///
   @visibleForTesting
   Future<void> onResume() async {
-    final globalConfig = defaultConfig;
     final queries = whereQuery((query) {
       if (!query.hasListener) {
         return false;
@@ -86,14 +85,7 @@ extension CachedQueryExt on CachedQuery {
         Query() => query.config,
         InfiniteQuery() => query.config,
       };
-      final globalResumeConfig = switch (globalConfig) {
-        GlobalQueryConfigFlutter() => globalConfig.refetchOnResume,
-        _ => defaultFlutterConfig.refetchOnResume
-      };
-      return switch (config) {
-        QueryConfigFlutter() => config.refetchOnResume,
-        _ => globalResumeConfig,
-      };
+      return config.refetchOnResume;
     }).toList();
     if (queries.isNotEmpty) {
       for (final q in queries) {
@@ -105,7 +97,6 @@ extension CachedQueryExt on CachedQuery {
   ///
   @visibleForTesting
   Future<void> onConnection() async {
-    final globalConfig = defaultConfig;
     final queries = whereQuery((query) {
       if (!query.hasListener) {
         return false;
@@ -114,14 +105,7 @@ extension CachedQueryExt on CachedQuery {
         Query() => query.config,
         InfiniteQuery() => query.config,
       };
-      final globalConnectionConfig = switch (globalConfig) {
-        GlobalQueryConfigFlutter() => globalConfig.refetchOnConnection,
-        _ => defaultFlutterConfig.refetchOnConnection
-      };
-      return switch (config) {
-        QueryConfigFlutter() => config.refetchOnConnection,
-        _ => globalConnectionConfig,
-      };
+      return config.refetchOnConnection;
     }).toList();
 
     if (queries.isNotEmpty) {

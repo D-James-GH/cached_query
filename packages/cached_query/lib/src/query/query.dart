@@ -3,6 +3,19 @@ part of '_query.dart';
 /// The result of the [QueryFunc] will be cached.
 typedef QueryFunc<T> = Future<T> Function();
 
+///
+class QueryFetchFunction<T> implements FetchFunction<T> {
+  ///
+  QueryFetchFunction({required this.queryFn});
+
+  ///
+  final Future<T> Function() queryFn;
+  @override
+  Future<T> call({required FetchOptions options, T? state}) {
+    return queryFn();
+  }
+}
+
 /// {@template query}
 /// [Query] is will fetch and cache the response of the [queryFn].
 ///
@@ -34,53 +47,67 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     CachedQuery? cache,
   }) {
     cache = cache ?? CachedQuery.instance;
-    var query = cache.getQuery<Query<T>>(key);
+    final existingQuery = cache.getQuery<Query<T>>(key);
+    config ??= QueryConfig<T>();
+    config = config.mergeWithGlobal(cache.defaultConfig);
+    final encodedKey = encodeKey(key);
 
-    // if query is null check the storage
-    if (query == null) {
-      final encodedKey = encodeKey(key);
-      final controller = QueryController(
-        cache: cache,
-        key: encodedKey,
-        unencodedKey: key,
-        initialData: initialData,
-        onFetch: ({required options, state}) {
-          return queryFn();
-        },
-        config: config,
-      );
+    final controller = existingQuery?._controller ??
+        QueryController(
+          cache: cache,
+          key: encodedKey,
+          unencodedKey: key,
+          initialData:
+              initialData == null ? Option<T>.none() : Option.some(initialData),
+          onFetch: QueryFetchFunction(queryFn: queryFn),
+          config: config,
+        );
 
-      query = Query<T>._internal(
-        onError: onError,
-        onSuccess: onSuccess,
-        controller: controller,
-      );
-      cache.addQuery(query);
+    final query = Query<T>._internal(
+      onError: onError,
+      onSuccess: onSuccess,
+      controller: controller,
+      config: config,
+    );
+
+    cache.addQuery(query);
+
+    if (controller._config != config) {
+      controller.updateConfig(config);
     }
-
     return query;
+  }
+
+  /// Build a query without adding it to the cache.
+  @visibleForTesting
+  factory Query.build(QueryController<T> controller, QueryConfig<T> config) {
+    return Query._internal(
+      controller: controller,
+      config: config,
+    );
   }
 
   Query._internal({
     OnQueryErrorCallback? onError,
     OnQuerySuccessCallback<T>? onSuccess,
     required QueryController<T> controller,
+    required this.config,
   })  : _onError = onError,
         _onSuccess = onSuccess,
         _controller = controller {
     _state = QueryInitial(
       timeCreated: controller.state.timeCreated,
-      data: controller.state.data,
+      data: controller.state.data.valueOrNull,
     );
     _stateSubject = BehaviorSubject.seeded(
       state,
       onListen: () {
         controller
-          ..addListener()
-          ..fetch(options: FetchOptions());
+          ..addListener(this)
+          ..fetch();
       },
       onCancel: () {
-        controller.removeListener();
+        controller.removeListener(this);
       },
     );
     _init();
@@ -92,7 +119,8 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   Object get unencodedKey => _controller.unencodedKey;
 
   /// The config for this specific query.
-  QueryConfig<T> get config => _controller.config;
+  @override
+  final QueryConfig<T> config;
 
   late QueryStatus<T> _state;
 
@@ -103,14 +131,29 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   Stream<QueryStatus<T>> get stream => _stateSubject.stream;
 
   @override
-  bool get stale => _controller.stale;
+  bool get stale {
+    return _controller.isStaleOrInvalidated(config.staleDuration);
+  }
 
   @override
   bool get hasListener => _stateSubject.hasListener;
 
   @override
   Future<QueryStatus<T>> fetch() async {
+    if (!stale) {
+      return state;
+    }
+    _controller.addListener(this);
     await _controller.fetch();
+    if (!hasListener) {
+      _controller.removeListener(this);
+    }
+
+    if (state case QueryError(:final stackTrace, :final error)
+        when config.shouldRethrow) {
+      Error.throwWithStackTrace(error as Object, stackTrace);
+    }
+
     return state;
   }
 
@@ -120,7 +163,7 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
 
   @override
   Future<QueryStatus<T>> refetch() async {
-    await _controller.fetch(forceRefetch: true);
+    await _controller.invalidate(refetchInactive: true);
     return state;
   }
 
@@ -199,15 +242,22 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
         case StorageError(:final error):
           _onError?.call(error);
         case DataUpdated(:final data, :final timeCreated):
-          _setState(state.copyWithData(data as T, timeCreated));
+          _setState(state.copyWithData(data, timeCreated));
         case Success(:final data, :final timeCreated):
-          _onSuccess?.call(data as T);
-          _setState(
-            QueryStatus.success(
-              timeCreated: timeCreated,
-              data: data as T,
-            ),
-          );
+          switch (data) {
+            case None():
+              _setState(
+                QueryStatus.initial(timeCreated: timeCreated, data: state.data),
+              );
+            case Some(:final value):
+              _onSuccess?.call(value);
+              _setState(
+                QueryStatus.success(
+                  timeCreated: timeCreated,
+                  data: value,
+                ),
+              );
+          }
       }
     });
   }
