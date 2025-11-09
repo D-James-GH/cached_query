@@ -45,5 +45,4 @@ sealed class Cacheable<State> {
 
   /// Query config
   QueryConfig<Object?> get config;
-
 }
