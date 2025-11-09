@@ -9,8 +9,8 @@ funding:
   - https://github.com/sponsors/D-James-GH
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
-  flutter: ">=3.0.0 <4.0.0"
+  sdk: ">=3.0.0"
+  flutter: ">=3.0.0"
 
 dependencies:
   flutter:
