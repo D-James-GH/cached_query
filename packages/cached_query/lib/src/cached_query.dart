@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cached_query/cached_query.dart';
 import 'package:cached_query/src/query/_query.dart';
+import 'package:cached_query/src/resume_controller.dart';
 import 'package:cached_query/src/util/encode_key.dart';
 import 'package:meta/meta.dart';
 
@@ -48,6 +49,7 @@ class CachedQuery {
 
   /// Whether global configs have been set.
   bool get isConfigSet => _configSet;
+  ResumeController? _resumeController;
 
   // This class should not be instantiated manually.
   CachedQuery._();
@@ -86,6 +88,7 @@ class CachedQuery {
     StorageInterface? storage,
     GlobalQueryConfig? config,
     List<QueryObserver>? observers,
+    Stream<AppState>? lifecycleStream,
   }) {
     assert(_configSet == false, "Config defaults must only be set once.");
     if (_configSet) return;
@@ -97,6 +100,12 @@ class CachedQuery {
     _configSet = true;
     if (observers != null) {
       this.observers = observers;
+    }
+    if (lifecycleStream != null) {
+      _resumeController = ResumeController(
+        cache: this,
+        lifecycleStream: lifecycleStream,
+      );
     }
 
     assert(() {
@@ -309,13 +318,31 @@ class CachedQuery {
         .where((element) => filter(element.unencodedKey, element.key));
   }
 
+  final List<FutureOr<void> Function()> _disposeListeners = [];
+
+  /// Add a listener that is called when this cache is disposed.
+  void addDisposeListener(FutureOr<void> Function() listener) {
+    _disposeListeners.add(listener);
+  }
+
+  /// Remove a dispose listener.
+  void removeDisposeListener(FutureOr<void> Function() listener) {
+    _disposeListeners.remove(listener);
+  }
+
   /// Dispose all queries and clear the cache.
   /// Not recommended to call this manually. Unless you are removing the entire
   /// cache from memory.
   Future<void> dispose() async {
     await Future.wait(
+      _disposeListeners.map((l) {
+        return Future.value(l());
+      }),
+    );
+    await Future.wait(
       _queryCache.map((q) => q.dispose()),
     );
+    await _resumeController?.dispose();
     _queryCache.removeAll();
   }
 }

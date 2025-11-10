@@ -1,7 +1,6 @@
-import 'dart:io';
-
 import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:cached_query_flutter/src/connectivity_controller.dart';
+import 'package:cached_query_flutter/src/lifecycle_stream_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -34,16 +33,21 @@ extension CachedQueryExt on CachedQuery {
     StorageInterface? storage,
     GlobalQueryConfigFlutter config = const GlobalQueryConfigFlutter(),
     List<QueryObserver>? observers,
+    Stream<AppState>? lifecycleStream,
   }) {
+    if (lifecycleStream == null) {
+      final lifecycleController = LifecycleStreamController(this);
+      lifecycleStream = lifecycleController.stream;
+      addDisposeListener(() async {
+        await lifecycleController.dispose();
+      });
+    }
     this.config(
       config: config,
       storage: storage,
       observers: observers,
+      lifecycleStream: lifecycleStream,
     );
-
-    final minBackgroundDuration = config.refetchOnResumeMinBackgroundDuration;
-
-    _setupRefetchOnResume(minBackgroundDuration);
 
     if (!neverCheckConnection) {
       ConnectivityController.instance.addListener(onConnection);
@@ -76,26 +80,6 @@ extension CachedQueryExt on CachedQuery {
 
   ///
   @visibleForTesting
-  Future<void> onResume() async {
-    final queries = whereQuery((query) {
-      if (!query.hasListener) {
-        return false;
-      }
-      final config = switch (query) {
-        Query() => query.config,
-        InfiniteQuery() => query.config,
-      };
-      return config.refetchOnResume;
-    }).toList();
-    if (queries.isNotEmpty) {
-      for (final q in queries) {
-        q.fetch();
-      }
-    }
-  }
-
-  ///
-  @visibleForTesting
   Future<void> onConnection() async {
     final queries = whereQuery((query) {
       if (!query.hasListener) {
@@ -112,52 +96,6 @@ extension CachedQueryExt on CachedQuery {
       for (final q in queries) {
         q.fetch();
       }
-    }
-  }
-
-  /// If the app comes back into the foreground refetch any queries that have listeners.
-  void _setupRefetchOnResume(Duration minBackgroundDuration) {
-    WidgetsBinding.instance
-        .addObserver(_LifecycleObserver(this, minBackgroundDuration));
-  }
-}
-
-class _LifecycleObserver extends WidgetsBindingObserver {
-  final CachedQuery cache;
-  final Duration minBackgroundDuration;
-
-  _LifecycleObserver(this.cache, this.minBackgroundDuration);
-
-  DateTime? _lastPaused;
-
-  bool shouldNotify() {
-    if (_lastPaused == null) {
-      if (!kIsWeb && (Platform.isIOS || Platform.isAndroid)) {
-        return false;
-      }
-      // Note: Other platforms might never enter full background mode so we
-      // return true to be safe (only if we have no last paused time).
-      return true;
-    }
-
-    final diff = DateTime.now().difference(_lastPaused!);
-    return diff > minBackgroundDuration;
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      final shouldNotify = this.shouldNotify();
-      _lastPaused = null;
-
-      if (shouldNotify) {
-        cache.onResume();
-      }
-      return;
-    }
-
-    if (state == AppLifecycleState.paused) {
-      _lastPaused = DateTime.now();
     }
   }
 }

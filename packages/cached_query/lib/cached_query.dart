@@ -9,3 +9,4 @@ export 'src/query_logging_observer.dart';
 export 'src/query_observer.dart';
 export 'src/query_state.dart';
 export 'src/storage_interface.dart';
+export "src/resume_controller.dart" show AppState;
