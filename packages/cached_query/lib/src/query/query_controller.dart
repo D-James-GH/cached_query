@@ -104,29 +104,13 @@ final class QueryController<T> {
     });
   }
 
-  /// Fetches the query.
-  Future<void> fetch({
-    bool ignoreStale = false,
-    FetchOptions options = const FetchOptions(),
-  }) async {
-    _resetDeleteTimer();
-
-    _currentFuture ??= _createResult(
-      ignoreStale: ignoreStale,
-      options: options,
-    );
-    await _currentFuture;
-  }
-
-  /// Broadcast stream controller that reacts to changes to the query state
-  final BehaviorSubject<ControllerAction<T>> _streamController =
-      BehaviorSubject(sync: true);
+  final _streamController = StateStreamController<ControllerAction<T>>();
 
   ///
   bool get isActive => _listeners.any((q) => q.hasListener);
   bool get hasListeners => _listeners.isNotEmpty;
 
-  Stream<ControllerAction<T>> get stream => _streamController.stream;
+  Stream<Event<ControllerAction<T>>> get stream => _streamController.stream;
 
   final CachedQuery _cache;
   Timer? _deleteQueryTimer;
@@ -139,6 +123,20 @@ final class QueryController<T> {
       _currentFuture = null;
       _invalidated = false;
     });
+  }
+
+  /// Fetches the query.
+  Future<void> fetch({
+    bool ignoreStale = false,
+    FetchOptions options = const FetchOptions(),
+  }) async {
+    _resetDeleteTimer();
+
+    _currentFuture ??= _createResult(
+      ignoreStale: ignoreStale,
+      options: options,
+    );
+    await _currentFuture;
   }
 
   /// Update the current query data.

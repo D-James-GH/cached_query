@@ -63,6 +63,10 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
           config: config,
         );
 
+    if (existingQuery != null && config == existingQuery.config) {
+      return existingQuery;
+    }
+
     final query = Query<T>._internal(
       onError: onError,
       onSuccess: onSuccess,
@@ -204,12 +208,14 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   final OnQueryErrorCallback? _onError;
   final QueryController<T> _controller;
 
-  void _setState(QueryStatus<T> state) {
-    final observers = _controller._cache.observers;
-    for (final observer in observers) {
-      observer.onChange(this, state);
-      if (state case QueryError(:final stackTrace)) {
-        observer.onError(this, stackTrace);
+  void _setState(QueryStatus<T> state, {required bool notifyObservers}) {
+    if (notifyObservers) {
+      final observers = _controller._cache.observers;
+      for (final observer in observers) {
+        observer.onChange(this, state);
+        if (state case QueryError(:final stackTrace)) {
+          observer.onError(this, stackTrace);
+        }
       }
     }
 
@@ -218,47 +224,60 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   }
 
   void _init() {
-    _controller.stream.listen((action) {
-      switch (action) {
-        case Fetch(:final isInitialFetch):
-          _setState(
-            QueryStatus.loading(
-              data: state.data,
-              timeCreated: state.timeCreated,
-              isRefetching: !isInitialFetch,
-              isInitialFetch: isInitialFetch,
-            ),
-          );
-        case FetchError(:final error, :final stackTrace):
-          _onError?.call(error);
-          _setState(
-            QueryStatus.error(
-              timeCreated: state.timeCreated,
-              data: state.data,
-              stackTrace: stackTrace,
-              error: error,
-            ),
-          );
-        case StorageError(:final error):
-          _onError?.call(error);
-        case DataUpdated(:final data, :final timeCreated):
-          _setState(state.copyWithData(data, timeCreated));
-        case Success(:final data, :final timeCreated):
-          switch (data) {
-            case None():
-              _setState(
-                QueryStatus.initial(timeCreated: timeCreated, data: state.data),
-              );
-            case Some(:final value):
-              _onSuccess?.call(value);
-              _setState(
-                QueryStatus.success(
-                  timeCreated: timeCreated,
-                  data: value,
-                ),
-              );
-          }
-      }
-    });
+    _controller.stream.listen(_handleAction);
+  }
+
+  void _handleAction(Event<ControllerAction<T>> event) {
+    final notifyObservers = event is DataEvent<ControllerAction<T>>;
+    switch (event.value) {
+      case Fetch(:final isInitialFetch):
+        _setState(
+          QueryStatus.loading(
+            data: state.data,
+            timeCreated: state.timeCreated,
+            isRefetching: !isInitialFetch,
+            isInitialFetch: isInitialFetch,
+          ),
+          notifyObservers: notifyObservers,
+        );
+      case FetchError(:final error, :final stackTrace):
+        _onError?.call(error);
+        _setState(
+          QueryStatus.error(
+            timeCreated: state.timeCreated,
+            data: state.data,
+            stackTrace: stackTrace,
+            error: error,
+          ),
+          notifyObservers: notifyObservers,
+        );
+      case StorageError(:final error):
+        _onError?.call(error);
+      case DataUpdated(:final data, :final timeCreated):
+        _setState(
+          state.copyWithData(data, timeCreated),
+          notifyObservers: notifyObservers,
+        );
+      case Success(:final data, :final timeCreated):
+        switch (data) {
+          case None():
+            _setState(
+              QueryStatus.initial(
+                timeCreated: timeCreated,
+                data: state.data,
+              ),
+              notifyObservers: notifyObservers,
+            );
+          case Some(:final value):
+            _onSuccess?.call(value);
+            _setState(
+              QueryStatus.success(
+                timeCreated: timeCreated,
+                data: value,
+              ),
+              notifyObservers: notifyObservers,
+            );
+        }
+    }
   }
 }

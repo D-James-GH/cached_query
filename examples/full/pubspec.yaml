@@ -23,6 +23,7 @@ dependencies:
     path: ../../packages/cached_query_flutter
   cached_storage:
     path: ../../packages/cached_storage
+  faker: ^2.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

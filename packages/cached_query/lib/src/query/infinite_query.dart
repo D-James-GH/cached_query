@@ -87,11 +87,16 @@ final class InfiniteQuery<T, Arg>
       onSuccess: onSuccess,
     );
 
-    if (existingQuery == null) {
-      cache.addQuery(query);
-    } else if (controller._config != config) {
+    if (existingQuery != null && config == existingQuery.config) {
+      return existingQuery;
+    }
+
+    cache.addQuery(query);
+
+    if (controller._config != config) {
       controller.updateConfig(config);
     }
+
     if (prefetchPages != null && controller.state.data.isNone) {
       controller.fetch(
         ignoreStale: true,
@@ -243,12 +248,17 @@ final class InfiniteQuery<T, Arg>
     await _stateSubject.close();
   }
 
-  void _setState(InfiniteQueryStatus<T, Arg> state) {
-    final observers = _controller._cache.observers;
-    for (final observer in observers) {
-      observer.onChange(this, state);
-      if (state case InfiniteQueryError(:final stackTrace)) {
-        observer.onError(this, stackTrace);
+  void _setState(
+    InfiniteQueryStatus<T, Arg> state, {
+    required bool notifyObservers,
+  }) {
+    if (notifyObservers) {
+      final observers = _controller._cache.observers;
+      for (final observer in observers) {
+        observer.onChange(this, state);
+        if (state case InfiniteQueryError(:final stackTrace)) {
+          observer.onError(this, stackTrace);
+        }
       }
     }
     _state = state;
@@ -256,55 +266,66 @@ final class InfiniteQuery<T, Arg>
   }
 
   void _init() {
-    _controller.stream.listen((action) {
-      switch (action) {
-        case Fetch(:final isInitialFetch, :final fetchOptions):
-          _setState(
-            InfiniteQueryStatus.loading(
-              isInitialFetch: isInitialFetch,
-              isFetchingNextPage: fetchOptions is InfiniteFetchOptions &&
-                  (fetchOptions.direction?.isForward ?? false),
-              isRefetching: !isInitialFetch &&
-                  (fetchOptions is InfiniteFetchOptions &&
-                      fetchOptions.direction == null),
-              data: state.data,
-              timeCreated: state.timeCreated,
-            ),
-          );
-        case FetchError(:final error, :final stackTrace):
-          _onError?.call(error);
-          _setState(
-            InfiniteQueryStatus.error(
-              error: error,
-              stackTrace: stackTrace,
-              data: state.data,
-              timeCreated: state.timeCreated,
-            ),
-          );
-        case StorageError(:final error):
-          _onError?.call(error);
-        case DataUpdated(:final data):
-          _setState(state.copyWithData(data));
-        case Success(:final data, :final timeCreated):
-          switch (data) {
-            case Some<InfiniteQueryData<T, Arg>>(:final value):
-              _onSuccess?.call(value);
-              _setState(
-                InfiniteQueryStatus.success(
-                  hasReachedMax: hasReachedMax(),
-                  data: value,
-                  timeCreated: timeCreated,
-                ),
-              );
-            case None<InfiniteQueryData<T, Arg>>():
-              _setState(
-                InfiniteQueryStatus.initial(
-                  timeCreated: timeCreated,
-                  data: state.data,
-                ),
-              );
-          }
-      }
-    });
+    _controller.stream.listen(_handleAction);
+  }
+
+  void _handleAction(Event<ControllerAction<InfiniteQueryData<T, Arg>>> event) {
+    final notifyObservers =
+        event is DataEvent<ControllerAction<InfiniteQueryData<T, Arg>>>;
+    switch (event.value) {
+      case Fetch(:final isInitialFetch, :final fetchOptions):
+        _setState(
+          InfiniteQueryStatus.loading(
+            isInitialFetch: isInitialFetch,
+            isFetchingNextPage: fetchOptions is InfiniteFetchOptions &&
+                (fetchOptions.direction?.isForward ?? false),
+            isRefetching: !isInitialFetch &&
+                (fetchOptions is InfiniteFetchOptions &&
+                    fetchOptions.direction == null),
+            data: state.data,
+            timeCreated: state.timeCreated,
+          ),
+          notifyObservers: notifyObservers,
+        );
+      case FetchError(:final error, :final stackTrace):
+        _onError?.call(error);
+        _setState(
+          InfiniteQueryStatus.error(
+            error: error,
+            stackTrace: stackTrace,
+            data: state.data,
+            timeCreated: state.timeCreated,
+          ),
+          notifyObservers: notifyObservers,
+        );
+      case StorageError(:final error):
+        _onError?.call(error);
+      case DataUpdated(:final data, :final timeCreated):
+        _setState(
+          state.copyWithData(data, timeCreated),
+          notifyObservers: notifyObservers,
+        );
+      case Success(:final data, :final timeCreated):
+        switch (data) {
+          case Some<InfiniteQueryData<T, Arg>>(:final value):
+            _onSuccess?.call(value);
+            _setState(
+              InfiniteQueryStatus.success(
+                hasReachedMax: hasReachedMax(),
+                data: value,
+                timeCreated: timeCreated,
+              ),
+              notifyObservers: notifyObservers,
+            );
+          case None<InfiniteQueryData<T, Arg>>():
+            _setState(
+              InfiniteQueryStatus.initial(
+                timeCreated: timeCreated,
+                data: state.data,
+              ),
+              notifyObservers: notifyObservers,
+            );
+        }
+    }
   }
 }

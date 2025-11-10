@@ -105,7 +105,10 @@ sealed class InfiniteQueryStatus<T, Arg>
 
   /// Copy the current state with new data
   @override
-  InfiniteQueryStatus<T, Arg> copyWithData(InfiniteQueryData<T, Arg>? data);
+  InfiniteQueryStatus<T, Arg> copyWithData(
+    InfiniteQueryData<T, Arg>? data, [
+    DateTime? timeCreated,
+  ]);
 
   @override
   bool get isInitial => this is InfiniteQueryInitial;
@@ -178,9 +181,12 @@ final class InfiniteQueryInitial<T, Arg> extends InfiniteQueryStatus<T, Arg> {
   int get hashCode => timeCreated.hashCode ^ data.hashCode;
 
   @override
-  InfiniteQueryInitial<T, Arg> copyWithData(InfiniteQueryData<T, Arg>? data) {
+  InfiniteQueryInitial<T, Arg> copyWithData(
+    InfiniteQueryData<T, Arg>? data, [
+    DateTime? timeCreated,
+  ]) {
     return InfiniteQueryInitial<T, Arg>(
-      timeCreated: timeCreated,
+      timeCreated: timeCreated ?? this.timeCreated,
       data: data,
     );
   }
@@ -231,10 +237,13 @@ final class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       timeCreated.hashCode;
 
   @override
-  InfiniteQueryLoading<T, Arg> copyWithData(InfiniteQueryData<T, Arg>? data) {
+  InfiniteQueryLoading<T, Arg> copyWithData(
+    InfiniteQueryData<T, Arg>? data, [
+    DateTime? timeCreated,
+  ]) {
     return InfiniteQueryLoading<T, Arg>(
       isInitialFetch: isInitialFetch,
-      timeCreated: timeCreated,
+      timeCreated: timeCreated ?? this.timeCreated,
       data: data,
       isRefetching: isRefetching,
       isFetchingNextPage: isFetchingNextPage,
@@ -276,13 +285,16 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       timeCreated.hashCode;
 
   @override
-  InfiniteQuerySuccess<T, Arg> copyWithData(InfiniteQueryData<T, Arg>? data) {
+  InfiniteQuerySuccess<T, Arg> copyWithData(
+    InfiniteQueryData<T, Arg>? data, [
+    DateTime? timeCreated,
+  ]) {
     assert(
       data != null,
       "Data in a successfully fetched query cannot be null; Please report this bug.",
     );
     return InfiniteQuerySuccess<T, Arg>(
-      timeCreated: timeCreated,
+      timeCreated: timeCreated ?? this.timeCreated,
       hasReachedMax: hasReachedMax,
       data: data!,
     );
@@ -331,9 +343,12 @@ final class InfiniteQueryError<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       timeCreated.hashCode;
 
   @override
-  InfiniteQueryError<T, Arg> copyWithData(InfiniteQueryData<T, Arg>? data) {
+  InfiniteQueryError<T, Arg> copyWithData(
+    InfiniteQueryData<T, Arg>? data, [
+    DateTime? timeCreated,
+  ]) {
     return InfiniteQueryError<T, Arg>(
-      timeCreated: timeCreated,
+      timeCreated: timeCreated ?? this.timeCreated,
       data: data,
       error: error,
       stackTrace: stackTrace,

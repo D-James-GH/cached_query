@@ -75,7 +75,7 @@ class GlobalQueryConfig {
   ///
   /// Defaults to true.
   ///
-  /// Only effective when TODO:
+  /// Only effective when a app state stream is added to the CachedQuery instance config.
   /// {@endtemplate}
   final bool refetchOnResume;
 
