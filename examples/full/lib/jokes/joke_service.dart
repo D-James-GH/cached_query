@@ -11,7 +11,7 @@ class JokeService {
   Query<JokeModel?> getJoke() {
     return Query<JokeModel>(
       key: 'joke',
-      config: QueryConfigFlutter(
+      config: QueryConfig(
         storeQuery: true,
         staleDuration: const Duration(seconds: 4),
         storageDeserializer: (json) =>

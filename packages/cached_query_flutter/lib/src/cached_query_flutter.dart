@@ -31,9 +31,10 @@ extension CachedQueryExt on CachedQuery {
   void configFlutter({
     bool neverCheckConnection = false,
     StorageInterface? storage,
-    GlobalQueryConfigFlutter config = const GlobalQueryConfigFlutter(),
+    GlobalQueryConfig config = const GlobalQueryConfig(),
     List<QueryObserver>? observers,
     Stream<AppState>? lifecycleStream,
+    Stream<ConnectionStatus>? connectionStream,
   }) {
     if (lifecycleStream == null) {
       final lifecycleController = LifecycleStreamController(this);
@@ -42,29 +43,34 @@ extension CachedQueryExt on CachedQuery {
         await lifecycleController.dispose();
       });
     }
+
+    if (!neverCheckConnection && connectionStream == null) {
+      connectionStream = ConnectivityController.instance.stream;
+    }
     this.config(
       config: config,
       storage: storage,
       observers: observers,
       lifecycleStream: lifecycleStream,
+      connectionStream: connectionStream,
     );
-
-    if (!neverCheckConnection) {
-      ConnectivityController.instance.addListener(onConnection);
-    }
   }
 
   /// Streams the connection state. If true then the device is able to access the internet.
-  Stream<bool> get connectivityStream => ConnectivityController.instance.stream;
+  Stream<bool> get connectivityStream => ConnectivityController.instance.stream
+      .map((status) => status.isConnected);
 
   /// Whether the device has access to the internet.
-  bool get hasConnection => ConnectivityController.instance.hasConnection;
+  bool get hasConnection =>
+      ConnectivityController.instance.connectionStatus.isConnected;
 
   /// Check the current connection state.
   /// Returns true if the device is connected to the internet.
   /// Updates the connection state if it has changed.
-  Future<bool> checkConnection() =>
-      ConnectivityController.instance.checkConnection();
+  Future<bool> checkConnection() async {
+    final res = await ConnectivityController.instance.checkConnection();
+    return res.isConnected;
+  }
 
   /// Refetch all queries and infinite queries with listeners.
   ///

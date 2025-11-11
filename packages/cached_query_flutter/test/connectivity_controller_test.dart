@@ -1,81 +1,308 @@
-import 'dart:io';
+import 'dart:async';
 
+import 'package:cached_query/cached_query.dart';
 import 'package:cached_query_flutter/src/connectivity_controller.dart';
-import 'package:cached_query_flutter/src/connectivity_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 
-import 'connectivity_controller_test.mocks.dart';
+class TestConnectivity implements Connectivity {
+  TestConnectivity({
+    List<ConnectivityResult>? initialResult,
+  }) : _initialResult = initialResult ?? [ConnectivityResult.wifi];
 
-@GenerateMocks([Connectivity, ConnectivityService])
+  final StreamController<List<ConnectivityResult>> _controller =
+      StreamController<List<ConnectivityResult>>.broadcast();
+  final List<ConnectivityResult> _initialResult;
+
+  @override
+  Stream<List<ConnectivityResult>> get onConnectivityChanged =>
+      _controller.stream;
+
+  @override
+  Future<List<ConnectivityResult>> checkConnectivity() async {
+    return _initialResult;
+  }
+
+  void emitConnectivityChange(List<ConnectivityResult> result) {
+    _controller.add(result);
+  }
+
+  void close() {
+    _controller.close();
+  }
+}
+
 void main() {
-  group("Check connection", () {
-    final connectivity = MockConnectivity();
-    final connectivityService = MockConnectivityService();
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    test("If has a connection should return true", () async {
-      when(connectivityService.lookup()).thenAnswer((_) async => true);
-      when(connectivity.onConnectivityChanged).thenAnswer(
-        (_) => Stream.fromIterable(
-          [
-            [ConnectivityResult.wifi],
-          ],
-        ),
-      );
-      final connectivityController = ConnectivityController.asNewInstance(
-        connectivity: connectivity,
-        service: connectivityService,
-      );
-      final hasConnection = await connectivityController.checkConnection();
-      expect(hasConnection, true);
+  group('ConnectivityController', () {
+    late TestConnectivity testConnectivity;
+    late ConnectivityController controller;
+
+    setUp(() {
+      testConnectivity = TestConnectivity();
     });
 
-    test("If no connection return false", () async {
-      when(connectivityService.lookup()).thenAnswer((_) async => false);
-
-      final connectivityController = ConnectivityController.asNewInstance(
-        connectivity: connectivity,
-        service: connectivityService,
-      );
-      final hasConnection = await connectivityController.checkConnection();
-      expect(hasConnection, false);
+    tearDown(() {
+      controller.dispose();
+      testConnectivity.close();
     });
-    test("Errors indicate no connection", () async {
-      when(connectivityService.lookup())
-          .thenThrow(const SocketException("could not find address."));
 
-      final connectivityController = ConnectivityController.asNewInstance(
-        connectivity: connectivity,
-        service: connectivityService,
+    test('initializes with unknown connection status by default', () {
+      controller = ConnectivityController.asNewInstance(
+        connectivity: testConnectivity,
       );
-      final hasConnection = await connectivityController.checkConnection();
-      expect(hasConnection, false);
+
+      expect(controller.connectionStatus, ConnectionStatus.unknown);
     });
-    test("Should refetch queries when connectivity is resumed", () async {
-      when(connectivity.onConnectivityChanged).thenAnswer(
-        (_) => Stream.fromIterable(
-          [
-            [ConnectivityResult.wifi],
-          ],
-        ),
+
+    test('initializes with custom initial connection status', () {
+      controller = ConnectivityController.asNewInstance(
+        connectivity: testConnectivity,
+        initialConnection: ConnectionStatus.connected,
       );
-      int callCount = 0;
 
-      void refetch() {
-        callCount++;
-      }
+      expect(controller.connectionStatus, ConnectionStatus.connected);
+    });
 
-      when(connectivityService.lookup()).thenAnswer((_) async => true);
+    test('stream emits current status when listener is added', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.connected,
+        );
 
-      final instance = ConnectivityController.asNewInstance(
-        connectivity: connectivity,
-        service: connectivityService,
-        initialConnection: false,
-      )..addListener(refetch);
-      await instance.checkConnection();
-      expect(callCount, 1);
+        ConnectionStatus? capturedStatus;
+        controller.stream.listen((status) {
+          capturedStatus = status;
+        });
+
+        async.flushMicrotasks();
+
+        expect(capturedStatus, ConnectionStatus.connected);
+      });
+    });
+
+    test(
+      'checkConnection sets status to connected when lookup succeeds',
+      () {
+        fakeAsync((async) {
+          controller = ConnectivityController.asNewInstance(
+            connectivity: testConnectivity,
+            lookupFunction: () async => true,
+          );
+
+          async.flushMicrotasks();
+
+          controller.checkConnection();
+          async.elapse(const Duration(milliseconds: 100));
+
+          expect(controller.connectionStatus, ConnectionStatus.connected);
+        });
+      },
+    );
+
+    test('handles wifi connectivity change', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.disconnected,
+          lookupFunction: () async => true,
+        );
+
+        final statusUpdates = <ConnectionStatus>[];
+        controller.stream.listen(statusUpdates.add);
+
+        async.flushMicrotasks();
+        statusUpdates.clear();
+
+        testConnectivity.emitConnectivityChange([ConnectivityResult.wifi]);
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(statusUpdates.last, ConnectionStatus.connected);
+      });
+    });
+
+    test('handles mobile connectivity change', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.disconnected,
+          lookupFunction: () async => true,
+        );
+
+        final statusUpdates = <ConnectionStatus>[];
+        controller.stream.listen(statusUpdates.add);
+
+        async.flushMicrotasks();
+        statusUpdates.clear();
+
+        testConnectivity.emitConnectivityChange([ConnectivityResult.mobile]);
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(statusUpdates.last, ConnectionStatus.connected);
+      });
+    });
+
+    test('handles ethernet connectivity change', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.disconnected,
+          lookupFunction: () async => true,
+        );
+
+        final statusUpdates = <ConnectionStatus>[];
+        controller.stream.listen(statusUpdates.add);
+
+        async.flushMicrotasks();
+        statusUpdates.clear();
+
+        testConnectivity.emitConnectivityChange([ConnectivityResult.ethernet]);
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(statusUpdates.last, ConnectionStatus.connected);
+      });
+    });
+
+    test('handles vpn connectivity change', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.disconnected,
+          lookupFunction: () async => true,
+        );
+
+        final statusUpdates = <ConnectionStatus>[];
+        controller.stream.listen(statusUpdates.add);
+
+        async.flushMicrotasks();
+        statusUpdates.clear();
+
+        testConnectivity.emitConnectivityChange([ConnectivityResult.vpn]);
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(statusUpdates.last, ConnectionStatus.connected);
+      });
+    });
+
+    test('handles other connectivity change', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.disconnected,
+          lookupFunction: () async => true,
+        );
+
+        final statusUpdates = <ConnectionStatus>[];
+        controller.stream.listen(statusUpdates.add);
+
+        async.flushMicrotasks();
+        statusUpdates.clear();
+
+        testConnectivity.emitConnectivityChange([ConnectivityResult.other]);
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(statusUpdates.last, ConnectionStatus.connected);
+      });
+    });
+
+    test('sets status to disconnected when connectivity is none', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.unknown,
+        );
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        controller.stream.listen((_) {});
+
+        async.flushMicrotasks();
+
+        testConnectivity.emitConnectivityChange([ConnectivityResult.none]);
+
+        async.elapse(const Duration(milliseconds: 50));
+
+        expect(controller.connectionStatus, ConnectionStatus.disconnected);
+      });
+    });
+
+    test('handles multiple connectivity results', () {
+      fakeAsync((async) {
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.disconnected,
+          lookupFunction: () async => true,
+        );
+
+        final statusUpdates = <ConnectionStatus>[];
+        controller.stream.listen(statusUpdates.add);
+
+        async.flushMicrotasks();
+        statusUpdates.clear();
+
+        testConnectivity.emitConnectivityChange([
+          ConnectivityResult.wifi,
+          ConnectivityResult.mobile,
+        ]);
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(statusUpdates.last, ConnectionStatus.connected);
+      });
+    });
+
+    test('checkConnection prevents concurrent calls', () {
+      fakeAsync((async) {
+        int lookupCallCount = 0;
+
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          lookupFunction: () async {
+            lookupCallCount++;
+            return true;
+          },
+        );
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        lookupCallCount = 0;
+
+        controller
+          ..checkConnection()
+          ..checkConnection()
+          ..checkConnection();
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(controller.connectionStatus, ConnectionStatus.connected);
+        expect(lookupCallCount, 1);
+      });
+    });
+
+    test('constructor calls checkConnection immediately', () {
+      fakeAsync((async) {
+        final statusUpdates = <ConnectionStatus>[];
+
+        controller = ConnectivityController.asNewInstance(
+          connectivity: testConnectivity,
+          initialConnection: ConnectionStatus.unknown,
+          lookupFunction: () async => true,
+        );
+
+        controller.stream.listen(statusUpdates.add);
+
+        async.elapse(const Duration(milliseconds: 100));
+
+        expect(statusUpdates.isNotEmpty, true);
+      });
     });
   });
 }

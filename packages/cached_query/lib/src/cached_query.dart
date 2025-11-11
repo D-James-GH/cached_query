@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query/src/connection_controller.dart';
 import 'package:cached_query/src/query/_query.dart';
 import 'package:cached_query/src/resume_controller.dart';
 import 'package:cached_query/src/util/encode_key.dart';
@@ -50,6 +51,7 @@ class CachedQuery {
   /// Whether global configs have been set.
   bool get isConfigSet => _configSet;
   ResumeController? _resumeController;
+  ConnectionController? _connectionController;
 
   // This class should not be instantiated manually.
   CachedQuery._();
@@ -89,6 +91,7 @@ class CachedQuery {
     GlobalQueryConfig? config,
     List<QueryObserver>? observers,
     Stream<AppState>? lifecycleStream,
+    Stream<ConnectionStatus>? connectionStream,
   }) {
     assert(_configSet == false, "Config defaults must only be set once.");
     if (_configSet) return;
@@ -106,6 +109,10 @@ class CachedQuery {
         cache: this,
         lifecycleStream: lifecycleStream,
       );
+    }
+    if (connectionStream != null) {
+      _connectionController =
+          ConnectionController(cache: this, connectionStream: connectionStream);
     }
 
     assert(() {
@@ -343,6 +350,7 @@ class CachedQuery {
       _queryCache.map((q) => q.dispose()),
     );
     await _resumeController?.dispose();
+    await _connectionController?.dispose();
     _queryCache.removeAll();
   }
 }

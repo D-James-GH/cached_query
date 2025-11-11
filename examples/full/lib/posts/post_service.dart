@@ -31,14 +31,24 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
       return (state?.length ?? 0) + 1;
     },
     queryFn: (arg) async {
-      final faker = Faker();
       // final uri = Uri.parse(
       //   'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
       // );
       // final res = await http.get(uri);
-      // if (Random().nextInt(1000) % 8 == 0) {
-      //   throw "A random error has occurred ⚠️";
-      // }
+      //
+      // // if (Random().nextInt(1000) % 8 == 0) {
+      // //   throw "A random error has occurred ⚠️";
+      // // }
+      //
+      // return Future.delayed(
+      //   const Duration(seconds: 1),
+      //   () => PostModel.listFromJson(
+      //     List<Map<String, dynamic>>.from(
+      //       jsonDecode(res.body) as List<dynamic>,
+      //     ),
+      //   ),
+      // );
+      final faker = Faker();
       return Future.delayed(
         const Duration(seconds: 1),
         () => List.generate(

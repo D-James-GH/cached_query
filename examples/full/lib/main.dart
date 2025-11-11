@@ -12,6 +12,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
     storage: await CachedStorage.ensureInitialized(),
+    config: const GlobalQueryConfig(
+      refetchOnResumeMinBackgroundDuration: Duration.zero,
+    ),
     observers: [
       Observer(),
       QueryLoggingObserver(colors: !Platform.isIOS),

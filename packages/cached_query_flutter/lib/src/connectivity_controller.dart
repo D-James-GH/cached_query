@@ -1,113 +1,112 @@
 import 'dart:async';
 
+import 'package:cached_query/cached_query.dart';
 import 'package:cached_query_flutter/src/connectivity_service.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 
 /// Connectivity manager.
 class ConnectivityController {
-  /// Instance of the retry controller.
-  static final ConnectivityController instance = ConnectivityController._();
-
-  /// Stream controller fo the connectivity state
-  StreamController<bool> connectionChangeController =
-      StreamController<bool>.broadcast();
-
-  /// Whether the device is connected.
-  bool hasConnection;
-
-  /// Whether the instance has been initialized.
-  bool hasInitialized = false;
-
-  final _listeners = <void Function()>[];
-  final Connectivity _connectivity;
-  final ConnectivityService _connectivityService;
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
-
-  ConnectivityController._({
-    Connectivity? connectivity,
-    ConnectivityService? service,
-    bool? initialConnection,
-  })  : _connectivity = connectivity ?? Connectivity(),
-        hasConnection = initialConnection ?? true,
-        _connectivityService = service ?? ConnectivityService() {
-    _connectivitySubscription =
-        _connectivity.onConnectivityChanged.listen((event) {
-      checkConnection();
-    });
-    checkConnection();
-  }
-
   /// Allow the creation of new instances for testing purposes
   @visibleForTesting
   factory ConnectivityController.asNewInstance({
     Connectivity? connectivity,
-    ConnectivityService? service,
-    bool? initialConnection,
+    ConnectionStatus? initialConnection,
+    Future<bool> Function()? lookupFunction,
   }) {
     return ConnectivityController._(
       initialConnection: initialConnection,
       connectivity: connectivity,
-      service: service,
+      lookupFunction: lookupFunction,
     );
   }
 
-  Future<bool>? _connectionFuture;
+  ConnectivityController._({
+    Connectivity? connectivity,
+    ConnectionStatus? initialConnection,
+    Future<bool> Function()? lookupFunction,
+  })  : _connectivity = connectivity ?? Connectivity(),
+        _connectionStatus = initialConnection ?? ConnectionStatus.unknown,
+        _lookupFunction = lookupFunction ?? lookup {
+    _connectionChangeController = StreamController<ConnectionStatus>.broadcast(
+      onListen: _onListen,
+      sync: true,
+    );
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_handleConnectivityChange);
+    checkConnection();
+  }
+
+  /// Instance of the connectivity controller
+  static final ConnectivityController instance = ConnectivityController._();
+
+  ConnectionStatus _connectionStatus = ConnectionStatus.unknown;
+
+  /// The current connection status
+  ConnectionStatus get connectionStatus => _connectionStatus;
+
+  late final StreamController<ConnectionStatus> _connectionChangeController;
+
+  final Connectivity _connectivity;
+  final Future<bool> Function() _lookupFunction;
+  StreamSubscription<List<ConnectivityResult>>? _connectivitySubscription;
+
+  Future<ConnectionStatus>? _connectionFuture;
 
   /// Stream the current connectivity state
-  Stream<bool> get stream => connectionChangeController.stream;
-
-  /// Listeners are called when connection is gained from an inactive state.
-  void addListener(void Function() listener) {
-    _listeners.add(listener);
-  }
-
-  /// Remove a listener.
-  void removeListener(void Function() listener) {
-    _listeners.remove(listener);
-  }
-
-  // stream current connection state
+  Stream<ConnectionStatus> get stream => _connectionChangeController.stream;
 
   /// The test to actually see if there is a connection
-  Future<bool> checkConnection() async {
+  Future<ConnectionStatus> checkConnection() async {
     try {
       _connectionFuture ??= _testConnection();
       return await _connectionFuture!;
     } catch (_) {
-      return false;
+      return _connectionStatus;
     } finally {
       _connectionFuture = null;
     }
   }
 
-  Future<bool> _testConnection() async {
-    final bool previousConnection = hasConnection;
-
+  Future<ConnectionStatus> _testConnection() async {
     try {
-      final result = await _connectivityService.lookup();
-      hasConnection = result;
-    } catch (_) {
-      hasConnection = false;
-    }
-
-    // The connection status changed send out an update to all listeners
-    if (previousConnection != hasConnection) {
-      connectionChangeController.add(hasConnection);
-      // The connection has come online, refetch all current queries
-      if (hasConnection) {
-        for (final listener in _listeners) {
-          listener();
-        }
+      final result = await _lookupFunction();
+      if (result) {
+        _setState(ConnectionStatus.connected);
+      } else {
+        _setState(ConnectionStatus.disconnected);
       }
+    } catch (_) {
+      _connectionChangeController.add(ConnectionStatus.unknown);
     }
 
-    return hasConnection;
+    return _connectionStatus;
+  }
+
+  void _setState(ConnectionStatus status) {
+    _connectionStatus = status;
+    _connectionChangeController.add(_connectionStatus);
+  }
+
+  void _onListen() {
+    _connectionChangeController.add(_connectionStatus);
+  }
+
+  void _handleConnectivityChange(List<ConnectivityResult> result) {
+    if (result.contains(ConnectivityResult.mobile) ||
+        result.contains(ConnectivityResult.wifi) ||
+        result.contains(ConnectivityResult.ethernet) ||
+        result.contains(ConnectivityResult.vpn) ||
+        result.contains(ConnectivityResult.other)) {
+      checkConnection();
+    } else if (result.contains(ConnectivityResult.none)) {
+      _setState(ConnectionStatus.disconnected);
+    }
   }
 
   /// Close the streams
   void dispose() {
-    connectionChangeController.close();
+    _connectionChangeController.close();
     _connectivitySubscription?.cancel();
   }
 }
