@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-11-12
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.1.0`](#cached_query---v310)
+ - [`cached_query_flutter` - `v3.1.0`](#cached_query_flutter---v310)
+ - [`cached_storage` - `v3.0.4`](#cached_storage---v304)
+
+Packages graduated to a stable release (see pre-releases prior to the stable version for changelog entries):
+
+ - `cached_query` - `v3.1.0`
+ - `cached_query_flutter` - `v3.1.0`
+ - `cached_storage` - `v3.0.4`
+
+---
+
+#### `cached_query` - `v3.1.0`
+
+#### `cached_query_flutter` - `v3.1.0`
+
+#### `cached_storage` - `v3.0.4`
+
+
 ## 2025-11-09
 
 ### Changes

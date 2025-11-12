@@ -1,3 +1,7 @@
+## 3.1.0
+
+ - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.
+
 ## 3.1.0-dev.0
 
  - **FEAT**: allow for changing of config by having multiple queries attaching to one controller ([#88](https://github.com/D-James-GH/cached_query/issues/88)). ([fecf0f4a](https://github.com/D-James-GH/cached_query/commit/fecf0f4a2ed53460bf70b8da64044cecac994c9b))
