@@ -7,7 +7,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
     storage: await CachedStorage.ensureInitialized(),
-    config: const GlobalQueryConfigFlutter(
+    config: const GlobalQueryConfig(
       refetchOnResume: true,
       refetchOnConnection: true,
     ),

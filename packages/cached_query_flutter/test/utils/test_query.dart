@@ -11,7 +11,7 @@ class QueryTester {
   int get numFetches => _numFetches;
 
   QueryTester({
-    QueryConfigFlutter<String>? config,
+    QueryConfig<String>? config,
     String? key,
     String res = testQueryRes,
     void Function()? onFetch,
@@ -30,7 +30,7 @@ class QueryTester {
   }
 
   QueryTester.infinite({
-    QueryConfigFlutter<InfiniteQueryData<String, int>>? config,
+    QueryConfig<InfiniteQueryData<String, int>>? config,
     String? key,
     String res = testQueryRes,
     void Function()? onFetch,
@@ -50,7 +50,7 @@ class QueryTester {
 }
 
 Query<String> createQuery({
-  QueryConfigFlutter<String>? config,
+  QueryConfig<String>? config,
   String? key,
   String res = testQueryRes,
   void Function()? onFetch,
@@ -69,7 +69,7 @@ Query<String> createQuery({
 }
 
 InfiniteQuery<String, int> createInfiniteQuery({
-  QueryConfigFlutter<InfiniteQueryData<String, int>>? config,
+  QueryConfig<InfiniteQueryData<String, int>>? config,
   String? key,
   String res = testQueryRes,
   void Function()? onFetch,

@@ -18,7 +18,7 @@ void main() {
         queryFn: () async {
           return response;
         },
-        config: const QueryConfigFlutter(
+        config: const QueryConfig(
           staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),
@@ -37,7 +37,7 @@ void main() {
         queryFn: () async {
           return "title";
         },
-        config: const QueryConfigFlutter(
+        config: const QueryConfig(
           staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),
@@ -62,7 +62,7 @@ void main() {
           queryFn: () async {
             return "title";
           },
-          config: const QueryConfigFlutter(
+          config: const QueryConfig(
             staleDuration: Duration.zero,
             ignoreCacheDuration: true,
           ),
@@ -89,7 +89,7 @@ void main() {
         queryFn: () {
           return Future.delayed(const Duration(seconds: 2), () => response);
         },
-        config: const QueryConfigFlutter(
+        config: const QueryConfig(
           staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),
@@ -124,7 +124,7 @@ void main() {
         queryFn: () async {
           return title;
         },
-        config: const QueryConfigFlutter(
+        config: const QueryConfig(
           staleDuration: Duration.zero,
           ignoreCacheDuration: true,
         ),

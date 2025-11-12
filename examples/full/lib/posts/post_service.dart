@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 InfiniteQuery<List<PostModel>, int> getPosts() {
   return InfiniteQuery(
     key: 'posts',
-    config: QueryConfigFlutter(
+    config: QueryConfig(
       storageDuration: const Duration(seconds: 60),
       storeQuery: true,
       staleDuration: const Duration(seconds: 5),
