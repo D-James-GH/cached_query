@@ -25,6 +25,18 @@ abstract interface class FetchFunction<T> {
   });
 }
 
+class EmptyFetchFunction<T> implements FetchFunction<T> {
+  @override
+  Future<T> call({
+    required FetchOptions options,
+    T? state,
+  }) {
+    throw UnimplementedError(
+      "No fetch function has been provided for this query. This is likely because the query has been created through 'update'",
+    );
+  }
+}
+
 /// {@template controllerState}
 /// Internal state for the query controller.
 /// {@endtemplate}
@@ -66,7 +78,7 @@ final class QueryController<T> {
   final List<Cacheable<QueryState<T>>> _listeners = [];
 
   /// The function that is called when the query is fetched.
-  final FetchFunction<T> onFetch;
+  FetchFunction<T> onFetch;
 
   /// The current state of the query.
   ControllerState<T> state;
@@ -148,8 +160,13 @@ final class QueryController<T> {
     return setData(newData);
   }
 
-  void updateConfig(ControllerOptions<T> config) {
-    _config = config;
+  void updateConfig({ControllerOptions<T>? config, FetchFunction<T>? fetchFn}) {
+    if (config != null) {
+      _config = config;
+    }
+    if (fetchFn != null) {
+      onFetch = fetchFn;
+    }
   }
 
   void setData(T data) {

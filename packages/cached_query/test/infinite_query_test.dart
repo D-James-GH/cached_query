@@ -64,6 +64,31 @@ void main() async {
       expect(query.state.data?.args.length, 2);
     });
   });
+  group("Accessing current state", () {
+    test("state is accessible immediately after fetch", () async {
+      final cache = CachedQuery.asNewInstance();
+      final query = InfiniteQuery<String, int>(
+        key: "accessState",
+        cache: cache,
+        queryFn: (_) => Future.value("data"),
+        getNextArg: (_) => 1,
+      );
+      final res1 = await query.fetch();
+      expect(res1, isA<InfiniteQuerySuccess<String, int>>());
+
+      final query2 = InfiniteQuery<String, int>(
+        key: "accessState",
+        cache: cache,
+        config: QueryConfig(
+          staleDuration: const Duration(minutes: 5),
+        ),
+        queryFn: (_) => Future.value("data"),
+        getNextArg: (_) => 1,
+      );
+      final res = await query2.getNextPage();
+      expect(res, isA<InfiniteQuerySuccess<String, int>>());
+    });
+  });
   group("Infinite query as a future", () {
     test("Should return an infinite query", () async {
       final cache = CachedQuery.asNewInstance();

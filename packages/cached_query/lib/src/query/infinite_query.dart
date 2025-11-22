@@ -53,11 +53,13 @@ final class InfiniteQuery<T, Arg>
     );
 
     cache = cache ?? CachedQuery.instance;
-    final existingQuery = cache.getQuery<InfiniteQuery<T, Arg>>(key);
+    final existingCache = cache.getQuery(key);
 
     assert(
-      existingQuery is InfiniteQuery<T, Arg> || existingQuery == null,
-      "Query found with key $key is not an InfiniteQuery<$T, $Arg>",
+      existingCache == null ||
+          existingCache is InfiniteQuery<T, Arg> ||
+          existingCache is Query<InfiniteQueryData<T, Arg>>,
+      "A query with the same key already exists with a different type: ${existingCache.runtimeType}",
     );
 
     config ??= QueryConfig<InfiniteQueryData<T, Arg>>();
@@ -65,20 +67,33 @@ final class InfiniteQuery<T, Arg>
 
     final encodedKey = encodeKey(key);
 
-    final controller = existingQuery?._controller ??
-        QueryController(
+    // ignore: prefer_function_declarations_over_variables
+    final createFetchFn = () => InfiniteFetch<T, Arg>(
+          getNextArg: getNextArg,
+          onPageRefetched: onPageRefetched,
+          queryFn: queryFn,
+          initialArg: getNextArg(initialData),
+        );
+
+    final controller = switch (existingCache) {
+      InfiniteQuery<T, Arg>(:final _controller) => _controller,
+      Query<InfiniteQueryData<T, Arg>>(:final _controller) => _controller,
+      _ => QueryController<InfiniteQueryData<T, Arg>>(
           cache: cache,
           key: encodedKey,
           unencodedKey: key,
           initialData: Option.fromNullable(initialData),
-          onFetch: InfiniteFetch<T, Arg>(
-            getNextArg: getNextArg,
-            onPageRefetched: onPageRefetched,
-            queryFn: queryFn,
-            initialArg: getNextArg(initialData),
-          ),
+          onFetch: createFetchFn(),
           config: config,
-        );
+        ),
+    };
+
+    if (existingCache != null &&
+        existingCache is InfiniteQuery<T, Arg> &&
+        config == existingCache.config) {
+      return existingCache;
+    }
+
     final query = InfiniteQuery<T, Arg>._internal(
       controller: controller,
       config: config,
@@ -87,14 +102,19 @@ final class InfiniteQuery<T, Arg>
       onSuccess: onSuccess,
     );
 
-    if (existingQuery != null && config == existingQuery.config) {
-      return existingQuery;
-    }
+    final shouldUpdateController =
+        controller.onFetch is EmptyFetchFunction<InfiniteQueryData<T, Arg>>;
 
     cache.addQuery(query);
 
+    if (shouldUpdateController) {
+      controller.updateConfig(
+        fetchFn: createFetchFn(),
+      );
+    }
+
     if (controller._config != config) {
-      controller.updateConfig(config);
+      controller.updateConfig(config: config);
     }
 
     if (prefetchPages != null && controller.state.data.isNone) {
@@ -131,6 +151,7 @@ final class InfiniteQuery<T, Arg>
       onCancel: () {
         controller.removeListener(this);
       },
+      sync: true,
     );
     _init();
   }
@@ -222,7 +243,7 @@ final class InfiniteQuery<T, Arg>
       ignoreStale: true,
       options: InfiniteFetchOptions(direction: InfiniteQueryDirection.forward),
     );
-    return state;
+    return _state;
   }
 
   @override

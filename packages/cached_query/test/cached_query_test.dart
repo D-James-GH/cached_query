@@ -1,5 +1,6 @@
 // ignore_for_file: avoid_redundant_argument_values
 import 'package:cached_query/cached_query.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:test/test.dart';
 
 import 'test_implementations.dart';
@@ -380,5 +381,127 @@ void main() {
     final queries = CachedQuery.instance.whereQuery((p) => p.key == "2");
     expect(queries.length, 1);
     expect(queries.first.key, "2");
+  });
+  group("Set Query", () {
+    test("Set query creates new query if not existing", () {
+      final cache = CachedQuery.asNewInstance()
+        ..setQueryData<String>(
+          key: "set_query",
+          data: "new_value",
+        );
+      final query = cache.getQuery<Query<String>>("set_query");
+      expect(query?.state.data, "new_value");
+    });
+    test("Calling fetch on a empty query fails", () async {
+      final cache = CachedQuery.asNewInstance()
+        ..setQueryData<String>(
+          key: "set_query",
+          data: "new_value",
+        );
+      final query = cache.getQuery<Query<String>>("set_query");
+      final status = await query!.refetch();
+      expect(status, isA<QueryError<dynamic>>());
+      expect((status as QueryError).error, isA<UnimplementedError>());
+    });
+    test("Creating a query after updates queryFn", () {
+      fakeAsync((async) async {
+        final cache = CachedQuery.asNewInstance()
+          ..setQueryData<String>(
+            key: "set_query",
+            data: "new_value",
+          );
+        final emptyQuery = cache.getQuery<Query<String>>("set_query");
+        expect(emptyQuery, isNotNull);
+        final query = Query<String>(
+          key: "set_query",
+          queryFn: () async => Future.delayed(
+            Duration(milliseconds: 300),
+            () => "fetched_value",
+          ),
+          cache: cache,
+        );
+        expect(query.state.data, "new_value");
+
+        final f = query.refetch();
+        async.elapse(const Duration(milliseconds: 300));
+        final status = await f;
+        expect(status.data, "fetched_value");
+        expect(status, isA<QueryError<String>>());
+      });
+    });
+  });
+
+  group("Set Infinite Query", () {
+    test("Set query creates new infinite query if not existing", () async {
+      final key = "set_i_query";
+      final cache = CachedQuery.asNewInstance()
+        ..setQueryData<InfiniteQueryData<String, int>>(
+          key: key,
+          data: InfiniteQueryData<String, int>(
+            pages: ["new_value"],
+            args: [1],
+          ),
+        );
+
+      final query =
+          cache.getQuery<Query<InfiniteQueryData<String, int>>>("set_i_query");
+
+      expect(query?.state.data?.pages.first, "new_value");
+
+      final infiniteQuery = InfiniteQuery<String, int>(
+        key: key,
+        getNextArg: (data) => 1,
+        queryFn: (page) async => "",
+        cache: cache,
+      );
+      expect(infiniteQuery.state.data?.pages.first, "new_value");
+      final res = await infiniteQuery.getNextPage();
+      expect(res, isA<InfiniteQuerySuccess<String, int>>());
+      final data = (res as InfiniteQuerySuccess).data;
+      expect(data.pages.length, 2);
+      expect(data, query?.state.data);
+    });
+
+    test("Getting infinite query fails", () async {
+      final cache = CachedQuery.asNewInstance()
+        ..setQueryData<String>(
+          key: "set_query",
+          data: "new_value",
+        );
+      try {
+        final _ = cache.getQuery<InfiniteQuery<String, int>>("set_query");
+        fail("Cannot get infinite query because it hasn't been created");
+      } catch (e) {
+        expect(e, isA<TypeError>());
+      }
+    });
+
+    test("Creating a query after updates queryFn", () {
+      fakeAsync((async) async {
+        final cache = CachedQuery.asNewInstance()
+          ..setQueryData<String>(
+            key: "set_i_query",
+            data: "new_value",
+          );
+        final emptyQuery = cache.getQuery<Query<String>>("set_i_query");
+        expect(emptyQuery, isNotNull);
+        final query = InfiniteQuery<String, int>(
+          key: "set_i_query",
+          getNextArg: (state) => (state?.length ?? 0) + 1,
+          queryFn: (_) async => Future.delayed(
+            Duration(milliseconds: 300),
+            () => "fetched_value",
+          ),
+          cache: cache,
+        );
+        expect(query.state.data, "new_value");
+
+        final f = query.refetch();
+        async.elapse(const Duration(milliseconds: 300));
+        final status = await f;
+        expect(status.data, "fetched_value");
+        expect(status, isA<InfiniteQueryError<String, int>>());
+      });
+    });
   });
 }

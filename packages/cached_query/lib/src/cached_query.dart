@@ -161,6 +161,29 @@ class CachedQuery {
     }
   }
 
+  /// Set the data of an [Query] at a given key.
+  ///
+  /// If the query does not exist, a new empty query is created.
+  ///
+  void setQueryData<T>({
+    required Object key,
+    required T data,
+  }) {
+    final query = getQuery<Cacheable<T>>(key);
+    switch (query) {
+      case InfiniteQuery(:final setData):
+        assert(
+          data is InfiniteQueryData,
+          "Data must be of type InfiniteQueryData for InfiniteQuery. Data is of type ${data.runtimeType}. And the query key found the query of type InfiniteQuery.",
+        );
+        setData(data as InfiniteQueryData);
+      case Query(:final setData):
+        setData(data);
+      case null:
+        createEmptyQuery<T>(key: key, cache: this).setData(data);
+    }
+  }
+
   /// Find and return a list of [Query]'s matching a given condition.
   Iterable<Cacheable<Object?>> whereQuery(
     WhereCallback findCallback,

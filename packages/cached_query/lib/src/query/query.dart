@@ -16,6 +16,34 @@ class QueryFetchFunction<T> implements FetchFunction<T> {
   }
 }
 
+/// Creates an empty [Query] without a query function.
+/// Used when cache.setQuery is called and no query is available.
+Query<T> createEmptyQuery<T>({
+  required Object key,
+  required CachedQuery cache,
+}) {
+  final encodedKey = encodeKey(key);
+
+  var config = QueryConfig<T>();
+  config = config.mergeWithGlobal(cache.defaultConfig);
+
+  final controller = QueryController<T>(
+    cache: cache,
+    key: encodedKey,
+    unencodedKey: key,
+    initialData: Option<T>.none(),
+    onFetch: EmptyFetchFunction(),
+    config: config,
+  );
+
+  final query = Query._internal(
+    controller: controller,
+    config: config,
+  );
+  cache.addQuery(query);
+  return query;
+}
+
 /// {@template query}
 /// [Query] is will fetch and cache the response of the [queryFn].
 ///
@@ -62,8 +90,11 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
           onFetch: QueryFetchFunction(queryFn: queryFn),
           config: config,
         );
+    final shouldUpdateController = controller.onFetch is EmptyFetchFunction<T>;
 
-    if (existingQuery != null && config == existingQuery.config) {
+    if (existingQuery != null &&
+        config == existingQuery.config &&
+        !shouldUpdateController) {
       return existingQuery;
     }
 
@@ -77,8 +108,15 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     cache.addQuery(query);
 
     if (controller._config != config) {
-      controller.updateConfig(config);
+      controller.updateConfig(config: config);
     }
+
+    if (shouldUpdateController) {
+      controller.updateConfig(
+        fetchFn: QueryFetchFunction(queryFn: queryFn),
+      );
+    }
+
     return query;
   }
 

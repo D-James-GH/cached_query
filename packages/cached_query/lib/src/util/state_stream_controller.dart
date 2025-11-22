@@ -37,9 +37,10 @@ class DataEvent<T> extends Event<T> {
 class StateStreamController<T> {
   ///{@macro StateStreamController}
   StateStreamController([T? initialValue])
-      : _value = initialValue == null ? Option.none() : Some(initialValue);
+      : _value = initialValue == null ? Option.none() : Some(initialValue),
+        _controller = StreamController<Event<T>>.broadcast(sync: true);
   Option<T> _value = None<T>();
-  final _controller = StreamController<Event<T>>.broadcast(sync: true);
+  final StreamController<Event<T>> _controller;
 
   /// The current value stored in this controller.
   T get value {
@@ -90,7 +91,7 @@ extension WithInitialExtension<T> on Stream<T> {
   ///         .withInitial(1)
   ///         .listen(print); // prints 1, 2, 3
   Stream<T> withInitial(T initialValue) {
-    final controller = StreamController<T>(sync: true);
+    final controller = StreamController<T>.broadcast(sync: true);
     StreamSubscription<T>? subscription;
 
     controller.onListen = () {
@@ -104,8 +105,6 @@ extension WithInitialExtension<T> on Stream<T> {
         onDone: controller.close,
       );
     };
-    controller.onPause = () => subscription?.pause();
-    controller.onResume = () => subscription?.resume();
     controller.onCancel = () => subscription?.cancel();
 
     return controller.stream;
