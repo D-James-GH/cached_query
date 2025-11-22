@@ -476,7 +476,7 @@ void main() {
       }
     });
 
-    test("Creating a query after updates queryFn", () {
+    test("Can convert an empty Query to an infinite query.", () {
       fakeAsync((async) async {
         final cache = CachedQuery.asNewInstance()
           ..setQueryData<String>(
@@ -502,6 +502,21 @@ void main() {
         expect(status.data, "fetched_value");
         expect(status, isA<InfiniteQueryError<String, int>>());
       });
+    });
+    test("Can not convert existing query into infinite query", () {
+      final cache = CachedQuery.asNewInstance();
+      final key = "query_key";
+      final query = Query(key: key, queryFn: () async => "", cache: cache);
+
+      expect(
+        () => InfiniteQuery<String, int>(
+          key: key,
+          getNextArg: (state) => (state?.length ?? 0) + 1,
+          queryFn: (_) async => "",
+          cache: cache,
+        ),
+        throwsA(isA<AssertionError>()),
+      );
     });
   });
 }

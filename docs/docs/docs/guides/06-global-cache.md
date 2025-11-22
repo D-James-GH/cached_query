@@ -84,6 +84,53 @@ CachedQuery.instance.getQuery(key);
 
 It is often useful to be able to update the cache manually, for example, when performing [optimistic updates](/docs/guides/optimistic-updates)
 
+### Setting query data
+
+Setting a query directly alters the data stored, if no query is available then one will be created.
+
+If a new query is added using `setQueryData` it will be created with an empty `queryFn`. Any subsequent 
+fetches will fail until a query or infinite query with the same key is created. 
+
+```dart
+
+CachedQuery.instance.setQueryData<String>(
+    key: "query_key",
+    data: "new_value",
+  );
+
+final query = CachedQuery.instance.getQuery("query_key");
+
+/// THIS WILL FAIL
+query.refetch();
+
+```
+
+To allow use of fetching, create an infinite query or query with the same key: 
+
+```dart
+final query = Query<String>(
+  key: "query_key",
+  queryFn: (_) async => "",
+);
+// WILL NOT FAIL
+query.refetch();
+```
+or for infinite query: 
+```dart
+final query = InfiniteQuery<String, int>(
+  key: "query_key",
+  getNextArg: (state) => (state?.length ?? 0) + 1,
+  queryFn: (_) async => "",
+);
+// WILL NOT FAIL
+query.refetch();
+```
+
+### Updating query data
+
+Updating query data requires that a query already be present in the cache. It will not create a new 
+query if the key doesn't exist.
+
 Use `updateQuery` to update a query or an infinite query. Any changes will be emitted down the query stream.
 The update function requires either a `key` or a `filterFn` to select the query to update. The `updateFn` is then called with the current data and should return the new data.
 
