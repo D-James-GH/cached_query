@@ -1,3 +1,9 @@
+## 3.2.0
+
+ - **FIX**: make controller updates sycronous to fix infinitequery getNextPage return result being out of sync. ([16a867e4](https://github.com/D-James-GH/cached_query/commit/16a867e42fe5ac0607c9a21ff8fd80539104a61e))
+ - **FEAT**: setQueryData creates a query if non exists. ([07c38e29](https://github.com/D-James-GH/cached_query/commit/07c38e297c636634b6df6cf9c83a733541ba2457))
+ - **DOCS**: add setQueryData to docs. ([90bc0822](https://github.com/D-James-GH/cached_query/commit/90bc0822d5fbc8d6499f7bce513d36a4ef971ed3))
+
 ## 3.1.0
 
  - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.

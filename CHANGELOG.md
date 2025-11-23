@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-11-23
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.2.0`](#cached_query---v320)
+ - [`cached_query_flutter` - `v3.2.0`](#cached_query_flutter---v320)
+ - [`cached_storage` - `v3.1.0`](#cached_storage---v310)
+
+---
+
+#### `cached_query` - `v3.2.0`
+
+ - **FIX**: make controller updates sycronous to fix infinitequery getNextPage return result being out of sync. ([16a867e4](https://github.com/D-James-GH/cached_query/commit/16a867e42fe5ac0607c9a21ff8fd80539104a61e))
+ - **FEAT**: setQueryData creates a query if non exists. ([07c38e29](https://github.com/D-James-GH/cached_query/commit/07c38e297c636634b6df6cf9c83a733541ba2457))
+ - **DOCS**: add setQueryData to docs. ([90bc0822](https://github.com/D-James-GH/cached_query/commit/90bc0822d5fbc8d6499f7bce513d36a4ef971ed3))
+
+#### `cached_query_flutter` - `v3.2.0`
+
+ - **FEAT**: setQueryData creates a query if non exists. ([07c38e29](https://github.com/D-James-GH/cached_query/commit/07c38e297c636634b6df6cf9c83a733541ba2457))
+
+#### `cached_storage` - `v3.1.0`
+
+ - **FEAT**: setQueryData creates a query if non exists. ([07c38e29](https://github.com/D-James-GH/cached_query/commit/07c38e297c636634b6df6cf9c83a733541ba2457))
+
+
 ## 2025-11-12
 
 ### Changes

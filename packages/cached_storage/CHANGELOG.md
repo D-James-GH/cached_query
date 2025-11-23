@@ -1,3 +1,7 @@
+## 3.1.0
+
+ - **FEAT**: setQueryData creates a query if non exists. ([07c38e29](https://github.com/D-James-GH/cached_query/commit/07c38e297c636634b6df6cf9c83a733541ba2457))
+
 ## 3.0.4
 
  - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.
