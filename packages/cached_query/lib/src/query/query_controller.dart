@@ -37,23 +37,6 @@ class EmptyFetchFunction<T> implements FetchFunction<T> {
   }
 }
 
-/// {@template controllerState}
-/// Internal state for the query controller.
-/// {@endtemplate}
-class ControllerState<T> {
-  /// The data of the query.
-  final Option<T> data;
-
-  /// The time the query was last fetched.
-  final DateTime timeCreated;
-
-  /// {@macro controllerState}
-  ControllerState({
-    required this.data,
-    required this.timeCreated,
-  });
-}
-
 /// {@template QueryController}
 /// The [QueryController] is the base class and logic for both [Query] and [InfiniteQuery].
 /// {@endtemplate}
@@ -68,9 +51,11 @@ final class QueryController<T> {
     required CachedQuery cache,
   })  : _cache = cache,
         _config = config,
-        state = ControllerState(
-          timeCreated: DateTime.now(),
-          data: initialData ?? Option.none(),
+        stateNotifier = QueryStateNotifier(
+          ControllerState(
+            timeCreated: DateTime.now(),
+            data: initialData ?? Option.none(),
+          ),
         );
 
   ControllerOptions<T> _config;
@@ -79,9 +64,6 @@ final class QueryController<T> {
 
   /// The function that is called when the query is fetched.
   FetchFunction<T> onFetch;
-
-  /// The current state of the query.
-  ControllerState<T> state;
 
   /// The key used to store and access the query. Encoded using jsonEncode.
   ///
@@ -94,7 +76,7 @@ final class QueryController<T> {
   bool _invalidated = false;
 
   bool isInvalidated() {
-    return _invalidated || state.data.isNone;
+    return _invalidated || stateNotifier.value.data.isNone;
   }
 
   bool isStaleOrInvalidated(Duration duration) {
@@ -103,7 +85,7 @@ final class QueryController<T> {
 
   bool isStaleFromDuration(Duration duration) {
     final currentTime = DateTime.now();
-    final staleTime = state.timeCreated.add(duration);
+    final staleTime = stateNotifier.value.timeCreated.add(duration);
     return staleTime.isBefore(currentTime);
   }
 
@@ -116,13 +98,11 @@ final class QueryController<T> {
     });
   }
 
-  final _streamController = StateStreamController<ControllerAction<T>>();
+  final QueryStateNotifier<T> stateNotifier;
 
   ///
   bool get isActive => _listeners.any((q) => q.hasListener);
   bool get hasListeners => _listeners.isNotEmpty;
-
-  Stream<Event<ControllerAction<T>>> get stream => _streamController.stream;
 
   final CachedQuery _cache;
   Timer? _deleteQueryTimer;
@@ -156,7 +136,7 @@ final class QueryController<T> {
   /// The [updateFn] passes the current query data and must return new data of
   /// the same type as the original query/infiniteQuery.
   void update(UpdateFunc<T> updateFn) {
-    final newData = updateFn(state.data.valueOrNull);
+    final newData = updateFn(stateNotifier.value.data.valueOrNull);
     return setData(newData);
   }
 
@@ -171,12 +151,12 @@ final class QueryController<T> {
 
   void setData(T data) {
     final newData = Some(data);
-    state = ControllerState(
-      data: newData,
-      timeCreated: state.timeCreated,
+    stateNotifier.add(
+      DataUpdated(
+        data: newData.value,
+        timeCreated: stateNotifier.value.timeCreated,
+      ),
     );
-    _streamController
-        .add(DataUpdated(data: newData.value, timeCreated: state.timeCreated));
     _saveToStorage();
   }
 
@@ -203,7 +183,7 @@ final class QueryController<T> {
   }
 
   /// Add a new query listener.
-  void addListener(Cacheable<QueryState<T>> query) {
+  void registerQuery(Cacheable<QueryState<T>> query) {
     if (!_listeners.contains(query)) {
       _listeners.add(query);
     }
@@ -211,10 +191,10 @@ final class QueryController<T> {
   }
 
   /// Removes a listener from the query.
-  void removeListener(Cacheable<QueryState<T>> query) {
+  void removeRegisteredQuery(Cacheable<QueryState<T>> query) {
     _listeners.remove(query);
     if (_listeners.isEmpty) {
-      _scheduleDelete();
+      scheduleDelete();
     }
   }
 
@@ -227,33 +207,36 @@ final class QueryController<T> {
         final config = q.config as QueryConfig<T>;
         return config.shouldFetch(
           key,
-          state.data.valueOrNull,
-          state.timeCreated,
+          stateNotifier.value.data.valueOrNull,
+          stateNotifier.value.timeCreated,
         );
       },
     );
     if (!shouldFetch) {
       return;
     }
-    _streamController.add(
-      Fetch(fetchOptions: options, isInitialFetch: state.data.isNone),
+    stateNotifier.add(
+      Fetch(
+        fetchOptions: options,
+        isInitialFetch: stateNotifier.value.data.isNone,
+      ),
     );
-    final getFromStorage = state.data.isNone && _config.storeQuery;
+    final getFromStorage =
+        stateNotifier.value.data.isNone && _config.storeQuery;
     if (getFromStorage) {
       try {
         final storedData = await _fetchFromStorage();
         if (storedData != null) {
           final newData = Some(storedData.data);
-          state = ControllerState(
-            data: newData,
-            timeCreated: storedData.createdAt,
-          );
-          _streamController.add(
-            DataUpdated(data: newData.value, timeCreated: state.timeCreated),
+          stateNotifier.add(
+            DataUpdated(
+              data: newData.value,
+              timeCreated: storedData.createdAt,
+            ),
           );
         }
       } catch (e, s) {
-        _streamController.add(StorageError(error: e, stackTrace: s));
+        stateNotifier.add(StorageError(error: e, stackTrace: s));
       }
     }
 
@@ -262,8 +245,8 @@ final class QueryController<T> {
         final config = q.config as QueryConfig<T>;
         return config.shouldFetch(
           key,
-          state.data.valueOrNull,
-          state.timeCreated,
+          stateNotifier.value.data.valueOrNull,
+          stateNotifier.value.timeCreated,
         );
       },
     );
@@ -273,38 +256,34 @@ final class QueryController<T> {
 
     if ((stale || ignoreStale) && shouldContinue) {
       try {
-        final res =
-            await onFetch(options: options, state: state.data.valueOrNull);
-        final newData = Some(res);
-        state = ControllerState(
-          data: newData,
-          timeCreated: DateTime.now(),
+        final res = await onFetch(
+          options: options,
+          state: stateNotifier.value.data.valueOrNull,
         );
-        _streamController.add(
-          Success(data: newData, timeCreated: state.timeCreated),
+        final newData = Some(res);
+        stateNotifier.add(
+          Success(data: newData, timeCreated: DateTime.now()),
         );
         _saveToStorage();
-        if (!isActive) {
-          _scheduleDelete();
-        }
+        scheduleDelete();
       } catch (e, s) {
-        _streamController.add(FetchError(error: e, stackTrace: s));
-        if (!isActive) {
-          _scheduleDelete();
-        }
+        stateNotifier.add(FetchError(error: e, stackTrace: s));
+        scheduleDelete();
       }
     } else {
-      _streamController.add(
+      stateNotifier.add(
         // Nothing has failed but the data might be missing.
-        // Maybe emit the option type and let the query handle it?
-        Success(data: state.data, timeCreated: state.timeCreated),
+        Success(
+          data: stateNotifier.value.data,
+          timeCreated: stateNotifier.value.timeCreated,
+        ),
       );
     }
   }
 
   void _saveToStorage() {
     if (!_config.storeQuery) return;
-    final data = state.data;
+    final data = stateNotifier.value.data;
     if (_cache.storage == null) return;
 
     if (data case Some(:final value)) {
@@ -315,7 +294,7 @@ final class QueryController<T> {
       final storedQuery = StoredQuery(
         key: key,
         data: dataToStore,
-        createdAt: state.timeCreated,
+        createdAt: stateNotifier.value.timeCreated,
         storageDuration: _config.storageDuration,
       );
       _cache.storage!.put(storedQuery);
@@ -360,9 +339,11 @@ final class QueryController<T> {
   }
 
   /// After the [_cacheTime] is up remove the query from the global cache.
-  void _scheduleDelete() {
-    if (!_config.ignoreCacheDuration) {
-      _deleteQueryTimer = Timer(_config.cacheDuration, deleteQuery);
+  void scheduleDelete() {
+    if (!isActive) {
+      if (!_config.ignoreCacheDuration) {
+        _deleteQueryTimer = Timer(_config.cacheDuration, deleteQuery);
+      }
     }
   }
 
@@ -381,7 +362,8 @@ final class QueryController<T> {
 
   /// Closes the stream and therefore starts the delete timer.
   Future<void> close() async {
-    await _streamController.close();
+    stateNotifier.close();
+    _listeners.clear();
   }
 
   Future<void> dispose() async {

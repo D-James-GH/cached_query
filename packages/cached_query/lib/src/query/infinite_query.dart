@@ -117,7 +117,7 @@ final class InfiniteQuery<T, Arg>
       controller.updateConfig(config: config);
     }
 
-    if (prefetchPages != null && controller.state.data.isNone) {
+    if (prefetchPages != null && controller.stateNotifier.value.data.isNone) {
       controller.fetch(
         ignoreStale: true,
         options: InfiniteFetchOptions(prefetchPages: prefetchPages),
@@ -138,18 +138,18 @@ final class InfiniteQuery<T, Arg>
         _onError = onError,
         _controller = controller {
     _state = InfiniteQueryStatus.initial(
-      timeCreated: controller.state.timeCreated,
-      data: controller.state.data.valueOrNull,
+      timeCreated: controller.stateNotifier.value.timeCreated,
+      data: controller.stateNotifier.value.data.valueOrNull,
     );
     _stateSubject = BehaviorSubject.seeded(
       state,
       onListen: () {
         controller
-          ..addListener(this)
+          ..registerQuery(this)
           ..fetch(options: InfiniteFetchOptions());
       },
       onCancel: () {
-        controller.removeListener(this);
+        controller.removeRegisteredQuery(this);
       },
       sync: true,
     );
@@ -192,10 +192,10 @@ final class InfiniteQuery<T, Arg>
     if (!stale) {
       return state;
     }
-    _controller.addListener(this);
+    _controller.registerQuery(this);
     await _controller.fetch(options: InfiniteFetchOptions());
     if (!hasListener) {
-      _controller.removeListener(this);
+      _controller.removeRegisteredQuery(this);
     }
 
     if (state case InfiniteQueryError(:final stackTrace, :final error)
@@ -287,13 +287,15 @@ final class InfiniteQuery<T, Arg>
   }
 
   void _init() {
-    _controller.stream.listen(_handleAction);
+    _controller.stateNotifier.addListener(_handleAction);
   }
 
-  void _handleAction(Event<ControllerAction<InfiniteQueryData<T, Arg>>> event) {
+  void _handleAction(
+    Event<ControllerAction<InfiniteQueryData<T, Arg>>> event,
+  ) {
     final notifyObservers =
         event is DataEvent<ControllerAction<InfiniteQueryData<T, Arg>>>;
-    switch (event.value) {
+    switch (event.action) {
       case Fetch(:final isInitialFetch, :final fetchOptions):
         _setState(
           InfiniteQueryStatus.loading(

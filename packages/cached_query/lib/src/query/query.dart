@@ -138,18 +138,18 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
         _onSuccess = onSuccess,
         _controller = controller {
     _state = QueryInitial(
-      timeCreated: controller.state.timeCreated,
-      data: controller.state.data.valueOrNull,
+      timeCreated: controller.stateNotifier.value.timeCreated,
+      data: controller.stateNotifier.value.data.valueOrNull,
     );
     _stateSubject = BehaviorSubject.seeded(
       state,
       onListen: () {
         controller
-          ..addListener(this)
+          ..registerQuery(this)
           ..fetch();
       },
       onCancel: () {
-        controller.removeListener(this);
+        controller.removeRegisteredQuery(this);
       },
     );
     _init();
@@ -185,10 +185,10 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     if (!stale) {
       return state;
     }
-    _controller.addListener(this);
+    _controller.registerQuery(this);
     await _controller.fetch();
     if (!hasListener) {
-      _controller.removeListener(this);
+      _controller.removeRegisteredQuery(this);
     }
 
     if (state case QueryError(:final stackTrace, :final error)
@@ -262,12 +262,12 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   }
 
   void _init() {
-    _controller.stream.listen(_handleAction);
+    _controller.stateNotifier.addListener(_handleAction);
   }
 
   void _handleAction(Event<ControllerAction<T>> event) {
     final notifyObservers = event is DataEvent<ControllerAction<T>>;
-    switch (event.value) {
+    switch (event.action) {
       case Fetch(:final isInitialFetch):
         _setState(
           QueryStatus.loading(

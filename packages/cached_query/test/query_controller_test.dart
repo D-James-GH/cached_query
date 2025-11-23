@@ -25,11 +25,11 @@ void main() {
 
         expect(controller.hasListeners, isFalse);
 
-        controller.addListener(query);
+        controller.registerQuery(query);
 
         expect(controller.hasListeners, isTrue);
 
-        controller.removeListener(query);
+        controller.removeRegisteredQuery(query);
 
         expect(async.pendingTimers.length, 1);
 

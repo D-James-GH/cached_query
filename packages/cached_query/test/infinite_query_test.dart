@@ -27,13 +27,28 @@ void main() async {
       expect(query, queryFromCache);
     });
     test("Can set initial data", () {
+      final cache = CachedQuery.asNewInstance();
       final query = InfiniteQuery<String, int>(
         key: "initial",
         queryFn: repo.getPosts,
         getNextArg: (state) => 1,
+        cache: cache,
         initialData: InfiniteQueryData(pages: ["initialData"], args: [1]),
       );
       expect(query.state.data!.pages.first, "initialData");
+    });
+    test("Initial data is considered fresh", () async {
+      final cache = CachedQuery.asNewInstance();
+      final initialData = InfiniteQueryData(pages: ["initialData"], args: [1]);
+      final query = InfiniteQuery<String, int>(
+        key: "initial-fresh",
+        cache: cache,
+        queryFn: repo.getPosts,
+        getNextArg: (state) => 1,
+        initialData: initialData,
+      );
+      final res = await query.fetch();
+      expect(res.data, same(initialData));
     });
     test("Initial data is first in stream", () async {
       final initialQuery = await InfiniteQuery<String, int>(
@@ -87,6 +102,21 @@ void main() async {
       );
       final res = await query2.getNextPage();
       expect(res, isA<InfiniteQuerySuccess<String, int>>());
+    });
+    test("state is accessible immediately after fetch with initial data",
+        () async {
+      final cache = CachedQuery.asNewInstance();
+      final query = InfiniteQuery<String, int>(
+        key: "accessState",
+        cache: cache,
+        config: const QueryConfig(staleDuration: Duration.zero),
+        initialData: InfiniteQueryData(pages: ["initial"], args: [1]),
+        queryFn: (_) => Future.value("data"),
+        getNextArg: (_) => 1,
+      );
+
+      final res1 = await query.fetch();
+      expect(res1, isA<InfiniteQuerySuccess<String, int>>());
     });
   });
   group("Infinite query as a future", () {

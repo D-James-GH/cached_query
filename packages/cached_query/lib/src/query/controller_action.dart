@@ -2,6 +2,23 @@
 import 'package:cached_query/src/query/_query.dart';
 import 'package:cached_query/src/util/option.dart';
 
+/// {@template controllerState}
+/// Internal state for the query controller.
+/// {@endtemplate}
+class ControllerState<T> {
+  /// The data of the query.
+  final Option<T> data;
+
+  /// The time the query was last fetched.
+  final DateTime timeCreated;
+
+  /// {@macro controllerState}
+  ControllerState({
+    required this.data,
+    required this.timeCreated,
+  });
+}
+
 sealed class ControllerAction<T> {}
 
 final class Fetch<T> extends ControllerAction<T> {

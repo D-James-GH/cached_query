@@ -506,7 +506,7 @@ void main() {
     test("Can not convert existing query into infinite query", () {
       final cache = CachedQuery.asNewInstance();
       final key = "query_key";
-      final query = Query(key: key, queryFn: () async => "", cache: cache);
+      final _ = Query(key: key, queryFn: () async => "", cache: cache);
 
       expect(
         () => InfiniteQuery<String, int>(

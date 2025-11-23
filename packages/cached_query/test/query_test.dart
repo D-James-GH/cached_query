@@ -58,6 +58,18 @@ void main() {
       final res = await query.fetch();
       expect(res.data, returnString);
     });
+    test("result returns the return string with initial data", () async {
+      final cache = CachedQuery.asNewInstance();
+      final query = Query(
+        key: "result",
+        cache: cache,
+        config: const QueryConfig<String>(staleDuration: Duration.zero),
+        queryFn: fetchFunction,
+        initialData: "init",
+      );
+      final res = await query.fetch();
+      expect(res.data, returnString);
+    });
     test("Calling twice while not stale returns the same result", () async {
       final QueryState<String> res1 = await Query(
         key: "calling twice",
