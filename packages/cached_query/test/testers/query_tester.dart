@@ -1,18 +1,19 @@
 import 'package:cached_query/cached_query.dart';
 
 int _serial = 0;
-const testQueryRes = 'result';
+const _testQueryRes = 'result';
 
-class QueryTester {
-  late final Cacheable<dynamic> query;
+class QueryTester<T extends Cacheable<dynamic>> {
+  late final T query;
   int _numFetches = 0;
   int get numFetches => _numFetches;
 
   QueryTester({
     QueryConfig<String>? config,
     String? key,
-    String res = testQueryRes,
+    String res = _testQueryRes,
     void Function()? onFetch,
+    bool Function(int numFetches)? shouldThrow,
     CachedQuery? cache,
   }) {
     query = createQuery(
@@ -22,16 +23,20 @@ class QueryTester {
       res: res,
       onFetch: () {
         _numFetches++;
+        if (shouldThrow != null && shouldThrow(_numFetches)) {
+          throw Exception('Fetch error on fetch #$_numFetches');
+        }
         onFetch?.call();
       },
-    );
+    ) as T;
   }
 
   QueryTester.infinite({
     QueryConfig<InfiniteQueryData<String, int>>? config,
     String? key,
-    String res = testQueryRes,
+    String res = _testQueryRes,
     void Function()? onFetch,
+    bool Function(int numFetches)? shouldThrow,
     CachedQuery? cache,
   }) {
     query = createInfiniteQuery(
@@ -41,16 +46,19 @@ class QueryTester {
       cache: cache,
       onFetch: () {
         _numFetches++;
+        if (shouldThrow != null && shouldThrow(_numFetches)) {
+          throw Exception('Fetch error on fetch #$_numFetches');
+        }
         onFetch?.call();
       },
-    );
+    ) as T;
   }
 }
 
 Query<String> createQuery({
   QueryConfig<String>? config,
   String? key,
-  String res = testQueryRes,
+  String res = _testQueryRes,
   void Function()? onFetch,
   CachedQuery? cache,
 }) {
@@ -69,7 +77,7 @@ Query<String> createQuery({
 InfiniteQuery<String, int> createInfiniteQuery({
   QueryConfig<InfiniteQueryData<String, int>>? config,
   String? key,
-  String res = testQueryRes,
+  String res = _testQueryRes,
   void Function()? onFetch,
   CachedQuery? cache,
 }) {

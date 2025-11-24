@@ -110,33 +110,34 @@ void main() {
   });
 
   test("Can prevent resume with min refetch background", () async {
-    fakeAsync((async) async {
-      final streamController = StreamController<AppState>();
-      final cache = CachedQuery.asNewInstance()
-        ..config(
-          config: GlobalQueryConfig(
-            staleDuration: Duration.zero,
-            refetchOnResumeMinBackgroundDuration: Duration(seconds: 5),
-          ),
-          lifecycleStream: streamController.stream,
-        );
-      final tester1 = QueryTester(cache: cache)..query.stream.listen((_) {});
+    final streamController = StreamController<AppState>();
+    final cache = CachedQuery.asNewInstance()
+      ..config(
+        config: GlobalQueryConfig(
+          staleDuration: Duration.zero,
+          refetchOnResumeMinBackgroundDuration: Duration(milliseconds: 50),
+        ),
+        lifecycleStream: streamController.stream,
+      );
+    final tester1 = QueryTester(cache: cache)..query.stream.listen((_) {});
 
-      await tester1.query.fetch();
-      streamController.add(AppState.background);
-      async.elapse(Duration(seconds: 3));
-      streamController.add(AppState.foreground);
-      expect(tester1.numFetches, 1);
+    await tester1.query.fetch();
 
-      streamController.add(AppState.background);
-      async.elapse(Duration(seconds: 5));
-      streamController.add(AppState.foreground);
+    expect(tester1.numFetches, 1);
+    streamController.add(AppState.background);
+    await Future<void>.delayed(Duration(milliseconds: 10));
+    streamController.add(AppState.foreground);
 
-      await Future<void>.delayed(Duration.zero);
+    expect(tester1.numFetches, 1);
 
-      expect(tester1.numFetches, 2);
-    });
+    streamController.add(AppState.background);
+    await Future<void>.delayed(Duration(milliseconds: 50));
+    streamController.add(AppState.foreground);
+    await pumpEventQueue();
+
+    expect(tester1.numFetches, 2);
   });
+
   test("Sending multiple states does not re-trigger", () async {
     final streamController = StreamController<AppState>();
     final cache = CachedQuery.asNewInstance()
