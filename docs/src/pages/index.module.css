@@ -4,20 +4,57 @@
  */
 
 .heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+    padding: 4rem 0;
+    position: relative;
+    overflow: hidden;
+    background-color: var(--ifm-background-surface-color);
+    color: var(--ifm-font-color-base);
+}
+
+.heroContent {
+    display: grid;
+    grid-template-columns: minmax(400px, 1fr) 1.5fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.heroLeft {
+    text-align: left;
+}
+.heroTitle {
+    margin-bottom: 0 !important;
+}
+
+.titleContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.logo {
+    width: 64px;
+    height: 64px;
+}
+
+.heroRight {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 @media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
+    .heroBanner {
+        padding: 2rem;
+    }
+
+    .heroContent {
+        grid-template-columns: 1fr;
+    }
 }
 
 .buttons {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
 }

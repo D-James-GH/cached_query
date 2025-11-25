@@ -52,6 +52,28 @@ QueryConfig(
 );
 ```
 
+### Polling / Refetch Duration
+
+A query can be set to automatically refetch at a given interval using the `pollingDuration` parameter.
+This is a function that will be called every time the query status changes. If a non-null duration is returned then the query will
+automatically refetch at that interval.
+
+By default the polling only affects active queries, meaning queries with listeners. However, this can be changed using the `pollInactive`
+parameter.
+
+```dart
+QueryConfig(
+  staleDuration: Duration.zero,
+  pollInactive: true,
+  pollingInterval: (state) {
+    if (state.isError) {
+      return null;
+    }
+    return const Duration(milliseconds: 5000);
+  },
+)
+```
+
 ## Global Configuration
 
 Global configuration can be set when instantiating a Cache or once by configuring the global instance.
