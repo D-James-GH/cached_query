@@ -1,8 +1,10 @@
 import 'package:cached_query/cached_query.dart';
+import 'package:fake_async/fake_async.dart';
 import 'package:test/test.dart';
 
 import 'repos/query_test_repo.dart';
 import 'test_implementations.dart';
+import 'testers/query_tester.dart';
 
 void main() {
   final cachedQuery = CachedQuery.instance;
@@ -669,6 +671,103 @@ void main() {
         queryFn: fetchFunction,
       );
       expect(query1, isNot(same(query2)));
+    });
+  });
+  group("Polling a query", () {
+    test("Should poll a query at specified interval", () async {
+      fakeAsync((async) {
+        final cache = CachedQuery.asNewInstance();
+        final tester = QueryTester<Query<String>>(
+          key: "polling",
+          cache: cache,
+          config: QueryConfig(
+            staleDuration: Duration.zero,
+            pollingInterval: (_) => const Duration(milliseconds: 100),
+          ),
+        );
+        final sub = tester.query.stream.listen((event) {});
+        tester.query.fetch();
+        async.flushMicrotasks();
+        expect(tester.numFetches, 1);
+        async
+          ..elapse(const Duration(milliseconds: 500))
+          ..flushMicrotasks();
+
+        expect(tester.numFetches, 6);
+        sub.cancel();
+      });
+    });
+    test("Won't fetch if no listeners", () {
+      fakeAsync((async) {
+        final cache = CachedQuery.asNewInstance();
+        final tester = QueryTester<Query<String>>(
+          key: "polling",
+          cache: cache,
+          config: QueryConfig(
+            staleDuration: Duration.zero,
+            pollingInterval: (_) => const Duration(milliseconds: 100),
+          ),
+        );
+        tester.query.fetch();
+        async.flushMicrotasks();
+        expect(tester.numFetches, 1);
+        async
+          ..elapse(const Duration(milliseconds: 500))
+          ..flushMicrotasks();
+
+        expect(tester.numFetches, 1);
+      });
+    });
+    test("Will fetch if no listeners if config set", () {
+      fakeAsync((async) {
+        final cache = CachedQuery.asNewInstance();
+        final tester = QueryTester<Query<String>>(
+          key: "polling",
+          cache: cache,
+          config: QueryConfig(
+            staleDuration: Duration.zero,
+            pollInactive: true,
+            pollingInterval: (_) => const Duration(milliseconds: 100),
+          ),
+        );
+        tester.query.fetch();
+        async.flushMicrotasks();
+        expect(tester.numFetches, 1);
+        async
+          ..elapse(const Duration(milliseconds: 500))
+          ..flushMicrotasks();
+
+        expect(tester.numFetches, 6);
+      });
+    });
+    test("Polling can change after a state change", () {
+      fakeAsync((async) {
+        final cache = CachedQuery.asNewInstance();
+        final tester = QueryTester<Query<String>>(
+          shouldThrow: (numFetches) => numFetches == 2,
+          key: "polling",
+          cache: cache,
+          config: QueryConfig(
+            staleDuration: Duration.zero,
+            pollInactive: true,
+            pollingInterval: (state) {
+              if (state.isError) {
+                return null;
+              }
+              return const Duration(milliseconds: 100);
+            },
+          ),
+        );
+
+        tester.query.fetch();
+        async.flushMicrotasks();
+        expect(tester.numFetches, 1);
+        async
+          ..elapse(const Duration(milliseconds: 600))
+          ..flushMicrotasks();
+
+        expect(tester.numFetches, 2);
+      });
     });
   });
 }

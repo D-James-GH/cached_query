@@ -12,6 +12,8 @@ class JokeService {
     return Query<JokeModel>(
       key: 'joke',
       config: QueryConfig(
+        // fetch a new joke every 5 seconds
+        pollingInterval: (_) => const Duration(seconds: 5),
         storeQuery: true,
         staleDuration: const Duration(seconds: 4),
         storageDeserializer: (json) =>

@@ -178,6 +178,23 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
   @override
   final Duration? storageDuration;
 
+  /// {@template QueryConfig.refetchInterval}
+  /// Return a [Duration] to have the query refetched at the given interval.
+  ///
+  /// The function will be called when the status of the query changes, allowing
+  /// for dynamic polling intervals based on the query state.
+  ///
+  /// If null is returned or no function is passed, polling will be disabled.
+  /// {@endtemplate}
+  final Duration? Function(QueryState<Data>)? pollingInterval;
+
+  /// {@template QueryConfig.pollInactive}
+  /// If true, the polling will continue even when there are no active listeners
+  ///
+  /// Defaults to false.
+  /// {@endtemplate}
+  final bool pollInactive;
+
   /// {@macro QueryConfig.cacheDuration}
   @override
   Duration get cacheDuration => _cacheDuration ?? _defaultConfig.cacheDuration;
@@ -238,10 +255,12 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
   const QueryConfig({
     ShouldFetch<Data>? shouldFetch,
     this.storageSerializer,
+    this.storageDuration,
     this.storageDeserializer,
+    this.pollingInterval,
+    this.pollInactive = false,
     bool? ignoreCacheDuration,
     bool? storeQuery,
-    this.storageDuration,
     @Deprecated('Use staleDuration instead, for clearer naming')
     Duration? refetchDuration,
     Duration? staleDuration,
@@ -263,6 +282,8 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
     return QueryConfig<Data>(
       storageDeserializer: storageDeserializer,
       storageSerializer: storageSerializer,
+      pollingInterval: pollingInterval,
+      pollInactive: pollInactive,
       ignoreCacheDuration: _ignoreCacheDuration ?? global.ignoreCacheDuration,
       shouldFetch: _shouldFetch ?? global.shouldFetch,
       storeQuery: _storeQuery ?? global.storeQuery,
@@ -288,6 +309,8 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
           storageSerializer == other.storageSerializer &&
           ignoreCacheDuration == other.ignoreCacheDuration &&
           refetchOnResume == other.refetchOnResume &&
+          pollingInterval == other.pollingInterval &&
+          pollInactive == other.pollInactive &&
           refetchOnConnection == other.refetchOnConnection;
 
   @override
@@ -299,5 +322,7 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
       storageDeserializer.hashCode ^
       ignoreCacheDuration.hashCode ^
       refetchOnResume.hashCode ^
+      pollingInterval.hashCode ^
+      pollInactive.hashCode ^
       refetchOnConnection.hashCode;
 }

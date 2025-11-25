@@ -283,11 +283,36 @@ final class InfiniteQuery<T, Arg>
       }
     }
     _state = state;
+
+    final newInterval = config.pollingInterval?.call(_state);
+    if (_pollingInterval != newInterval) {
+      _pollingTimer?.cancel();
+      _pollingInterval = newInterval;
+      if (_pollingInterval != null) {
+        _pollingTimer = _createPollingTimer(_pollingInterval!);
+      }
+    }
+
     _stateSubject.add(state);
   }
 
+  Timer? _pollingTimer;
+  Duration? _pollingInterval;
   void _init() {
     _controller.stateNotifier.addListener(_handleAction);
+
+    _pollingInterval = config.pollingInterval?.call(_state);
+    if (_pollingInterval != null) {
+      _pollingTimer = _createPollingTimer(_pollingInterval!);
+    }
+  }
+
+  Timer _createPollingTimer(Duration interval) {
+    return Timer.periodic(interval, (_) {
+      if (hasListener || config.pollInactive) {
+        fetch();
+      }
+    });
   }
 
   void _handleAction(
