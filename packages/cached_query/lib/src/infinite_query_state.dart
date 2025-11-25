@@ -58,6 +58,11 @@ final class InfiniteQueryData<T, Arg> {
 
   @override
   int get hashCode => pages.hashCode ^ args.hashCode;
+
+  @override
+  String toString() {
+    return 'InfiniteQueryData(pages: $pages, args: $args)';
+  }
 }
 
 /// {@template infiniteQueryState}
