@@ -4,7 +4,7 @@
   <ShortName>Cached Query</ShortName>
   <Description>Search Cached Query</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/x-icon">https://www.cachedquery.dev/img/favicon.ico</Image>
+  <Image width="16" height="16" type="image/x-icon">https://www.cachedquery.dev/img/favicon.svg</Image>
   <Url type="text/html" method="get" template="https://www.cachedquery.dev/search?q={searchTerms}"/>
   <Url type="application/opensearchdescription+xml" rel="self" template="https://www.cachedquery.dev/opensearch.xml" />
   <moz:SearchForm>https://www.cachedquery.dev/</moz:SearchForm>
