@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cached_query/cached_query.dart';
-import 'package:fake_async/fake_async.dart';
 import 'package:test/test.dart';
 
 import 'testers/query_tester.dart';
