@@ -1,3 +1,9 @@
+## 3.3.0
+
+ - **REFACTOR**: add toString to infiniteQueryData. ([166814cd](https://github.com/D-James-GH/cached_query/commit/166814cd2ca8d6d04b284720e61e68f1d0f8be02))
+ - **REFACTOR**: add better printing to infinite query status. ([71a746f9](https://github.com/D-James-GH/cached_query/commit/71a746f9ae27292cfd485eb3061501dea8579d8a))
+ - **FEAT**: add polling interval config. ([fe9e8384](https://github.com/D-James-GH/cached_query/commit/fe9e8384774719ea669ad8e922e84c07e83cb775))
+
 ## 3.2.0
 
  - **FIX**: make controller updates sycronous to fix infinitequery getNextPage return result being out of sync. ([16a867e4](https://github.com/D-James-GH/cached_query/commit/16a867e42fe5ac0607c9a21ff8fd80539104a61e))

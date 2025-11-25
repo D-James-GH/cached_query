@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-11-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.3.0`](#cached_query---v330)
+ - [`cached_query_flutter` - `v3.3.0`](#cached_query_flutter---v330)
+ - [`cached_storage` - `v3.2.0`](#cached_storage---v320)
+
+---
+
+#### `cached_query` - `v3.3.0`
+
+ - **REFACTOR**: add toString to infiniteQueryData. ([166814cd](https://github.com/D-James-GH/cached_query/commit/166814cd2ca8d6d04b284720e61e68f1d0f8be02))
+ - **REFACTOR**: add better printing to infinite query status. ([71a746f9](https://github.com/D-James-GH/cached_query/commit/71a746f9ae27292cfd485eb3061501dea8579d8a))
+ - **FEAT**: add polling interval config. ([fe9e8384](https://github.com/D-James-GH/cached_query/commit/fe9e8384774719ea669ad8e922e84c07e83cb775))
+
+#### `cached_query_flutter` - `v3.3.0`
+
+ - **FEAT**: add polling interval config. ([fe9e8384](https://github.com/D-James-GH/cached_query/commit/fe9e8384774719ea669ad8e922e84c07e83cb775))
+
+#### `cached_storage` - `v3.2.0`
+
+ - **FEAT**: add polling interval config. ([fe9e8384](https://github.com/D-James-GH/cached_query/commit/fe9e8384774719ea669ad8e922e84c07e83cb775))
+
+
 ## 2025-11-23
 
 ### Changes

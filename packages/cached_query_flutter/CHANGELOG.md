@@ -1,3 +1,7 @@
+## 3.3.0
+
+ - **FEAT**: add polling interval config. ([fe9e8384](https://github.com/D-James-GH/cached_query/commit/fe9e8384774719ea669ad8e922e84c07e83cb775))
+
 ## 3.2.0
 
  - **FEAT**: setQueryData creates a query if non exists. ([07c38e29](https://github.com/D-James-GH/cached_query/commit/07c38e297c636634b6df6cf9c83a733541ba2457))
