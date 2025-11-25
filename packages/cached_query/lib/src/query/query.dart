@@ -276,6 +276,7 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   Duration? _pollingInterval;
   void _init() {
     _controller.stateNotifier.addListener(_handleAction);
+
     _pollingInterval = config.pollingInterval?.call(_state);
     if (_pollingInterval != null) {
       _pollingTimer = _createPollingTimer(_pollingInterval!);

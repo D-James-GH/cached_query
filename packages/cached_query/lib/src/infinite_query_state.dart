@@ -190,6 +190,11 @@ final class InfiniteQueryInitial<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       data: data,
     );
   }
+
+  @override
+  String toString() {
+    return 'InfiniteQueryInitial(timeCreated: $timeCreated, data: $data)';
+  }
 }
 
 /// {@template InfiniteQueryLoading}
@@ -249,6 +254,11 @@ final class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       isFetchingNextPage: isFetchingNextPage,
     );
   }
+
+  @override
+  String toString() {
+    return 'InfiniteQueryLoading(timeCreated: $timeCreated, data: $data, isRefetching: $isRefetching, isFetchingNextPage: $isFetchingNextPage, isInitialFetch: $isInitialFetch)';
+  }
 }
 
 /// {@template InfiniteQuerySuccess}
@@ -298,6 +308,11 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       hasReachedMax: hasReachedMax,
       data: data!,
     );
+  }
+
+  @override
+  String toString() {
+    return 'InfiniteQuerySuccess(timeCreated: $timeCreated, data: $data, hasReachedMax: $hasReachedMax)';
   }
 }
 
@@ -353,5 +368,10 @@ final class InfiniteQueryError<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       error: error,
       stackTrace: stackTrace,
     );
+  }
+
+  @override
+  String toString() {
+    return 'InfiniteQueryError(timeCreated: $timeCreated, error: $error, stackTrace: $stackTrace, data: $data)';
   }
 }
