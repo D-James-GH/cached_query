@@ -16,7 +16,7 @@ class ResumeController {
 
   /// The lifecycle stream to listen to.
   final Stream<AppState> lifecycleStream;
-  AppState? _currentState;
+  AppState _currentState = AppState.foreground;
   DateTime _lastPaused = DateTime.now();
   late final StreamSubscription<AppState> _lifecycleSubscription;
 
@@ -29,7 +29,7 @@ class ResumeController {
     if (newState == AppState.background) {
       _lastPaused = DateTime.now();
     } else if (newState == AppState.foreground) {
-      if (shouldRefetch(previousState!, newState)) {
+      if (shouldRefetch(previousState, newState)) {
         onResume();
       }
     }
