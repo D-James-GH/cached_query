@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2025-11-26
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.3.1`](#cached_query---v331)
+ - [`cached_query_flutter` - `v3.3.1`](#cached_query_flutter---v331)
+ - [`cached_storage` - `v3.2.1`](#cached_storage---v321)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.3.1`
+ - `cached_storage` - `v3.2.1`
+
+---
+
+#### `cached_query` - `v3.3.1`
+
+ - **FIX**: resume null check error. ([87c9cad6](https://github.com/D-James-GH/cached_query/commit/87c9cad6c903b5c6eaf93fa42c9bc769b4ed327b))
+
+
 ## 2025-11-25
 
 ### Changes

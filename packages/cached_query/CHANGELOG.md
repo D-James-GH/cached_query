@@ -1,3 +1,7 @@
+## 3.3.1
+
+ - **FIX**: resume null check error. ([87c9cad6](https://github.com/D-James-GH/cached_query/commit/87c9cad6c903b5c6eaf93fa42c9bc769b4ed327b))
+
 ## 3.3.0
 
  - **REFACTOR**: add toString to infiniteQueryData. ([166814cd](https://github.com/D-James-GH/cached_query/commit/166814cd2ca8d6d04b284720e61e68f1d0f8be02))
