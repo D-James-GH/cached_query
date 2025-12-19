@@ -6,316 +6,212 @@ part of 'query.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$staleHash() => r'6b89d1f71c9d892febf5c3cf9735dc5a8a4c99e5';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
+@ProviderFor(QueryList)
+const queryListProvider = QueryListProvider._();
 
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [stale].
-@ProviderFor(stale)
-const staleProvider = StaleFamily();
-
-/// See also [stale].
-class StaleFamily extends Family<AsyncValue<bool?>> {
-  /// See also [stale].
-  const StaleFamily();
-
-  /// See also [stale].
-  StaleProvider call(
-    InstanceRef instanceRef,
-  ) {
-    return StaleProvider(
-      instanceRef,
-    );
-  }
-
-  @override
-  StaleProvider getProviderOverride(
-    covariant StaleProvider provider,
-  ) {
-    return call(
-      provider.instanceRef,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'staleProvider';
-}
-
-/// See also [stale].
-class StaleProvider extends FutureProvider<bool?> {
-  /// See also [stale].
-  StaleProvider(
-    InstanceRef instanceRef,
-  ) : this._internal(
-          (ref) => stale(
-            ref as StaleRef,
-            instanceRef,
-          ),
-          from: staleProvider,
-          name: r'staleProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$staleHash,
-          dependencies: StaleFamily._dependencies,
-          allTransitiveDependencies: StaleFamily._allTransitiveDependencies,
-          instanceRef: instanceRef,
+final class QueryListProvider
+    extends $AsyncNotifierProvider<QueryList, QueryListState> {
+  const QueryListProvider._()
+      : super(
+          from: null,
+          argument: null,
+          retry: null,
+          name: r'queryListProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  StaleProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.instanceRef,
-  }) : super.internal();
-
-  final InstanceRef instanceRef;
-
   @override
-  Override overrideWith(
-    FutureOr<bool?> Function(StaleRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: StaleProvider._internal(
-        (ref) => create(ref as StaleRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        instanceRef: instanceRef,
-      ),
-    );
-  }
+  String debugGetCreateSourceHash() => _$queryListHash();
 
+  @$internal
   @override
-  FutureProviderElement<bool?> createElement() {
-    return _StaleProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is StaleProvider && other.instanceRef == instanceRef;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, instanceRef.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin StaleRef on FutureProviderRef<bool?> {
-  /// The parameter `instanceRef` of this provider.
-  InstanceRef get instanceRef;
-}
-
-class _StaleProviderElement extends FutureProviderElement<bool?> with StaleRef {
-  _StaleProviderElement(super.provider);
-
-  @override
-  InstanceRef get instanceRef => (origin as StaleProvider).instanceRef;
-}
-
-String _$queryStatusHash() => r'13ceaaf641458ba1d886e031b56b05f93170dc6a';
-
-/// See also [queryStatus].
-@ProviderFor(queryStatus)
-const queryStatusProvider = QueryStatusFamily();
-
-/// See also [queryStatus].
-class QueryStatusFamily extends Family<AsyncValue<String?>> {
-  /// See also [queryStatus].
-  const QueryStatusFamily();
-
-  /// See also [queryStatus].
-  QueryStatusProvider call(
-    InstanceRef instanceRef,
-    String queryKey,
-  ) {
-    return QueryStatusProvider(
-      instanceRef,
-      queryKey,
-    );
-  }
-
-  @override
-  QueryStatusProvider getProviderOverride(
-    covariant QueryStatusProvider provider,
-  ) {
-    return call(
-      provider.instanceRef,
-      provider.queryKey,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'queryStatusProvider';
-}
-
-/// See also [queryStatus].
-class QueryStatusProvider extends AutoDisposeFutureProvider<String?> {
-  /// See also [queryStatus].
-  QueryStatusProvider(
-    InstanceRef instanceRef,
-    String queryKey,
-  ) : this._internal(
-          (ref) => queryStatus(
-            ref as QueryStatusRef,
-            instanceRef,
-            queryKey,
-          ),
-          from: queryStatusProvider,
-          name: r'queryStatusProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$queryStatusHash,
-          dependencies: QueryStatusFamily._dependencies,
-          allTransitiveDependencies:
-              QueryStatusFamily._allTransitiveDependencies,
-          instanceRef: instanceRef,
-          queryKey: queryKey,
-        );
-
-  QueryStatusProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.instanceRef,
-    required this.queryKey,
-  }) : super.internal();
-
-  final InstanceRef instanceRef;
-  final String queryKey;
-
-  @override
-  Override overrideWith(
-    FutureOr<String?> Function(QueryStatusRef provider) create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: QueryStatusProvider._internal(
-        (ref) => create(ref as QueryStatusRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        instanceRef: instanceRef,
-        queryKey: queryKey,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<String?> createElement() {
-    return _QueryStatusProviderElement(this);
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is QueryStatusProvider &&
-        other.instanceRef == instanceRef &&
-        other.queryKey == queryKey;
-  }
-
-  @override
-  int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, instanceRef.hashCode);
-    hash = _SystemHash.combine(hash, queryKey.hashCode);
-
-    return _SystemHash.finish(hash);
-  }
-}
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin QueryStatusRef on AutoDisposeFutureProviderRef<String?> {
-  /// The parameter `instanceRef` of this provider.
-  InstanceRef get instanceRef;
-
-  /// The parameter `queryKey` of this provider.
-  String get queryKey;
-}
-
-class _QueryStatusProviderElement
-    extends AutoDisposeFutureProviderElement<String?> with QueryStatusRef {
-  _QueryStatusProviderElement(super.provider);
-
-  @override
-  InstanceRef get instanceRef => (origin as QueryStatusProvider).instanceRef;
-  @override
-  String get queryKey => (origin as QueryStatusProvider).queryKey;
+  QueryList create() => QueryList();
 }
 
 String _$queryListHash() => r'ea408e262bdff1c21a42a737bb448649b3602020';
 
-/// See also [QueryList].
-@ProviderFor(QueryList)
-final queryListProvider =
-    AutoDisposeAsyncNotifierProvider<QueryList, QueryListState>.internal(
-  QueryList.new,
-  name: r'queryListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$queryListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+abstract class _$QueryList extends $AsyncNotifier<QueryListState> {
+  FutureOr<QueryListState> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build();
+    final ref = this.ref as $Ref<AsyncValue<QueryListState>, QueryListState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<QueryListState>, QueryListState>,
+        AsyncValue<QueryListState>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}
 
-typedef _$QueryList = AutoDisposeAsyncNotifier<QueryListState>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(stale)
+const staleProvider = StaleFamily._();
+
+final class StaleProvider
+    extends $FunctionalProvider<AsyncValue<bool?>, bool?, FutureOr<bool?>>
+    with $FutureModifier<bool?>, $FutureProvider<bool?> {
+  const StaleProvider._(
+      {required StaleFamily super.from, required InstanceRef super.argument})
+      : super(
+          retry: null,
+          name: r'staleProvider',
+          isAutoDispose: false,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$staleHash();
+
+  @override
+  String toString() {
+    return r'staleProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<bool?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<bool?> create(Ref ref) {
+    final argument = this.argument as InstanceRef;
+    return stale(
+      ref,
+      argument,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is StaleProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$staleHash() => r'6b89d1f71c9d892febf5c3cf9735dc5a8a4c99e5';
+
+final class StaleFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<bool?>, InstanceRef> {
+  const StaleFamily._()
+      : super(
+          retry: null,
+          name: r'staleProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: false,
+        );
+
+  StaleProvider call(
+    InstanceRef instanceRef,
+  ) =>
+      StaleProvider._(argument: instanceRef, from: this);
+
+  @override
+  String toString() => r'staleProvider';
+}
+
+@ProviderFor(queryStatus)
+const queryStatusProvider = QueryStatusFamily._();
+
+final class QueryStatusProvider
+    extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
+    with $FutureModifier<String?>, $FutureProvider<String?> {
+  const QueryStatusProvider._(
+      {required QueryStatusFamily super.from,
+      required (
+        InstanceRef,
+        String,
+      )
+          super.argument})
+      : super(
+          retry: null,
+          name: r'queryStatusProvider',
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
+        );
+
+  @override
+  String debugGetCreateSourceHash() => _$queryStatusHash();
+
+  @override
+  String toString() {
+    return r'queryStatusProvider'
+        ''
+        '$argument';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<String?> create(Ref ref) {
+    final argument = this.argument as (
+      InstanceRef,
+      String,
+    );
+    return queryStatus(
+      ref,
+      argument.$1,
+      argument.$2,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is QueryStatusProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$queryStatusHash() => r'13ceaaf641458ba1d886e031b56b05f93170dc6a';
+
+final class QueryStatusFamily extends $Family
+    with
+        $FunctionalFamilyOverride<
+            FutureOr<String?>,
+            (
+              InstanceRef,
+              String,
+            )> {
+  const QueryStatusFamily._()
+      : super(
+          retry: null,
+          name: r'queryStatusProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  QueryStatusProvider call(
+    InstanceRef instanceRef,
+    String queryKey,
+  ) =>
+      QueryStatusProvider._(argument: (
+        instanceRef,
+        queryKey,
+      ), from: this);
+
+  @override
+  String toString() => r'queryStatusProvider';
+}

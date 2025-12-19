@@ -1,6 +1,6 @@
 name: devtools_extension
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
@@ -8,26 +8,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  devtools_extensions: ^0.1.1
-  devtools_app_shared: ^0.1.1
-  flutter_riverpod: ^2.5.1
-  freezed_annotation: ^2.4.1
+  devtools_extensions: ^0.4.0
+  devtools_app_shared: ^0.4.0
+  flutter_riverpod: ^3.0.3
+  freezed_annotation: ^3.1.0
   json_annotation: ^4.9.0
-  riverpod_annotation: ^2.3.5
-  vm_service: ^14.2.2
+  riverpod_annotation: ^3.0.3
+  vm_service: ^15.0.2
   logger: ^2.3.0
   cached_query: ^3.3.1
   collection: ^1.18.0
 
 dev_dependencies:
-  flutter_lints: ^3.0.1
-  riverpod_generator: ^2.3.11
+  flutter_lints: ^6.0.0
+  riverpod_generator: ^3.0.3
   build_runner: ^2.4.10
-  freezed: ^2.4.7
+  freezed: ^3.2.3
   json_serializable: ^6.8.0
 #  custom_lint: ^0.6.4
 #  riverpod_lint: ^2.3.12
 
 flutter:
   uses-material-design: true
-

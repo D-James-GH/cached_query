@@ -1,5 +1,4 @@
 import 'package:devtools_extension/src/state/eval.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vm_service/vm_service.dart';
@@ -8,7 +7,7 @@ part "query.freezed.dart";
 part "query.g.dart";
 
 @freezed
-class QueryInstance with _$QueryInstance {
+abstract class QueryInstance with _$QueryInstance {
   const factory QueryInstance({
     required String key,
     required String type,
@@ -17,7 +16,7 @@ class QueryInstance with _$QueryInstance {
 }
 
 @freezed
-class QueryListState with _$QueryListState {
+abstract class QueryListState with _$QueryListState {
   const factory QueryListState({
     String? selectedKey,
     required List<QueryInstance> queries,
@@ -59,7 +58,7 @@ class QueryList extends _$QueryList {
         await ref.watch(cachedQueryEvalProvider.future);
 
     final cacheRef = await libraryEval.eval(
-      'CachedQuery.instance._queryCache',
+      'CachedQuery.instance._queryCache._queryCache',
       isAlive: disposable,
     );
 

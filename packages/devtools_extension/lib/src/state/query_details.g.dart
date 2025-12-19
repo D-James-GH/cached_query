@@ -6,172 +6,94 @@ part of 'query_details.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$queryDetailsHash() => r'1b16c4263665acf398cb7ea4913e42b7a5c9206a';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-abstract class _$QueryDetails
-    extends BuildlessAutoDisposeAsyncNotifier<QueryDetailsState> {
-  late final QueryInstance instance;
-
-  FutureOr<QueryDetailsState> build(
-    QueryInstance instance,
-  );
-}
-
-/// See also [QueryDetails].
 @ProviderFor(QueryDetails)
-const queryDetailsProvider = QueryDetailsFamily();
+const queryDetailsProvider = QueryDetailsFamily._();
 
-/// See also [QueryDetails].
-class QueryDetailsFamily extends Family<AsyncValue<QueryDetailsState>> {
-  /// See also [QueryDetails].
-  const QueryDetailsFamily();
-
-  /// See also [QueryDetails].
-  QueryDetailsProvider call(
-    QueryInstance instance,
-  ) {
-    return QueryDetailsProvider(
-      instance,
-    );
-  }
-
-  @override
-  QueryDetailsProvider getProviderOverride(
-    covariant QueryDetailsProvider provider,
-  ) {
-    return call(
-      provider.instance,
-    );
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'queryDetailsProvider';
-}
-
-/// See also [QueryDetails].
-class QueryDetailsProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    QueryDetails, QueryDetailsState> {
-  /// See also [QueryDetails].
-  QueryDetailsProvider(
-    QueryInstance instance,
-  ) : this._internal(
-          () => QueryDetails()..instance = instance,
-          from: queryDetailsProvider,
+final class QueryDetailsProvider
+    extends $AsyncNotifierProvider<QueryDetails, QueryDetailsState> {
+  const QueryDetailsProvider._(
+      {required QueryDetailsFamily super.from,
+      required QueryInstance super.argument})
+      : super(
+          retry: null,
           name: r'queryDetailsProvider',
-          debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product')
-                  ? null
-                  : _$queryDetailsHash,
-          dependencies: QueryDetailsFamily._dependencies,
-          allTransitiveDependencies:
-              QueryDetailsFamily._allTransitiveDependencies,
-          instance: instance,
+          isAutoDispose: true,
+          dependencies: null,
+          $allTransitiveDependencies: null,
         );
 
-  QueryDetailsProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.instance,
-  }) : super.internal();
-
-  final QueryInstance instance;
+  @override
+  String debugGetCreateSourceHash() => _$queryDetailsHash();
 
   @override
-  FutureOr<QueryDetailsState> runNotifierBuild(
-    covariant QueryDetails notifier,
-  ) {
-    return notifier.build(
-      instance,
-    );
+  String toString() {
+    return r'queryDetailsProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  Override overrideWith(QueryDetails Function() create) {
-    return ProviderOverride(
-      origin: this,
-      override: QueryDetailsProvider._internal(
-        () => create()..instance = instance,
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        instance: instance,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeAsyncNotifierProviderElement<QueryDetails, QueryDetailsState>
-      createElement() {
-    return _QueryDetailsProviderElement(this);
-  }
+  QueryDetails create() => QueryDetails();
 
   @override
   bool operator ==(Object other) {
-    return other is QueryDetailsProvider && other.instance == instance;
+    return other is QueryDetailsProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, instance.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin QueryDetailsRef
-    on AutoDisposeAsyncNotifierProviderRef<QueryDetailsState> {
-  /// The parameter `instance` of this provider.
-  QueryInstance get instance;
-}
+String _$queryDetailsHash() => r'1b16c4263665acf398cb7ea4913e42b7a5c9206a';
 
-class _QueryDetailsProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<QueryDetails,
-        QueryDetailsState> with QueryDetailsRef {
-  _QueryDetailsProviderElement(super.provider);
+final class QueryDetailsFamily extends $Family
+    with
+        $ClassFamilyOverride<QueryDetails, AsyncValue<QueryDetailsState>,
+            QueryDetailsState, FutureOr<QueryDetailsState>, QueryInstance> {
+  const QueryDetailsFamily._()
+      : super(
+          retry: null,
+          name: r'queryDetailsProvider',
+          dependencies: null,
+          $allTransitiveDependencies: null,
+          isAutoDispose: true,
+        );
+
+  QueryDetailsProvider call(
+    QueryInstance instance,
+  ) =>
+      QueryDetailsProvider._(argument: instance, from: this);
 
   @override
-  QueryInstance get instance => (origin as QueryDetailsProvider).instance;
+  String toString() => r'queryDetailsProvider';
 }
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+
+abstract class _$QueryDetails extends $AsyncNotifier<QueryDetailsState> {
+  late final _$args = ref.$arg as QueryInstance;
+  QueryInstance get instance => _$args;
+
+  FutureOr<QueryDetailsState> build(
+    QueryInstance instance,
+  );
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final created = build(
+      _$args,
+    );
+    final ref =
+        this.ref as $Ref<AsyncValue<QueryDetailsState>, QueryDetailsState>;
+    final element = ref.element as $ClassProviderElement<
+        AnyNotifier<AsyncValue<QueryDetailsState>, QueryDetailsState>,
+        AsyncValue<QueryDetailsState>,
+        Object?,
+        Object?>;
+    element.handleValue(ref, created);
+  }
+}

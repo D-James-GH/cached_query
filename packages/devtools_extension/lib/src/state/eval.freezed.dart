@@ -1,5 +1,5 @@
-// coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
 // ignore_for_file: type=lint
 // ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
@@ -9,86 +9,56 @@ part of 'eval.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#adding-getters-and-methods-to-our-models');
 
 /// @nodoc
 mixin _$AppEvent {
-  String get name => throw _privateConstructorUsedError;
-  Map<String, dynamic> get data => throw _privateConstructorUsedError;
-  EventType get type => throw _privateConstructorUsedError;
+  String get name;
+  Map<String, dynamic> get data;
+  EventType get type;
 
   /// Create a copy of AppEvent
   /// with the given fields replaced by the non-null parameter values.
   @JsonKey(includeFromJson: false, includeToJson: false)
-  $AppEventCopyWith<AppEvent> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $AppEventCopyWith<$Res> {
-  factory $AppEventCopyWith(AppEvent value, $Res Function(AppEvent) then) =
-      _$AppEventCopyWithImpl<$Res, AppEvent>;
-  @useResult
-  $Res call({String name, Map<String, dynamic> data, EventType type});
-}
-
-/// @nodoc
-class _$AppEventCopyWithImpl<$Res, $Val extends AppEvent>
-    implements $AppEventCopyWith<$Res> {
-  _$AppEventCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
-  /// Create a copy of AppEvent
-  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
+  $AppEventCopyWith<AppEvent> get copyWith =>
+      _$AppEventCopyWithImpl<AppEvent>(this as AppEvent, _$identity);
+
   @override
-  $Res call({
-    Object? name = null,
-    Object? data = null,
-    Object? type = null,
-  }) {
-    return _then(_value.copyWith(
-      name: null == name
-          ? _value.name
-          : name // ignore: cast_nullable_to_non_nullable
-              as String,
-      data: null == data
-          ? _value.data
-          : data // ignore: cast_nullable_to_non_nullable
-              as Map<String, dynamic>,
-      type: null == type
-          ? _value.type
-          : type // ignore: cast_nullable_to_non_nullable
-              as EventType,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is AppEvent &&
+            (identical(other.name, name) || other.name == name) &&
+            const DeepCollectionEquality().equals(other.data, data) &&
+            (identical(other.type, type) || other.type == type));
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      runtimeType, name, const DeepCollectionEquality().hash(data), type);
+
+  @override
+  String toString() {
+    return 'AppEvent(name: $name, data: $data, type: $type)';
   }
 }
 
 /// @nodoc
-abstract class _$$AppEventImplCopyWith<$Res>
-    implements $AppEventCopyWith<$Res> {
-  factory _$$AppEventImplCopyWith(
-          _$AppEventImpl value, $Res Function(_$AppEventImpl) then) =
-      __$$AppEventImplCopyWithImpl<$Res>;
-  @override
+abstract mixin class $AppEventCopyWith<$Res> {
+  factory $AppEventCopyWith(AppEvent value, $Res Function(AppEvent) _then) =
+      _$AppEventCopyWithImpl;
   @useResult
   $Res call({String name, Map<String, dynamic> data, EventType type});
 }
 
 /// @nodoc
-class __$$AppEventImplCopyWithImpl<$Res>
-    extends _$AppEventCopyWithImpl<$Res, _$AppEventImpl>
-    implements _$$AppEventImplCopyWith<$Res> {
-  __$$AppEventImplCopyWithImpl(
-      _$AppEventImpl _value, $Res Function(_$AppEventImpl) _then)
-      : super(_value, _then);
+class _$AppEventCopyWithImpl<$Res> implements $AppEventCopyWith<$Res> {
+  _$AppEventCopyWithImpl(this._self, this._then);
+
+  final AppEvent _self;
+  final $Res Function(AppEvent) _then;
 
   /// Create a copy of AppEvent
   /// with the given fields replaced by the non-null parameter values.
@@ -99,27 +69,187 @@ class __$$AppEventImplCopyWithImpl<$Res>
     Object? data = null,
     Object? type = null,
   }) {
-    return _then(_$AppEventImpl(
+    return _then(_self.copyWith(
       name: null == name
-          ? _value.name
+          ? _self.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
       data: null == data
-          ? _value._data
+          ? _self.data
           : data // ignore: cast_nullable_to_non_nullable
               as Map<String, dynamic>,
       type: null == type
-          ? _value.type
+          ? _self.type
           : type // ignore: cast_nullable_to_non_nullable
               as EventType,
     ));
   }
 }
 
+/// Adds pattern-matching-related methods to [AppEvent].
+extension AppEventPatterns on AppEvent {
+  /// A variant of `map` that fallback to returning `orElse`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>(
+    TResult Function(_AppEvent value)? $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AppEvent() when $default != null:
+        return $default(_that);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// Callbacks receives the raw object, upcasted.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case final Subclass2 value:
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>(
+    TResult Function(_AppEvent value) $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AppEvent():
+        return $default(_that);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `map` that fallback to returning `null`.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case final Subclass value:
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>(
+    TResult? Function(_AppEvent value)? $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AppEvent() when $default != null:
+        return $default(_that);
+      case _:
+        return null;
+    }
+  }
+
+  /// A variant of `when` that fallback to an `orElse` callback.
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return orElse();
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>(
+    TResult Function(String name, Map<String, dynamic> data, EventType type)?
+        $default, {
+    required TResult orElse(),
+  }) {
+    final _that = this;
+    switch (_that) {
+      case _AppEvent() when $default != null:
+        return $default(_that.name, _that.data, _that.type);
+      case _:
+        return orElse();
+    }
+  }
+
+  /// A `switch`-like method, using callbacks.
+  ///
+  /// As opposed to `map`, this offers destructuring.
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case Subclass2(:final field2):
+  ///     return ...;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>(
+    TResult Function(String name, Map<String, dynamic> data, EventType type)
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AppEvent():
+        return $default(_that.name, _that.data, _that.type);
+      case _:
+        throw StateError('Unexpected subclass');
+    }
+  }
+
+  /// A variant of `when` that fallback to returning `null`
+  ///
+  /// It is equivalent to doing:
+  /// ```dart
+  /// switch (sealedClass) {
+  ///   case Subclass(:final field):
+  ///     return ...;
+  ///   case _:
+  ///     return null;
+  /// }
+  /// ```
+
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>(
+    TResult? Function(String name, Map<String, dynamic> data, EventType type)?
+        $default,
+  ) {
+    final _that = this;
+    switch (_that) {
+      case _AppEvent() when $default != null:
+        return $default(_that.name, _that.data, _that.type);
+      case _:
+        return null;
+    }
+  }
+}
+
 /// @nodoc
 
-class _$AppEventImpl implements _AppEvent {
-  const _$AppEventImpl(
+class _AppEvent implements AppEvent {
+  const _AppEvent(
       {required this.name,
       required final Map<String, dynamic> data,
       required this.type})
@@ -138,16 +268,19 @@ class _$AppEventImpl implements _AppEvent {
   @override
   final EventType type;
 
+  /// Create a copy of AppEvent
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'AppEvent(name: $name, data: $data, type: $type)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$AppEventCopyWith<_AppEvent> get copyWith =>
+      __$AppEventCopyWithImpl<_AppEvent>(this, _$identity);
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$AppEventImpl &&
+            other is _AppEvent &&
             (identical(other.name, name) || other.name == name) &&
             const DeepCollectionEquality().equals(other._data, _data) &&
             (identical(other.type, type) || other.type == type));
@@ -157,32 +290,53 @@ class _$AppEventImpl implements _AppEvent {
   int get hashCode => Object.hash(
       runtimeType, name, const DeepCollectionEquality().hash(_data), type);
 
+  @override
+  String toString() {
+    return 'AppEvent(name: $name, data: $data, type: $type)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$AppEventCopyWith<$Res>
+    implements $AppEventCopyWith<$Res> {
+  factory _$AppEventCopyWith(_AppEvent value, $Res Function(_AppEvent) _then) =
+      __$AppEventCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String name, Map<String, dynamic> data, EventType type});
+}
+
+/// @nodoc
+class __$AppEventCopyWithImpl<$Res> implements _$AppEventCopyWith<$Res> {
+  __$AppEventCopyWithImpl(this._self, this._then);
+
+  final _AppEvent _self;
+  final $Res Function(_AppEvent) _then;
+
   /// Create a copy of AppEvent
   /// with the given fields replaced by the non-null parameter values.
-  @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   @pragma('vm:prefer-inline')
-  _$$AppEventImplCopyWith<_$AppEventImpl> get copyWith =>
-      __$$AppEventImplCopyWithImpl<_$AppEventImpl>(this, _$identity);
+  $Res call({
+    Object? name = null,
+    Object? data = null,
+    Object? type = null,
+  }) {
+    return _then(_AppEvent(
+      name: null == name
+          ? _self.name
+          : name // ignore: cast_nullable_to_non_nullable
+              as String,
+      data: null == data
+          ? _self._data
+          : data // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>,
+      type: null == type
+          ? _self.type
+          : type // ignore: cast_nullable_to_non_nullable
+              as EventType,
+    ));
+  }
 }
 
-abstract class _AppEvent implements AppEvent {
-  const factory _AppEvent(
-      {required final String name,
-      required final Map<String, dynamic> data,
-      required final EventType type}) = _$AppEventImpl;
-
-  @override
-  String get name;
-  @override
-  Map<String, dynamic> get data;
-  @override
-  EventType get type;
-
-  /// Create a copy of AppEvent
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @JsonKey(includeFromJson: false, includeToJson: false)
-  _$$AppEventImplCopyWith<_$AppEventImpl> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

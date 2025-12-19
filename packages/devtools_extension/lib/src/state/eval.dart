@@ -1,7 +1,7 @@
 import 'package:devtools_app_shared/service.dart';
+import 'package:devtools_app_shared/utils.dart';
 import 'package:devtools_extension/src/state/service.dart';
 import 'package:devtools_extensions/devtools_extensions.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vm_service/vm_service.dart';
@@ -51,7 +51,7 @@ enum EventType {
 }
 
 @freezed
-class AppEvent with _$AppEvent {
+abstract class AppEvent with _$AppEvent {
   const factory AppEvent({
     required String name,
     required Map<String, dynamic> data,
@@ -64,7 +64,6 @@ Stream<AppEvent> eventStream(Ref ref) async* {
   final service = await ref.watch(serviceProvider.future);
 
   final stream = service.onExtensionEvent;
-
   await for (final event in stream) {
     final Event(extensionKind: name, extensionData: data) = event;
     final type = EventType.fromString(name ?? "");

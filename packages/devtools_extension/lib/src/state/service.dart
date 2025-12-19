@@ -1,5 +1,4 @@
 import 'package:devtools_extensions/devtools_extensions.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:vm_service/vm_service.dart';
 

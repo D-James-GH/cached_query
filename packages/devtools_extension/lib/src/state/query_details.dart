@@ -10,42 +10,29 @@ import 'package:vm_service/vm_service.dart';
 part 'query_details.freezed.dart';
 part 'query_details.g.dart';
 
-sealed class QueryStateDetails {
-  String get status;
-}
-
 @freezed
-class QueryStateDetailsJson extends QueryStateDetails
-    with _$QueryStateDetailsJson {
-  const factory QueryStateDetailsJson({
+sealed class QueryStateDetails with _$QueryStateDetails {
+  const factory QueryStateDetails.json({
     required String dataRuntimeType,
     required String status,
     dynamic data,
-  }) = _QueryStateDetailsJson;
-}
+  }) = QueryStateDetailsJson;
 
-@freezed
-class QueryStateDetailsString extends QueryStateDetails
-    with _$QueryStateDetailsString {
-  const factory QueryStateDetailsString({
+  const factory QueryStateDetails.string({
     required String dataRuntimeType,
     required String status,
     String? data,
-  }) = _QueryStateDetailsString;
-}
+  }) = QueryStateDetailsString;
 
-@freezed
-class InfiniteQueryDetailsJson extends QueryStateDetails
-    with _$InfiniteQueryDetailsJson {
-  const factory InfiniteQueryDetailsJson({
+  const factory QueryStateDetails.infiniteJson({
     required String status,
     required String dataRuntimeType,
     List<dynamic>? pages,
-  }) = _InfiniteQueryDetailsJson;
+  }) = InfiniteQueryDetailsJson;
 }
 
 @freezed
-class QueryDetailsState with _$QueryDetailsState {
+abstract class QueryDetailsState with _$QueryDetailsState {
   const factory QueryDetailsState({
     required String key,
     required String type,
