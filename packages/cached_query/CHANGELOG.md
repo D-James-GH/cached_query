@@ -1,3 +1,7 @@
+## 3.3.2
+
+ - **FIX**: devtools not working on 3.2.0+. ([7fa8e984](https://github.com/D-James-GH/cached_query/commit/7fa8e984629530a2925153b7a255a307eed01470))
+
 ## 3.3.1
 
  - **FIX**: resume null check error. ([87c9cad6](https://github.com/D-James-GH/cached_query/commit/87c9cad6c903b5c6eaf93fa42c9bc769b4ed327b))
