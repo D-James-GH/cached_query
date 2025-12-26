@@ -32,7 +32,7 @@ class GlobalQueryConfig {
 
   /// {@template QueryConfig.storeQuery}
   /// Use [storeQuery] to set whether a query should be stored or not.
-  /// Defaults to true;
+  /// Defaults to false;
   ///
   /// Only effective when [CachedQuery] storage is set.
   /// {@endtemplate}
