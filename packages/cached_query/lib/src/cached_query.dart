@@ -75,7 +75,7 @@ class CachedQuery {
   /// Use [cacheDuration] to specify how long a query that has zero listeners
   /// stays in memory. Defaults to 5 minutes.
   ///
-  /// Use [refetchDuration] to specify how long before the query is re-fetched
+  /// Use [staleDuration] to specify how long before the query is re-fetched
   /// in the background. Defaults to 4 seconds
   ///
   /// Pass a [StorageInterface] to automatically store queries for fast initial

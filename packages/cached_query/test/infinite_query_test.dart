@@ -185,7 +185,7 @@ void main() async {
       });
       expect(res1, res2);
     });
-    test("Adding refetchDuration means next result will come from cache.",
+    test("Adding staleDuration means next result will come from cache.",
         () async {
       final cache = CachedQuery.asNewInstance();
       int fetchCount = 0;
@@ -339,7 +339,7 @@ void main() async {
     });
   });
   group("Infinite re-fetching", () {
-    test("Should refetch list after refetchDuration", () async {
+    test("Should refetch list after staleDuration", () async {
       final cache = CachedQuery.asNewInstance();
       int fetchCount = 0;
       final query = InfiniteQuery<String, int>(

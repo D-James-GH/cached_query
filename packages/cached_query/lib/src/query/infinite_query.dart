@@ -19,7 +19,7 @@ typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryData<T, Arg>? state);
 /// The [key] can be any serializable data. The [key] is converted to a [String]
 /// using [jsonEncode].
 ///
-/// Each [InfiniteQuery] can override the global defaults for [refetchDuration]
+/// Each [InfiniteQuery] can override the global defaults for [staleDuration]
 /// and [cacheDuration], see [CachedQuery.config] for more info.
 ///
 /// Use [revalidateAll] to sequentially refetch all cached pages if the first two

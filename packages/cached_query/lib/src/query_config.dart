@@ -247,7 +247,7 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
   ///
   /// {@macro QueryConfig.storeQuery}
   ///
-  /// {@macro QueryConfig.refetchDuration}
+  /// {@macro QueryConfig.staleDuration}
   ///
   /// {@macro QueryConfig.cacheDuration}
   ///
