@@ -48,6 +48,10 @@ class _PostListScreenState extends State<PostListScreen> {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => query.refetch(),
+          ),
           MutationBuilder<PostModel, PostModel>(
             mutation: service.createPost(),
             builder: (context, state, mutate) {
@@ -85,6 +89,7 @@ class _PostListScreenState extends State<PostListScreen> {
         builder: (context, state) {
           if (state.data != null && state.data!.pages.isNotEmpty) {
             final allPosts = state.data!.pages.expand((e) => e).toList();
+
             return CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -180,6 +185,9 @@ class _PostListScreenState extends State<PostListScreen> {
     if (_isBottom && !query.state.isLoading) {
       query.getNextPage();
     }
+    if (_isTop && !query.state.isLoading && query.hasPreviousPage()) {
+      query.getPreviousPage();
+    }
   }
 
   bool get _isBottom {
@@ -187,6 +195,12 @@ class _PostListScreenState extends State<PostListScreen> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.offset;
     return currentScroll >= (maxScroll * 0.9);
+  }
+
+  bool get _isTop {
+    if (!_scrollController.hasClients) return false;
+    final currentScroll = _scrollController.offset;
+    return currentScroll < 10;
   }
 
   @override
@@ -221,7 +235,7 @@ class _Post extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
-              child: Text(index.toString()),
+              child: Text(post.id.toString()),
             ),
             Expanded(
               child: Column(
@@ -231,7 +245,6 @@ class _Post extends StatelessWidget {
                     post.title,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  Text(post.id.toString()),
                   Text(post.body),
                 ],
               ),

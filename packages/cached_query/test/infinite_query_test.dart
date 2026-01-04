@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'dart:convert';
 import 'dart:math';
 
@@ -424,6 +426,7 @@ void main() async {
       await query.getNextPage();
       await query.getNextPage();
       expect(query.hasReachedMax(), true);
+      expect(query.hasNextPage(), false);
     });
 
     test(
@@ -454,9 +457,11 @@ void main() async {
       final res1 = await query.getNextPage();
       expect(res1!.data?.pages.length, 3);
       expect(query.hasReachedMax(), true);
+      expect(query.hasNextPage(), false);
       final res2 = await query.refetch();
       expect(res2.data?.pages.length, 1);
       expect(query.hasReachedMax(), false);
+      expect(query.hasNextPage(), true);
     });
   });
   group("Infinite query args", () {
@@ -853,6 +858,59 @@ void main() async {
       await query.refetch();
 
       expect(numCalls, 2);
+    });
+  });
+  group("Previous page", () {
+    test("Can get previous page", () async {
+      final cache = CachedQuery.asNewInstance();
+      final query = InfiniteQuery<int, int>(
+        cache: cache,
+        key: "getPrevious",
+        queryFn: Future.value,
+        getPrevArg: (state) {
+          final first = state?.pages.firstOrNull;
+          if (first == null || first <= 1) return null;
+          return first - 1;
+        },
+        getNextArg: (state) {
+          // initial page
+          if (state == null) return 10;
+          return (state.pages.lastOrNull ?? 0) + 1;
+        },
+      );
+      await query.fetch();
+      await query.getPreviousPage();
+
+      expect(query.state.data?.pages.length, 2);
+
+      final firstPage = query.state.data!.pages.first;
+      expect(firstPage, 9);
+    });
+
+    test("Previous page stops if arg is null", () async {
+      final cache = CachedQuery.asNewInstance();
+      final query = InfiniteQuery<int, int>(
+        cache: cache,
+        key: "getPrevious",
+        queryFn: Future.value,
+        getPrevArg: (state) {
+          final first = state?.pages.firstOrNull;
+          if (first == null || first <= 1) return null;
+          return first - 1;
+        },
+        getNextArg: (state) {
+          // initial page
+          if (state == null) return 10;
+          return (state.pages.lastOrNull ?? 0) + 1;
+        },
+      );
+      await query.fetch();
+      await query.getPreviousPage();
+
+      expect(query.state.data?.pages.length, 2);
+
+      final firstPage = query.state.data!.pages.first;
+      expect(firstPage, 9);
     });
   });
 

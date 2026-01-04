@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cached_query_flutter/cached_query_flutter.dart';
-import 'package:faker/faker.dart';
 import 'package:full/posts/post_model/post_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -27,40 +26,48 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
     ),
     onError: print,
     getNextArg: (state) {
-      if (state?.lastPage?.isEmpty ?? false) return null;
-      return (state?.length ?? 0) + 1;
+      // initial arg
+      if (state == null || state.args.isEmpty) return 5;
+
+      final lastArg = state.args.last;
+      return lastArg + 1;
+    },
+    getPrevArg: (state) {
+      final firstArg = state?.args.firstOrNull;
+      if (firstArg == null || firstArg <= 1) return null;
+      return firstArg - 1;
     },
     queryFn: (arg) async {
-      // final uri = Uri.parse(
-      //   'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
-      // );
-      // final res = await http.get(uri);
-      //
-      // // if (Random().nextInt(1000) % 8 == 0) {
-      // //   throw "A random error has occurred ⚠️";
-      // // }
-      //
-      // return Future.delayed(
-      //   const Duration(seconds: 1),
-      //   () => PostModel.listFromJson(
-      //     List<Map<String, dynamic>>.from(
-      //       jsonDecode(res.body) as List<dynamic>,
-      //     ),
-      //   ),
-      // );
-      final faker = Faker();
+      final uri = Uri.parse(
+        'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
+      );
+      final res = await http.get(uri);
+
+      // if (Random().nextInt(1000) % 8 == 0) {
+      //   throw "A random error has occurred ⚠️";
+      // }
+
       return Future.delayed(
         const Duration(seconds: 1),
-        () => List.generate(
-          10,
-          (i) => PostModel(
-            id: arg + i,
-            title: faker.lorem.words(5).join(" "),
-            body: faker.lorem.sentences(3).join(" "),
-            userId: arg + i,
+        () => PostModel.listFromJson(
+          List<Map<String, dynamic>>.from(
+            jsonDecode(res.body) as List<dynamic>,
           ),
         ),
       );
+      // final faker = Faker();
+      // return Future.delayed(
+      //   const Duration(seconds: 1),
+      //   () => List.generate(
+      //     10,
+      //     (i) => PostModel(
+      //       id: arg + i,
+      //       title: faker.lorem.words(5).join(" "),
+      //       body: faker.lorem.sentences(3).join(" "),
+      //       userId: arg + i,
+      //     ),
+      //   ),
+      // );
     },
   );
 }

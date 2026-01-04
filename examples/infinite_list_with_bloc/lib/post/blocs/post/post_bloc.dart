@@ -34,7 +34,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           posts: queryState.data?.pages.expand((page) => page).toList() ?? [],
           status:
               queryState.isLoading ? PostStatus.loading : PostStatus.success,
-          hasReachedMax: query.hasReachedMax(),
+          hasReachedMax: !query.hasNextPage(),
         );
       },
     );
