@@ -1,3 +1,10 @@
+## 3.4.0
+
+ - **FEAT**: add previous page fetch. ([903481da](https://github.com/D-James-GH/cached_query/commit/903481da17a8863ad9b8aa8aa3357edaae9d46f1))
+ - **DOCS**: update for previous page. ([d7d44c6c](https://github.com/D-James-GH/cached_query/commit/d7d44c6c5c7c1e0219653c1b8622132aa698dab1))
+ - **DOCS**: cached_query - replace refetchDuration with staleDuration on documentation ([#93](https://github.com/D-James-GH/cached_query/issues/93)). ([9dfa8d2a](https://github.com/D-James-GH/cached_query/commit/9dfa8d2a12c1e237fe8d80d1714fd32a37d82f75))
+ - **DOCS**: correct default value for storeQuery in GlobalQueryConfig documentation ([#92](https://github.com/D-James-GH/cached_query/issues/92)). ([72a4938a](https://github.com/D-James-GH/cached_query/commit/72a4938a7040ab083ff040c148425e6f91e1b00b))
+
 ## 3.3.2
 
  - **FIX**: devtools not working on 3.2.0+. ([7fa8e984](https://github.com/D-James-GH/cached_query/commit/7fa8e984629530a2925153b7a255a307eed01470))
