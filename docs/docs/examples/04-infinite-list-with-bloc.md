@@ -4,7 +4,7 @@ This blog will demonstrate how to create a cached infinite list with cached quer
 
 There are two options when integrating cached query with flutter bloc.
 
-The code for this example can be found here: 
+The code for this example can be found here:
 https://github.com/D-James-GH/cached_query/tree/main/examples/infinite_list_with_bloc
 
 There are two implementation options to consider when using Cached Query with Flutter Bloc. In this example will go through using both the query builder and mapping a query into bloc state. For more information on the pros and cons of each way go to [Flutter Bloc Query](/examples/with-flutter-bloc#how-to-integrate)
@@ -58,7 +58,8 @@ class PostRepository {
   }
 }
 ```
-The return value of `getNextArg` will be passed to the `queryFn` which in this case is an integer. If the last page is **Not** null and it is empty then it means there are no more pages that can be fetched and therefore we return null from `getNextArg`. Returning null sets the state of the infinite query the `hasReachedMax`. If the last page was null or had data then we return the length of the state plus 1 for the next page.
+
+The return value of `getNextArg` will be passed to the `queryFn` which in this case is an integer. If the last page is **Not** null and it is empty then it means there are no more pages that can be fetched and therefore we return null from `getNextArg`. Returning null sets the `hasNextPage` to false. If the last page was null or had data then we return the length of the state plus 1 for the next page.
 
 ### Post Model
 
@@ -94,6 +95,7 @@ class PostModel extends Equatable {
   List<Object?> get props => [id, title, body, userId];
 }
 ```
+
 Using Equatable or freezed to override the equality operator is a good idea, as Cached Query uses equality when determining which pages need re-fetching.
 
 ## Bloc without the InfiniteQueryBuilder
@@ -103,7 +105,6 @@ As mentioned at the start, when integrating cached query into an existing projec
 The following section will focus on mapping the infinite query stream to bloc states.
 
 ### The Events
-
 
 We only need two events in the bloc. One to initialise the query and listen to the stream (`PostsFetched`) and one to get the next page.
 
@@ -122,8 +123,6 @@ class PostsNextPage extends PostEvent {
 }
 ```
 
-
-
 ### Bloc state
 
 The bloc state consists of the current list of posts to show, whether the infinite query has any more pages and the current status of the requests.
@@ -134,31 +133,32 @@ enum PostStatus { loading, initial, success }
 class PostState extends Equatable {
   final PostStatus status;
   final List<PostModel>? posts;
-  final bool hasReachedMax;
+  final bool hasNextPage;
 
   const PostState({
     this.status = PostStatus.initial,
     this.posts,
-    this.hasReachedMax = false,
+    this.hasNextPage = true,
   });
 
   @override
-  List<Object?> get props => [posts, status, hasReachedMax];
+  List<Object?> get props => [posts, status, hasNextPage];
 
   PostState copyWith({
     PostStatus? status,
     List<PostModel>? posts,
-    bool? hasReachedMax,
+    bool? hasNextPage,
     bool? isMutationLoading,
   }) {
     return PostState(
       status: status ?? this.status,
       posts: posts ?? this.posts,
-      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      hasNextPage: hasNextPage ?? this.hasNextPage,
     );
   }
 }
 ```
+
 ### The Bloc
 
 We use Flutter Blocs `emit.forEach` to manage the stream subscription for us. Any time data is emitted from the infinite query then `onData` will be called. In side `onData` we map the incoming infinite query state to a bloc state.
@@ -177,8 +177,7 @@ Notice there is no event transformer or throttle on the `getNextPage` event. Thi
 
 :::
 
-
-```dart 
+```dart
 class PostBloc extends Bloc<PostEvent, PostState> {
   final _repo = PostRepository();
 
@@ -202,7 +201,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           status: queryState.status == QueryStatus.loading
               ? PostStatus.loading
               : PostStatus.success,
-          hasReachedMax: queryState.hasReachedMax,
+          hasNextPage: queryState.hasNextPage,
         );
       },
     );
@@ -218,7 +217,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
 ### The UI
 
-In order to take advantage of re-fetch on connection and re-fetching when the app comes back into view we need to configure Cached Query Flutter. 
+In order to take advantage of re-fetch on connection and re-fetching when the app comes back into view we need to configure Cached Query Flutter.
 
 ```dart
 void main() {
@@ -251,7 +250,8 @@ class MyApp extends StatelessWidget {
 ```
 
 #### Post Widget
-The post component will very simply display each posts data. 
+
+The post component will very simply display each posts data.
 
 ```dart
 class Post extends StatelessWidget {
@@ -371,7 +371,7 @@ class _ListState extends State<_List> {
           return ListView.builder(
             controller: _scrollController,
             itemCount:
-                !state.hasReachedMax && state.status == PostStatus.loading
+                state.hasNextPage && state.status == PostStatus.loading
                     ? posts.length + 1
                     : posts.length,
             itemBuilder: (context, i) {
@@ -427,9 +427,10 @@ class _ListState extends State<_List> {
 
 For better cache management it is a good idea to use the `InfiniteQueryBuilder`. When the builder is removed from the widget tree the listener to the cache will be removed immediately. Unlike listening to the query in the bloc where the listener will only be removed when the bloc is removed from the tree.
 
-### Events 
+### Events
 
 There are the same two events here. One to fetch the initial list and one to get the next page.
+
 ```dart
 @immutable
 abstract class PostWithBuilderEvent {}
@@ -492,11 +493,10 @@ class PostWithBuilderBloc extends Bloc<PostWithBuilderEvent, PostWithBuilderStat
   }
 }
 ```
+
 ### The UI
 
-The UI with the build is must the same as with the bloc builder. 
-
-
+The UI with the build is must the same as with the bloc builder.
 
 ```dart
 class PostListWithBuilderPage extends StatelessWidget {
@@ -526,6 +526,7 @@ class PostListWithBuilderPage extends StatelessWidget {
   }
 }
 ```
+
 The List component this time uses a custom scroll view so that other loading widgets and information banners can be displayed in the list.
 
 We pass the infinite query from the bloc state to the Infinite Query Builder. The builder will then call the builder function whenever a new `InfiniteQueryState` is emitted down the query stream.
@@ -642,6 +643,4 @@ class _ListState extends State<_List> {
 
 We have shown two examples of how an infinite list can be cached using Cached Query and Flutter Bloc together. The same integration techniques could easily be transferable to other state management options.
 
-It is up to you which method of integration is best for your app and architecture. 
-
-
+It is up to you which method of integration is best for your app and architecture.

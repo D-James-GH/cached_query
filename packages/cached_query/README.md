@@ -86,14 +86,14 @@ void main() async {
   CachedQuery.instance.config(
     storage: await CachedStorage.ensureInitialized(),
     config: GlobalQueryConfig(
-      refetchDuration: Duration(seconds: 4),
+      staleDuration: Duration(seconds: 4),
       cacheDuration: Duration(minutes: 5),
     ),
   );
 }
 ```
 
-The QueryConfig can be overridden on any individual query. The `refetchDuration` sets the minimum time before the queryFn
+The QueryConfig can be overridden on any individual query. The `staleDuration` sets the minimum time before the queryFn
 is called again. The defaults to 4 seconds but if you know data is unlikely to get stale this could be increased. If you
 are using the `Query.stream` api then the latest current cached data will always be emitted while waiting for data to be returned
 from the queryFn.
@@ -104,10 +104,10 @@ the `Stream` api then the `cacheDuration` timer will start when the last listene
 
 ## Re-fetching and Invalidation
 
-Any Query will automatically be re-fetched if another call to the query function happens after the refetchDuration.
+Any Query will automatically be re-fetched if another call to the query function happens after the staleDuration.
 A Query can be forced to re-fetched at anytime using `Query.refetch()`.
 
-After the `refetchDuration` is finished the query will be marked as stale. This is what causes a refetch the next time
+After the `staleDuration` is finished the query will be marked as stale. This is what causes a refetch the next time
 the query is requested. A query can be manually be invalidated with `Query.invalidate()` or a list of queries can be
 invalidated at once with `CachedQuery.instance.invalidateCache`, this is useful during [Mutations](#mutation).
 

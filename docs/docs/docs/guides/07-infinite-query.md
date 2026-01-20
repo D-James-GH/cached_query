@@ -23,7 +23,7 @@ The function getNextArg will always be called before the query function. Whateve
 passed to the `queryFn`.
 
 If the return value of getNextArg is null the state on the infinite query will be set to
-`hasReachedMax = true`. This will block further page calls.
+`hasNextPage = false`. This will block further page calls.
 
 ```dart
 getNextArg: (state) {
@@ -70,6 +70,38 @@ necessary to use the return value though, as the state will also be emitted down
 
 Each request for `getNextPage` will be de-duplicated, so only one page request can be made at a time. This normally reduces
 the need for a throttle in an infinite list.
+
+## Get Previous Page
+
+An infinite query can also fetch the previous page using `infiniteQuery.getPreviousPage()`.
+
+It works in the same way as `getNextPage` but will use the `getPreviousArg` function to get the argument for the previous page.
+
+Full example can be found: https://github.com/D-James-GH/cached_query/blob/main/examples/full/lib/posts/post_service.dart
+
+```dart
+
+InfiniteQuery<List<PostModel>, int> getPosts() {
+  return InfiniteQuery(
+    key: 'posts',
+    getNextArg: (state) {
+      // initial arg
+      if (state == null || state.args.isEmpty) return 5;
+
+      final lastArg = state.args.last;
+      return lastArg + 1;
+    },
+    getPrevArg: (state) {
+      final firstArg = state?.args.firstOrNull;
+      if (firstArg == null || firstArg <= 1) return null;
+      return firstArg - 1;
+    },
+    queryFn: (arg) async {
+       ///...fetch posts with arg
+    },
+  );
+}
+```
 
 ## Invalidation and Re-fetching
 
