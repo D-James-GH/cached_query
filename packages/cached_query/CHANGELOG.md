@@ -1,3 +1,7 @@
+## 3.3.3
+
+- **FIX**: update query state before notifying observers to prevent stale state during onError.
+
 ## 3.3.2
 
  - **FIX**: devtools not working on 3.2.0+. ([7fa8e984](https://github.com/D-James-GH/cached_query/commit/7fa8e984629530a2925153b7a255a307eed01470))
