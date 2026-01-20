@@ -54,7 +54,7 @@ Query<T> createEmptyQuery<T>({
 /// can be any serializable data. The [key] is converted to a [String] using
 /// [jsonEncode].
 ///
-/// Each [Query] can override the global defaults for [refetchDuration], [cacheDuration],
+/// Each [Query] can override the global defaults for [staleDuration], [cacheDuration],
 /// see [CachedQuery.config] for more info.
 ///
 /// Use [forceRefetch] to force the query to be run again regardless of whether

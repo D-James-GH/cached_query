@@ -93,6 +93,7 @@ typedef InfiniteFetchFunc<T, Arg> = Future<InfiniteQueryData<T, Arg>> Function({
 class InfiniteFetch<T, Arg>
     implements FetchFunction<InfiniteQueryData<T, Arg>> {
   final GetNextArg<T, Arg> getNextArg;
+  final GetNextArg<T, Arg>? getPrevArg;
   final OnPageRefetched<T, Arg>? onPageRefetched;
   final InfiniteQueryFunc<T, Arg> queryFn;
   final Arg? initialArg;
@@ -102,6 +103,7 @@ class InfiniteFetch<T, Arg>
     required this.getNextArg,
     required this.onPageRefetched,
     required this.queryFn,
+    required this.getPrevArg,
     required this.initialArg,
   });
 
@@ -160,7 +162,7 @@ class InfiniteFetch<T, Arg>
 
     // ======================================================================
 
-    final arg = (direction.isForward ? getNextArg(state) : null);
+    final arg = (direction.isForward ? getNextArg(state) : getPrevArg!(state));
     if (arg == null) {
       return state;
     }

@@ -6,7 +6,7 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A pageArgs);
 /// Determines the parameters of the next page in an infinite query.
 ///
 /// Return null if the last page has already been fetch and therefore trigger
-/// [InfiniteQueryStatus.hasReachedMax] to equal `true`.
+/// [InfiniteQueryStatus.hasNextPage] to equal `false`.
 typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryData<T, Arg>? state);
 
 /// {@template infiniteQuery}
@@ -19,7 +19,7 @@ typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryData<T, Arg>? state);
 /// The [key] can be any serializable data. The [key] is converted to a [String]
 /// using [jsonEncode].
 ///
-/// Each [InfiniteQuery] can override the global defaults for [refetchDuration]
+/// Each [InfiniteQuery] can override the global defaults for [staleDuration]
 /// and [cacheDuration], see [CachedQuery.config] for more info.
 ///
 /// Use [revalidateAll] to sequentially refetch all cached pages if the first two
@@ -39,6 +39,7 @@ final class InfiniteQuery<T, Arg>
     required Object key,
     required Future<T> Function(Arg arg) queryFn,
     required GetNextArg<T, Arg> getNextArg,
+    GetNextArg<T, Arg>? getPrevArg,
     int? prefetchPages,
     QueryConfig<InfiniteQueryData<T, Arg>>? config,
     InfiniteQueryData<T, Arg>? initialData,
@@ -70,6 +71,7 @@ final class InfiniteQuery<T, Arg>
     // ignore: prefer_function_declarations_over_variables
     final createFetchFn = () => InfiniteFetch<T, Arg>(
           getNextArg: getNextArg,
+          getPrevArg: getPrevArg,
           onPageRefetched: onPageRefetched,
           queryFn: queryFn,
           initialArg: getNextArg(initialData),
@@ -97,6 +99,7 @@ final class InfiniteQuery<T, Arg>
     final query = InfiniteQuery<T, Arg>._internal(
       controller: controller,
       config: config,
+      getPrevArg: getPrevArg,
       getNextArg: getNextArg,
       onError: onError,
       onSuccess: onSuccess,
@@ -131,9 +134,11 @@ final class InfiniteQuery<T, Arg>
     required GetNextArg<T, Arg> getNextArg,
     required QueryController<InfiniteQueryData<T, Arg>> controller,
     required this.config,
+    required GetNextArg<T, Arg>? getPrevArg,
     OnQueryErrorCallback? onError,
     OnQuerySuccessCallback<InfiniteQueryData<T, Arg>>? onSuccess,
   })  : _getNextArg = getNextArg,
+        _getPrevArg = getPrevArg,
         _onSuccess = onSuccess,
         _onError = onError,
         _controller = controller {
@@ -186,6 +191,7 @@ final class InfiniteQuery<T, Arg>
   final QueryController<InfiniteQueryData<T, Arg>> _controller;
   late final BehaviorSubject<InfiniteQueryStatus<T, Arg>> _stateSubject;
   final GetNextArg<T, Arg> _getNextArg;
+  final GetNextArg<T, Arg>? _getPrevArg;
 
   @override
   Future<InfiniteQueryStatus<T, Arg>> fetch() async {
@@ -213,8 +219,24 @@ final class InfiniteQuery<T, Arg>
   /// True if there are no more pages available to fetch.
   ///
   /// Calculated using [GetNextArg], if it has returned null then this is true.
+  @Deprecated(
+    "Use hasNextPage() instead. Since adding previous page fetching, hasReachedMax is less clear.",
+  )
   bool hasReachedMax() {
     return _getNextArg(_stateSubject.valueOrNull?.data) == null;
+  }
+
+  /// True if there is a next page available to fetch.
+  bool hasNextPage() {
+    return _getNextArg(_stateSubject.valueOrNull?.data) != null;
+  }
+
+  /// True if there is a previous page available to fetch.
+  bool hasPreviousPage() {
+    if (_getPrevArg == null) {
+      return false;
+    }
+    return _getPrevArg!(_stateSubject.valueOrNull?.data) != null;
   }
 
   /// Update the current query data.
@@ -242,6 +264,19 @@ final class InfiniteQuery<T, Arg>
     await _controller.fetch(
       ignoreStale: true,
       options: InfiniteFetchOptions(direction: InfiniteQueryDirection.forward),
+    );
+    return _state;
+  }
+
+  /// Get the previous page in an [InfiniteQuery] and cache the result.
+  Future<InfiniteQueryStatus<T, Arg>?> getPreviousPage() async {
+    assert(
+      _getPrevArg != null,
+      "getPreviousPage can only be used if getPrevArg is provided to the InfiniteQuery",
+    );
+    await _controller.fetch(
+      ignoreStale: true,
+      options: InfiniteFetchOptions(direction: InfiniteQueryDirection.backward),
     );
     return _state;
   }
@@ -357,9 +392,12 @@ final class InfiniteQuery<T, Arg>
         switch (data) {
           case Some<InfiniteQueryData<T, Arg>>(:final value):
             _onSuccess?.call(value);
+            final nextPage = hasNextPage();
             _setState(
               InfiniteQueryStatus.success(
-                hasReachedMax: hasReachedMax(),
+                hasReachedMax: !nextPage,
+                hasPreviousPage: hasPreviousPage(),
+                hasNextPage: nextPage,
                 data: value,
                 timeCreated: timeCreated,
               ),

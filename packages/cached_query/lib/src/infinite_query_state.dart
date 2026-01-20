@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 part of "query_state.dart";
 
 /// {@template InfiniteQueryData}
@@ -87,8 +89,10 @@ sealed class InfiniteQueryStatus<T, Arg>
   ///{@macro InfiniteQuerySuccess}
   const factory InfiniteQueryStatus.success({
     required DateTime timeCreated,
-    required InfiniteQueryData<T, Arg> data,
     required bool hasReachedMax,
+    required bool hasNextPage,
+    required bool hasPreviousPage,
+    required InfiniteQueryData<T, Arg> data,
   }) = InfiniteQuerySuccess<T, Arg>;
 
   ///{@macro InfiniteQueryLoading}
@@ -274,12 +278,23 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
   final InfiniteQueryData<T, Arg> data;
 
   /// True if there are no more pages to fetch.
+  @Deprecated(
+    "Use hasNextPage() instead. Since adding previous page fetching, hasReachedMax is less clear.",
+  )
   final bool hasReachedMax;
+
+  /// True if there is a next page to fetch.
+  final bool hasNextPage;
+
+  /// True if there is a previous page to fetch.
+  final bool hasPreviousPage;
 
   ///{@macro InfiniteQuerySuccess}
   const InfiniteQuerySuccess({
     required super.timeCreated,
     required this.hasReachedMax,
+    required this.hasNextPage,
+    required this.hasPreviousPage,
     required this.data,
   });
 
@@ -289,13 +304,16 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       other is InfiniteQuerySuccess &&
           runtimeType == other.runtimeType &&
           data == other.data &&
-          hasReachedMax == other.hasReachedMax &&
+          hasNextPage == other.hasNextPage &&
+          hasPreviousPage == other.hasPreviousPage &&
           timeCreated == other.timeCreated;
 
   @override
   int get hashCode =>
       data.hashCode ^
       timeCreated.hashCode ^
+      hasNextPage.hashCode ^
+      hasPreviousPage.hashCode ^
       hasReachedMax.hashCode ^
       timeCreated.hashCode;
 
@@ -311,13 +329,15 @@ class InfiniteQuerySuccess<T, Arg> extends InfiniteQueryStatus<T, Arg> {
     return InfiniteQuerySuccess<T, Arg>(
       timeCreated: timeCreated ?? this.timeCreated,
       hasReachedMax: hasReachedMax,
+      hasNextPage: hasNextPage,
+      hasPreviousPage: hasPreviousPage,
       data: data!,
     );
   }
 
   @override
   String toString() {
-    return 'InfiniteQuerySuccess(timeCreated: $timeCreated, data: $data, hasReachedMax: $hasReachedMax)';
+    return 'InfiniteQuerySuccess(timeCreated: $timeCreated, data: $data, hasReachedMax: $hasReachedMax, hasNextPage: $hasNextPage, hasPreviousPage: $hasPreviousPage)';
   }
 }
 

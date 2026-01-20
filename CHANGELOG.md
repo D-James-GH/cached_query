@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-01-04
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.4.0`](#cached_query---v340)
+ - [`cached_query_flutter` - `v3.3.3`](#cached_query_flutter---v333)
+ - [`cached_storage` - `v3.2.3`](#cached_storage---v323)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.3.3`
+ - `cached_storage` - `v3.2.3`
+
+---
+
+#### `cached_query` - `v3.4.0`
+
+ - **FEAT**: add previous page fetch. ([903481da](https://github.com/D-James-GH/cached_query/commit/903481da17a8863ad9b8aa8aa3357edaae9d46f1))
+ - **DOCS**: update for previous page. ([d7d44c6c](https://github.com/D-James-GH/cached_query/commit/d7d44c6c5c7c1e0219653c1b8622132aa698dab1))
+ - **DOCS**: cached_query - replace refetchDuration with staleDuration on documentation ([#93](https://github.com/D-James-GH/cached_query/issues/93)). ([9dfa8d2a](https://github.com/D-James-GH/cached_query/commit/9dfa8d2a12c1e237fe8d80d1714fd32a37d82f75))
+ - **DOCS**: correct default value for storeQuery in GlobalQueryConfig documentation ([#92](https://github.com/D-James-GH/cached_query/issues/92)). ([72a4938a](https://github.com/D-James-GH/cached_query/commit/72a4938a7040ab083ff040c148425e6f91e1b00b))
+
+
 ## 2025-12-19
 
 ### Changes
