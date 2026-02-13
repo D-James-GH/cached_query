@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import "mutation_state.dart";
 import 'package:cached_query/src/util/encode_key.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../cached_query.dart';
 import 'mutation_cache.dart';
+import "mutation_state.dart";
 
 /// Called when the [queryFn] as completed with no error.
 typedef OnSuccessCallback<T, Arg> = FutureOr<void> Function(T res, Arg arg);
@@ -58,18 +58,27 @@ class Mutation<ReturnType, Arg> {
   final MutationQueryCallback<ReturnType, Arg> _mutationFn;
   final List<Object>? _invalidateQueries;
   final List<Object>? _refetchQueries;
-  MutationState<ReturnType> _state;
-  BehaviorSubject<MutationState<ReturnType>>? _streamController;
   final MutationCache _cache;
 
   /// Current [MutationState] of the mutation.
-  MutationState<ReturnType> get state => _state;
+  MutationState<ReturnType> get state => _streamController.value;
+
+  late final BehaviorSubject<MutationState<ReturnType>> _streamController =
+      BehaviorSubject.seeded(
+    MutationInitial<ReturnType>(),
+    onCancel: () {
+      _streamController.close();
+      if (key != null) {
+        _cache.deleteMutation(key!);
+      }
+    },
+  );
 
   /// Stream the state of the query.
   ///
   /// When the state is updated either by a mutation or a new query [stream]
   /// will be notified.
-  Stream<MutationState<ReturnType>> get stream => _createStream();
+  Stream<MutationState<ReturnType>> get stream => _streamController.stream;
 
   Mutation._internal({
     this.key,
@@ -86,8 +95,7 @@ class Mutation<ReturnType, Arg> {
         _cache = cache,
         _onStartMutation = onStartMutation,
         _onSuccess = onSuccess,
-        _refetchQueries = refetchQueries,
-        _state = MutationInitial<ReturnType>() {
+        _refetchQueries = refetchQueries {
     if (key != null) {
       _cache.addMutation(this);
     }
@@ -139,33 +147,14 @@ class Mutation<ReturnType, Arg> {
     return _fetch(arg);
   }
 
-  Stream<MutationState<ReturnType>> _createStream() {
-    if (_streamController != null) {
-      return _streamController!.stream;
-    }
-
-    _streamController = BehaviorSubject.seeded(
-      _state,
-      onCancel: () {
-        _streamController!.close();
-        _streamController = null;
-        if (key != null) {
-          _cache.deleteMutation(key!);
-        }
-      },
-    );
-
-    return _streamController!.stream;
-  }
-
   Future<MutationState<ReturnType?>> _fetch(Arg arg) async {
     _setState(MutationLoading(data: state.data));
-    _emit();
+
     dynamic startMutationResponse;
     if (_onStartMutation != null) {
       startMutationResponse = await _onStartMutation!(arg);
     }
-    // call query fn
+    // call mutation fn
     try {
       final res = await _mutationFn(arg);
       if (_onSuccess != null) {
@@ -193,24 +182,20 @@ class Mutation<ReturnType, Arg> {
       _setState(MutationError(data: state.data, error: e, stackTrace: trace));
 
       return state;
-    } finally {
-      _emit();
     }
   }
 
   void _setState(MutationState<ReturnType> newState) {
+    _streamController.add(newState);
+
     for (final ob in CachedQuery.instance.observers) {
       ob.onMutationChange(this, newState);
     }
-    _state = newState;
+
     if (state case MutationError(:final stackTrace)) {
       for (final ob in CachedQuery.instance.observers) {
         ob.onMutationError(this, stackTrace);
       }
     }
-  }
-
-  void _emit() {
-    _streamController?.add(_state);
   }
 }

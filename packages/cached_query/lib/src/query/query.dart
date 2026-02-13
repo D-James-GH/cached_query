@@ -10,6 +10,7 @@ class QueryFetchFunction<T> implements FetchFunction<T> {
 
   ///
   final Future<T> Function() queryFn;
+
   @override
   Future<T> call({required FetchOptions options, T? state}) {
     return queryFn();
@@ -138,12 +139,11 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   })  : _onError = onError,
         _onSuccess = onSuccess,
         _controller = controller {
-    _state = QueryInitial(
-      timeCreated: controller.stateNotifier.value.timeCreated,
-      data: controller.stateNotifier.value.data.valueOrNull,
-    );
     _stateSubject = BehaviorSubject.seeded(
-      state,
+      QueryInitial(
+        timeCreated: controller.stateNotifier.value.timeCreated,
+        data: controller.stateNotifier.value.data.valueOrNull,
+      ),
       onListen: () {
         controller
           ..registerQuery(this)
@@ -158,6 +158,7 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
 
   @override
   String get key => _controller.key;
+
   @override
   Object get unencodedKey => _controller.unencodedKey;
 
@@ -165,10 +166,8 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   @override
   final QueryConfig<T> config;
 
-  late QueryStatus<T> _state;
-
   @override
-  QueryStatus<T> get state => _state;
+  QueryStatus<T> get state => _stateSubject.value;
 
   @override
   Stream<QueryStatus<T>> get stream => _stateSubject.stream;
@@ -248,6 +247,8 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   final QueryController<T> _controller;
 
   void _setState(QueryStatus<T> state, {required bool notifyObservers}) {
+    _stateSubject.add(state);
+
     if (notifyObservers) {
       final observers = _controller._cache.observers;
       for (final observer in observers) {
@@ -258,9 +259,7 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
       }
     }
 
-    _state = state;
-
-    final newInterval = config.pollingInterval?.call(_state);
+    final newInterval = config.pollingInterval?.call(state);
     if (_pollingInterval != newInterval) {
       _pollingTimer?.cancel();
       _pollingInterval = newInterval;
@@ -268,16 +267,15 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
         _pollingTimer = _createPollingTimer(_pollingInterval!);
       }
     }
-
-    _stateSubject.add(state);
   }
 
   Timer? _pollingTimer;
   Duration? _pollingInterval;
+
   void _init() {
     _controller.stateNotifier.addListener(_handleAction);
 
-    _pollingInterval = config.pollingInterval?.call(_state);
+    _pollingInterval = config.pollingInterval?.call(state);
     if (_pollingInterval != null) {
       _pollingTimer = _createPollingTimer(_pollingInterval!);
     }
