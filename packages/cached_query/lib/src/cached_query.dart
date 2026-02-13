@@ -221,6 +221,8 @@ class CachedQuery {
       final k = encodeKey(key);
       if (_queryCache.containsKey(k)) {
         queries = [_queryCache.get(k)!];
+      } else {
+        queries = [];
       }
     } else {
       // invalidate the whole cache
