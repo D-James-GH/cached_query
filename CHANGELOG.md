@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-02-12
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.4.1`](#cached_query---v341)
+ - [`cached_query_flutter` - `v3.3.4`](#cached_query_flutter---v334)
+ - [`cached_storage` - `v3.2.4`](#cached_storage---v324)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.3.4`
+ - `cached_storage` - `v3.2.4`
+
+---
+
+#### `cached_query` - `v3.4.1`
+
+ - **FIX**: late initialization error ([#97](https://github.com/D-James-GH/cached_query/issues/97)). ([8c02a72f](https://github.com/D-James-GH/cached_query/commit/8c02a72fbda0e6c405abb54a71e0458a93afb562))
+
+
 ## 2026-01-04
 
 ### Changes

@@ -1,3 +1,7 @@
+## 3.4.1
+
+ - **FIX**: late initialization error ([#97](https://github.com/D-James-GH/cached_query/issues/97)). ([8c02a72f](https://github.com/D-James-GH/cached_query/commit/8c02a72fbda0e6c405abb54a71e0458a93afb562))
+
 ## 3.4.0
 
  - **FEAT**: add previous page fetch. ([903481da](https://github.com/D-James-GH/cached_query/commit/903481da17a8863ad9b8aa8aa3357edaae9d46f1))
