@@ -308,6 +308,8 @@ final class InfiniteQuery<T, Arg>
     InfiniteQueryStatus<T, Arg> state, {
     required bool notifyObservers,
   }) {
+    _state = state;
+
     if (notifyObservers) {
       final observers = _controller._cache.observers;
       for (final observer in observers) {
@@ -317,7 +319,6 @@ final class InfiniteQuery<T, Arg>
         }
       }
     }
-    _state = state;
 
     final newInterval = config.pollingInterval?.call(_state);
     if (_pollingInterval != newInterval) {

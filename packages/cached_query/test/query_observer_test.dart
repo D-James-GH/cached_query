@@ -166,6 +166,41 @@ void main() {
       expect(queryError, isA<Query<String>>());
     });
 
+    test("State should be QueryError if failed", () async {
+      bool called = false;
+      CachedQuery.instance.observers = [
+        QueryFailObserver((query, stacktrace) {
+          expect(query.state, isA<QueryError<String>>());
+          expect(query.state.error, "error");
+          called = true;
+        }),
+      ];
+      final query = Query<String>(
+        key: "queryFail",
+        queryFn: () => throw "error",
+      );
+      await query.result;
+      expect(called, true);
+    });
+
+    test("Infinite State should be InfiniteQueryError if failed", () async {
+      bool called = false;
+      CachedQuery.instance.observers = [
+        QueryFailObserver((query, stacktrace) {
+          expect(query.state, isA<InfiniteQueryError<String, int>>());
+          expect(query.state.error, "error");
+          called = true;
+        }),
+      ];
+      final query = InfiniteQuery<String, int>(
+        key: "queryFail",
+        getNextArg: (p) => 1,
+        queryFn: (_) => throw "error",
+      );
+      await query.result;
+      expect(called, true);
+    });
+
     test("Should be called when a infinite query is fetching", () async {
       int count = 0;
       Cacheable<dynamic>? queryChange;

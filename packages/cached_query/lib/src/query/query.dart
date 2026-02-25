@@ -248,6 +248,8 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   final QueryController<T> _controller;
 
   void _setState(QueryStatus<T> state, {required bool notifyObservers}) {
+    _state = state;
+
     if (notifyObservers) {
       final observers = _controller._cache.observers;
       for (final observer in observers) {
@@ -257,8 +259,6 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
         }
       }
     }
-
-    _state = state;
 
     final newInterval = config.pollingInterval?.call(_state);
     if (_pollingInterval != newInterval) {
