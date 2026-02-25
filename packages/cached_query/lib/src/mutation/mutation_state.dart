@@ -111,6 +111,7 @@ class MutationError<T> extends MutationState<T> {
   final T? data;
 
   /// The error of the mutation.
+  @override
   final Object error;
 
   /// The stack trace of the error.
