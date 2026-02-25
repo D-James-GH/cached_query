@@ -21,6 +21,14 @@ sealed class MutationState<T> {
 
   /// Whether this is the error state
   bool get isError => this is MutationError;
+
+  /// Returns the current error if the query is in an error state.
+  dynamic get error {
+    return switch (this) {
+      MutationError<T>(:final error) => error,
+      _ => null,
+    };
+  }
 }
 
 /// {@template MutationInitial}
