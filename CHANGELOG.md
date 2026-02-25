@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-02-25
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.5.0`](#cached_query---v350)
+ - [`cached_query_flutter` - `v3.3.5`](#cached_query_flutter---v335)
+ - [`cached_storage` - `v3.2.5`](#cached_storage---v325)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.3.5`
+ - `cached_storage` - `v3.2.5`
+
+---
+
+#### `cached_query` - `v3.5.0`
+
+ - **FIX**: analysis issue. ([7b0409b4](https://github.com/D-James-GH/cached_query/commit/7b0409b4aef525f7cfe87eba6f35599b42834174))
+ - **FIX**: state is updated and visible in the observers. ([9a1f3e1a](https://github.com/D-James-GH/cached_query/commit/9a1f3e1a0fa32dea1e17cc1f99a939fef05fba2d))
+ - **FEAT**: allow getting the error on mutation base state. ([4f37225b](https://github.com/D-James-GH/cached_query/commit/4f37225b2f55d75f368d640891217080fd9828eb))
+
+
 ## 2026-02-12
 
 ### Changes

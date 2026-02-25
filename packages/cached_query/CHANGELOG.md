@@ -1,3 +1,9 @@
+## 3.5.0
+
+ - **FIX**: analysis issue. ([7b0409b4](https://github.com/D-James-GH/cached_query/commit/7b0409b4aef525f7cfe87eba6f35599b42834174))
+ - **FIX**: state is updated and visible in the observers. ([9a1f3e1a](https://github.com/D-James-GH/cached_query/commit/9a1f3e1a0fa32dea1e17cc1f99a939fef05fba2d))
+ - **FEAT**: allow getting the error on mutation base state. ([4f37225b](https://github.com/D-James-GH/cached_query/commit/4f37225b2f55d75f368d640891217080fd9828eb))
+
 ## 3.4.1
 
  - **FIX**: late initialization error ([#97](https://github.com/D-James-GH/cached_query/issues/97)). ([8c02a72f](https://github.com/D-James-GH/cached_query/commit/8c02a72fbda0e6c405abb54a71e0458a93afb562))
