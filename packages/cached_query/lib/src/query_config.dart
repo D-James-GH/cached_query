@@ -299,7 +299,7 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is QueryConfig &&
+      other is QueryConfig<Data> &&
           runtimeType == other.runtimeType &&
           staleDuration == other.staleDuration &&
           storeQuery == other.storeQuery &&

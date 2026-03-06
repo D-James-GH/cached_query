@@ -697,6 +697,28 @@ void main() {
         sub.cancel();
       });
     });
+
+    test("Should handle adding polling interval", () async {
+      final cache = CachedQuery.asNewInstance();
+      final queryInitial = Query<Map<String, dynamic>>(
+        key: "typed-query",
+        cache: cache,
+        queryFn: () async => {"test": "data"},
+      );
+      await queryInitial.fetch();
+      final query = Query<Map<String, dynamic>>(
+        key: "typed-query",
+        cache: cache,
+        queryFn: () async => {"test": "data"},
+        config: QueryConfig(
+          pollingInterval: (_) => const Duration(seconds: 20),
+        ),
+      );
+
+      expect(query, isNotNull);
+      expect(query.state, isA<QueryState<Map<String, dynamic>>>());
+    });
+
     test("Won't fetch if no listeners", () {
       fakeAsync((async) {
         final cache = CachedQuery.asNewInstance();
@@ -770,4 +792,5 @@ void main() {
       });
     });
   });
+  group("Query config with generic types", () {});
 }
