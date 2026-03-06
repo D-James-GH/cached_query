@@ -1,3 +1,7 @@
+## 3.5.1
+
+ - **FIX**: can't change polling interval without downgrading generic type. ([4daa10e1](https://github.com/D-James-GH/cached_query/commit/4daa10e1b0249dc178bf1a940529bb3932c6d9fd))
+
 ## 3.5.0
 
  - **FIX**: analysis issue. ([7b0409b4](https://github.com/D-James-GH/cached_query/commit/7b0409b4aef525f7cfe87eba6f35599b42834174))

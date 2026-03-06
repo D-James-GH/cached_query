@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-03-06
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.5.1`](#cached_query---v351)
+ - [`cached_query_flutter` - `v3.3.6`](#cached_query_flutter---v336)
+ - [`cached_storage` - `v3.2.6`](#cached_storage---v326)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.3.6`
+ - `cached_storage` - `v3.2.6`
+
+---
+
+#### `cached_query` - `v3.5.1`
+
+ - **FIX**: can't change polling interval without downgrading generic type. ([4daa10e1](https://github.com/D-James-GH/cached_query/commit/4daa10e1b0249dc178bf1a940529bb3932c6d9fd))
+
+
 ## 2026-02-25
 
 ### Changes
