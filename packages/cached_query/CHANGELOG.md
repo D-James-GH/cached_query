@@ -1,3 +1,7 @@
+## 3.6.0
+
+ - **FEAT**: allowing query cache to be passed to mutation. ([af8bd3ca](https://github.com/D-James-GH/cached_query/commit/af8bd3ca4f0d53155e1f419add3f545b87742f28))
+
 ## 3.5.1
 
  - **FIX**: can't change polling interval without downgrading generic type. ([4daa10e1](https://github.com/D-James-GH/cached_query/commit/4daa10e1b0249dc178bf1a940529bb3932c6d9fd))

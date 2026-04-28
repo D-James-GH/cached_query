@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-04-28
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.6.0`](#cached_query---v360)
+ - [`cached_query_flutter` - `v3.3.7`](#cached_query_flutter---v337)
+ - [`cached_storage` - `v3.2.7`](#cached_storage---v327)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `cached_query_flutter` - `v3.3.7`
+ - `cached_storage` - `v3.2.7`
+
+---
+
+#### `cached_query` - `v3.6.0`
+
+ - **FEAT**: allowing query cache to be passed to mutation. ([af8bd3ca](https://github.com/D-James-GH/cached_query/commit/af8bd3ca4f0d53155e1f419add3f545b87742f28))
+
+
 ## 2026-03-06
 
 ### Changes
