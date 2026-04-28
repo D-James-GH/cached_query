@@ -5,6 +5,21 @@ import 'package:test/test.dart';
 
 import 'test_implementations.dart';
 
+class _CountingObserver extends QueryObserver {
+  final void Function() _onCall;
+  _CountingObserver(this._onCall);
+
+  @override
+  void onMutationCreation(Mutation<dynamic, dynamic> query) => _onCall();
+
+  @override
+  void onMutationChange(
+    Mutation<dynamic, dynamic> mutation,
+    MutationState<dynamic> nextState,
+  ) =>
+      _onCall();
+}
+
 void main() {
   group("Creating a mutation", () {
     test("Can create a mutation object", () {
@@ -174,6 +189,51 @@ void main() {
       );
       await mutation.mutate();
       expect(errorCount, 1);
+    });
+  });
+  group("Custom queryCache", () {
+    test("invalidateQueries runs on custom cache, not global", () async {
+      final customCache = CachedQuery.asNewInstance();
+      const key = "custom_invalidate";
+      final query = createQuery(key: key, cache: customCache);
+      await query.fetch();
+      expect(query.stale, false);
+
+      final mutation = Mutation<String, void>(
+        queryCache: customCache,
+        invalidateQueries: [key],
+        mutationFn: (_) async => "",
+      );
+      await mutation.mutate();
+      expect(query.stale, true);
+
+      // global instance should not have been touched
+      final globalQuery = CachedQuery.instance.getQuery<Query<String>>(key);
+      expect(globalQuery, isNull);
+    });
+
+    test("observers called on custom cache, not global", () async {
+      int customObserverCalls = 0;
+      int globalObserverCalls = 0;
+
+      final testObserver = _CountingObserver(() => customObserverCalls++);
+      final globalObserver = _CountingObserver(() => globalObserverCalls++);
+
+      final customCache = CachedQuery.asNewInstance();
+      customCache.observers.add(testObserver);
+      CachedQuery.instance.observers.add(globalObserver);
+
+      final mutation = Mutation<String, void>(
+        queryCache: customCache,
+        mutationFn: (_) async => "result",
+      );
+      await mutation.mutate();
+
+      expect(customObserverCalls, greaterThan(0));
+      expect(globalObserverCalls, 0);
+
+      // cleanup
+      CachedQuery.instance.observers.remove(globalObserver);
     });
   });
   group("Optional side effects", () {

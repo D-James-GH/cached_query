@@ -61,6 +61,7 @@ class Mutation<ReturnType, Arg> {
   MutationState<ReturnType> _state;
   BehaviorSubject<MutationState<ReturnType>>? _streamController;
   final MutationCache _cache;
+  final CachedQuery _queryCache;
 
   /// Current [MutationState] of the mutation.
   MutationState<ReturnType> get state => _state;
@@ -74,6 +75,7 @@ class Mutation<ReturnType, Arg> {
   Mutation._internal({
     this.key,
     required MutationCache cache,
+    required CachedQuery queryCache,
     OnStartMutateCallback<Arg>? onStartMutation,
     OnSuccessCallback<ReturnType, Arg>? onSuccess,
     OnErrorCallback<Arg>? onError,
@@ -84,6 +86,7 @@ class Mutation<ReturnType, Arg> {
         _invalidateQueries = invalidateQueries,
         _onError = onError,
         _cache = cache,
+        _queryCache = queryCache,
         _onStartMutation = onStartMutation,
         _onSuccess = onSuccess,
         _refetchQueries = refetchQueries,
@@ -97,6 +100,7 @@ class Mutation<ReturnType, Arg> {
   factory Mutation({
     Object? key,
     MutationCache? cache,
+    CachedQuery? queryCache,
     OnStartMutateCallback<Arg>? onStartMutation,
     OnSuccessCallback<ReturnType, Arg>? onSuccess,
     OnErrorCallback<Arg>? onError,
@@ -105,12 +109,13 @@ class Mutation<ReturnType, Arg> {
     List<Object>? refetchQueries,
   }) {
     cache = cache ?? MutationCache.instance;
+    queryCache = queryCache ?? CachedQuery.instance;
     String? stringKey;
     if (key != null) {
       stringKey = encodeKey(key);
       final mutationFromCache = cache.getMutation<ReturnType, Arg>(stringKey);
       if (mutationFromCache != null) {
-        for (final ob in CachedQuery.instance.observers) {
+        for (final ob in queryCache.observers) {
           ob.onMutationReuse(mutationFromCache);
         }
         return mutationFromCache;
@@ -119,6 +124,7 @@ class Mutation<ReturnType, Arg> {
     final mutation = Mutation._internal(
       key: stringKey,
       cache: cache,
+      queryCache: queryCache,
       onStartMutation: onStartMutation,
       onSuccess: onSuccess,
       onError: onError,
@@ -126,7 +132,7 @@ class Mutation<ReturnType, Arg> {
       refetchQueries: refetchQueries,
       mutationFn: mutationFn,
     );
-    for (final ob in CachedQuery.instance.observers) {
+    for (final ob in queryCache.observers) {
       ob.onMutationCreation(mutation);
     }
     return mutation;
@@ -176,12 +182,12 @@ class Mutation<ReturnType, Arg> {
 
       if (_invalidateQueries != null) {
         for (final k in _invalidateQueries!) {
-          CachedQuery.instance.invalidateCache(key: k);
+          _queryCache.invalidateCache(key: k);
         }
       }
 
       if (_refetchQueries != null) {
-        CachedQuery.instance.refetchQueries(keys: _refetchQueries!);
+        _queryCache.refetchQueries(keys: _refetchQueries!);
       }
 
       return state;
@@ -199,12 +205,12 @@ class Mutation<ReturnType, Arg> {
   }
 
   void _setState(MutationState<ReturnType> newState) {
-    for (final ob in CachedQuery.instance.observers) {
+    for (final ob in _queryCache.observers) {
       ob.onMutationChange(this, newState);
     }
     _state = newState;
     if (state case MutationError(:final stackTrace)) {
-      for (final ob in CachedQuery.instance.observers) {
+      for (final ob in _queryCache.observers) {
         ob.onMutationError(this, stackTrace);
       }
     }
