@@ -1063,4 +1063,72 @@ void main() async {
       });
     });
   });
+
+  group("retrying", () {
+    late CachedQuery cache;
+    setUp(() => cache = CachedQuery.asNewInstance());
+    tearDown(() => cache.deleteCache());
+
+    test("initial fetch retries up to maxRetries then emits error", () async {
+      final tester = QueryTester.infinite(
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+          ),
+        ),
+        shouldThrow: (_) => true,
+      );
+      final result = await tester.query.fetch();
+      expect(result, isA<InfiniteQueryError<String, int>>());
+      expect(tester.numFetches, 3);
+    });
+
+    test("getNextPage retries on failure", () async {
+      int fetchCount = 0;
+      final query = InfiniteQuery<String, int>(
+        key: "retry-next-page",
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+          ),
+        ),
+        getNextArg: (data) => (data?.pages.length ?? 0) + 1,
+        queryFn: (arg) async {
+          fetchCount++;
+          if (fetchCount == 1) return "page1";
+          throw Exception("next page fail");
+        },
+      );
+      await query.fetch();
+      await query.getNextPage();
+      expect(fetchCount, 4); // 1 success + 1 fail + 2 retries
+    });
+
+    test("retryCount visible in InfiniteQueryLoading", () async {
+      final retryCounts = <int>[];
+      final query = InfiniteQuery<String, int>(
+        key: "retry-count-infinite",
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+          ),
+        ),
+        getNextArg: (data) => (data?.pages.length ?? 0) + 1,
+        queryFn: (_) async => throw Exception("fail"),
+      );
+      query.stream.listen((state) {
+        if (state is InfiniteQueryLoading<String, int>) {
+          retryCounts.add(state.retryCount);
+        }
+      });
+      await query.fetch();
+      expect(retryCounts, containsAllInOrder([0, 1, 2]));
+    });
+  });
 }

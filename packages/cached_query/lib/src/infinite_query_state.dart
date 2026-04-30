@@ -102,6 +102,7 @@ sealed class InfiniteQueryStatus<T, Arg>
     required bool isRefetching,
     required bool isFetchingNextPage,
     required bool isInitialFetch,
+    int retryCount,
   }) = InfiniteQueryLoading<T, Arg>;
 
   ///{@macro InfiniteQueryError}
@@ -222,6 +223,12 @@ final class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg> {
   /// True if the query is currently fetching the next page of data.
   final bool isFetchingNextPage;
 
+  /// The number of retry attempts so far. 0 means the initial fetch is in progress.
+  final int retryCount;
+
+  /// True if the query is currently retrying after a failed attempt.
+  bool get isRetrying => retryCount > 0;
+
   /// {@macro InfiniteQueryLoading}
   const InfiniteQueryLoading({
     required super.timeCreated,
@@ -229,6 +236,7 @@ final class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg> {
     required this.isRefetching,
     required this.isFetchingNextPage,
     required this.isInitialFetch,
+    this.retryCount = 0,
   });
 
   @override
@@ -239,6 +247,7 @@ final class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg> {
           isInitialFetch == other.isInitialFetch &&
           isRefetching == other.isRefetching &&
           isFetchingNextPage == other.isFetchingNextPage &&
+          retryCount == other.retryCount &&
           data == other.data &&
           timeCreated == other.timeCreated;
 
@@ -247,6 +256,7 @@ final class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       isInitialFetch.hashCode ^
       isRefetching.hashCode ^
       isFetchingNextPage.hashCode ^
+      retryCount.hashCode ^
       data.hashCode ^
       timeCreated.hashCode;
 
@@ -261,12 +271,13 @@ final class InfiniteQueryLoading<T, Arg> extends InfiniteQueryStatus<T, Arg> {
       data: data,
       isRefetching: isRefetching,
       isFetchingNextPage: isFetchingNextPage,
+      retryCount: retryCount,
     );
   }
 
   @override
   String toString() {
-    return 'InfiniteQueryLoading(timeCreated: $timeCreated, data: $data, isRefetching: $isRefetching, isFetchingNextPage: $isFetchingNextPage, isInitialFetch: $isInitialFetch)';
+    return 'InfiniteQueryLoading(timeCreated: $timeCreated, data: $data, isRefetching: $isRefetching, isFetchingNextPage: $isFetchingNextPage, isInitialFetch: $isInitialFetch, retryCount: $retryCount)';
   }
 }
 

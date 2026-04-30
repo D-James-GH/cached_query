@@ -793,4 +793,210 @@ void main() {
     });
   });
   group("Query config with generic types", () {});
+
+  group("retrying", () {
+    tearDown(cachedQuery.deleteCache);
+
+    test("no retry by default — immediate error", () async {
+      final cache = CachedQuery.asNewInstance();
+      final tester = QueryTester(
+        cache: cache,
+        shouldThrow: (_) => true,
+      );
+      final result = await tester.query.fetch();
+      expect(result, isA<QueryError<String>>());
+      expect(tester.numFetches, 1);
+    });
+
+    test("retries up to maxRetries then emits QueryError", () async {
+      final cache = CachedQuery.asNewInstance();
+      final tester = QueryTester(
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+          ),
+        ),
+        shouldThrow: (_) => true,
+      );
+      final result = await tester.query.fetch();
+      expect(result, isA<QueryError<String>>());
+      expect(tester.numFetches, 3); // 1 initial + 2 retries
+    });
+
+    test("succeeds after retry", () async {
+      final cache = CachedQuery.asNewInstance();
+      final tester = QueryTester(
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+          ),
+        ),
+        shouldThrow: (n) => n < 3, // fail first 2, succeed on 3rd
+      );
+      final result = await tester.query.fetch();
+      expect(result, isA<QuerySuccess<String>>());
+      expect(tester.numFetches, 3);
+    });
+
+    test("onError fires only after all retries exhausted", () async {
+      int onErrorCount = 0;
+      final cache = CachedQuery.asNewInstance();
+      final query = Query<String>(
+        key: "retry-onerror",
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+          ),
+        ),
+        queryFn: () async => throw Exception("fail"),
+        onError: (_) => onErrorCount++,
+      );
+      await query.fetch();
+      expect(onErrorCount, 1);
+    });
+
+    test("whenError false skips retries", () async {
+      final cache = CachedQuery.asNewInstance();
+      final tester = QueryTester(
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 3,
+            delay: (_) => Duration.zero,
+            whenError: (_, __) => false,
+          ),
+        ),
+        shouldThrow: (_) => true,
+      );
+      final result = await tester.query.fetch();
+      expect(result, isA<QueryError<String>>());
+      expect(tester.numFetches, 1); // no retries
+    });
+
+    test("whenError receives correct attempt number", () async {
+      final attempts = <int>[];
+      final cache = CachedQuery.asNewInstance();
+      final tester = QueryTester(
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 3,
+            delay: (_) => Duration.zero,
+            whenError: (_, attempt) {
+              attempts.add(attempt);
+              return true;
+            },
+          ),
+        ),
+        shouldThrow: (_) => true,
+      );
+      await tester.query.fetch();
+      expect(attempts, [1, 2, 3]);
+    });
+
+    test("retryCount increments in QueryLoading state", () async {
+      final cache = CachedQuery.asNewInstance();
+      final retryCounts = <int>[];
+      final query = Query<String>(
+        key: "retry-count-state",
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+          ),
+        ),
+        queryFn: () async => throw Exception("fail"),
+      );
+      query.stream.listen((state) {
+        if (state is QueryLoading<String>) {
+          retryCounts.add(state.retryCount);
+        }
+      });
+      await query.fetch();
+      expect(retryCounts, containsAllInOrder([0, 1, 2]));
+    });
+
+    test("custom delay is called with correct attempt numbers", () {
+      fakeAsync((async) {
+        final delayAttempts = <int>[];
+        final cache = CachedQuery.asNewInstance();
+        final tester = QueryTester(
+          cache: cache,
+          config: QueryConfig(
+            retryConfig: RetryConfig(
+              maxRetries: 2,
+              delay: (attempt) {
+                delayAttempts.add(attempt);
+                return const Duration(milliseconds: 500);
+              },
+            ),
+          ),
+          shouldThrow: (_) => true,
+        );
+        tester.query.fetch();
+        async.elapse(const Duration(milliseconds: 1500));
+        expect(delayAttempts, [1, 2]);
+      });
+    });
+
+    test("exponential backoff default delays", () {
+      fakeAsync((async) {
+        final cache = CachedQuery.asNewInstance();
+        int fetchCount = 0;
+        Query<String>(
+          key: "backoff",
+          cache: cache,
+          config: QueryConfig(
+            retryConfig: RetryConfig(maxRetries: 3),
+          ),
+          queryFn: () async {
+            fetchCount++;
+            throw Exception("fail");
+          },
+        ).fetch();
+        async.flushMicrotasks();
+        expect(fetchCount, 1); // initial attempt
+
+        async.elapse(const Duration(milliseconds: 199));
+        expect(fetchCount, 1);
+        async.elapse(const Duration(milliseconds: 1));
+        expect(fetchCount, 2); // after 200ms
+
+        async.elapse(const Duration(milliseconds: 399));
+        expect(fetchCount, 2);
+        async.elapse(const Duration(milliseconds: 1));
+        expect(fetchCount, 3); // after 400ms
+
+        async.elapse(const Duration(milliseconds: 799));
+        expect(fetchCount, 3);
+        async.elapse(const Duration(milliseconds: 1));
+        expect(fetchCount, 4); // after 800ms
+      });
+    });
+
+    test("async whenError is awaited", () async {
+      final cache = CachedQuery.asNewInstance();
+      final tester = QueryTester(
+        cache: cache,
+        config: QueryConfig(
+          retryConfig: RetryConfig(
+            maxRetries: 2,
+            delay: (_) => Duration.zero,
+            whenError: (_, __) async => true,
+          ),
+        ),
+        shouldThrow: (_) => true,
+      );
+      final result = await tester.query.fetch();
+      expect(result, isA<QueryError<String>>());
+      expect(tester.numFetches, 3);
+    });
+  });
 }

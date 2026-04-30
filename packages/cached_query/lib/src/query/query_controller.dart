@@ -74,6 +74,7 @@ final class QueryController<T> {
   final Object unencodedKey;
 
   bool _invalidated = false;
+  bool _disposed = false;
 
   bool isInvalidated() {
     return _invalidated || stateNotifier.value.data.isNone;
@@ -255,20 +256,48 @@ final class QueryController<T> {
     final stale = _isStale();
 
     if ((stale || ignoreStale) && shouldContinue) {
-      try {
-        final res = await onFetch(
-          options: options,
-          state: stateNotifier.value.data.valueOrNull,
-        );
-        final newData = Some(res);
-        stateNotifier.add(
-          Success(data: newData, timeCreated: DateTime.now()),
-        );
-        _saveToStorage();
-        scheduleDelete();
-      } catch (e, s) {
-        stateNotifier.add(FetchError(error: e, stackTrace: s));
-        scheduleDelete();
+      final isInitialFetch = stateNotifier.value.data.isNone;
+      int attempt = 0;
+      while (true) {
+        if (_disposed) break;
+        try {
+          final res = await onFetch(
+            options: options,
+            state: stateNotifier.value.data.valueOrNull,
+          );
+          stateNotifier.add(
+            Success(data: Some(res), timeCreated: DateTime.now()),
+          );
+          _saveToStorage();
+          scheduleDelete();
+          break;
+        } catch (e, s) {
+          final retryConfig = _config.retryConfig;
+          final maxRetries = retryConfig?.maxRetries ?? 0;
+          final canRetry = attempt < maxRetries &&
+              (retryConfig?.whenError == null ||
+                  await retryConfig!.whenError!(e, attempt + 1));
+
+          if (canRetry) {
+            attempt++;
+            stateNotifier.add(
+              Fetch(
+                fetchOptions: options,
+                isInitialFetch: isInitialFetch,
+                retryCount: attempt,
+              ),
+            );
+            final delay = retryConfig?.delay?.call(attempt) ??
+                Duration(milliseconds: 200 << (attempt - 1));
+            if (_disposed) break;
+            await Future<void>.delayed(delay);
+            if (_disposed) break;
+          } else {
+            stateNotifier.add(FetchError(error: e, stackTrace: s));
+            scheduleDelete();
+            break;
+          }
+        }
       }
     } else {
       stateNotifier.add(
@@ -367,6 +396,7 @@ final class QueryController<T> {
   }
 
   Future<void> dispose() async {
+    _disposed = true;
     if (_deleteQueryTimer?.isActive ?? false) {
       _deleteQueryTimer!.cancel();
       _deleteQueryTimer = null;

@@ -53,6 +53,7 @@ sealed class QueryStatus<T> implements QueryState<T> {
     required bool isRefetching,
     required bool isInitialFetch,
     required T? data,
+    int retryCount,
   }) = QueryLoading<T>;
 
   const factory QueryStatus.error({
@@ -73,11 +74,12 @@ sealed class QueryStatus<T> implements QueryState<T> {
     return switch (this) {
       QueryInitial<T>() => QueryInitial(timeCreated: timeCreated, data: data),
       QuerySuccess<T>() => QuerySuccess(timeCreated: timeCreated, data: data),
-      QueryLoading<T>(:final isRefetching, :final isInitialFetch) =>
+      QueryLoading<T>(:final isRefetching, :final isInitialFetch, :final retryCount) =>
         QueryLoading(
           isInitialFetch: isInitialFetch,
           timeCreated: timeCreated,
           isRefetching: isRefetching,
+          retryCount: retryCount,
           data: data,
         ),
       QueryError<T>(:final error, :final stackTrace) => QueryError(
@@ -177,12 +179,19 @@ class QueryLoading<T> extends QueryStatus<T> {
   /// Whether the query is currently refetching
   final bool isRefetching;
 
+  /// The number of retry attempts so far. 0 means the initial fetch is in progress.
+  final int retryCount;
+
+  /// True if the query is currently retrying after a failed attempt.
+  bool get isRetrying => retryCount > 0;
+
   /// {@macro QueryLoading}
   const QueryLoading({
     required super.timeCreated,
     this.data,
     required this.isRefetching,
     required this.isInitialFetch,
+    this.retryCount = 0,
   });
 
   @override
@@ -193,6 +202,7 @@ class QueryLoading<T> extends QueryStatus<T> {
           runtimeType == other.runtimeType &&
           timeCreated == other.timeCreated &&
           isRefetching == other.isRefetching &&
+          retryCount == other.retryCount &&
           data == other.data;
 
   @override
@@ -200,11 +210,12 @@ class QueryLoading<T> extends QueryStatus<T> {
       timeCreated.hashCode ^
       data.hashCode ^
       isRefetching.hashCode ^
-      isInitialFetch.hashCode;
+      isInitialFetch.hashCode ^
+      retryCount.hashCode;
 
   @override
   String toString() {
-    return 'QueryLoading(timeCreated: $timeCreated, data: $data, isInitialFetch: $isInitialFetch, isRefetching: $isRefetching)';
+    return 'QueryLoading(timeCreated: $timeCreated, data: $data, isInitialFetch: $isInitialFetch, isRefetching: $isRefetching, retryCount: $retryCount)';
   }
 }
 

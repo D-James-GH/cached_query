@@ -24,8 +24,13 @@ sealed class ControllerAction<T> {}
 final class Fetch<T> extends ControllerAction<T> {
   final FetchOptions fetchOptions;
   final bool isInitialFetch;
+  final int retryCount;
 
-  Fetch({required this.fetchOptions, required this.isInitialFetch});
+  Fetch({
+    required this.fetchOptions,
+    required this.isInitialFetch,
+    this.retryCount = 0,
+  });
 }
 
 final class FetchError<T> extends ControllerAction<T> {

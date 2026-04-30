@@ -357,7 +357,7 @@ final class InfiniteQuery<T, Arg>
     final notifyObservers =
         event is DataEvent<ControllerAction<InfiniteQueryData<T, Arg>>>;
     switch (event.action) {
-      case Fetch(:final isInitialFetch, :final fetchOptions):
+      case Fetch(:final isInitialFetch, :final fetchOptions, :final retryCount):
         _setState(
           InfiniteQueryStatus.loading(
             isInitialFetch: isInitialFetch,
@@ -368,6 +368,7 @@ final class InfiniteQuery<T, Arg>
                     fetchOptions.direction == null),
             data: state.data,
             timeCreated: state.timeCreated,
+            retryCount: retryCount,
           ),
           notifyObservers: notifyObservers,
         );
