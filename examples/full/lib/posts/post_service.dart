@@ -38,8 +38,9 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
       return firstArg - 1;
     },
     queryFn: (arg) async {
+      final skip = (arg - 1) * 10;
       final uri = Uri.parse(
-        'https://jsonplaceholder.typicode.com/posts?_limit=10&_page=$arg',
+        'https://dummyjson.com/posts?limit=10&skip=$skip',
       );
       final res = await http.get(uri);
 
@@ -51,7 +52,8 @@ InfiniteQuery<List<PostModel>, int> getPosts() {
         const Duration(seconds: 1),
         () => PostModel.listFromJson(
           List<Map<String, dynamic>>.from(
-            jsonDecode(res.body) as List<dynamic>,
+            (jsonDecode(res.body) as Map<String, dynamic>)['posts']
+                as List<dynamic>,
           ),
         ),
       );
@@ -76,7 +78,7 @@ Query<PostModel> getPostById(int id) => Query(
       key: "posts/$id",
       queryFn: () async {
         final uri = Uri.parse(
-          'https://jsonplaceholder.typicode.com/posts/$id',
+          'https://dummyjson.com/posts/$id',
         );
         final res = await http.get(uri);
         return PostModel.fromJson(
