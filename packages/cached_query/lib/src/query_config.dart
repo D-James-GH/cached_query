@@ -2,6 +2,8 @@ import 'package:cached_query/src/query/controller_options.dart';
 
 import '../cached_query.dart';
 
+export 'retry_config.dart';
+
 /// {@template QueryConfig.ShouldRefetch}
 /// ShouldFetch is called before a query is fetched, both after the data is fetched from storage
 /// and when a query is stale. This would usually not be necessary to use but can give
@@ -99,6 +101,11 @@ class GlobalQueryConfig {
   /// Defaults to true.
   final bool refetchOnConnection;
 
+  /// {@macro RetryConfig}
+  ///
+  /// Defaults to null (no retries).
+  final RetryConfig? retryConfig;
+
   /// {@macro queryConfig}
   ///
   /// {@macro QueryConfig.storageSerializer}
@@ -131,6 +138,7 @@ class GlobalQueryConfig {
     this.refetchOnResume = true,
     this.refetchOnResumeMinBackgroundDuration = const Duration(seconds: 5),
     this.refetchOnConnection = true,
+    this.retryConfig,
   }) : staleDuration =
             staleDuration ?? refetchDuration ?? const Duration(seconds: 4);
 
@@ -144,6 +152,7 @@ class GlobalQueryConfig {
           cacheDuration == other.cacheDuration &&
           shouldRethrow == other.shouldRethrow &&
           shouldFetch == other.shouldFetch &&
+          retryConfig == other.retryConfig &&
           ignoreCacheDuration == other.ignoreCacheDuration;
 
   @override
@@ -153,6 +162,7 @@ class GlobalQueryConfig {
       cacheDuration.hashCode ^
       shouldRethrow.hashCode ^
       shouldFetch.hashCode ^
+      retryConfig.hashCode ^
       ignoreCacheDuration.hashCode;
 }
 
@@ -233,6 +243,11 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
       _refetchOnConnection ?? _defaultConfig.refetchOnConnection;
   final bool? _refetchOnConnection;
 
+  /// {@macro RetryConfig}
+  @override
+  RetryConfig? get retryConfig => _retryConfig ?? _defaultConfig.retryConfig;
+  final RetryConfig? _retryConfig;
+
   /// {@macro queryConfig}
   ///
   /// {@macro QueryConfig.storageSerializer}
@@ -268,6 +283,7 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
     bool? shouldRethrow,
     bool? refetchOnResume,
     bool? refetchOnConnection,
+    RetryConfig? retryConfig,
   })  : _storeQuery = storeQuery,
         _shouldFetch = shouldFetch,
         _ignoreCacheDuration = ignoreCacheDuration,
@@ -275,7 +291,8 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
         _shouldRethrow = shouldRethrow,
         _cacheDuration = cacheDuration,
         _refetchOnResume = refetchOnResume,
-        _refetchOnConnection = refetchOnConnection;
+        _refetchOnConnection = refetchOnConnection,
+        _retryConfig = retryConfig;
 
   /// Merges the global config with the local config.
   QueryConfig<Data> mergeWithGlobal(GlobalQueryConfig global) {
@@ -293,6 +310,7 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
       shouldRethrow: _shouldRethrow ?? global.shouldRethrow,
       refetchOnResume: _refetchOnResume ?? global.refetchOnResume,
       refetchOnConnection: _refetchOnConnection ?? global.refetchOnConnection,
+      retryConfig: _retryConfig ?? global.retryConfig,
     );
   }
 
@@ -311,6 +329,7 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
           refetchOnResume == other.refetchOnResume &&
           pollingInterval == other.pollingInterval &&
           pollInactive == other.pollInactive &&
+          retryConfig == other.retryConfig &&
           refetchOnConnection == other.refetchOnConnection;
 
   @override
@@ -324,5 +343,6 @@ class QueryConfig<Data> implements ControllerOptions<Data> {
       refetchOnResume.hashCode ^
       pollingInterval.hashCode ^
       pollInactive.hashCode ^
+      retryConfig.hashCode ^
       refetchOnConnection.hashCode;
 }

@@ -16,8 +16,8 @@ void main() async {
       refetchOnResumeMinBackgroundDuration: Duration.zero,
     ),
     observers: [
-      Observer(),
-      QueryLoggingObserver(colors: !Platform.isIOS),
+      // Observer(),
+      // QueryLoggingObserver(colors: !Platform.isIOS),
     ],
   );
   runApp(const MyApp());

@@ -15,7 +15,7 @@ dependencies:
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
   freezed_annotation:
-  cached_query_flutter: ^3.3.6
+  cached_query_flutter: any
   http: ^1.2.2
   bloc_concurrency: ^0.2.5
 

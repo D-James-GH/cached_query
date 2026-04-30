@@ -10,6 +10,7 @@ class ControllerOptions<Data> {
     required this.ignoreCacheDuration,
     required this.storageSerializer,
     required this.storageDeserializer,
+    this.retryConfig,
   });
 
   ///
@@ -29,4 +30,7 @@ class ControllerOptions<Data> {
 
   ///
   final Deserializer<Data>? storageDeserializer;
+
+  ///
+  final RetryConfig? retryConfig;
 }

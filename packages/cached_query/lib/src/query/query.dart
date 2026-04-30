@@ -294,13 +294,14 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   void _handleAction(Event<ControllerAction<T>> event) {
     final notifyObservers = event is DataEvent<ControllerAction<T>>;
     switch (event.action) {
-      case Fetch(:final isInitialFetch):
+      case Fetch(:final isInitialFetch, :final retryCount):
         _setState(
           QueryStatus.loading(
             data: state.data,
             timeCreated: state.timeCreated,
             isRefetching: !isInitialFetch,
             isInitialFetch: isInitialFetch,
+            retryCount: retryCount,
           ),
           notifyObservers: notifyObservers,
         );

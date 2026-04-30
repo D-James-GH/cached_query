@@ -80,11 +80,6 @@ class CachedQuery {
   ///
   /// Pass a [StorageInterface] to automatically store queries for fast initial
   /// fetches.
-  ///
-  /// [shouldRethrow] tells cached query whether it should rethrow any error
-  /// caught in the query. This is useful if you use try catches in your app for
-  /// error handling/logout. By default a query will catch all errors and exceptions
-  /// and update the state.
   /// {@endtemplate}
   void config({
     StorageInterface? storage,

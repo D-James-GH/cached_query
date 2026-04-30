@@ -51,16 +51,17 @@ class JokeScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               children: [
-                if (state.isError &&
-                    (state as QueryError).error is SocketException)
+                if (state case QueryError(:final error))
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.error,
                     ),
-                    child: const Text(
-                      "No internet connection",
-                      style: TextStyle(color: Colors.white, fontSize: 24),
+                    child: Text(
+                      error is SocketException
+                          ? "No internet connection"
+                          : error.toString(),
+                      style: const TextStyle(color: Colors.white, fontSize: 24),
                       textAlign: TextAlign.center,
                     ),
                   ),
