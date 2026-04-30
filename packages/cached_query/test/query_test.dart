@@ -950,7 +950,7 @@ void main() {
       fakeAsync((async) {
         final cache = CachedQuery.asNewInstance();
         int fetchCount = 0;
-        Query<String>(
+        final query = Query<String>(
           key: "backoff",
           cache: cache,
           config: QueryConfig(
@@ -960,7 +960,9 @@ void main() {
             fetchCount++;
             throw Exception("fail");
           },
-        ).fetch();
+        );
+
+        query.fetch();
         async.flushMicrotasks();
         expect(fetchCount, 1); // initial attempt
 

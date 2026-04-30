@@ -21,10 +21,8 @@ dependencies:
   connectivity_plus: ^7.0.0
 
   freezed_annotation: ^3.1.0
-  cached_query_flutter:
-    path: ../../packages/cached_query_flutter
-  cached_storage:
-    path: ../../packages/cached_storage
+  cached_query_flutter: any
+  cached_storage: any
   faker: ^2.2.0
 dev_dependencies:
   flutter_test:
