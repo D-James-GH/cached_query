@@ -74,7 +74,11 @@ sealed class QueryStatus<T> implements QueryState<T> {
     return switch (this) {
       QueryInitial<T>() => QueryInitial(timeCreated: timeCreated, data: data),
       QuerySuccess<T>() => QuerySuccess(timeCreated: timeCreated, data: data),
-      QueryLoading<T>(:final isRefetching, :final isInitialFetch, :final retryCount) =>
+      QueryLoading<T>(
+        :final isRefetching,
+        :final isInitialFetch,
+        :final retryCount
+      ) =>
         QueryLoading(
           isInitialFetch: isInitialFetch,
           timeCreated: timeCreated,
