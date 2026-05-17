@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2026-05-17
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`cached_query` - `v3.7.0`](#cached_query---v370)
+ - [`cached_query_flutter` - `v3.4.0`](#cached_query_flutter---v340)
+ - [`cached_storage` - `v3.3.0`](#cached_storage---v330)
+
+---
+
+#### `cached_query` - `v3.7.0`
+
+ - **FEAT**: retrying for queries and infinite queries. ([613db689](https://github.com/D-James-GH/cached_query/commit/613db6898e6bd580c5685f8177bea14ed450f3af))
+
+#### `cached_query_flutter` - `v3.4.0`
+
+ - **FEAT**: retrying for queries and infinite queries. ([613db689](https://github.com/D-James-GH/cached_query/commit/613db6898e6bd580c5685f8177bea14ed450f3af))
+
+#### `cached_storage` - `v3.3.0`
+
+ - **FEAT**: retrying for queries and infinite queries. ([613db689](https://github.com/D-James-GH/cached_query/commit/613db6898e6bd580c5685f8177bea14ed450f3af))
+
+
 ## 2026-04-28
 
 ### Changes

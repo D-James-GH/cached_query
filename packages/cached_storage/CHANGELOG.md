@@ -1,3 +1,7 @@
+## 3.3.0
+
+ - **FEAT**: retrying for queries and infinite queries. ([613db689](https://github.com/D-James-GH/cached_query/commit/613db6898e6bd580c5685f8177bea14ed450f3af))
+
 ## 3.2.7
 
  - Update a dependency to the latest release.

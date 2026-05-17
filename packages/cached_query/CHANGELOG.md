@@ -1,3 +1,7 @@
+## 3.7.0
+
+ - **FEAT**: retrying for queries and infinite queries. ([613db689](https://github.com/D-James-GH/cached_query/commit/613db6898e6bd580c5685f8177bea14ed450f3af))
+
 ## 3.6.0
 
  - **FEAT**: allowing query cache to be passed to mutation. ([af8bd3ca](https://github.com/D-James-GH/cached_query/commit/af8bd3ca4f0d53155e1f419add3f545b87742f28))
