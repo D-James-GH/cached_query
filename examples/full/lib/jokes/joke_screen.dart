@@ -21,9 +21,9 @@ class JokeScreen extends StatelessWidget {
         title: Row(
           children: [
             const Text('jokes'),
-            QueryBuilder(
-              query: service.getJoke(),
-              builder: (_, state) {
+            Builder(
+              builder: (context) {
+                final state = context.watchQuery(query: service.getJoke());
                 if (state.isLoading) {
                   return const CircularProgressIndicator(
                     valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
@@ -44,9 +44,10 @@ class JokeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: QueryBuilder<QueryState<JokeModel?>>(
-        query: service.getJoke(),
-        builder: (_, state) {
+      body: Builder(
+        builder: (context) {
+          final state =
+              context.watchQuery<JokeModel?>(query: service.getJoke());
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(

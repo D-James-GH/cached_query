@@ -21,7 +21,7 @@ workspace:
   - examples/simple_caching_with_bloc
 
 dev_dependencies:
-  melos: ^7.0.0
+  melos: ^7.8.0
 
 melos:
   repository: https://github.com/D-James-GH/cached_query

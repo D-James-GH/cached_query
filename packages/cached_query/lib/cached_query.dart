@@ -1,6 +1,6 @@
 export './src/cached_query.dart';
 export "./src/query/_query.dart"
-    hide QueryCache, QueryFetchFunction, createEmptyQuery;
+    hide QueryCache, QueryFetchFunction;
 export "src/connection_controller.dart" show ConnectionStatus;
 export 'src/devtools_observer.dart';
 export 'src/mutation/mutation.dart';

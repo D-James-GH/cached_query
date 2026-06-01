@@ -9,4 +9,5 @@ export 'src/mutation_consumer.dart';
 export 'src/mutation_listener.dart';
 export 'src/query_builder.dart';
 export 'src/query_consumer.dart';
+export 'src/cached_query_provider.dart';
 export 'src/query_listener.dart';

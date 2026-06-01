@@ -25,6 +25,7 @@ class _ListQueryState extends State<ListQuery> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(splashFactory: InkSplash.splashFactory),
       home: QueryBuilder<InfiniteQueryStatus<String, int>>(
         queryKey: widget.queryKey,
         enabled: enabled,
