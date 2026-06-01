@@ -31,6 +31,7 @@ class TitleValueState extends State<TitleValue> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(splashFactory: InkSplash.splashFactory),
       home: Column(
         children: [
           ElevatedButton(

@@ -29,12 +29,15 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      routes: {
-        PostListScreen.routeName: (_) => const PostListScreen(),
-        JokeScreen.routeName: (_) => JokeScreen(),
-      },
-      title: 'Flutter Demo',
+    return CachedQueryProvider(
+      cache: CachedQuery.instance,
+      child: MaterialApp(
+        routes: {
+          PostListScreen.routeName: (_) => const PostListScreen(),
+          JokeScreen.routeName: (_) => JokeScreen(),
+        },
+        title: 'Flutter Demo',
+      ),
     );
   }
 }
