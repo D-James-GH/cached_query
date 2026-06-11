@@ -1131,4 +1131,52 @@ void main() async {
       expect(retryCounts, containsAllInOrder([0, 1, 2]));
     });
   });
+
+  group("empty infinite query", () {
+    test("createEmptyInfiniteQuery adds an empty query to the cache", () {
+      final cache = CachedQuery.asNewInstance();
+      final empty = createEmptyInfiniteQuery<String, int>(
+        key: "empty-infinite",
+        cache: cache,
+      );
+
+      expect(empty.state.data, isNull);
+      expect(cache.getQuery("empty-infinite"), isNotNull);
+      expect(cache.getQuery("empty-infinite"), same(empty));
+    });
+
+    test("creating the real query swaps in the fetch function", () async {
+      final cache = CachedQuery.asNewInstance()
+        ..config(
+          config: const GlobalQueryConfig(ignoreCacheDuration: true),
+        );
+      final empty = createEmptyInfiniteQuery<String, int>(
+        key: "swap-infinite",
+        cache: cache,
+      );
+
+      var fetchCount = 0;
+      final real = InfiniteQuery<String, int>(
+        key: "swap-infinite",
+        cache: cache,
+        queryFn: (page) async {
+          fetchCount++;
+          return "page-$page";
+        },
+        getNextArg: (data) => data?.args.lastOrNull ?? 0,
+        config: const QueryConfig(
+          staleDuration: Duration.zero,
+          ignoreCacheDuration: true,
+        ),
+      );
+
+      await real.fetch();
+
+      // Real fetch function ran instead of the EmptyFetchFunction.
+      expect(fetchCount, 1);
+      expect(real.state.data?.pages.first, "page-0");
+      // Shared controller — the originally watched empty instance sees it too.
+      expect(empty.state.data?.pages.first, "page-0");
+    });
+  });
 }

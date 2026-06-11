@@ -9,6 +9,18 @@ Widget _wrap({required CachedQuery cache, required Widget child}) {
   );
 }
 
+Widget _wrapWithKey({
+  required Key key,
+  required CachedQuery cache,
+  required Widget child,
+}) {
+  return CachedQueryProvider(
+    key: key,
+    cache: cache,
+    child: MaterialApp(home: child),
+  );
+}
+
 class _WatchWidget extends StatelessWidget {
   final Query<String> query;
   final bool enabled;
@@ -46,6 +58,19 @@ class _WatchByKeyWidget extends StatelessWidget {
     final state = context.watchQuery<String>(key: queryKey);
     if (state.data == null) return const SizedBox(key: Key('empty'));
     return Text(state.data!, key: const Key('data'));
+  }
+}
+
+class _WatchInfiniteByKeyWidget extends StatelessWidget {
+  final Object queryKey;
+
+  const _WatchInfiniteByKeyWidget({required this.queryKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final state = context.watchInfiniteQuery<String, int>(key: queryKey);
+    if (state.data == null) return const SizedBox(key: Key('empty'));
+    return Text(state.data!.pages.first, key: const Key('data'));
   }
 }
 
@@ -335,6 +360,112 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(query.hasListener, isFalse);
+    });
+
+    testWidgets('key-only lookup creates empty infinite query if missing',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          cache: cache,
+          child: const _WatchInfiniteByKeyWidget(queryKey: 'missing'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      // Empty infinite query created — stays empty (no queryFn).
+      expect(find.byKey(const Key('empty')), findsOneWidget);
+      expect(cache.getQuery('missing'), isNotNull);
+    });
+
+    testWidgets(
+        'swapping fetch fn: watch empty by key, then create + fetch real query',
+        (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          cache: cache,
+          child: const _WatchInfiniteByKeyWidget(queryKey: 'infinite'),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('empty')), findsOneWidget);
+
+      // Package user creates the real query and triggers the fetch.
+      final query = InfiniteQuery<String, int>(
+        cache: cache,
+        key: 'infinite',
+        queryFn: (page) async => 'page-$page',
+        getNextArg: (data) => data?.args.lastOrNull ?? 0,
+        config: const QueryConfig(
+          staleDuration: Duration.zero,
+          ignoreCacheDuration: true,
+        ),
+      );
+      await query.fetch();
+      await tester.pumpAndSettle();
+
+      // Swapped fetch fn drove the shared controller; the watching widget,
+      // already subscribed to the empty instance's stream, rebuilt with data.
+      expect(find.text('page-0'), findsOneWidget);
+    });
+  });
+
+  group('CachedQueryProvider cache swap', () {
+    late CachedQuery cacheA;
+    late CachedQuery cacheB;
+
+    setUp(() {
+      cacheA = CachedQuery.asNewInstance()
+        ..config(config: const GlobalQueryConfig(ignoreCacheDuration: true));
+      cacheB = CachedQuery.asNewInstance()
+        ..config(config: const GlobalQueryConfig(ignoreCacheDuration: true));
+    });
+
+    tearDown(() async {
+      await cacheA.dispose();
+      await cacheB.dispose();
+    });
+
+    testWidgets('swapping cache rebuilds watcher and resolves from new cache',
+        (tester) async {
+      Query<String>(
+        cache: cacheA,
+        key: 'shared',
+        queryFn: () async => 'from-a',
+        config: const QueryConfig(
+          staleDuration: Duration.zero,
+          ignoreCacheDuration: true,
+        ),
+      );
+      Query<String>(
+        cache: cacheB,
+        key: 'shared',
+        queryFn: () async => 'from-b',
+        config: const QueryConfig(
+          staleDuration: Duration.zero,
+          ignoreCacheDuration: true,
+        ),
+      );
+
+      final providerKey = GlobalKey();
+
+      await tester.pumpWidget(
+        _wrapWithKey(
+          key: providerKey,
+          cache: cacheA,
+          child: _WatchByKeyWidget(queryKey: 'shared', cache: cacheA),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('from-a'), findsOneWidget);
+
+      await tester.pumpWidget(
+        _wrapWithKey(
+          key: providerKey,
+          cache: cacheB,
+          child: _WatchByKeyWidget(queryKey: 'shared', cache: cacheB),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('from-b'), findsOneWidget);
     });
   });
 }

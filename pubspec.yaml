@@ -11,6 +11,7 @@ workspace:
   - packages/cached_storage
   - packages/devtools_extension
   - examples/full
+  - examples/build_extensions
   - examples/full_with_bloc
   - examples/infinite_list
   - examples/infinite_list_with_bloc

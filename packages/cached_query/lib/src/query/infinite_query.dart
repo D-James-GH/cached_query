@@ -9,6 +9,39 @@ typedef InfiniteQueryFunc<T, A> = Future<T> Function(A pageArgs);
 /// [InfiniteQueryStatus.hasNextPage] to equal `false`.
 typedef GetNextArg<T, Arg> = Arg? Function(InfiniteQueryData<T, Arg>? state);
 
+/// Creates an empty [InfiniteQuery] without a query function.
+///
+/// Used by `watchInfiniteQuery` when looking up by key and no query exists yet.
+/// The [EmptyFetchFunction] (and placeholder [GetNextArg]) are swapped for real
+/// ones when the matching [InfiniteQuery] is later created with the same key.
+InfiniteQuery<T, Arg> createEmptyInfiniteQuery<T, Arg>({
+  required Object key,
+  required CachedQuery cache,
+}) {
+  final encodedKey = encodeKey(key);
+
+  var config = QueryConfig<InfiniteQueryData<T, Arg>>();
+  config = config.mergeWithGlobal(cache.defaultConfig);
+
+  final controller = QueryController<InfiniteQueryData<T, Arg>>(
+    cache: cache,
+    key: encodedKey,
+    unencodedKey: key,
+    initialData: Option.none(),
+    onFetch: EmptyFetchFunction(),
+    config: config,
+  );
+
+  final query = InfiniteQuery<T, Arg>._internal(
+    controller: controller,
+    config: config,
+    getNextArg: (_) => null,
+    getPrevArg: null,
+  );
+  cache.addQuery(query);
+  return query;
+}
+
 /// {@template infiniteQuery}
 ///
 /// [InfiniteQuery] caches a series of [Query]'s for use in an infinite list.
@@ -149,9 +182,13 @@ final class InfiniteQuery<T, Arg>
     _stateSubject = BehaviorSubject.seeded(
       state,
       onListen: () {
-        controller
-          ..registerQuery(this)
-          ..fetch(options: InfiniteFetchOptions());
+        controller.registerQuery(this);
+
+        if (controller.onFetch case EmptyFetchFunction()) {
+          return;
+        }
+
+        controller.fetch(options: InfiniteFetchOptions());
       },
       onCancel: () {
         controller.removeRegisteredQuery(this);
