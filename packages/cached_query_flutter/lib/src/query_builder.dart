@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cached_query/cached_query.dart';
+import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 
 /// {@template queryBuilderCallback}
@@ -70,16 +71,19 @@ class _QueryBuilderState<T extends QueryState<dynamic>>
     extends State<QueryBuilder<T>> {
   late Cacheable<T> _query;
   late T _state;
-  late final CachedQuery _cache;
+  CachedQuery? _cache;
 
   StreamSubscription<QueryState<dynamic>>? _subscription;
 
   @override
-  void initState() {
-    super.initState();
-    _cache = widget.cache ?? CachedQuery.instance;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newCache =
+        widget.cache ?? context.readCache() ?? CachedQuery.instance;
+    if (newCache == _cache) return;
+    _cache = newCache;
     if (widget.queryKey != null) {
-      final q = _cache.getQuery(widget.queryKey!) as Cacheable<T>?;
+      final q = _cache!.getQuery(widget.queryKey!) as Cacheable<T>?;
       assert(
         q != null,
         "No query found with the key ${widget.queryKey}, have you created it yet?",
@@ -89,16 +93,16 @@ class _QueryBuilderState<T extends QueryState<dynamic>>
     if (widget.query != null) {
       _query = widget.query!;
     }
+    _unsubscribe();
     _subscribe();
-
     _state = _query.state;
   }
 
   @override
   void didUpdateWidget(covariant QueryBuilder<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final oldQuery = oldWidget.query ?? _cache.getQuery(oldWidget.queryKey!);
-    final currentQuery = widget.query ?? _cache.getQuery(widget.queryKey!);
+    final oldQuery = oldWidget.query ?? _cache!.getQuery(oldWidget.queryKey!);
+    final currentQuery = widget.query ?? _cache!.getQuery(widget.queryKey!);
     assert(
       currentQuery is Cacheable<T>,
       "Query found is not of type $T",

@@ -1,0 +1,136 @@
+import 'dart:convert';
+
+import 'package:cached_query_flutter/cached_query_flutter.dart';
+import 'package:build_extensions/posts/post_model/post_model.dart';
+import 'package:http/http.dart' as http;
+
+InfiniteQuery<List<PostModel>, int> getPosts() {
+  return InfiniteQuery(
+    key: 'posts',
+    config: QueryConfig(
+      storageDuration: const Duration(seconds: 60),
+      storeQuery: true,
+      staleDuration: const Duration(seconds: 5),
+      shouldFetch: (key, data, createdAt) => true,
+      storageDeserializer: (json) {
+        return InfiniteQueryData.fromJson(
+          json,
+          pagesConverter: (pages) => pages
+              .map(
+                (page) => PostModel.listFromJson(page as List<dynamic>),
+              )
+              .toList(),
+          argsConverter: (args) => args.cast<int>(),
+        );
+      },
+    ),
+    onError: print,
+    getNextArg: (state) {
+      // initial arg
+      if (state == null || state.args.isEmpty) return 5;
+
+      final lastArg = state.args.last;
+      return lastArg + 1;
+    },
+    getPrevArg: (state) {
+      final firstArg = state?.args.firstOrNull;
+      if (firstArg == null || firstArg <= 1) return null;
+      return firstArg - 1;
+    },
+    queryFn: (arg) async {
+      final skip = (arg - 1) * 10;
+      final uri = Uri.parse(
+        'https://dummyjson.com/posts?limit=10&skip=$skip',
+      );
+      final res = await http.get(uri);
+
+      // if (Random().nextInt(1000) % 8 == 0) {
+      //   throw "A random error has occurred ⚠️";
+      // }
+
+      return Future.delayed(
+        const Duration(seconds: 1),
+        () => PostModel.listFromJson(
+          List<Map<String, dynamic>>.from(
+            (jsonDecode(res.body) as Map<String, dynamic>)['posts']
+                as List<dynamic>,
+          ),
+        ),
+      );
+      // final faker = Faker();
+      // return Future.delayed(
+      //   const Duration(seconds: 1),
+      //   () => List.generate(
+      //     10,
+      //     (i) => PostModel(
+      //       id: arg + i,
+      //       title: faker.lorem.words(5).join(" "),
+      //       body: faker.lorem.sentences(3).join(" "),
+      //       userId: arg + i,
+      //     ),
+      //   ),
+      // );
+    },
+  );
+}
+
+Query<PostModel> getPostById(int id) => Query(
+      key: "posts/$id",
+      queryFn: () async {
+        final uri = Uri.parse(
+          'https://dummyjson.com/posts/$id',
+        );
+        final res = await http.get(uri);
+        return PostModel.fromJson(
+          jsonDecode(res.body) as Map<String, dynamic>,
+        );
+      },
+    );
+
+Mutation<PostModel, PostModel> createPost() {
+  return Mutation<PostModel, PostModel>(
+    key: "createPost",
+    invalidateQueries: ['posts'],
+    mutationFn: (post) async {
+      final res = await Future.delayed(
+        const Duration(milliseconds: 400),
+        () => {
+          "id": 123,
+          "title": post.title,
+          "userId": post.userId,
+          "body": post.body,
+        },
+      );
+      return PostModel.fromJson(res);
+    },
+    onStartMutation: (newPost) {
+      final query = CachedQuery.instance
+          .getQuery<InfiniteQuery<List<PostModel>, int>>("posts");
+
+      final fallback = query?.state.data;
+
+      query?.update(
+        (old) {
+          return InfiniteQueryData(
+            args: old?.args ?? [],
+            pages: [
+              [newPost, ...?old?.pages.first],
+              ...?old?.pages.sublist(1),
+            ],
+          );
+        },
+      );
+
+      return fallback;
+    },
+    onError: (arg, error, fallback) {
+      if (fallback != null) {
+        CachedQuery.instance
+            .getQuery<InfiniteQuery<List<PostModel>, int>>("posts")
+            ?.update(
+              (old) => fallback as InfiniteQueryData<List<PostModel>, int>,
+            );
+      }
+    },
+  );
+}

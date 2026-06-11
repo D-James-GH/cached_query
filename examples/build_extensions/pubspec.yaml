@@ -1,0 +1,39 @@
+name: build_extensions
+description: A new Flutter project.
+
+# Prevent accidental publishing to pub.dev.
+publish_to: "none"
+
+version: 1.0.0+1
+
+resolution: workspace
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.1.0
+  meta: ^1.9.1
+  json_annotation: ^4.8.1
+  connectivity_plus: ^7.0.0
+
+  freezed_annotation: ^3.1.0
+  cached_query_flutter: any
+  faker: ^2.2.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  build_runner: ^2.4.6
+  freezed: ^3.2.3
+  json_serializable: ^6.7.1
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    # Add assets from the images directory to the application.
+    - assets/images/

@@ -145,9 +145,13 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     _stateSubject = BehaviorSubject.seeded(
       state,
       onListen: () {
-        controller
-          ..registerQuery(this)
-          ..fetch();
+        controller.registerQuery(this);
+
+        if (controller.onFetch case EmptyFetchFunction()) {
+          return;
+        }
+
+        controller.fetch();
       },
       onCancel: () {
         controller.removeRegisteredQuery(this);
