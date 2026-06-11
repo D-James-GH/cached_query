@@ -29,17 +29,17 @@ class CachedQueryProvider extends StatefulWidget {
   /// The [CachedQuery] instance used for key-based query lookups.
   ///
   /// Defaults to [CachedQuery.instance] when omitted.
-  final CachedQuery? cache;
+  final CachedQuery cache;
 
   /// The widget below this widget in the tree.
   final Widget child;
 
   /// {@macro cachedQueryProvider}
-  const CachedQueryProvider({
+  CachedQueryProvider({
     super.key,
-    this.cache,
+    CachedQuery? cache,
     required this.child,
-  });
+  }) : cache = cache ?? CachedQuery.instance;
 
   @override
   State<CachedQueryProvider> createState() => _CachedQueryProviderState();
@@ -67,6 +67,9 @@ class _ElementWatcher {
 class _CachedQueryProviderState extends State<CachedQueryProvider> {
   final Map<String, _QueryEntry> _subscriptions = {};
 
+  final Map<Element, Set<String>> _pendingKeys = {};
+  bool _frameCallbackScheduled = false;
+
   @override
   Widget build(BuildContext context) {
     return _CachedQueryScope(
@@ -76,11 +79,29 @@ class _CachedQueryProviderState extends State<CachedQueryProvider> {
   }
 
   @override
+  void didUpdateWidget(CachedQueryProvider oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.cache != oldWidget.cache) {
+      for (final entry in _subscriptions.values) {
+        for (final element in entry.watchers.keys) {
+          if (element.mounted) element.markNeedsBuild();
+        }
+      }
+      for (final entry in _subscriptions.values) {
+        entry.subscription.cancel();
+      }
+      _subscriptions.clear();
+      _pendingKeys.clear();
+    }
+  }
+
+  @override
   void dispose() {
     for (final entry in _subscriptions.values) {
       entry.subscription.cancel();
     }
     _subscriptions.clear();
+    _pendingKeys.clear();
     super.dispose();
   }
 
@@ -97,6 +118,15 @@ class _CachedQueryProviderState extends State<CachedQueryProvider> {
       return;
     }
 
+    _pendingKeys.putIfAbsent(element, () => {}).add(key);
+    if (!_frameCallbackScheduled) {
+      _frameCallbackScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _frameCallbackScheduled = false;
+        _sweepDroppedKeys();
+      });
+    }
+
     if (!_subscriptions.containsKey(key)) {
       _subscriptions[key] = _QueryEntry(
         subscription: query.stream.listen((newState) {
@@ -105,10 +135,26 @@ class _CachedQueryProviderState extends State<CachedQueryProvider> {
       );
     }
 
+    final existing = _subscriptions[key]!.watchers[element];
     _subscriptions[key]!.watchers[element] = _ElementWatcher(
-      lastState: query.state,
+      lastState: existing?.lastState ?? query.state,
       buildWhen: buildWhen,
     );
+  }
+
+  void _sweepDroppedKeys() {
+    for (final MapEntry(:key, :value) in _pendingKeys.entries) {
+      final element = key;
+      final newKeys = value;
+      final currentKeys = _subscriptions.entries
+          .where((e) => e.value.watchers.containsKey(element))
+          .map((e) => e.key)
+          .toSet();
+      for (final dropped in currentKeys.difference(newKeys)) {
+        _decrementWatcher(element, dropped);
+      }
+    }
+    _pendingKeys.clear();
   }
 
   void _decrementWatcher(Element element, String key) {
@@ -135,7 +181,7 @@ class _CachedQueryProviderState extends State<CachedQueryProvider> {
       }
       if (shouldRebuild) {
         watcher.lastState = newState;
-        element.markNeedsBuild();
+        if (element.mounted) element.markNeedsBuild();
       }
     }
   }
@@ -171,6 +217,7 @@ class _CachedQueryScopeElement extends InheritedModelElement<String> {
     final deps = getDependencies(dependent);
     if (deps is Set<String>) {
       final scope = widget as _CachedQueryScope;
+      scope.providerState._pendingKeys.remove(dependent);
       for (final key in deps) {
         scope.providerState._decrementWatcher(dependent, key);
       }
@@ -219,7 +266,7 @@ extension QueryWatchContext on BuildContext {
     if (query != null) {
       resolved = query;
     } else {
-      final cache = providerState.widget.cache ?? CachedQuery.instance;
+      final cache = providerState.widget.cache;
       final found = cache.getQuery<Query<T>>(key!);
       resolved = found ?? createEmptyQuery<T>(key: key, cache: cache);
     }
@@ -243,8 +290,10 @@ extension QueryWatchContext on BuildContext {
 
   /// Watch an [InfiniteQuery] and rebuild when its state changes.
   ///
-  /// Provide either [query] or [key] — one is required. When using [key], the
-  /// [InfiniteQuery] must already exist in the cache.
+  /// Provide either [query] or [key] — one is required.
+  ///
+  /// When [key] is provided and no matching query exists in the cache, an empty
+  /// infinite query is created automatically (same behaviour as [watchQuery]).
   ///
   /// Set [enabled] to `false` to return a state snapshot without subscribing.
   InfiniteQueryStatus<T, Arg> watchInfiniteQuery<T, Arg>({
@@ -272,14 +321,10 @@ extension QueryWatchContext on BuildContext {
     if (query != null) {
       resolved = query;
     } else {
-      final cache = providerState.widget.cache ?? CachedQuery.instance;
+      final cache = providerState.widget.cache;
       final found = cache.getQuery<InfiniteQuery<T, Arg>>(key!);
-      assert(
-        found != null,
-        'No InfiniteQuery found with key $key. '
-        'Create the InfiniteQuery before watching it by key.',
-      );
-      resolved = found!;
+      resolved =
+          found ?? createEmptyInfiniteQuery<T, Arg>(key: key, cache: cache);
     }
 
     InheritedModel.inheritFrom<_CachedQueryScope>(this, aspect: resolved.key);
@@ -297,5 +342,72 @@ extension QueryWatchContext on BuildContext {
     );
 
     return resolved.state;
+  }
+
+  /// Read a [Query] from the cache without subscribing.
+  ///
+  /// Returns `null` when no matching query exists in the cache.
+  /// Does not register a watcher — widget will not rebuild on state changes.
+  Query<T>? readQuery<T>({
+    Object? key,
+    Query<T>? query,
+  }) {
+    assert(
+      key != null || query != null,
+      'Either key or query must be provided to readQuery.',
+    );
+
+    if (query != null) return query;
+
+    final scopeElement =
+        getElementForInheritedWidgetOfExactType<_CachedQueryScope>();
+    assert(
+      scopeElement != null,
+      'No CachedQueryProvider found in the widget tree. '
+      'Wrap your app with CachedQueryProvider.',
+    );
+    final cache =
+        (scopeElement!.widget as _CachedQueryScope).providerState.widget.cache;
+    return cache.getQuery<Query<T>>(key!);
+  }
+
+  /// Returns the nearest [CachedQuery] instance from the widget tree.
+  ///
+  /// Returns `null` when no [CachedQueryProvider] ancestor exists.
+  CachedQuery? readCache() {
+    final scopeElement =
+        getElementForInheritedWidgetOfExactType<_CachedQueryScope>();
+    if (scopeElement == null) return null;
+    return (scopeElement.widget as _CachedQueryScope)
+        .providerState
+        .widget
+        .cache;
+  }
+
+  /// Read an [InfiniteQuery] from the cache without subscribing.
+  ///
+  /// Returns `null` when no matching query exists in the cache.
+  /// Does not register a watcher — widget will not rebuild on state changes.
+  InfiniteQuery<T, Arg>? readInfiniteQuery<T, Arg>({
+    Object? key,
+    InfiniteQuery<T, Arg>? query,
+  }) {
+    assert(
+      key != null || query != null,
+      'Either key or query must be provided to readInfiniteQuery.',
+    );
+
+    if (query != null) return query;
+
+    final scopeElement =
+        getElementForInheritedWidgetOfExactType<_CachedQueryScope>();
+    assert(
+      scopeElement != null,
+      'No CachedQueryProvider found in the widget tree. '
+      'Wrap your app with CachedQueryProvider.',
+    );
+    final cache =
+        (scopeElement!.widget as _CachedQueryScope).providerState.widget.cache;
+    return cache.getQuery<InfiniteQuery<T, Arg>>(key!);
   }
 }
