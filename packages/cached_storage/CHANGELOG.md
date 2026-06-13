@@ -1,3 +1,7 @@
+## 3.3.0-dev.0
+
+ - **FEAT**: update to melos v7. ([b0295e6e](https://github.com/D-James-GH/cached_query/commit/b0295e6e42e85ec83361eab5d7f1ca235c077254))
+
 ## 3.3.0
 
  - **FEAT**: retrying for queries and infinite queries. ([613db689](https://github.com/D-James-GH/cached_query/commit/613db6898e6bd580c5685f8177bea14ed450f3af))
