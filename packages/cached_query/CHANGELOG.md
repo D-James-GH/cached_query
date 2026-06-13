@@ -1,3 +1,10 @@
+## 3.7.0-dev.0
+
+ - **FEAT**: Add provider and watch extension on build context to automatically create, listen and read a query then re-build a listener widget. ([86772386](https://github.com/D-James-GH/cached_query/commit/86772386ff3140549dd4669eec41b5a8efc151e3))
+ - **FEAT**: add watch query and watch infinite query. ([86d53f45](https://github.com/D-James-GH/cached_query/commit/86d53f450e2fc76f81f49228a7405fcb45d397ad))
+ - **FEAT**: retrying for queries and infinite queries. ([8c93ddf8](https://github.com/D-James-GH/cached_query/commit/8c93ddf858d76cf81bac38832e4e8586212c7825))
+ - **FEAT**: update to melos v7. ([b0295e6e](https://github.com/D-James-GH/cached_query/commit/b0295e6e42e85ec83361eab5d7f1ca235c077254))
+
 ## 3.6.0
 
  - **FEAT**: allowing query cache to be passed to mutation. ([af8bd3ca](https://github.com/D-James-GH/cached_query/commit/af8bd3ca4f0d53155e1f419add3f545b87742f28))
