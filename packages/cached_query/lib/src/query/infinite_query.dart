@@ -226,6 +226,7 @@ final class InfiniteQuery<T, Arg>
   final OnQueryErrorCallback? _onError;
 
   final QueryController<InfiniteQueryData<T, Arg>> _controller;
+  InfiniteQueryStatus<T, Arg>? _revertState;
   late final BehaviorSubject<InfiniteQueryStatus<T, Arg>> _stateSubject;
   final GetNextArg<T, Arg> _getNextArg;
   final GetNextArg<T, Arg>? _getPrevArg;
@@ -284,6 +285,15 @@ final class InfiniteQuery<T, Arg>
   /// Set the current query data.
   void setData(InfiniteQueryData<T, Arg> data) {
     return _controller.setData(data);
+  }
+
+  /// Cancels the current in-flight fetch, if any.
+  ///
+  /// When cancelled, the infinite query reverts to its previous public state
+  /// before the fetch started. For example, if the query was in an error state
+  /// it will return to that error state rather than entering a new one.
+  void cancel([Object? reason]) {
+    _controller.cancel(reason);
   }
 
   @override
@@ -395,6 +405,9 @@ final class InfiniteQuery<T, Arg>
         event is DataEvent<ControllerAction<InfiniteQueryData<T, Arg>>>;
     switch (event.action) {
       case Fetch(:final isInitialFetch, :final fetchOptions, :final retryCount):
+        if (!state.isLoading) {
+          _revertState = state;
+        }
         _setState(
           InfiniteQueryStatus.loading(
             isInitialFetch: isInitialFetch,
@@ -451,6 +464,12 @@ final class InfiniteQuery<T, Arg>
               notifyObservers: notifyObservers,
             );
         }
+      case Cancelled():
+        _setState(
+          _revertState ?? state,
+          notifyObservers: notifyObservers,
+        );
+        _revertState = null;
     }
   }
 }

@@ -79,6 +79,12 @@ class QueryStateNotifier<T> {
           timeCreated: timeCreated,
         );
         break;
+      case Cancelled<T>(:final data, :final timeCreated):
+        _state = ControllerState(
+          data: data,
+          timeCreated: timeCreated,
+        );
+        break;
     }
     _notifyListeners();
   }

@@ -94,6 +94,8 @@ immediately if there are no other listeners attached.
 If a query, infinite query or a mutation throws an error or exception it will be caught and the current state will be
 updated with the error.
 
+See [Cancellation](/docs/guides/cancellation) for manually aborting an in-flight fetch and reverting to the previous state.
+
 ## Side Effects
 
 There are two side effects that can be passed to a query.

@@ -2,13 +2,14 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:cached_storage/cached_storage.dart';
 import 'package:flutter/material.dart';
 
-import 'jokes/joke_screen.dart';
+import 'cancel/cancel_query_screen.dart';
+import 'movies/movie_screen.dart';
 import 'posts/post_list_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   CachedQuery.instance.configFlutter(
-    storage: await CachedStorage.ensureInitialized(),
+    // storage: await CachedStorage.ensureInitialized(),
     config: const GlobalQueryConfig(
       refetchOnResumeMinBackgroundDuration: Duration.zero,
     ),
@@ -31,7 +32,8 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         routes: {
           PostListScreen.routeName: (_) => const PostListScreen(),
-          JokeScreen.routeName: (_) => JokeScreen(),
+          MovieScreen.routeName: (_) => MovieScreen(),
+          CancelQueryScreen.routeName: (_) => const CancelQueryScreen(),
         },
         title: 'Flutter Demo',
       ),

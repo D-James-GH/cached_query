@@ -174,3 +174,7 @@ final query = InfiniteQuery<String>(
 Each infinite query can take a local cache as a prop.
 
 For more information, see [local cache](/docs/guides/query#local-cache).
+
+## Cancellation
+
+Infinite queries support the same [manual cancellation](/docs/guides/cancellation) as standard queries. Call `infiniteQuery.cancel()` or read `CachedQuery.instance.currentCancelToken` inside `queryFn` to abort fetches, including `getNextPage`, `getPreviousPage`, and multi-page refetches.

@@ -76,6 +76,25 @@ void main() {
         expect(notifier.value, equals(initialState));
       });
 
+      test('Cancelled action restores pre-fetch controller state', () {
+        final notifier = QueryStateNotifier<int>();
+        final timeCreated = DateTime(2024);
+        notifier.add(
+          Success<int>(data: Some(42), timeCreated: timeCreated),
+        );
+
+        notifier.add(
+          Cancelled<int>(
+            data: Some(42),
+            timeCreated: timeCreated,
+          ),
+        );
+
+        expect(notifier.value.data, isA<Some<int>>());
+        expect((notifier.value.data as Some<int>).value, equals(42));
+        expect(notifier.value.timeCreated, equals(timeCreated));
+      });
+
       test('FetchError action does not update state', () {
         final notifier = QueryStateNotifier<int>();
         final initialState = notifier.value;

@@ -235,6 +235,15 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     return _controller.setData(data);
   }
 
+  /// Cancels the current in-flight fetch, if any.
+  ///
+  /// When cancelled, the query reverts to its previous public state before the
+  /// fetch started. For example, if the query was in an error state it will
+  /// return to that error state rather than entering a new error.
+  void cancel([Object? reason]) {
+    _controller.cancel(reason);
+  }
+
   @override
   void deleteQuery({bool deleteStorage = false}) {
     _controller.deleteQuery(deleteStorage: deleteStorage);
@@ -250,6 +259,7 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
   final OnQuerySuccessCallback<T>? _onSuccess;
   final OnQueryErrorCallback? _onError;
   final QueryController<T> _controller;
+  QueryStatus<T>? _revertState;
 
   void _setState(QueryStatus<T> state, {required bool notifyObservers}) {
     _state = state;
@@ -299,6 +309,9 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
     final notifyObservers = event is DataEvent<ControllerAction<T>>;
     switch (event.action) {
       case Fetch(:final isInitialFetch, :final retryCount):
+        if (!state.isLoading) {
+          _revertState = state;
+        }
         _setState(
           QueryStatus.loading(
             data: state.data,
@@ -347,6 +360,12 @@ final class Query<T> extends Cacheable<QueryStatus<T>> {
               notifyObservers: notifyObservers,
             );
         }
+      case Cancelled():
+        _setState(
+          _revertState ?? state,
+          notifyObservers: notifyObservers,
+        );
+        _revertState = null;
     }
   }
 }

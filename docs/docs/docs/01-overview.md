@@ -19,6 +19,7 @@ The Cached Query packages are:
 - [ Infinite list caching ](/docs/guides/infinite-query)
 - [Background fetching](/docs/flutter-additions)
 - [Mutations](/docs/guides/mutations)
+- [Manual cancellation](/docs/guides/cancellation) of in-flight fetches
 - [Persistent cache](/docs/storage) (flutter ios/android only, or easily create your own)
 - [Can be used alongside state management options](/examples/with-flutter-bloc) (Bloc, Provider, etc...)
 - [Re-fetch when connection is resumed](/docs/flutter-additions) (flutter only)

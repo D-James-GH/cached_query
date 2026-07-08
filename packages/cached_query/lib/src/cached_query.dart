@@ -122,6 +122,37 @@ class CachedQuery {
     return _queryCache.get<QueryType>(k);
   }
 
+  /// The [CancelToken] for the query currently being fetched, if any.
+  ///
+  /// Returns `null` when called outside of a query function. Use this inside
+  /// a [Query] or [InfiniteQuery] `queryFn` to wire cancellation into an HTTP
+  /// client:
+  ///
+  /// ```dart
+  /// queryFn: () async {
+  ///   final token = CachedQuery.instance.currentCancelToken;
+  ///   // wire token?.whenCancelled into your HTTP client
+  /// },
+  /// ```
+  CancelToken? get currentCancelToken =>
+      Zone.current[cancelTokenZoneKey] as CancelToken?;
+
+  /// Cancels in-flight fetches for the [Query] or [InfiniteQuery] at the
+  /// given [key].
+  ///
+  /// [Mutation] instances are not affected.
+  void cancelQueries({required Object key, Object? reason}) {
+    final query = _queryCache.get(encodeKey(key));
+    switch (query) {
+      case Query():
+        query.cancel(reason);
+      case InfiniteQuery():
+        query.cancel(reason);
+      case null:
+        break;
+    }
+  }
+
   /// Update the data of an [Query] at a given key.
   ///
   /// Optionally use the [filterFn] to update multiple queries at once.

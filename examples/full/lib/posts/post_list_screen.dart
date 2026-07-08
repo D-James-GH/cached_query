@@ -4,9 +4,10 @@ import 'package:cached_query_flutter/cached_query_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:full/posts/post_service.dart' as service;
 import 'package:full/posts/single_post_screen.dart';
+import 'package:shared_models/shared_models.dart';
 
-import '../jokes/joke_screen.dart';
-import 'post_model/post_model.dart';
+import '../cancel/cancel_query_screen.dart';
+import '../movies/movie_screen.dart';
 
 class PostListScreen extends StatefulWidget {
   static const routeName = '/';
@@ -19,7 +20,7 @@ class PostListScreen extends StatefulWidget {
 
 class _PostListScreenState extends State<PostListScreen> {
   final _scrollController = ScrollController();
-  late final InfiniteQuery<List<PostModel>, int> query;
+  late final InfiniteQuery<List<Post>, int> query;
 
   @override
   void initState() {
@@ -32,7 +33,7 @@ class _PostListScreenState extends State<PostListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: QueryBuilder<InfiniteQueryStatus<List<PostModel>, int>>(
+        title: QueryBuilder<InfiniteQueryStatus<List<Post>, int>>(
           queryKey: 'posts',
           builder: (context, state) {
             return Row(
@@ -52,7 +53,7 @@ class _PostListScreenState extends State<PostListScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: () => query.refetch(),
           ),
-          MutationBuilder<PostModel, PostModel>(
+          MutationBuilder<Post, Post>(
             mutation: service.createPost(),
             builder: (context, state, mutate) {
               return Row(
@@ -65,7 +66,7 @@ class _PostListScreenState extends State<PostListScreen> {
                   IconButton(
                     icon: const Icon(Icons.create),
                     onPressed: () => mutate(
-                      const PostModel(
+                      const Post(
                         id: 1234,
                         title: "new post",
                         userId: 1,
@@ -78,9 +79,16 @@ class _PostListScreenState extends State<PostListScreen> {
             },
           ),
           IconButton(
+            icon: const Icon(Icons.stop_circle_outlined),
+            onPressed: () => Navigator.pushNamed(
+              context,
+              CancelQueryScreen.routeName,
+            ),
+          ),
+          IconButton(
             icon: const Icon(Icons.arrow_right_alt),
             onPressed: () =>
-                Navigator.pushReplacementNamed(context, JokeScreen.routeName),
+                Navigator.pushReplacementNamed(context, MovieScreen.routeName),
           ),
         ],
       ),
@@ -122,7 +130,7 @@ class _PostListScreenState extends State<PostListScreen> {
                     ),
                   ),
                 SliverToBoxAdapter(
-                  child: MutationBuilder<PostModel, PostModel>(
+                  child: MutationBuilder<Post, Post>(
                     mutation: service.createPost(),
                     builder: (context, state, _) {
                       if (state.isLoading) {
@@ -213,7 +221,7 @@ class _PostListScreenState extends State<PostListScreen> {
 }
 
 class _Post extends StatelessWidget {
-  final PostModel post;
+  final Post post;
   final int index;
 
   const _Post({required this.post, required this.index});
