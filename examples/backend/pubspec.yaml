@@ -1,0 +1,18 @@
+name: backend
+description: Mock API server for cached_query examples.
+publish_to: none
+
+resolution: workspace
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  shared_models:
+    path: ../shared_models
+  shelf: ^1.4.2
+  shelf_cors_headers: ^0.1.5
+  shelf_router: ^1.1.4
+
+dev_dependencies:
+  lints: ^6.0.0
