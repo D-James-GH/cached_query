@@ -1,7 +1,15 @@
 // ignore_for_file: public_member_api_docs
 
+import 'dart:async';
+
+import 'package:cached_query/src/cancel_token.dart';
 import 'package:cached_query/src/query/_query.dart';
 import 'package:cached_query/src/query_state.dart';
+
+CancelToken? _currentCancelToken() =>
+    Zone.current[cancelTokenZoneKey] as CancelToken?;
+
+void _throwIfCancelled() => _currentCancelToken()?.throwIfCancelled();
 
 /// The fetch direction of an infinite query.
 enum InfiniteQueryDirection {
@@ -133,6 +141,7 @@ class InfiniteFetch<T, Arg>
       );
       var i = 0;
       do {
+        _throwIfCancelled();
         final arg = i == 0
             ? currentPageParams.firstOrNull ?? initialArg
             : getNextArg(result);
@@ -141,6 +150,7 @@ class InfiniteFetch<T, Arg>
         }
 
         final res = await queryFn(arg);
+        _throwIfCancelled();
         result = InfiniteQueryData(
           pages: [...result.pages, res],
           args: [...result.args, arg],
@@ -162,12 +172,14 @@ class InfiniteFetch<T, Arg>
 
     // ======================================================================
 
+    _throwIfCancelled();
     final arg = (direction.isForward ? getNextArg(state) : getPrevArg!(state));
     if (arg == null) {
       return state;
     }
 
     final res = await queryFn(arg);
+    _throwIfCancelled();
 
     return switch (direction) {
       InfiniteQueryDirection.forward => InfiniteQueryData(

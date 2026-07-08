@@ -108,6 +108,7 @@ final class QueryController<T> {
   final CachedQuery _cache;
   Timer? _deleteQueryTimer;
   Future<void>? _f;
+  CancelToken? _activeCancelToken;
 
   Future<void>? get _currentFuture => _f;
 
@@ -115,6 +116,7 @@ final class QueryController<T> {
     _f = future?.whenComplete(() {
       _currentFuture = null;
       _invalidated = false;
+      _activeCancelToken = null;
     });
   }
 
@@ -130,6 +132,11 @@ final class QueryController<T> {
       options: options,
     );
     await _currentFuture;
+  }
+
+  /// Cancels the current in-flight fetch, if any.
+  void cancel([Object? reason]) {
+    _activeCancelToken?.cancel(reason);
   }
 
   /// Update the current query data.
@@ -203,6 +210,9 @@ final class QueryController<T> {
     required bool ignoreStale,
     required FetchOptions options,
   }) async {
+    final previousState = stateNotifier.value;
+    final token = _activeCancelToken = CancelToken();
+
     final shouldFetch = _listeners.every(
       (q) {
         final config = q.config as QueryConfig<T>;
@@ -261,10 +271,22 @@ final class QueryController<T> {
       while (true) {
         if (_disposed) break;
         try {
-          final res = await onFetch(
-            options: options,
-            state: stateNotifier.value.data.valueOrNull,
+          final res = await runZoned(
+            () => onFetch(
+              options: options,
+              state: stateNotifier.value.data.valueOrNull,
+            ),
+            zoneValues: {cancelTokenZoneKey: token},
           );
+          if (token.isCancelled) {
+            stateNotifier.add(
+              Cancelled(
+                data: previousState.data,
+                timeCreated: previousState.timeCreated,
+              ),
+            );
+            break;
+          }
           stateNotifier.add(
             Success(data: Some(res), timeCreated: DateTime.now()),
           );
@@ -272,6 +294,15 @@ final class QueryController<T> {
           scheduleDelete();
           break;
         } catch (e, s) {
+          if (token.isCancelled) {
+            stateNotifier.add(
+              Cancelled(
+                data: previousState.data,
+                timeCreated: previousState.timeCreated,
+              ),
+            );
+            break;
+          }
           final retryConfig = _config.retryConfig;
           final maxRetries = retryConfig?.maxRetries ?? 0;
           final canRetry = attempt < maxRetries &&

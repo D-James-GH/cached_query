@@ -59,3 +59,15 @@ final class Success<T> extends ControllerAction<T> {
   final DateTime timeCreated;
   Success({required this.data, required this.timeCreated});
 }
+
+/// Emitted when an in-flight fetch is cancelled and the controller should
+/// revert to its pre-fetch state.
+final class Cancelled<T> extends ControllerAction<T> {
+  /// The data snapshot from before the fetch started.
+  final Option<T> data;
+
+  /// The [timeCreated] snapshot from before the fetch started.
+  final DateTime timeCreated;
+
+  Cancelled({required this.data, required this.timeCreated});
+}

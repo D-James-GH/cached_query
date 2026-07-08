@@ -275,6 +275,12 @@ The Stored data is used to populate the initial data of a query. It is then upda
 
 Create a custom storage object using your favourite package by extending the `StorageInterface`.
 
+## Cancellation
+
+Queries and infinite queries support manual cancellation of in-flight fetches via `Query.cancel`, `InfiniteQuery.cancel`, and `CachedQuery.cancelQueries`. The `queryFn` signature is unchanged — read `CachedQuery.instance.currentCancelToken` inside the function to wire cancellation into your HTTP client.
+
+See the [Cancellation guide](https://cachedquery.dev/docs/guides/cancellation) for full documentation, including `http` and `dio` integration.
+
 ## Error handling
 
 By default, any errors throw during the `queryFn` are caught by the `Query`. These are then added to the state and sent

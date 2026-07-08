@@ -1,4 +1,5 @@
 export './src/cached_query.dart';
+export 'src/cancel_token.dart';
 export "./src/query/_query.dart"
     hide QueryCache, QueryFetchFunction;
 export "src/connection_controller.dart" show ConnectionStatus;

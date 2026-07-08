@@ -1,0 +1,16 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  language:
+    strict-raw-types: true
+    strict-casts: true
+    strict-inference: true
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+
+linter:
+  rules:
+    always_declare_return_types: true
+    prefer_final_locals: true
+    require_trailing_commas: true

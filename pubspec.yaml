@@ -10,6 +10,8 @@ workspace:
   - packages/cached_query_flutter/example
   - packages/cached_storage
   - packages/devtools_extension
+  - examples/shared_models
+  - examples/backend
   - examples/full
   - examples/build_extensions
   - examples/full_with_bloc
@@ -73,6 +75,9 @@ melos:
       packageFilters:
         dependsOn: build_runner
       description: Build all generated files for Flutter packages in this project.
+    backend:
+      run: dart run examples/backend/bin/server.dart
+      description: Start the examples mock API server.
     test:
       run: |
         melos exec -c 6 --fail-fast -- \
