@@ -371,9 +371,20 @@ final class QueryController<T> {
   void scheduleDelete() {
     if (!isActive) {
       if (!_config.ignoreCacheDuration) {
-        _deleteQueryTimer = Timer(_config.cacheDuration, deleteQuery);
+        // Cancel the pending timer before replacing it. Otherwise it keeps
+        // running unreferenced, [_cancelDelete] can no longer reach it, and it
+        // can delete the query after a listener has registered again.
+        _deleteQueryTimer?.cancel();
+        _deleteQueryTimer = Timer(_config.cacheDuration, _deleteIfInactive);
       }
     }
+  }
+
+  /// Called when a delete timer fires: deletes the query unless it has
+  /// listeners again.
+  void _deleteIfInactive() {
+    if (isActive) return;
+    deleteQuery();
   }
 
   void _cancelDelete() {
@@ -385,7 +396,7 @@ final class QueryController<T> {
   void _resetDeleteTimer() {
     if (_deleteQueryTimer?.isActive ?? false) {
       _deleteQueryTimer!.cancel();
-      _deleteQueryTimer = Timer(_config.cacheDuration, deleteQuery);
+      _deleteQueryTimer = Timer(_config.cacheDuration, _deleteIfInactive);
     }
   }
 
