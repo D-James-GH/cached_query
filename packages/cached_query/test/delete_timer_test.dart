@@ -8,12 +8,7 @@ void main() {
       "a query is not deleted while listened to after a refetch while inactive",
       () {
         fakeAsync((async) {
-          final cache = CachedQuery.asNewInstance()
-            ..config(
-              config: GlobalQueryConfig(
-                cacheDuration: const Duration(minutes: 5),
-              ),
-            );
+          final cache = CachedQuery.asNewInstance();
           var fetches = 0;
           final query = Query<int>(
             key: "leak",
@@ -21,18 +16,14 @@ void main() {
             cache: cache,
           );
 
-          // Listen, then stop listening: a delete timer is armed.
           var sub = query.stream.listen((_) {});
           async.flushMicrotasks();
           sub.cancel();
           async.flushMicrotasks();
 
-          // Refetch while nothing listens. Before the fix this replaced the
-          // pending timer without cancelling it.
           query.refetch();
           async.flushMicrotasks();
 
-          // Listen again and stay subscribed past the cache duration.
           sub = query.stream.listen((_) {});
           async
             ..flushMicrotasks()
@@ -48,12 +39,7 @@ void main() {
 
     test("a query nobody listens to is still deleted after cacheDuration", () {
       fakeAsync((async) {
-        final cache = CachedQuery.asNewInstance()
-          ..config(
-            config: GlobalQueryConfig(
-              cacheDuration: const Duration(minutes: 5),
-            ),
-          );
+        final cache = CachedQuery.asNewInstance();
         final query = Query<int>(
           key: "idle",
           queryFn: () async => 1,
