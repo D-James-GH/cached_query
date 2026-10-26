@@ -8,6 +8,7 @@ analyzer:
     - "README.md"
     - "example/main.dart"
     - "**/*.mocks.dart"
+    - build/**
   language:
     strict-casts: true
     strict-inference: true

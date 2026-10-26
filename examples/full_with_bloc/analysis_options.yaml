@@ -9,6 +9,8 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.gr.dart"
     - "**/*.freezed.dart"
+    - android/**
+    - ios/**
   language:
     strict-raw-types: true
     strict-inference: true
