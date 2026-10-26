@@ -114,7 +114,6 @@ final class QueryController<T> {
   set _currentFuture(Future<void>? future) {
     _f = future?.whenComplete(() {
       _currentFuture = null;
-      _invalidated = false;
     });
   }
 
@@ -265,6 +264,7 @@ final class QueryController<T> {
             options: options,
             state: stateNotifier.value.data.valueOrNull,
           );
+          _invalidated = false;
           stateNotifier.add(
             Success(data: Some(res), timeCreated: DateTime.now()),
           );
