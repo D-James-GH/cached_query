@@ -55,6 +55,23 @@ const config = {
         ],
     ],
 
+    plugins: [
+        [
+            "docusaurus-plugin-llms",
+            {
+                generateMarkdownFiles: true,
+                excludeImports: true,
+                removeDuplicateHeadings: true,
+                includeOrder: [
+                    "docs/01-overview.md",
+                    "docs/02-quick-start.md",
+                    "docs/**",
+                    "examples/**",
+                ],
+            },
+        ],
+    ],
+
     themeConfig:
         /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
         ({
