@@ -10,6 +10,9 @@ analyzer:
     - "**/*.gr.dart"
     - "**/*.freezed.dart"
     - "README.md"
+    - android/**
+    - ios/**
+    - web/**
   language:
     strict-raw-types: true
     strict-casts: true
