@@ -1,3 +1,8 @@
+## 3.7.1
+
+ - **FIX**: keep a query invalidated when its refetch fails ([#102](https://github.com/D-James-GH/cached_query/issues/102)). ([c28c464c](https://github.com/D-James-GH/cached_query/commit/c28c464cb9487bc378ad2ce0b5625f1e336c14f5))
+ - **FIX**: don't leak the delete timer when a query is fetched while inactive ([#101](https://github.com/D-James-GH/cached_query/issues/101)). ([e8d8c53b](https://github.com/D-James-GH/cached_query/commit/e8d8c53b045b36fc982ffebeb3436afa4c5dba81))
+
 ## 3.7.0
 
  - **FEAT**: retrying for queries and infinite queries. ([613db689](https://github.com/D-James-GH/cached_query/commit/613db6898e6bd580c5685f8177bea14ed450f3af))
